@@ -4,36 +4,45 @@ import discord
 
 bot = discord.Client()
 
+def make_correction(author, message):
+    kubes = ["koober nets", "kuber nets", "kubernets", "kubernetes"]
+    for k in kubes:
+        if k in message:
+            return "I think {0} means K8s".format(author)
+    
+    if "bitcoin" in message:
+        return "Magic Beans*"
+
+    return None
+# end def make_correction
+
 
 @bot.event
 async def on_ready():
-	guild_count = 0
+    guild_count = 0
 
-	for guild in bot.guilds:
-		print(f"- {guild.id} (name: {guild.name})")
+    for guild in bot.guilds:
+        print(f"- {guild.id} (name: {guild.name})")
 
-		guild_count = guild_count + 1
+        guild_count = guild_count + 1
 
-	print("SampleDiscordBot is in " + str(guild_count) + " guilds.")
+    print("SampleDiscordBot is in " + str(guild_count) + " guilds.")
 # end def on_ready
 
 
 @bot.event
 async def on_message(message):
+    author = str(message.author).split("#")[0]
+    print(author)
+
     if message.author == bot.user:
         return
 
-    kubes = ["koober nets", "kuber nets", "kubernets", "kubernetes"]
-    for k in kubes:
-        if k in message.content.lower():
-            await message.channel.send("I think you mean K8s")
-    
-    if "bitcoin" in message.content.lower():
-        await message.channel.send("Magic Beans*")
-
-    if "tsla" in message.content.lower():
-        await message.channel.send("TSLA or SCAM?")
+    correction = make_correction(author, message.content.lower())
+    if correction is not None:
+        await message.channel.send(correction)
 # end def on_message
 
 
-bot.run(os.environ["TOKEN"])
+if __name__ == "__main__":
+    bot.run(os.environ["TOKEN"])
