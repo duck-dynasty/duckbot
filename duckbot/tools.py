@@ -3,9 +3,13 @@ def make_correction(author, message):
     for k in kubes:
         if k in message:
             return "I think {0} means K8s".format(author)
-    
+
+    if "k8" in message:
+            return "I think {0} means Kubernetes".format(author)
+
     if "bitcoin" in message:
         return "Magic Beans*"
 
     return None
 # end def make_correction
+
