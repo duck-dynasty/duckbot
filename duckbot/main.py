@@ -1,21 +1,10 @@
 import os
 import tools
+import days
 import dotenv
 import discord
 import datetime
 from discord.ext import commands, tasks
-
-
-days = {
-    "Monday": "the day of the moon",
-    "Tuesday": "Tiw's day",
-    "Wednesday": "Odin's day",
-    "Thursday": "Thor's day",
-    "Friday": "Frigga's day",
-    "Saturday": "Satun's day",
-    "Sunday": "the day of the sun",
-}
-
 
 # Load the token from .env file
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
@@ -53,16 +42,14 @@ async def on_message(message):
 
 
 @tasks.loop(hours=1)
-async def called_once_a_day2():
-    message_channel = bot.get_channel(780860661675720765)
-    
-    now = datetime.datetime.now()
-    if str(now.hour) == "7":
-        day = datetime.datetime.today().strftime('%A')
-        await message_channel.send("Yoooooo, today is {0}! Brother.".format(days[day]))
+async def on_hour():
+    day = days.announce_day_of_week
+    if day is not None:
+        channel = bot.get_channel(780860661675720765)
+        await channel.send(day)
     
     return
-# end def called_once_a_day2
+# end def on_hour
 
 
 if __name__ == "__main__":
