@@ -1,6 +1,7 @@
 
 import datetime
 import random
+import validators
 
 def announce_day_of_week():
     days = {
@@ -16,6 +17,8 @@ def announce_day_of_week():
         "Wednesday": [
             "Odin's day",
             "Wednesday",
+            "It is Wednesday, my dudes",
+            "https://www.youtube.com/watch?v=du-TY1GUFGk",
         ],
         "Thursday": [
             "Thor's day",
@@ -45,7 +48,11 @@ def announce_day_of_week():
     now = datetime.datetime.now()
     if str(now.hour) == "7":
         day = datetime.datetime.today().strftime('%A')
-        return random.choice(templates).format(random.choice(days[day]))
+        message = random.choice(days[day])
+
+        if validators.url(message):
+            return f"A video to start your {day}: {message}"
+        return random.choice(templates).format()
 
     return None
 
