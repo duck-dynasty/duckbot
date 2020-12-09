@@ -1,17 +1,18 @@
 import os
-import tools
 import dotenv
 import discord
 import datetime
+import bitcoin
+import kubernetes
 from discord.ext import commands, tasks
+
 
 # Load the token from .env file
 dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
 dotenv.load_dotenv(dotenv_path)
 
 # Initialize the Discord client
-#bot = discord.Client()
-bot = commands.Bot('.')
+bot = commands.Bot(command_prefix='!')
 
 
 @bot.event
@@ -24,37 +25,16 @@ async def on_ready():
         guild_count = guild_count + 1
 
     print("DuckBot is in " + str(guild_count) + " channels.")
-# end def on_ready
 
 
-@bot.listen()
+"""
+@bot.event
 async def on_message(message):
-    author = str(message.author).split("#")[0]
-    print(author, "1")
-
     if message.author == bot.user:
         return
 
-    correction = tools.get_correction(author, message.content.lower())
-    if correction is not None:
-        await message.channel.send(correction)
+    await bot.process_commands(message)  # so commands will still get called
 # end def on_message
-
-
-"""
-@bot.listen()
-async def on_message(message):
-    author = str(message.author).split("#")[0]
-    print(author, "2")
-
-    if message.author == bot.user:
-        return
-
-    correction = tools.get_correction(author, message.content.lower())
-    if correction is not None:
-        await message.channel.send(correction)
-# end def on_message2
-"""
 
 
 @tasks.loop(hours=1)
@@ -66,7 +46,10 @@ async def on_hour():
     
     return
 # end def on_hour
+"""
 
 
 if __name__ == "__main__":
+    bot.add_cog(bitcoin.Bitcoin(bot))
+    bot.add_cog(kubernetes.Kubernetes(bot))
     bot.run(os.environ["TOKEN"])
