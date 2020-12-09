@@ -1,10 +1,10 @@
 import os
 import dotenv
 import discord
-import datetime
-import bitcoin
-import kubernetes
-from discord.ext import commands, tasks
+from cogs.bitcoin import Bitcoin
+from cogs.kubernetes import Kubernetes
+from cogs.announce_day import AnnounceDay
+from discord.ext import commands
 
 
 # Load the token from .env file
@@ -22,12 +22,14 @@ async def on_ready():
     for guild in bot.guilds:
         print(f"- {guild.id} (name: {guild.name})")
 
+        """for channel in guild.channels:
+            print(channel.name, channel.id)"""
+
         guild_count = guild_count + 1
 
-    print("DuckBot is in " + str(guild_count) + " channels.")
+    print("DuckBot is in " + str(guild_count) + " guilds.")
 
 
-"""
 @bot.event
 async def on_message(message):
     if message.author == bot.user:
@@ -37,19 +39,9 @@ async def on_message(message):
 # end def on_message
 
 
-@tasks.loop(hours=1)
-async def on_hour():
-    day = tools.get_day_of_week()
-    if day is not None:
-        channel = bot.get_channel(780860661675720765)
-        await channel.send(day)
-    
-    return
-# end def on_hour
-"""
-
-
 if __name__ == "__main__":
-    bot.add_cog(bitcoin.Bitcoin(bot))
-    bot.add_cog(kubernetes.Kubernetes(bot))
+    bot.add_cog(Bitcoin(bot))
+    bot.add_cog(Kubernetes(bot))
+    bot.add_cog(AnnounceDay(bot))
+
     bot.run(os.environ["TOKEN"])
