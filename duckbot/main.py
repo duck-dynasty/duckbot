@@ -22,8 +22,11 @@ async def on_ready():
     for guild in bot.guilds:
         print(f"- {guild.id} (name: {guild.name})")
 
-        """for channel in guild.channels:
-            print(channel.name, channel.id)"""
+        for channel in guild.channels:
+            #print(channel.name, channel.id, channel.type)
+            if str(channel.name) == "general":
+                channel = bot.get_channel(channel.id)
+                await channel.send("Have no fear! DuckBot is here!")
 
         guild_count = guild_count + 1
 
