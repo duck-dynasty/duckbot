@@ -1,7 +1,8 @@
 import pytest
 import mock
 
-def async_mock(func):
+def patch_async_mock(func):
+    """A decorator to allow @mock.patch to work for async methods"""
     async def async_magic():
         pass
 

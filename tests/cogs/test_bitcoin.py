@@ -1,11 +1,11 @@
 import pytest
 import mock
 import discord
-from async_mock_ext import async_mock
+from async_mock_ext import patch_async_mock
 from duckbot.cogs.bitcoin import Bitcoin
 
 @pytest.mark.asyncio
-@async_mock
+@patch_async_mock
 @mock.patch('discord.Message')
 @mock.patch('discord.ext.commands.Bot')
 async def test_correct_bitcoin_bot_author(message, bot):
@@ -17,7 +17,7 @@ async def test_correct_bitcoin_bot_author(message, bot):
     message.channel.send.assert_not_called()
 
 @pytest.mark.asyncio
-@async_mock
+@patch_async_mock
 @mock.patch('discord.Message')
 @mock.patch('discord.ext.commands.Bot')
 async def test_correct_bitcoin_message_is_bitcoin(message, bot):
@@ -30,7 +30,7 @@ async def test_correct_bitcoin_message_is_bitcoin(message, bot):
     message.channel.send.assert_called_once_with("Magic Beans*")
 
 @pytest.mark.asyncio
-@async_mock
+@patch_async_mock
 @mock.patch('discord.Message')
 @mock.patch('discord.ext.commands.Bot')
 async def test_correct_bitcoin_message_contains_bitcoin(message, bot):
