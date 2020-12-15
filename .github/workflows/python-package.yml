@@ -33,4 +33,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag duckbot:$(date +%s)
+      run: |
+      echo "${{ secrets.DISCORD_TOKEN }}" > .env
+      docker build . --file Dockerfile --tag duckbot:$(date +%s)
