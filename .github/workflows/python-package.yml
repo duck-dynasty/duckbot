@@ -10,29 +10,32 @@ on:
 jobs:
   test:
     runs-on: self-hosted
-    strategy:
-      matrix:
-        python-version: ['3.7']
     steps:
     - uses: actions/checkout@v2
     - name: Install dependencies
       run: |
-        pip3 install -r requirements.txt
-    - name: Lint with flake8
-      run: |
-        pip3 install flake8
-        # stop the build if there are Python syntax errors or undefined names
-        python3 -m flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        python3 -m flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        python3.8 -m pip install -r requirements.txt
     - name: Test with pytest
       run: |
-        python3 -m pytest -s
+        python3.8 -m pytest -s
   build:
+    needs: test
+    runs-on: self-hosted
+    steps:
+    - uses: actions/checkout@v2
+    - name: Lint with flake8
+      run: |
+        python3.8 pip3 install flake8
+        # stop the build if there are Python syntax errors or undefined names
+        python3.8 -m flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        python3.8 -m flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+  deploy:
+    needs: build
     runs-on: self-hosted
     steps:
     - uses: actions/checkout@v2
     - name: Push env variables
       run: echo "${{ secrets.DISCORD_TOKEN }}" > .env
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag duckbot:$(date +%s)
+      run: docker build . --file Dockerfile --tag duckbot:${GITHUB_SHA}
