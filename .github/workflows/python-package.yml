@@ -5,17 +5,15 @@ name: Python package
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    branches: [ tom_dev ]
 
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     strategy:
       matrix:
-        python-version: ['3.8']
+        python-version: ['3.7']
 
     steps:
     - uses: actions/checkout@v2
