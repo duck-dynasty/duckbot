@@ -8,13 +8,11 @@ on:
     branches: [ tom_dev ]
 
 jobs:
-  build:
-
+  test:
     runs-on: self-hosted
     strategy:
       matrix:
         python-version: ['3.7']
-
     steps:
     - uses: actions/checkout@v2
     - name: Install dependencies
@@ -30,3 +28,9 @@ jobs:
     - name: Test with pytest
       run: |
         python3 -m pytest -s
+  build:
+    runs-on: self-hosted
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag duckbot:$(date +%s)
