@@ -32,7 +32,7 @@ jobs:
     runs-on: self-hosted
     steps:
     - uses: actions/checkout@v2
+    - name: Push env variables
+      run: echo "${{ secrets.DISCORD_TOKEN }}" > .env
     - name: Build the Docker image
-      run: |
-      echo "${{ secrets.DISCORD_TOKEN }}" > .env
-      docker build . --file Dockerfile --tag duckbot:$(date +%s)
+      run: docker build . --file Dockerfile --tag duckbot:$(date +%s)
