@@ -1,6 +1,7 @@
 import os
 import dotenv
 import discord
+from cogs.duck import Duck
 from cogs.tito import Tito
 from cogs.bitcoin import Bitcoin
 from cogs.kubernetes import Kubernetes
@@ -37,6 +38,7 @@ async def on_message(message):
 
 
 if __name__ == "__main__":
+    bot.add_cog(Duck(bot))
     bot.add_cog(Tito(bot))
     bot.add_cog(Bitcoin(bot))
     bot.add_cog(Kubernetes(bot))
