@@ -1,5 +1,5 @@
 import random
-import cogs.channels as channels
+import duckbot.cogs.channels as channels
 import datetime
 import pytz
 import validators
