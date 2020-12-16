@@ -10,30 +10,43 @@ on:
     branches: [ main ]
 
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ['3.8']
-
+  test:
+    runs-on: self-hosted
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-    - name: Lint with flake8
-      run: |
-        python -m pip install flake8
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        python3.8 -m pip install -r requirements.txt
     - name: Test with pytest
       run: |
-        pytest -s
+        python3.8 -m pytest -s
+  build:
+    needs: test
+    runs-on: self-hosted
+    steps:
+    - uses: actions/checkout@v2
+    - name: Lint with flake8
+      run: |
+        python3.8 -m pip install flake8
+        # stop the build if there are Python syntax errors or undefined names
+        python3.8 -m flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        python3.8 -m flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+  deploy:
+    if: github.event_name == 'push'
+    needs: build
+    runs-on: self-hosted
+    steps:
+    - uses: actions/checkout@v2
+    - name: Push Discord token to env variables
+      run: echo "${{ secrets.DISCORD_TOKEN }}" > .env
+    - name: Add SHORT_SHA env property with commit short sha
+      run: echo "SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
+    - name: Build the Docker Image
+      run: docker build . --file Dockerfile --tag duckbot:${SHORT_SHA}
+    - name: Stop old DuckBot Container
+      run: echo $(docker ps -aq) | grep -q '^$' && echo "No containers are running" || echo $(docker stop $(docker ps -aq))
+    - name: Delete old DuckBot Container
+      run: echo $(docker ps -aq) | grep -q '^$' && echo "No containers are running" || echo $(docker rm $(docker ps -aq))
+    - name: Run new DuckBot Container
+      run: docker run -d duckbot:${SHORT_SHA}
