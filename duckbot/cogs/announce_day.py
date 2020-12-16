@@ -1,6 +1,7 @@
 import random
 import cogs.channels as channels
 import datetime
+import pytz
 import validators
 from discord.ext import commands, tasks
 
@@ -69,12 +70,11 @@ class AnnounceDay(commands.Cog):
 
     @tasks.loop(hours=1.0)
     async def on_hour(self):
-        if datetime.datetime.now().hour == 7:
+        now = datetime.datetime.now(pytz.timezone("US/Eastern"))
+        if now.hour == 7:
             channel = self.bot.get_channel(channels.GENERAL)
             day = self.get_day_of_week()
             await channel.send(day)
-        
-        return
 
     @on_hour.before_loop
     async def before_loop(self):

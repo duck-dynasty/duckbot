@@ -5,3 +5,4 @@ mock
 discord.py
 python-dotenv
 validators
+pytz
