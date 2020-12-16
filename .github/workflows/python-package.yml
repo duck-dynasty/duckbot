@@ -35,13 +35,15 @@ jobs:
     runs-on: self-hosted
     steps:
     - uses: actions/checkout@v2
-    - name: Push env variables
+    - name: Push Discord token to env variables
       run: echo "${{ secrets.DISCORD_TOKEN }}" > .env
+    - name: Add SHORT_SHA env property with commit short sha
+      run: echo "SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
     - name: Build the Docker Image
-      run: docker build . --file Dockerfile --tag duckbot:$(git rev-parse --short HEAD)
+      run: docker build . --file Dockerfile --tag duckbot:${SHORT_SHA}
     - name: Stop old DuckBot Container
       run: docker stop $(docker ps -aq)
     - name: Delete old DuckBot Container
       run: docker rm $(docker ps -aq)
     - name: Run new DuckBot Container
-      run: docker run -d duckbot:$(git rev-parse --short HEAD)
+      run: docker run -d duckbot:${SHORT_SHA}
