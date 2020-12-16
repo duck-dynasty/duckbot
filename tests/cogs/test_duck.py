@@ -22,3 +22,11 @@ async def test_react_duck_random_fails(message, random):
     msg = await clazz.react_duck(message)
     assert msg == None
     message.add_reaction.assert_called_once_with("\U0001F986")
+
+@pytest.mark.asyncio
+@patch_async_mock
+@mock.patch('discord.ext.commands.Context')
+async def test_github(context):
+    clazz = Duck(None)
+    await clazz.github(context)
+    context.send.assert_called_once_with("https://github.com/Chippers255/duckbot")

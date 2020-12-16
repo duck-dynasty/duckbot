@@ -11,3 +11,7 @@ class Duck(commands.Cog):
         """Tiny chance to react with :duck: to any message."""
         if random.random() < 1.0 / 10_000.0:
             await message.add_reaction("\U0001F986")
+    
+    @commands.command(name = "duck")
+    async def github(self, context):
+        await context.send("https://github.com/Chippers255/duckbot")
