@@ -1,6 +1,5 @@
 import pytest
 import mock
-import discord
 from async_mock_ext import patch_async_mock
 from duckbot.cogs.tito import Tito
 
@@ -14,7 +13,7 @@ async def test_react_to_tito_with_yugoslavia_bot_author(message, bot):
     clazz = Tito(bot)
     msg = await clazz.react_to_tito_with_yugoslavia(message)
     assert msg == None
-    message.channel.add_reaction.assert_not_called()
+    message.add_reaction.assert_not_called()
 
 @pytest.mark.asyncio
 @patch_async_mock

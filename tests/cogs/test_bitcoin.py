@@ -1,6 +1,5 @@
 import pytest
 import mock
-import discord
 from async_mock_ext import patch_async_mock
 from duckbot.cogs.bitcoin import Bitcoin
 
