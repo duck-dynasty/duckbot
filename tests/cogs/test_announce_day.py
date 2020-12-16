@@ -19,7 +19,6 @@ async def test_do_announcement_7am_eastern(bot, channel):
         bot.get_channel.assert_called_once_with(channels.GENERAL)
         channel.send.assert_called()
 
-
 @pytest.mark.asyncio
 @patch_async_mock
 @mock.patch('discord.ext.commands.Bot')
