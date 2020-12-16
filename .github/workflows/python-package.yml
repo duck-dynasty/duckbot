@@ -42,8 +42,8 @@ jobs:
     - name: Build the Docker Image
       run: docker build . --file Dockerfile --tag duckbot:${SHORT_SHA}
     - name: Stop old DuckBot Container
-      run: docker stop $(docker ps -aq)
+      run: echo $(docker ps -aq) | grep -q '^$' && echo "No containers are running" || echo $(docker stop $(docker ps -aq))
     - name: Delete old DuckBot Container
-      run: docker rm $(docker ps -aq)
+      run: echo $(docker ps -aq) | grep -q '^$' && echo "No containers are running" || echo $(docker rm $(docker ps -aq))
     - name: Run new DuckBot Container
       run: docker run -d duckbot:${SHORT_SHA}
