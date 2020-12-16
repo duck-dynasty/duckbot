@@ -1,5 +1,5 @@
 import random
-import cogs.channels as channels
+import duckbot.cogs.channels as channels
 import datetime
 import pytz
 import validators
@@ -59,6 +59,10 @@ class AnnounceDay(commands.Cog):
     def cog_unload(self):
         self.on_hour.cancel()
 
+    def should_announce_day(self):
+        now = datetime.datetime.now(pytz.timezone("US/Eastern"))
+        return now.hour == 7
+
     def get_day_of_week(self):
         day = datetime.datetime.today().strftime('%A')
         message = random.choice(days[day])
@@ -68,13 +72,15 @@ class AnnounceDay(commands.Cog):
 
         return random.choice(templates).format(message)
 
-    @tasks.loop(hours=1.0)
-    async def on_hour(self):
-        now = datetime.datetime.now(pytz.timezone("US/Eastern"))
-        if now.hour == 7:
+    async def do_announcement(self):
+        if self.should_announce_day():
             channel = self.bot.get_channel(channels.GENERAL)
             day = self.get_day_of_week()
             await channel.send(day)
+
+    @tasks.loop(hours=1.0)
+    async def on_hour(self):
+        await do_announcement()
 
     @on_hour.before_loop
     async def before_loop(self):
