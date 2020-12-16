@@ -37,5 +37,11 @@ jobs:
     - uses: actions/checkout@v2
     - name: Push env variables
       run: echo "${{ secrets.DISCORD_TOKEN }}" > .env
-    - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag duckbot:${GITHUB_SHA}
+    - name: Build the Docker Image
+      run: docker build . --file Dockerfile --tag duckbot:$(git rev-parse --short HEAD)
+    - name: Stop old DuckBot Container
+      run: docker stop $(docker ps -aq)
+    - name: Delete old DuckBot Container
+      run: docker rm $(docker ps -aq)
+    - name: Run new DuckBot Container
+      run: docker run -d duckbot:$(git rev-parse --short HEAD)
