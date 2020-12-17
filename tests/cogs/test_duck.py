@@ -28,5 +28,5 @@ async def test_react_duck_random_fails(message, random):
 @mock.patch('discord.ext.commands.Context')
 async def test_github(context):
     clazz = Duck(None)
-    await clazz.github(context)
+    await clazz._Duck__github(context)
     context.send.assert_called_once_with("https://github.com/Chippers255/duckbot")
