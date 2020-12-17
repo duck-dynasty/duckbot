@@ -13,5 +13,5 @@ class Duck(commands.Cog):
             await message.add_reaction("\U0001F986")
     
     @commands.command(name = "duck")
-    async def github(self, context):
+    async def github(context):
         await context.send("https://github.com/Chippers255/duckbot")
