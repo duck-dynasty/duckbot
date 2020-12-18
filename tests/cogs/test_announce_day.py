@@ -2,8 +2,8 @@ import pytest
 import mock
 import datetime
 from async_mock_ext import patch_async_mock
-import duckbot.cogs.channels as channels
-from duckbot.cogs.announce_day import AnnounceDay
+import cogs.channels as channels
+from cogs.announce_day import AnnounceDay
 
 @pytest.mark.asyncio
 @patch_async_mock
