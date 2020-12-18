@@ -3,10 +3,8 @@
 and how to deal with it.
 
 ## @commands.command
-Passing `self` as an argument to a command method breaks in tests.
-The decorating function doesn't seem to pass `self` when you call the
-method directly (the bot, presumably, invokes the command through different means).
-
+For some reason, including `self` as a parameter to a command method
+breaks in tests. Without `self`, the bot itself fails.  
 In order to test a `@command` method, delegate all the work to a new
 method and have the `@command` method do nothing else.
 
