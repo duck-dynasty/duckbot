@@ -27,8 +27,7 @@ async def on_ready():
         guild_count = guild_count + 1
 
     print("DuckBot is in " + str(guild_count) + " guilds.")
-        
-    
+
 
 @bot.event
 async def on_message(message):
