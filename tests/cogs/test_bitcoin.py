@@ -1,7 +1,7 @@
 import pytest
 import mock
 from async_mock_ext import patch_async_mock
-from duckbot.cogs.bitcoin import Bitcoin
+from cogs.bitcoin import Bitcoin
 
 @pytest.mark.asyncio
 @patch_async_mock

@@ -2,11 +2,11 @@
 `pytest` kinda sucks. Here's the list of things we've had issues with
 and how to deal with it.
 
-## @commands.command
+## @commands.command, @tasks.loop
 For some reason, including `self` as a parameter to a command method
 breaks in tests. Without `self`, the bot itself fails.  
-In order to test a `@command` method, delegate all the work to a new
-method and have the `@command` method do nothing else.
+In order to test a `@command` or `@loop` method, delegate all the work to a new
+method and have the `@whatever` method do nothing else.
 
 ```python
 # src
