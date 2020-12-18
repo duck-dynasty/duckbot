@@ -72,15 +72,14 @@ class AnnounceDay(commands.Cog):
 
         return random.choice(templates).format(message)
 
-    async def do_announcement(self):
+    @tasks.loop(hours=1.0)
+    async def on_hour(self):
+        await self.on_hour()
+    async def __on_hour(self):
         if self.should_announce_day():
             channel = self.bot.get_channel(channels.GENERAL)
             message = self.get_message()
             await channel.send(message)
-
-    @tasks.loop(hours=1.0)
-    async def on_hour(self):
-        await do_announcement()
 
     @on_hour.before_loop
     async def before_loop(self):
