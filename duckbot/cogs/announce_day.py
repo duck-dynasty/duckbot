@@ -1,5 +1,5 @@
 import random
-import duckbot.cogs.channels as channels
+import cogs.channels as channels
 import datetime
 import pytz
 import validators
@@ -74,7 +74,7 @@ class AnnounceDay(commands.Cog):
 
     @tasks.loop(hours=1.0)
     async def on_hour(self):
-        await self.on_hour()
+        await self.__on_hour()
     async def __on_hour(self):
         if self.should_announce_day():
             channel = self.bot.get_channel(channels.GENERAL)
