@@ -1,42 +1,43 @@
 import random
 import cogs.channels as channels
 import datetime
+import pytz
 import validators
 from discord.ext import commands, tasks
 
 
 days = {
-    "Monday": [
+    0: [
         "the day of the moon",
         "Moonday",
         "Monday",
     ],
-    "Tuesday": [
+    1: [
         "Tiw's day",
         "Tuesday",
         "Dndndndndndndnd"
     ],
-    "Wednesday": [
+    2: [
         "Odin's day",
         "Wednesday",
         "Wednesday, my dudes",
         "https://www.youtube.com/watch?v=du-TY1GUFGk",
     ],
-    "Thursday": [
+    3: [
         "Thor's day",
         "civ day",
         "Thursday",
     ],
-    "Friday": [
+    4: [
         "Frigga's day",
         "Friday, Friday, gotta get down on Friday",
         "Friday",
     ],
-    "Saturday": [
+    5: [
         "Saturn's day",
         "Saturday",
     ],
-    "Sunday": [
+    6: [
         "the day of the sun",
         "Sunday",
     ],
@@ -58,8 +59,12 @@ class AnnounceDay(commands.Cog):
     def cog_unload(self):
         self.on_hour.cancel()
 
-    def get_day_of_week(self):
-        day = datetime.datetime.today().strftime('%A')
+    def should_announce_day(self):
+        now = datetime.datetime.now(pytz.timezone("US/Eastern"))
+        return now.hour == 7
+
+    def get_message(self):
+        day = datetime.datetime.today().weekday()
         message = random.choice(days[day])
 
         if validators.url(message):
@@ -69,12 +74,12 @@ class AnnounceDay(commands.Cog):
 
     @tasks.loop(hours=1.0)
     async def on_hour(self):
-        if datetime.datetime.now().hour == 7:
+        await self.__on_hour()
+    async def __on_hour(self):
+        if self.should_announce_day():
             channel = self.bot.get_channel(channels.GENERAL)
-            day = self.get_day_of_week()
-            await channel.send(day)
-        
-        return
+            message = self.get_message()
+            await channel.send(message)
 
     @on_hour.before_loop
     async def before_loop(self):

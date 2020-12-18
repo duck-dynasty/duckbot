@@ -6,3 +6,4 @@ discord.py
 python-dotenv
 validators
 beautifulsoup4
+pytz
