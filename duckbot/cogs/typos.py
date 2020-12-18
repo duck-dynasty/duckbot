@@ -16,10 +16,8 @@ class Typos(commands.Cog):
     def get_corrections(self):
         request = urllib.request.Request("https://en.wikipedia.org/wiki/Wikipedia:Lists_of_common_misspellings/For_machines")
         html_content = urllib.request.urlopen(request).read()
-        
         soup = BeautifulSoup(html_content, 'html.parser')
         text = soup.findAll("pre")[-1].get_text()
-
         return { l[0]: l[1].split(", ") for l in (x.split("->") for x in text.splitlines()) }
 
     @tasks.loop(hours = 24.0)
