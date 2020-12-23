@@ -1,4 +1,3 @@
-import urllib.parse
 import urllib.request
 from bs4 import BeautifulSoup
 from discord.ext import commands, tasks
@@ -16,6 +15,7 @@ class Typos(commands.Cog):
     def get_wiki_corrections(self):
         request = urllib.request.Request("https://en.wikipedia.org/wiki/Wikipedia:Lists_of_common_misspellings/For_machines")
         html_content = urllib.request.urlopen(request).read()
+        print(html_content)
         soup = BeautifulSoup(html_content, 'html.parser')
         text = soup.findAll("pre")[-1].get_text()
         return { l[0]: l[1].split(", ") for l in (x.split("->") for x in text.splitlines()) }
@@ -23,11 +23,14 @@ class Typos(commands.Cog):
     def __get_custom_corrections(self):
         return {
             "fcuk": ["fuck"],
+            "fcuking": ["fucking"],
             "gud": ["good"],
             "hye": ["hey"],
             "prety": ["pretty"],
             "ta": ["at"],
             "thats": ["that's"],
+            "wut": ["what"],
+            "wat": ["what"],
         }
 
     @tasks.loop(hours = 24.0)
