@@ -44,9 +44,14 @@ days = {
 }
 
 templates = [
+    "Today is {0}.",
+    "Brothers, the day is {0}.",
     "Yoooooo, today is {0}! Brother.",
     "The day is {0}. Prepare yourself.",
     "What if I said to you that in fact, today is not {0}? I'd be lying.",
+    "Rejoice, for today is {0}.",
+    "{0}",
+    "Today is {0}, I hope you have your pants on.",
 ]
 
 
@@ -54,17 +59,18 @@ class AnnounceDay(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.tz = pytz.timezone("US/Eastern")
         self.on_hour.start()
 
     def cog_unload(self):
         self.on_hour.cancel()
 
     def should_announce_day(self):
-        now = datetime.datetime.now(pytz.timezone("US/Eastern"))
+        now = datetime.datetime.now(self.tz)
         return now.hour == 7
 
     def get_message(self):
-        day = datetime.datetime.today().weekday()
+        day = datetime.datetime.now(self.tz).weekday()
         message = random.choice(days[day])
 
         if validators.url(message):
