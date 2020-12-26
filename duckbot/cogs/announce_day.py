@@ -13,7 +13,7 @@ days = {
         "Monday",
     ],
     1: [
-        "Tiw's day",
+        "Tyr's day",
         "Tuesday",
         "Dndndndndndndnd"
     ],
