@@ -20,7 +20,7 @@ async def test_get_wiki_corrections(bot):
 @mock.patch('discord.ext.commands.Bot')
 async def test_correct(bot):
     html = content("poo->oops")
-    with mock.patch('urllib.request.urlopen', return_value=MockResponse(data=html)) as open:
+    with mock.patch('urllib.request.urlopen', return_value=MockResponse(data=html)):
         clazz = Typos(bot, start_tasks = False)
         clazz.corrections = { "poo": ["oops"] }
         correction = clazz.correct("poo")
@@ -31,7 +31,7 @@ async def test_correct(bot):
 @mock.patch('discord.ext.commands.Bot')
 async def test_correct_case_insensitive(bot):
     html = content("poo->oops")
-    with mock.patch('urllib.request.urlopen', return_value=MockResponse(data=html)) as open:
+    with mock.patch('urllib.request.urlopen', return_value=MockResponse(data=html)):
         clazz = Typos(bot, start_tasks = False)
         clazz.corrections = { "poo": ["oops"] }
         correction = clazz.correct("PoO")
