@@ -12,7 +12,7 @@ URLOPEN = "urllib.request.urlopen"
 @mock.patch('discord.ext.commands.Bot')
 async def test_get_wiki_corrections(bot):
     html = content("poo->oops")
-    with mock.patch(URLOPEN, return_value=MockResponse(data=html)) as open:
+    with mock.patch(URLOPEN, return_value=MockResponse(data=html)):
         clazz = Typos(bot, start_tasks = False)
         corrections = clazz.get_wiki_corrections()
         assert corrections == { "poo": ["oops"] }
