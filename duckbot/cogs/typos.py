@@ -4,10 +4,11 @@ from discord.ext import commands, tasks
 
 class Typos(commands.Cog):
 
-    def __init__(self, bot):
+    def __init__(self, bot, start_tasks=True):
         self.bot = bot
         self.corrections = {}
-        self.refresh_corrections.start()
+        if start_tasks:
+            self.refresh_corrections.start()
 
     def cog_unload(self):
         self.refresh_corrections.cancel()
@@ -15,7 +16,6 @@ class Typos(commands.Cog):
     def get_wiki_corrections(self):
         request = urllib.request.Request("https://en.wikipedia.org/wiki/Wikipedia:Lists_of_common_misspellings/For_machines")
         html_content = urllib.request.urlopen(request).read()
-        print(html_content)
         soup = BeautifulSoup(html_content, 'html.parser')
         text = soup.findAll("pre")[-1].get_text()
         return { l[0]: l[1].split(", ") for l in (x.split("->") for x in text.splitlines()) }
@@ -45,7 +45,7 @@ class Typos(commands.Cog):
     @commands.Cog.listener('on_message')
     async def correct_typos(self, message):
         """Try to correct common typos for user's previous message."""
-        if message.content.lower() == "fuck":
+        if message.content.strip().lower() == "fuck":
             prev = await self.__get_previous_message(message)
             if prev is not None:
                 c = self.correct(prev.content)
