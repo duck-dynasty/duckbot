@@ -38,7 +38,7 @@ async def test_correct_case_insensitive(bot):
         assert correction == "oops"
 
 def content(*args):
-    str = "<html><pre>"
+    html = "<html><pre>"
     for a in args:
-        str += a
-    return str + "</pre></html>"
+        html += a
+    return html + "</pre></html>"
