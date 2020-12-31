@@ -57,10 +57,11 @@ templates = [
 
 class AnnounceDay(commands.Cog):
 
-    def __init__(self, bot):
+    def __init__(self, bot, start_tasks=True):
         self.bot = bot
         self.tz = pytz.timezone("US/Eastern")
-        self.on_hour.start()
+        if start_tasks:
+            self.on_hour.start()
 
     def cog_unload(self):
         self.on_hour.cancel()
