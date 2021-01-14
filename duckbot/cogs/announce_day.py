@@ -25,6 +25,7 @@ days = {
     ],
     3: [
         "Thor's day",
+        "Thorsday",
         "civ day",
         "Thursday",
     ],
