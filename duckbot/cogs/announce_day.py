@@ -21,6 +21,8 @@ days = {
         "Odin's day",
         "Wednesday",
         "Wednesday, my dudes",
+        "hump day",
+        "Ness' wedding day",
         "https://www.youtube.com/watch?v=du-TY1GUFGk",
     ],
     3: [
@@ -41,6 +43,7 @@ days = {
     6: [
         "the day of the sun",
         "Sunday",
+        "Sunday, Sunday, Sunday",
     ],
 }
 
