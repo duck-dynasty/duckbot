@@ -7,6 +7,7 @@ from cogs.typos import Typos
 from cogs.bitcoin import Bitcoin
 from cogs.kubernetes import Kubernetes
 from cogs.announce_day import AnnounceDay
+from cogs.thanking_robot import ThankingRobot
 from discord.ext import commands
 
 
@@ -45,5 +46,6 @@ if __name__ == "__main__":
     bot.add_cog(Bitcoin(bot))
     bot.add_cog(Kubernetes(bot))
     bot.add_cog(AnnounceDay(bot))
+    bot.add_cog(ThankingRobot(bot))
 
     bot.run(os.environ["TOKEN"])
