@@ -1,6 +1,3 @@
-import random
-import datetime
-import validators
 from discord.ext import commands
 
 
