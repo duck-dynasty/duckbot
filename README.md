@@ -6,3 +6,25 @@
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Chippers255_duckbot&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=Chippers255_duckbot)
 
 A Discord bot for personal friend group
+
+## Development
+The `scripts/build` directory contains scripts for development.
+
+### Install Dependencies
+Should be run whenever you pull from `upstream/main`.
+```
+. scripts/build/install.sh
+```
+
+### Run Tests and Linter
+Both require the `install` script to have run.
+```
+. scripts/build/test.sh
+. scripts/build/lint.sh
+```
+
+### Run DuckBot
+Requires `duckbut/.env` to be present, and the `TOKEN` environment variable to be set.
+```
+. scripts/duckbot.sh
+```
