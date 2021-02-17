@@ -7,3 +7,6 @@ python-dotenv
 validators
 beautifulsoup4
 pytz
+
+# for linter
+flake8
