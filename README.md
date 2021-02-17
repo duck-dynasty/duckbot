@@ -23,7 +23,7 @@ Should be run whenever you pull from `upstream/main`.
 ```
 
 ### Run DuckBot
-Requires `duckbut/.env` to be present, and the `TOKEN` environment variable to be set.
+Requires `duckbut/.env` to be present, and the `TOKEN` environment variable to be set therein.
 ```
 . scripts/duckbot.sh
 ```
