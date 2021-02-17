@@ -17,7 +17,6 @@ Should be run whenever you pull from `upstream/main`.
 ```
 
 ### Run Tests and Linter
-Both require the `install` script to have run.
 ```
 . scripts/build/test.sh
 . scripts/build/lint.sh
