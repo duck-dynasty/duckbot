@@ -55,6 +55,7 @@ templates = [
     "What if I said to you that in fact, today is not {0}? I'd be lying.",
     "Rejoice, for today is {0}.",
     "{0}",
+    "It {0}.",
     "Today is {0}, I hope you have your pants on.",
     "Gentlemen, it is with great pleasure that I inform you. Today is {0}.",
 ]
