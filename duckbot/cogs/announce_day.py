@@ -96,7 +96,8 @@ templates = [
     "Huh, it's {0}, but it feels more like {1}.",
     "The day of the week according to the Gregorian calendar is {0}.",
     "Beep boop: {0}.",
-    "I take no please in announcing that today is {0}, for I am a robot.",
+    "I take no pleasure in announcing that today is {0}, for I am a robot.",
+    "I take no displeasure in announcing that today is {0}, for I am a robot.",
 ]
 
 
