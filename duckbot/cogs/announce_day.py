@@ -164,7 +164,7 @@ class SpecialDays(holidays.Canada):
         self[datetime.date(year, 3, 9)] = f"Lachlan's Birthday. He is {year-1989} years old. All hail this magnificent and unsurpassed achievement in longevity. Glory be unto him"
         self[datetime.date(year, 3, 14)] = f"Pi Day ({math.pi})"
         self[datetime.date(year, 3, 17)] = "St. Patrick's Day"
-        self[datetime.date(year, 3, 20)] = "Tom and Kelly's real wedding anniversary. They've been real together for {year-2015} years"
+        self[datetime.date(year, 3, 20)] = f"Tom and Kelly's real wedding anniversary. They've been real together for {year-2015} years"
         self[datetime.date(year, 3, 25)] = "The Day the One Ring was cast into the fires of Mt. Doom, bringing about the fall of Sauron"
         self[datetime.date(year, 4, 12)] = "National Grilled Cheese Day"
         self[datetime.date(year, 5, 1) + rd(weekday=SU(+2))] = "Mother's Day"
