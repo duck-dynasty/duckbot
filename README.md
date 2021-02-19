@@ -27,3 +27,18 @@ Requires `duckbut/.env` to be present, and the `TOKEN` environment variable to b
 ```
 . scripts/duckbot.sh
 ```
+
+###Installation Reference can be seen from here:
+
+https://medium.com/better-programming/coding-a-discord-bot-with-python-64da9d6cade7
+
+
+###Please note this works well with Python Versions 3.x or higher
+
+###Ubuntu or MacOS is very much preferred
+
+###In Windows use virtual box to use this
+
+###You don't need to write code for Bot as the DuckBot code is already here
+
+###Token can be generated from https://discord.com/developers/applications/812362721713848330/bot after you create the bot
