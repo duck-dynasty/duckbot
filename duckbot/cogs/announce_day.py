@@ -1,6 +1,6 @@
 import random
-import server.channels as channels
-import server.emojis as emojis
+import cogs.channels as channels
+import cogs.emojis as emojis
 import datetime
 import pytz
 import holidays

@@ -2,7 +2,7 @@ import pytest
 import mock
 import datetime
 from async_mock_ext import patch_async_mock
-import server.channels as channels
+import cogs.channels as channels
 from cogs.announce_day import AnnounceDay
 
 @pytest.mark.asyncio
