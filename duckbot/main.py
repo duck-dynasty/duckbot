@@ -5,6 +5,7 @@ from cogs.duck import Duck
 from cogs.tito import Tito
 from cogs.typos import Typos
 from cogs.bitcoin import Bitcoin
+from cogs.insights import Insights
 from cogs.kubernetes import Kubernetes
 from cogs.announce_day import AnnounceDay
 from cogs.thanking_robot import ThankingRobot
@@ -47,5 +48,6 @@ if __name__ == "__main__":
     bot.add_cog(Kubernetes(bot))
     bot.add_cog(AnnounceDay(bot))
     bot.add_cog(ThankingRobot(bot))
+    bot.add_cog(Insights(bot))
 
     bot.run(os.environ["TOKEN"])
