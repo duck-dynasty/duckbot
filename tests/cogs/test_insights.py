@@ -80,4 +80,3 @@ class Hist:
             return [ self.message ]
         else:
             return []
-    
