@@ -3,7 +3,7 @@ import mock
 import datetime
 from async_mock_ext import patch_async_mock
 from mock_channel_history import ChannelHistory
-import server.channels as channels
+import cogs.channels as channels
 from cogs.insights import Insights
 
 @pytest.mark.asyncio
