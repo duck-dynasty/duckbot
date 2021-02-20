@@ -26,19 +26,13 @@ async def on_ready():
 
     for guild in bot.guilds:
         print(f"- {guild.id} (name: {guild.name})")
+        for channel in guild.channels:
+            print(f"  - channel: {channel.id} (#{channel.name})")
+        for emoji in guild.emojis:
+            print(f"  - emoji: {emoji}")
         guild_count = guild_count + 1
 
-    print("DuckBot is in " + str(guild_count) + " guilds.")
-
-
-@bot.event
-async def on_message(message):
-    if message.author == bot.user:
-        return
-
-    await bot.process_commands(message)  # so commands will still get called
-# end def on_message
-
+    print(f"DuckBot is in {guild_count} guilds.")
 
 if __name__ == "__main__":
     bot.add_cog(Duck(bot))
