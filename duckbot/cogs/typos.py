@@ -1,7 +1,7 @@
 import urllib.request
 from bs4 import BeautifulSoup
 from discord.ext import commands, tasks
-
+from textblob import TextBlob
 class Typos(commands.Cog):
 
     def __init__(self, bot, start_tasks=True):
@@ -48,10 +48,10 @@ class Typos(commands.Cog):
         if message.content.strip().lower() == "fuck":
             prev = await self.__get_previous_message(message)
             if prev is not None:
-                c = self.correct(prev.content)
+                c = self.correct_sentence(prev.content)
                 if c != prev.content:
-                    msg = f"> {c}\nThink I fixed it, {message.author.mention}!"
-                    await message.channel.send(msg)
+                    #msg = f"> {c}\nThink I fixed it, {message.author.mention}!"
+                    await message.channel.send(f"I think I fixed it, {message.author.mention}!.You mean {c}?")
                 else:
                     await message.channel.send(f"There's no need for harsh words, {message.author.mention}.")
 
@@ -79,3 +79,8 @@ class Typos(commands.Cog):
             return None
         else:
             return by_same_author[0]
+    def correct_sentence(self,str):
+        txt = TextBlob(str)
+        corrected_string = txt.correct()
+        return corrected_string
+
