@@ -11,3 +11,6 @@ def patch_async_mock(func):
         mock.MagicMock.__await__ = lambda x: async_magic().__await__()
         await func(*args, **kwargs)
     return async_wrap
+
+async def async_value(value):
+    return value
