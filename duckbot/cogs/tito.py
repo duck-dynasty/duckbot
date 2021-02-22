@@ -19,8 +19,5 @@ class Tito(commands.Cog):
     async def react_to_tito_with_yugoslavia(self, message):
         """Adds reactions for all formally Yugoslavian country flags when :tito: is sent."""
 
-        if message.author == self.bot.user:
-            return
-
         if ":tito:" in message.content:
             await asyncio.wait([message.add_reaction(f) for f in self.flags])
