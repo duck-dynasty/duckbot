@@ -33,6 +33,7 @@ async def on_ready():
 
     print(f"DuckBot is in {guild_count} guilds.")
 
+
 if __name__ == "__main__":
     bot.add_cog(Duck(bot))
     bot.add_cog(Tito(bot))
