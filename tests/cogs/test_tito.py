@@ -6,24 +6,9 @@ from cogs.tito import Tito
 @pytest.mark.asyncio
 @patch_async_mock
 @mock.patch('discord.Message')
-@mock.patch('discord.ext.commands.Bot')
-async def test_react_to_tito_with_yugoslavia_bot_author(message, bot):
-    bot.user = "THEBOT"
-    message.author = bot.user
-    clazz = Tito(bot)
-    msg = await clazz.react_to_tito_with_yugoslavia(message)
-    assert msg == None
-    message.add_reaction.assert_not_called()
-
-@pytest.mark.asyncio
-@patch_async_mock
-@mock.patch('discord.Message')
-@mock.patch('discord.ext.commands.Bot')
-async def test_react_to_tito_with_yugoslavia_message_contains_tito_text(message, bot):
-    bot.user = "but"
-    message.author = "author"
+async def test_react_to_tito_with_yugoslavia_message_contains_tito_text(message):
     message.content = "josip bro :tito:, brother"
-    clazz = Tito(bot)
+    clazz = Tito(None)
     msg = await clazz.react_to_tito_with_yugoslavia(message)
     assert msg == None
     assert_flags_sent(message)
@@ -31,12 +16,9 @@ async def test_react_to_tito_with_yugoslavia_message_contains_tito_text(message,
 @pytest.mark.asyncio
 @patch_async_mock
 @mock.patch('discord.Message')
-@mock.patch('discord.ext.commands.Bot')
-async def test_react_to_tito_with_yugoslavia_message_contains_tito_emoji(message, bot):
-    bot.user = "but"
-    message.author = "author"
+async def test_react_to_tito_with_yugoslavia_message_contains_tito_emoji(message):
     message.content = "josip bro <:tito:780954015285641276>, brother"
-    clazz = Tito(bot)
+    clazz = Tito(None)
     msg = await clazz.react_to_tito_with_yugoslavia(message)
     assert msg == None
     assert_flags_sent(message)
