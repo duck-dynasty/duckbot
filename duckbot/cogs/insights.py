@@ -1,7 +1,7 @@
 import random
 import datetime
 import pytz
-import cogs.channels as channels
+import server.channels as channels
 from discord.ext import commands, tasks
 
 responses = [
