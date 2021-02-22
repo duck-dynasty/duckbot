@@ -7,6 +7,16 @@ from cogs.tito import Tito
 @patch_async_mock
 @mock.patch('discord.Message')
 async def test_react_to_tito_with_yugoslavia_message_contains_tito_text(message):
+    message.content = "josip bro tito, brother"
+    clazz = Tito(None)
+    msg = await clazz.react_to_tito_with_yugoslavia(message)
+    assert msg == None
+    message.add_reaction.assert_not_called()
+
+@pytest.mark.asyncio
+@patch_async_mock
+@mock.patch('discord.Message')
+async def test_react_to_tito_with_yugoslavia_message_contains_tito_text(message):
     message.content = "josip bro :tito:, brother"
     clazz = Tito(None)
     msg = await clazz.react_to_tito_with_yugoslavia(message)
