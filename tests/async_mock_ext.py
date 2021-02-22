@@ -13,4 +13,5 @@ def patch_async_mock(func):
     return async_wrap
 
 async def async_value(value):
+    """A wrapper for methods that return an async value."""
     return value
