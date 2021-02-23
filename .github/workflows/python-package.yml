@@ -11,6 +11,10 @@ on:
 
 jobs:
   test:
+    runs-on: ubuntu-latest
+      strategy:
+        matrix:
+          python-version: [3.8]
     steps:
     - uses: actions/checkout@v2
     - name: Install dependencies
@@ -18,6 +22,10 @@ jobs:
     - name: Test with pytest
       run: . scripts/build/test.sh
   build:
+    runs-on: ubuntu-latest
+        strategy:
+          matrix:
+            python-version: [3.8]
     needs: test
     steps:
     - uses: actions/checkout@v2
