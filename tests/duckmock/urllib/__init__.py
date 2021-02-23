@@ -1,2 +1,8 @@
+import mock
+from .request import MockResponse
 
-from .request import *
+URLOPEN = "urllib.request.urlopen"
+
+
+def patch_urlopen(html):
+    return mock.patch(URLOPEN, return_value=MockResponse(data=html))

@@ -1,6 +1,5 @@
 import os
 import dotenv
-import discord
 from cogs.duck import Duck
 from cogs.tito import Tito
 from cogs.typos import Typos
