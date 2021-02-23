@@ -19,3 +19,10 @@ class Duck(commands.Cog):
 
     async def __github(self, context):
         await context.send("https://github.com/Chippers255/duckbot")
+
+    @commands.command(name="help")
+    async def wiki(self, context):
+        await self.__wiki(context)
+
+    async def __wiki(self, context):
+        await context.send("https://github.com/Chippers255/duckbot/wiki")
