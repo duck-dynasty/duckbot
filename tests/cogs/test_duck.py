@@ -33,3 +33,12 @@ async def test_github(context):
     clazz = Duck(None)
     await clazz._Duck__github(context)
     context.send.assert_called_once_with("https://github.com/Chippers255/duckbot")
+
+
+@pytest.mark.asyncio
+@patch_async_mock
+@mock.patch('discord.ext.commands.Context')
+async def test_wiki(context):
+    clazz = Duck(None)
+    await clazz._Duck__wiki(context)
+    context.send.assert_called_once_with("https://github.com/Chippers255/duckbot/wiki")
