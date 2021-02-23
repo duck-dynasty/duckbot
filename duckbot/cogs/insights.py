@@ -1,6 +1,5 @@
 import random
 import datetime
-import server.channels as channels
 from discord.ext import commands, tasks
 
 responses = [
@@ -27,7 +26,7 @@ class Insights(commands.Cog):
         await self.__check_should_respond()
 
     async def __check_should_respond(self):
-        channel = self.bot.get_channel(channels.GENERAL)
+        channel = self.bot.get_cog("channels").get_general_channel()
         message = await self.__get_last_message(channel)
         if self.should_respond(message):
             response = random.choice(responses)

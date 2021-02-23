@@ -1,6 +1,4 @@
 import random
-import server.channels as channels
-import server.emojis as emojis
 import datetime
 import pytz
 import holidays
@@ -109,7 +107,7 @@ class AnnounceDay(commands.Cog):
     def __init__(self, bot, start_tasks=True):
         self.bot = bot
         self.tz = pytz.timezone("US/Eastern")
-        self.holidays = SpecialDays()
+        self.holidays = SpecialDays(bot)
         if start_tasks:
             self.on_hour.start()
 
@@ -138,7 +136,7 @@ class AnnounceDay(commands.Cog):
 
     async def __on_hour(self):
         if self.should_announce_day():
-            channel = self.bot.get_channel(channels.GENERAL)
+            channel = self.bot.get_cog("channels").get_general_channel()
             message = self.get_message()
             await channel.send(message)
 
@@ -157,6 +155,10 @@ class SpecialDays(holidays.Canada):
     @see https://github.com/dr-prodigy/python-holidays/blob/master/holidays/countries/canada.py
     """
 
+    def __init__(self, bot):
+        holidays.Canada.__init__(self)
+        self.bot = bot
+
     def _populate(self, year):
         holidays.Canada._populate(self, year)
 
@@ -170,7 +172,7 @@ class SpecialDays(holidays.Canada):
         self[datetime.date(year, 3, 25)] = "The Day the One Ring was cast into the fires of Mt. Doom, bringing about the fall of Sauron"
         self[datetime.date(year, 4, 12)] = "National Grilled Cheese Day"
         self[datetime.date(year, 5, 1) + rd(weekday=SU(+2))] = "Mother's Day"
-        self[datetime.date(year, 5, 7)] = f"Bro Tito Day {emojis.TITO}"
+        self[datetime.date(year, 5, 7)] = f"Bro Tito Day {self.bot.get_cog('emojis').get_emoji_by_name('tito')}"
         self[datetime.date(year, 6, 1) + rd(weekday=SU(+3))] = "Father's Day"
         self[datetime.date(year, 6, 21)] = f"Erin's Birthday. She's {year-1991} years old"
         self[datetime.date(year, 9, 8)] = f"Dan's Birthday. He {year-1989} old"
