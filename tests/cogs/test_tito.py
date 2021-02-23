@@ -3,6 +3,7 @@ import mock
 from async_mock_ext import patch_async_mock, async_value
 from cogs.tito import Tito
 
+
 @pytest.mark.asyncio
 @patch_async_mock
 @mock.patch('discord.Message')
@@ -10,8 +11,9 @@ async def test_react_to_tito_with_yugoslavia_no_tito_emoji(message):
     message.content = "josip bro tito, brother"
     clazz = Tito(None)
     msg = await clazz.react_to_tito_with_yugoslavia(message)
-    assert msg == None
+    assert msg is None
     message.add_reaction.assert_not_called()
+
 
 @pytest.mark.asyncio
 @patch_async_mock
@@ -20,8 +22,9 @@ async def test_react_to_tito_with_yugoslavia_message_contains_tito_text(message)
     message.content = "josip bro :tito:, brother"
     clazz = Tito(None)
     msg = await clazz.react_to_tito_with_yugoslavia(message)
-    assert msg == None
+    assert msg is None
     assert_flags_sent(message)
+
 
 @pytest.mark.asyncio
 @patch_async_mock
@@ -30,8 +33,9 @@ async def test_react_to_tito_with_yugoslavia_message_contains_tito_emoji(message
     message.content = "josip bro <:tito:780954015285641276>, brother"
     clazz = Tito(None)
     msg = await clazz.react_to_tito_with_yugoslavia(message)
-    assert msg == None
+    assert msg is None
     assert_flags_sent(message)
+
 
 @pytest.mark.asyncio
 @patch_async_mock
@@ -42,6 +46,7 @@ async def test_react_to_tito_reaction_no_tito_emoji(bot, payload):
     clazz = Tito(bot)
     await clazz.react_to_tito_reaction(payload)
     bot.fetch_channel.assert_not_called()
+
 
 @pytest.mark.asyncio
 @patch_async_mock
@@ -72,4 +77,4 @@ def assert_flags_sent(message):
         mock.call("\U0001F1F7\U0001F1F8"),
         mock.call("\U0001F1F8\U0001F1EE"),
     ]
-    message.add_reaction.assert_has_calls(calls, any_order = True)
+    message.add_reaction.assert_has_calls(calls, any_order=True)

@@ -1,6 +1,5 @@
 import random
 import datetime
-import pytz
 import server.channels as channels
 from discord.ext import commands, tasks
 
@@ -11,6 +10,7 @@ responses = [
     "Thanks for sharing!",
     "You sparked my curiousity.",
 ]
+
 
 class Insights(commands.Cog):
 
@@ -25,6 +25,7 @@ class Insights(commands.Cog):
     @tasks.loop(minutes=139.0)
     async def check_should_respond(self):
         await self.__check_should_respond()
+
     async def __check_should_respond(self):
         channel = self.bot.get_channel(channels.GENERAL)
         message = await self.__get_last_message(channel)
@@ -33,15 +34,15 @@ class Insights(commands.Cog):
             await channel.send(response)
 
     async def __get_last_message(self, channel):
-        message = await channel.history(limit = 1).flatten()
+        message = await channel.history(limit=1).flatten()
         if message:
             return message[0]
         else:
             return None
-    
+
     def should_respond(self, message):
         stamp = datetime.datetime.utcnow() - datetime.timedelta(minutes=23)
-        return message != None and stamp >= message.created_at and message.author.id == 244629273191645184
+        return message is not None and stamp >= message.created_at and message.author.id == 244629273191645184
 
     @check_should_respond.before_loop
     async def before_loop(self):
