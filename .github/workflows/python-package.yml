@@ -12,23 +12,30 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-      strategy:
-        matrix:
-          python-version: [3.8]
     steps:
     - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
     - name: Install dependencies
       run: . scripts/build/install.sh
     - name: Test with pytest
       run: . scripts/build/test.sh
   build:
     runs-on: ubuntu-latest
-        strategy:
-          matrix:
-            python-version: [3.8]
+    strategy:
+      matrix:
+        python-version: [3.8]
     needs: test
     steps:
     - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+    - name: Install dependencies
+      run: . scripts/build/install.sh
     - name: Ensure main interprets
       run: . scripts/build/compile.sh
     - name: Lint with flake8
