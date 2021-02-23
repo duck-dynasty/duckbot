@@ -2,7 +2,7 @@ import pytest
 import mock
 import urllib.request
 from async_mock_ext import patch_async_mock
-from mock_response import MockResponse
+from duckmock.urllib import MockResponse
 from cogs.typos import Typos
 
 URLOPEN = "urllib.request.urlopen"
