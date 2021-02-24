@@ -1,6 +1,6 @@
 import os
+import sys
 import dotenv
-import discord
 from cogs.duck import Duck
 from cogs.tito import Tito
 from cogs.typos import Typos
@@ -12,12 +12,7 @@ from cogs.thanking_robot import ThankingRobot
 from discord.ext import commands
 
 
-# Load the token from .env file
-dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
-dotenv.load_dotenv(dotenv_path)
-
-# Initialize the Discord client
-bot = commands.Bot(command_prefix='!')
+bot = commands.Bot(command_prefix='!', help_command=None)
 
 
 @bot.event
@@ -45,4 +40,8 @@ if __name__ == "__main__":
     bot.add_cog(AnnounceDay(bot))
     bot.add_cog(ThankingRobot(bot))
 
-    bot.run(os.environ["TOKEN"])
+    if "dry-run" not in sys.argv:
+        # load the token from .env file
+        dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+        dotenv.load_dotenv(dotenv_path)
+        bot.run(os.environ["TOKEN"])
