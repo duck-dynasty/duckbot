@@ -9,27 +9,18 @@ from cogs.kubernetes import Kubernetes
 from cogs.announce_day import AnnounceDay
 from cogs.thanking_robot import ThankingRobot
 from discord.ext import commands
-
-
-bot = commands.Bot(command_prefix='!', help_command=None)
-
-
-@bot.event
-async def on_ready():
-    guild_count = 0
-
-    for guild in bot.guilds:
-        print(f"- {guild.id} (name: {guild.name})")
-        for channel in guild.channels:
-            print(f"  - channel: {channel.id} (#{channel.name})")
-        for emoji in guild.emojis:
-            print(f"  - emoji: {emoji}")
-        guild_count = guild_count + 1
-
-    print(f"DuckBot is in {guild_count} guilds.")
+from server.channels import Channels
+from server.emojis import Emojis
 
 
 if __name__ == "__main__":
+    bot = commands.Bot(command_prefix='!', help_command=None)
+
+    # server cogs must be loaded first; any references to
+    # them should happen in or after the `on_ready` event
+    bot.add_cog(Channels(bot))
+    bot.add_cog(Emojis(bot))
+
     bot.add_cog(Duck(bot))
     bot.add_cog(Tito(bot))
     bot.add_cog(Typos(bot))
