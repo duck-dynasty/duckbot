@@ -51,6 +51,7 @@ class Typos(commands.Cog):
                 c = self.correct_sentence(prev.content)
                 if c != prev.content:
                     msg = f"> {c}\nThink I fixed it, {message.author.mention}!"
+                    print(msg)
                     await message.channel.send(msg)
                 else:
                     await message.channel.send(f"There's no need for harsh words, {message.author.mention}.")
