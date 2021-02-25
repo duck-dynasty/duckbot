@@ -50,8 +50,8 @@ class Typos(commands.Cog):
             if prev is not None:
                 c = self.correct_sentence(prev.content)
                 if c != prev.content:
-                    #msg = f"> {c}\nThink I fixed it, {message.author.mention}!"
-                    await message.channel.send(f"I think I fixed it, {message.author.mention}!.You mean {c}?")
+                    msg = f"> {c}\nThink I fixed it, {message.author.mention}!"
+                    await message.channel.send(msg)
                 else:
                     await message.channel.send(f"There's no need for harsh words, {message.author.mention}.")
 
