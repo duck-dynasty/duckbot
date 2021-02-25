@@ -80,6 +80,9 @@ class Typos(commands.Cog):
         else:
             return by_same_author[0]
     def correct_sentence(self,str):
+        ''' New function is used to correct typos
+        '''
+        
         txt = TextBlob(str)
         corrected_string = txt.correct()
         return corrected_string
