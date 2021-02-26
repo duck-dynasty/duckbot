@@ -36,6 +36,10 @@ class Channels(commands.Cog, name="channels"):
         self.channels = channels
         self.guild = gid
 
+    @refresh.before_loop
+    async def before_loop(self):
+        await self.bot.wait_until_ready()
+
     def get_channel_by_name(self, name):
         """Returns the channel with the given name. Throws if it does not exist."""
         return next(channel for channel in self.channels[self.guild].values() if channel.name == name)
