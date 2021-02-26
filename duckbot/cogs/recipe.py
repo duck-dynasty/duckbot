@@ -11,7 +11,7 @@ class Recipe(commands.Cog):
         self.bot = bot
 
     @staticmethod
-    def __search(search_term):
+    def search(search_term):
         """Search recipes parsing the returned html data.
 
         Retrieves a random recipe from allrecipes based on a search term. The
