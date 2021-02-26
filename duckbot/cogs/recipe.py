@@ -46,8 +46,6 @@ class Recipe(commands.Cog):
             return f"This is embarassing. Something went wrong while trying to find a recipe for {search_term}."
         elif len(articles) == 0:
             return f"I am terribly sorry. There doesn't seem to be any recipes for {search_term}."
-        elif len(articles) == 1:
-            article = articles[0]
         else:
             article = random.choice(articles)
         
