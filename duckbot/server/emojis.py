@@ -36,6 +36,10 @@ class Emojis(commands.Cog, name="emojis"):
         self.emojis = emojis
         self.guild = gid
 
+    @refresh.before_loop
+    async def before_loop(self):
+        await self.bot.wait_until_ready()
+
     def get_emoji_by_name(self, name):
         """Returns the emoji with the given name. Throws if it does not exist."""
         return next(emoji for emoji in self.emojis[self.guild].values() if emoji.name == name)
