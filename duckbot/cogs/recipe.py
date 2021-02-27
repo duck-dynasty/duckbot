@@ -28,14 +28,14 @@ class Recipe(commands.Cog):
                 data["name"] = article.find("h3", {"class": "fixed-recipe-card__h3"}).get_text().strip(' \t\n\r')
                 data["description"] = article.find("div", {"class": "fixed-recipe-card__description"}).get_text().strip(' \t\n\r')
                 data["url"] = article.find("a", href=re.compile('^https://www.allrecipes.com/recipe/'))['href']
-                
+
                 try:
                     data["rating"] = float(article.find("div", {"class": "fixed-recipe-card__ratings"}).find("span")["data-ratingstars"])
                 except ValueError:
                     data["rating"] = None
-                
+
                 recipe_list.append(data)
-            except:
+            except Exception:
                 pass
 
         return recipe_list
@@ -68,8 +68,8 @@ class Recipe(commands.Cog):
         html_content = urllib.request.urlopen(req).read()
 
         return html_content
-        
-    @commands.command(name = "recipe")
+
+    @commands.command(name="recipe")
     async def recipe(self, context, *args):
         # clean up the arguments to make a valid recipe search
         search_term = ' '.join(args)
