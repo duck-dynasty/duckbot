@@ -103,6 +103,38 @@ async def test_select_with_many(bot):
     assert response in recipe_list
 
 
+@pytest.mark.asyncio
+@patch_async_mock
+@mock.patch('discord.ext.commands.Bot')
+@mock.patch('discord.ext.commands.Context')
+async def test_command_with_content(bot, context):
+    mock_data = {
+        "name": "test_1",
+        "description": "This is the first test recipe.",
+        "url": "this-is-a-test-1",
+        "rating": 4.7
+    }
+    expected_response = f"""How about a nice {mock_data['name']}. {mock_data['description']} This recipe has a {mock_data['rating']:.2} rating! https://www.allrecipes.com/recipe/10759/{mock_data['url']}/"""
+    with patch_urlopen(with_articles(mock_data)):
+        search_term = "test1"
+        clazz = Recipe(bot)
+        await clazz._Recipe__recipe(context, search_term)
+        context.send.assert_called_once_with(expected_response)
+
+
+@pytest.mark.asyncio
+@patch_async_mock
+@mock.patch('discord.ext.commands.Bot')
+@mock.patch('discord.ext.commands.Context')
+async def test_command_without_content(bot, context):
+    with patch_urlopen(without_content()):
+        search_term = "test1"
+        expected_response = f"""I am terribly sorry. There doesn't seem to be any recipes for {search_term}."""
+        clazz = Recipe(bot)
+        await clazz._Recipe__recipe(context, search_term)
+        context.send.assert_called_once_with(expected_response)
+
+
 def with_articles(*args):
     html = "<html>"
     for a in args:

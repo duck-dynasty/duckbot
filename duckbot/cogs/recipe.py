@@ -12,11 +12,13 @@ class Recipe(commands.Cog):
 
     @staticmethod
     def select_recipe(recipe_list):
+        """Given a list of recipes, select a random one."""
         # TODO: add filtering to ensure no gluten free or vegan recipes
         return random.choice(recipe_list)
 
     @staticmethod
     def parse_recipes(html_content):
+        """Parse raw HTML from allrecipes to find a list of recipes."""
         recipe_list = []
         soup = BeautifulSoup(html_content, 'html.parser')
 
@@ -42,21 +44,7 @@ class Recipe(commands.Cog):
 
     @staticmethod
     def search_recipes(search_term):
-        """Search recipes parsing the returned html data.
-
-        Retrieves a random recipe from allrecipes based on a search term. The
-        recipe html is then parsed for the required DuckBot output.
-
-        Args:
-            search_term:
-                A recipe you want to search for.
-
-        Returns:
-            A dictionary of recipie data that will include a title, url, and description.
-
-        Raises:
-            some error i need to find: An error occurred connecting or retrieving html
-        """
+        """Search allrecipes with a given search term then return html data."""
 
         query_dict = {"wt": search_term}
         query_url = urllib.parse.urlencode(query_dict)
@@ -69,8 +57,7 @@ class Recipe(commands.Cog):
 
         return html_content
 
-    @commands.command(name="recipe")
-    async def recipe(self, context, *args):
+    async def __recipe(self, context, *args):
         # clean up the arguments to make a valid recipe search
         search_term = ' '.join(args)
         search_term = re.sub(r'[^\w\s]', '', search_term)
@@ -88,3 +75,7 @@ class Recipe(commands.Cog):
             response = f"How about a nice {recipe['name']}. {recipe['description']} This recipe has a {recipe['rating']:.2} rating! {recipe['url']}"
 
         await context.send(response)
+
+    @commands.command(name="recipe")
+    async def recipe(self, context, *args):
+        await self.__recipe(context, *args)
