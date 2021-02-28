@@ -4,19 +4,21 @@ from async_mock_ext import patch_async_mock
 from duckmock.urllib import patch_urlopen
 from cogs.recipe import Recipe
 
-URLOPEN = "urllib.request.urlopen"
+
+def get_mock_data(name, rating):
+    return {
+        "name": name,
+        "description": f"This is the {name} recipe.",
+        "url": f"https://www.allrecipes.com/recipe/10759/{name}/",
+        "rating": rating
+    }
 
 
 @pytest.mark.asyncio
 @patch_async_mock
 @mock.patch('discord.ext.commands.Bot')
 async def test_search(bot):
-    mock_data = {
-        "name": "test_1",
-        "description": "This is the first test recipe.",
-        "url": "this-is-a-test-1",
-        "rating": 4.7
-    }
+    mock_data = get_mock_data("test1", 4.7)
     with patch_urlopen(with_articles(mock_data)):
         search_term = "test1"
         clazz = Recipe(bot)
@@ -28,18 +30,8 @@ async def test_search(bot):
 @patch_async_mock
 @mock.patch('discord.ext.commands.Bot')
 async def test_parse_with_articles(bot):
-    mock_data = {
-        "name": "test_1",
-        "description": "This is the first test recipe.",
-        "url": "this-is-a-test-1",
-        "rating": 4.7
-    }
-    expected_response = [{
-        "name": "test_1",
-        "description": "This is the first test recipe.",
-        "url": "https://www.allrecipes.com/recipe/10759/this-is-a-test-1/",
-        "rating": 4.7
-    }]
+    mock_data = get_mock_data("test1", 4.7)
+    expected_response = [get_mock_data("test1", 4.7)]
     html = with_articles(mock_data)
     clazz = Recipe(bot)
     response = clazz.parse_recipes(html)
@@ -72,12 +64,7 @@ async def test_parse_without_content(bot):
 @patch_async_mock
 @mock.patch('discord.ext.commands.Bot')
 async def test_select_with_one(bot):
-    recipe_list = [{
-        "name": "test_1",
-        "description": "This is the first test recipe.",
-        "url": "https://www.allrecipes.com/recipe/10759/this-is-a-test-1/",
-        "rating": 4.7
-    }]
+    recipe_list = [get_mock_data("test1", 4.7)]
     clazz = Recipe(bot)
     response = clazz.select_recipe(recipe_list)
     assert response == recipe_list[0]
@@ -87,17 +74,7 @@ async def test_select_with_one(bot):
 @patch_async_mock
 @mock.patch('discord.ext.commands.Bot')
 async def test_select_with_many(bot):
-    recipe_list = [{
-        "name": "test_1",
-        "description": "This is the first test recipe.",
-        "url": "https://www.allrecipes.com/recipe/10759/this-is-a-test-1/",
-        "rating": 4.7
-    }, {
-        "name": "test_2",
-        "description": "This is the second test recipe.",
-        "url": "https://www.allrecipes.com/recipe/10759/this-is-a-test-2/",
-        "rating": 4.9
-    }]
+    recipe_list = [get_mock_data("test1", 4.7), get_mock_data("test2", 4.9)]
     clazz = Recipe(bot)
     response = clazz.select_recipe(recipe_list)
     assert response in recipe_list
@@ -108,13 +85,8 @@ async def test_select_with_many(bot):
 @mock.patch('discord.ext.commands.Bot')
 @mock.patch('discord.ext.commands.Context')
 async def test_command_with_content(bot, context):
-    mock_data = {
-        "name": "test_1",
-        "description": "This is the first test recipe.",
-        "url": "this-is-a-test-1",
-        "rating": 4.7
-    }
-    expected_response = f"""How about a nice {mock_data['name']}. {mock_data['description']} This recipe has a {mock_data['rating']:.2} rating! https://www.allrecipes.com/recipe/10759/{mock_data['url']}/"""
+    mock_data = get_mock_data("test1", 4.7)
+    expected_response = f"""How about a nice {mock_data['name']}. {mock_data['description']} This recipe has a {mock_data['rating']:.2} rating! {mock_data['url']}"""
     with patch_urlopen(with_articles(mock_data)):
         search_term = "test1"
         clazz = Recipe(bot)
@@ -143,10 +115,10 @@ def with_articles(*args):
     <img src="https://pubads.g.doubleclick.net/gampad/ad?iu=/3865/DFP_1x1_impression_tracker&amp;sz=1x1&amp;t=adpartner%3Dallrecipesmagazine_earned_impression&amp;c=47296729-323f-4f6d-bda9-2581f95b921e">
     <a ng-class="{{ highlighted : saved }}" title="Save this recipe" data-ng-show="showHeart" class="favorite ng-isolate-scope" data-id="10759" data-type="'Recipe'" data-name="&quot;Oatmeal Peanut Butter Cookies III&quot;" data-segmentpageproperties="segmentContentInfo" data-imageurl="'https://images.media-allrecipes.com/userphotos/300x300/591345.jpg'"><span class="ng-binding"></span></a>
     <div class="grid-card-image-container">
-            <a href="https://www.allrecipes.com/recipe/10759/{a["url"]}/" data-content-provider-id="" data-internal-referrer-link="hub recipe" data-click-id="cardslot 2" class="ng-isolate-scope" target="_self">
+            <a href="{a["url"]}" data-content-provider-id="" data-internal-referrer-link="hub recipe" data-click-id="cardslot 2" class="ng-isolate-scope" target="_self">
             <img class="fixed-recipe-card__img ng-isolate-scope" data-lazy-load="" data-original-src="https://images.media-allrecipes.com/userphotos/300x300/591345.jpg" alt="Oatmeal Peanut Butter Cookies III Recipe and Video - These are so close to the Girl Scout oatmeal peanut butter cookies that you  won't know the difference!" title="Oatmeal Peanut Butter Cookies III Recipe and Video" src="https://images.media-allrecipes.com/userphotos/300x300/591345.jpg" style="display: inline;">
             </a>
-                <a href="https://www.allrecipes.com/video/3120/{a["url"]}/" data-content-provider-id="" data-internal-referrer-link="hub recipe" data-click-id="cardslot 2" class="ng-isolate-scope" target="_self">
+                <a href="{a["url"]}" data-content-provider-id="" data-internal-referrer-link="hub recipe" data-click-id="cardslot 2" class="ng-isolate-scope" target="_self">
                     <span class="watchButton">
                             <span class="watchButton__text">WATCH</span>
                     </span>
@@ -154,11 +126,11 @@ def with_articles(*args):
         </div>
         <div class="fixed-recipe-card__info">
             <h3 class="fixed-recipe-card__h3">
-                    <a href="https://www.allrecipes.com/recipe/10759/{a["url"]}/" data-content-provider-id="" data-internal-referrer-link="hub recipe" class="fixed-recipe-card__title-link ng-isolate-scope" target="_self">
+                    <a href="{a["url"]}" data-content-provider-id="" data-internal-referrer-link="hub recipe" class="fixed-recipe-card__title-link ng-isolate-scope" target="_self">
                         <span class="fixed-recipe-card__title-link">{a["name"]}</span>
                     </a>
             </h3>
-            <a href="https://www.allrecipes.com/recipe/10759/{a["url"]}/" data-content-provider-id="" data-internal-referrer-link="hub recipe" class="ng-isolate-scope" target="_self">
+            <a href="{a["url"]}" data-content-provider-id="" data-internal-referrer-link="hub recipe" class="ng-isolate-scope" target="_self">
                     <div class="fixed-recipe-card__ratings">
                         <span class="stars stars-5" onclick="AnchorScroll('reviews')" data-ratingstars="{a["rating"]}" aria-label="Rated 4.79 out of 5 stars"></span>
                 <span class="fixed-recipe-card__reviews">1K</span>
