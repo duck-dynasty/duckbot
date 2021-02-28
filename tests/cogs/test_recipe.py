@@ -17,7 +17,7 @@ def get_mock_data(name, rating):
 @pytest.mark.asyncio
 @patch_async_mock
 @mock.patch('discord.ext.commands.Bot')
-async def test_search(bot):
+async def test_search_recipes_returns_scraped_html(bot):
     mock_data = get_mock_data("test1", 4.7)
     with patch_urlopen(with_articles(mock_data)):
         search_term = "test1"
@@ -29,7 +29,7 @@ async def test_search(bot):
 @pytest.mark.asyncio
 @patch_async_mock
 @mock.patch('discord.ext.commands.Bot')
-async def test_parse_with_articles(bot):
+async def test_parse_recipes_returns_articles(bot):
     mock_data = get_mock_data("test1", 4.7)
     expected_response = [get_mock_data("test1", 4.7)]
     html = with_articles(mock_data)
@@ -41,7 +41,7 @@ async def test_parse_with_articles(bot):
 @pytest.mark.asyncio
 @patch_async_mock
 @mock.patch('discord.ext.commands.Bot')
-async def test_parse_without_articles(bot):
+async def test_parse_recipes_returns_empty(bot):
     expected_response = []
     html = without_articles()
     clazz = Recipe(bot)
@@ -52,7 +52,7 @@ async def test_parse_without_articles(bot):
 @pytest.mark.asyncio
 @patch_async_mock
 @mock.patch('discord.ext.commands.Bot')
-async def test_parse_without_content(bot):
+async def test_parse_recipes_no_content_returns_empty(bot):
     expected_response = []
     html = without_content()
     clazz = Recipe(bot)
@@ -63,7 +63,7 @@ async def test_parse_without_content(bot):
 @pytest.mark.asyncio
 @patch_async_mock
 @mock.patch('discord.ext.commands.Bot')
-async def test_select_with_one(bot):
+async def test_select_recipes_with_one_return_one(bot):
     recipe_list = [get_mock_data("test1", 4.7)]
     clazz = Recipe(bot)
     response = clazz.select_recipe(recipe_list)
@@ -73,7 +73,7 @@ async def test_select_with_one(bot):
 @pytest.mark.asyncio
 @patch_async_mock
 @mock.patch('discord.ext.commands.Bot')
-async def test_select_with_many(bot):
+async def test_select_recipes_with_many_return_one(bot):
     recipe_list = [get_mock_data("test1", 4.7), get_mock_data("test2", 4.9)]
     clazz = Recipe(bot)
     response = clazz.select_recipe(recipe_list)
@@ -84,9 +84,9 @@ async def test_select_with_many(bot):
 @patch_async_mock
 @mock.patch('discord.ext.commands.Bot')
 @mock.patch('discord.ext.commands.Context')
-async def test_command_with_content(bot, context):
+async def test_command_with_content_return_recipe(bot, context):
     mock_data = get_mock_data("test1", 4.7)
-    expected_response = f"""How about a nice {mock_data['name']}. {mock_data['description']} This recipe has a {mock_data['rating']:.2} rating! {mock_data['url']}"""
+    expected_response = f"How about a nice {mock_data['name']}. {mock_data['description']} This recipe has a {mock_data['rating']:.2} rating! {mock_data['url']}"
     with patch_urlopen(with_articles(mock_data)):
         search_term = "test1"
         clazz = Recipe(bot)
@@ -98,10 +98,10 @@ async def test_command_with_content(bot, context):
 @patch_async_mock
 @mock.patch('discord.ext.commands.Bot')
 @mock.patch('discord.ext.commands.Context')
-async def test_command_without_content(bot, context):
+async def test_command_without_content_return_sorry(bot, context):
     with patch_urlopen(without_content()):
         search_term = "test1"
-        expected_response = f"""I am terribly sorry. There doesn't seem to be any recipes for {search_term}."""
+        expected_response = f"I am terribly sorry. There doesn't seem to be any recipes for {search_term}."
         clazz = Recipe(bot)
         await clazz._Recipe__recipe(context, search_term)
         context.send.assert_called_once_with(expected_response)

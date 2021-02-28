@@ -13,7 +13,6 @@ class Recipe(commands.Cog):
     @staticmethod
     def select_recipe(recipe_list):
         """Given a list of recipes, select a random one."""
-        # TODO: add filtering to ensure no gluten free or vegan recipes
         return random.choice(recipe_list)
 
     @staticmethod
@@ -24,7 +23,7 @@ class Recipe(commands.Cog):
 
         articles = soup.findAll("article", {"class": "fixed-recipe-card"})
 
-        for article in articles:  # if there are no articles this loop will be skipped
+        for article in articles:
             data = {}
             try:
                 data["name"] = article.find("h3", {"class": "fixed-recipe-card__h3"}).get_text().strip(' \t\n\r')
