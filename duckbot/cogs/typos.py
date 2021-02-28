@@ -1,7 +1,7 @@
 import urllib.request
 from bs4 import BeautifulSoup
 from discord.ext import commands, tasks
-from textblob import TextBlob
+from autocorrect import Speller
 class Typos(commands.Cog):
 
     def __init__(self, bot, start_tasks=True):
@@ -56,21 +56,21 @@ class Typos(commands.Cog):
                 else:
                     await message.channel.send(f"There's no need for harsh words, {message.author.mention}.")
 
-    def correct(self, str):
-        words = str.split()
-        correction = []
-        modified = False
-        for w in words:
-            l = w.lower()
-            if l in self.corrections:
-                correction.append(self.corrections[l][0])
-                modified = True
-            else:
-                correction.append(w)
-        if modified:
-            return " ".join(correction)
-        else:
-            return str
+    #def correct(self, str):
+     #   words = str.split()
+      #  correction = []
+       # modified = False
+        #for w in words:
+         #   l = w.lower()
+          #  if l in self.corrections:
+           #     correction.append(self.corrections[l][0])
+            #    modified = True
+            #else:
+             #   correction.append(w)
+        #if modified:
+         #   return " ".join(correction)
+        #else:
+         #   return str
 
     async def __get_previous_message(self, message):
         # limit of 20 may be restricting, since it includes everyone's messages
@@ -83,8 +83,13 @@ class Typos(commands.Cog):
     def correct_sentence(self,str):
         ''' New function is used to correct typos
         '''
+        words = str.split()
+        corrected_string = []
+        spell = Speller(lang='en')
+        for w in words:
+            lw = w.lower()
+            lw = spell(lw)
+            corrected_string.append(lw)
+        return " ".join(corrected_string)
         
-        txt = TextBlob(str)
-        corrected_string = txt.correct()
-        return corrected_string
 
