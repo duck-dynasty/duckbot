@@ -7,6 +7,7 @@ python-dotenv
 validators
 beautifulsoup4
 pytz
+holidays
 
 # for linter
 flake8

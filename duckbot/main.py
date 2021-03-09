@@ -1,51 +1,40 @@
 import os
+import sys
 import dotenv
-import discord
 from cogs.duck import Duck
 from cogs.tito import Tito
 from cogs.typos import Typos
+from cogs.recipe import Recipe
 from cogs.bitcoin import Bitcoin
+from cogs.insights import Insights
 from cogs.kubernetes import Kubernetes
 from cogs.announce_day import AnnounceDay
 from cogs.thanking_robot import ThankingRobot
 from discord.ext import commands
-
-
-# Load the token from .env file
-dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
-dotenv.load_dotenv(dotenv_path)
-
-# Initialize the Discord client
-bot = commands.Bot(command_prefix='!')
-
-
-@bot.event
-async def on_ready():
-    guild_count = 0
-
-    for guild in bot.guilds:
-        print(f"- {guild.id} (name: {guild.name})")
-        guild_count = guild_count + 1
-
-    print("DuckBot is in " + str(guild_count) + " guilds.")
-
-
-@bot.event
-async def on_message(message):
-    if message.author == bot.user:
-        return
-
-    await bot.process_commands(message)  # so commands will still get called
-# end def on_message
+from server.channels import Channels
+from server.emojis import Emojis
 
 
 if __name__ == "__main__":
+    bot = commands.Bot(command_prefix='!', help_command=None)
+
+    # server cogs must be loaded first; any references to
+    # them should happen in or after the `on_ready` event
+    bot.add_cog(Channels(bot))
+    bot.add_cog(Emojis(bot))
+
     bot.add_cog(Duck(bot))
     bot.add_cog(Tito(bot))
     bot.add_cog(Typos(bot))
+    bot.add_cog(Recipe(bot))
     bot.add_cog(Bitcoin(bot))
+    bot.add_cog(Insights(bot))
     bot.add_cog(Kubernetes(bot))
     bot.add_cog(AnnounceDay(bot))
     bot.add_cog(ThankingRobot(bot))
 
-    bot.run(os.environ["TOKEN"])
+    if "dry-run" not in sys.argv:
+        # load the token from .env file
+        dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+        dotenv.load_dotenv(dotenv_path)
+        bot.run(os.environ["TOKEN"])
