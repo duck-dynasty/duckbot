@@ -8,6 +8,7 @@ validators
 beautifulsoup4
 pytz
 holidays
+pyowm # openweather
 
 # for linter
 flake8
