@@ -125,13 +125,13 @@ def with_articles(*args):
     html = '''{"html":"'''
     for a in args:
         rating = """"""
-        for i in range(a["rating"]):
+        for _ in range(a["rating"]):
             rating += """                  <span class=\\"rating-star active\\" aria-hidden=\\"true\\" data-rating=\\"1\\">
                      <svg width=\\"24\\" height=\\"24\\" viewBox=\\"0 0 24 24\\" role=\\"img\\" aria-hidden=\\"true\\" tabindex=\\"-1\\" xmlns=\\"http://www.w3.org/2000/svg\\">
                         <path class=\\"rating-star-filled\\" d=\\"M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z\\"></path>
                      </svg>
                   </span>"""
-        for i in range(a["rating"], 5):
+        for _ in range(a["rating"], 5):
             rating += """                  <span class=\\"rating-star\\" aria-hidden=\\"true\\" data-rating=\\"1\\">
                      <svg width=\\"24\\" height=\\"24\\" viewBox=\\"0 0 24 24\\" role=\\"img\\" aria-hidden=\\"true\\" tabindex=\\"-1\\" xmlns=\\"http://www.w3.org/2000/svg\\">
                         <path class=\\"rating-star-filled\\" d=\\"M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z\\"></path>
