@@ -1,13 +1,6 @@
-pytest
-pytest-asyncio
-pytest-mock
-mock
 discord.py
 python-dotenv
 validators
 beautifulsoup4
 pytz
 holidays
-
-# for linter
-flake8
