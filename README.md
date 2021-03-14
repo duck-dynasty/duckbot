@@ -12,14 +12,20 @@ The `scripts/build` directory contains scripts for development.
 
 ### Install Dependencies
 Should be run whenever you pull from `upstream/main`.
-```
+```sh
 . scripts/build/install.sh
 ```
 
 ### Run Tests and Linter
-```
+```sh
 . scripts/build/test.sh
 . scripts/build/lint.sh
+```
+
+### Containerized Tests
+If you like containers, you can also run all the tests as part of a docker image build. If the docker image is built, all the tests passed. The script deletes the image afterwards, pass or fail.
+```sh
+. scripts/build/docker-test.sh
 ```
 
 ### Run DuckBot
