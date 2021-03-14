@@ -78,6 +78,7 @@ async def test_check_should_respond_old_message_sent_by_special_user(bot, channe
         channels.get_general_channel.assert_called()
         channel.send.assert_called()
 
+
 @pytest.mark.asyncio
 @patch_async_mock
 @mock.patch('discord.ext.commands.Context')
