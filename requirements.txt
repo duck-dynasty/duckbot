@@ -1,7 +1,3 @@
-pytest
-pytest-asyncio
-pytest-mock
-mock
 discord.py
 python-dotenv
 validators
@@ -9,6 +5,3 @@ beautifulsoup4
 pytz
 holidays
 pyowm # openweather
-
-# for linter
-flake8
