@@ -61,6 +61,7 @@ days = {
     },
     5: {
         "names": [
+            "Tom's Movie Night",
             "Saturn's day",
             "Saturday",
         ],
