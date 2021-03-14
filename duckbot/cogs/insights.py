@@ -12,7 +12,7 @@ responses = [
     "A-Ok.",
     "I appreciate the information!",
     "Thanks for bringing that up.",
-    "\U0001F64C", # :raised_hands:
+    ":raised_hands:",
     ":eyes:",
     ":exploding_head:",
     ":eggplant: :sweat_drops:",
@@ -54,3 +54,7 @@ class Insights(commands.Cog):
     @check_should_respond.before_loop
     async def before_loop(self):
         await self.bot.wait_until_ready()
+
+    @commands.command(name="insight")
+    async def insight_command(self, context):
+        await context.send(random.choice(responses))
