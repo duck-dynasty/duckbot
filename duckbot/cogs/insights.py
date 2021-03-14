@@ -8,6 +8,10 @@ responses = [
     "Wow!",
     "Thanks for sharing!",
     "You sparked my curiousity.",
+    "A-Ok.",
+    "I appreciate the information!",
+    "Thanks for bringing that up.",
+    "\U0001F64C", # :raised_hands:
 ]
 
 
