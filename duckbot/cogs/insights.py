@@ -8,6 +8,14 @@ responses = [
     "Wow!",
     "Thanks for sharing!",
     "You sparked my curiousity.",
+    "I have been enlightened.",
+    "A-Ok.",
+    "I appreciate the information!",
+    "Thanks for bringing that up.",
+    ":raised_hands:",
+    ":eyes:",
+    ":exploding_head:",
+    ":eggplant: :sweat_drops:",
 ]
 
 
@@ -46,3 +54,10 @@ class Insights(commands.Cog):
     @check_should_respond.before_loop
     async def before_loop(self):
         await self.bot.wait_until_ready()
+
+    @commands.command(name="insight")
+    async def insight_command(self, context):
+        await self.__insight(context)
+
+    async def __insight(self, context):
+        await context.send(random.choice(responses))
