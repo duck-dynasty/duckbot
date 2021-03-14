@@ -57,4 +57,7 @@ class Insights(commands.Cog):
 
     @commands.command(name="insight")
     async def insight_command(self, context):
+        await self.__insight(context)
+
+    async def __insight(self, context):
         await context.send(random.choice(responses))
