@@ -8,10 +8,14 @@ responses = [
     "Wow!",
     "Thanks for sharing!",
     "You sparked my curiousity.",
+    "I have been enlightened.",
     "A-Ok.",
     "I appreciate the information!",
     "Thanks for bringing that up.",
     "\U0001F64C", # :raised_hands:
+    ":eyes:",
+    ":exploding_head:",
+    ":eggplant: :sweat_drops:",
 ]
 
 
