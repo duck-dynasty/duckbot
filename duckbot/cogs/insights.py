@@ -20,7 +20,6 @@ responses = [
 
 
 class Insights(commands.Cog):
-
     def __init__(self, bot, start_tasks=True):
         self.bot = bot
         if start_tasks:

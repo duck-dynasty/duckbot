@@ -9,7 +9,7 @@ URLOPEN = "urllib.request.urlopen"
 
 @pytest.mark.asyncio
 @patch_async_mock
-@mock.patch('discord.ext.commands.Bot')
+@mock.patch("discord.ext.commands.Bot")
 async def test_get_wiki_corrections(bot):
     with patch_urlopen(content("poo->oops")):
         clazz = Typos(bot, start_tasks=False)
@@ -19,7 +19,7 @@ async def test_get_wiki_corrections(bot):
 
 @pytest.mark.asyncio
 @patch_async_mock
-@mock.patch('discord.ext.commands.Bot')
+@mock.patch("discord.ext.commands.Bot")
 async def test_correct(bot):
     with patch_urlopen(content("")):
         clazz = Typos(bot, start_tasks=False)
@@ -30,7 +30,7 @@ async def test_correct(bot):
 
 @pytest.mark.asyncio
 @patch_async_mock
-@mock.patch('discord.ext.commands.Bot')
+@mock.patch("discord.ext.commands.Bot")
 async def test_correct_case_insensitive(bot):
     with patch_urlopen(content("")):
         clazz = Typos(bot, start_tasks=False)

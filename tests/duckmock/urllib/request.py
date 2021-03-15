@@ -1,6 +1,6 @@
-
 class MockResponse:
     """A stub implementation for `urllib.request.urlopen`"""
+
     status: int
     data: bytes
 

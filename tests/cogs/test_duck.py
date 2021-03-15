@@ -6,8 +6,8 @@ from cogs.duck import Duck
 
 @pytest.mark.asyncio
 @patch_async_mock
-@mock.patch('discord.Message')
-@mock.patch('random.random', return_value=0.0001)
+@mock.patch("discord.Message")
+@mock.patch("random.random", return_value=0.0001)
 async def test_react_duck_random_passes(message, random):
     clazz = Duck(None)
     msg = await clazz.react_duck(message)
@@ -17,8 +17,8 @@ async def test_react_duck_random_passes(message, random):
 
 @pytest.mark.asyncio
 @patch_async_mock
-@mock.patch('discord.Message')
-@mock.patch('random.random', return_value=0.000009)
+@mock.patch("discord.Message")
+@mock.patch("random.random", return_value=0.000009)
 async def test_react_duck_random_fails(message, random):
     clazz = Duck(None)
     msg = await clazz.react_duck(message)
@@ -28,7 +28,7 @@ async def test_react_duck_random_fails(message, random):
 
 @pytest.mark.asyncio
 @patch_async_mock
-@mock.patch('discord.ext.commands.Context')
+@mock.patch("discord.ext.commands.Context")
 async def test_github(context):
     clazz = Duck(None)
     await clazz._Duck__github(context)
@@ -37,7 +37,7 @@ async def test_github(context):
 
 @pytest.mark.asyncio
 @patch_async_mock
-@mock.patch('discord.ext.commands.Context')
+@mock.patch("discord.ext.commands.Context")
 async def test_wiki(context):
     clazz = Duck(None)
     await clazz._Duck__wiki(context)

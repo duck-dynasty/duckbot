@@ -19,11 +19,7 @@ days = {
         ],
     },
     1: {
-        "names": [
-            "Tyr's day",
-            "Tuesday",
-            "Dndndndndndndnd"
-        ],
+        "names": ["Tyr's day", "Tuesday", "Dndndndndndndnd"],
         "templates": [
             "Yo, one of my favourite days ever: {0}.",
         ],
@@ -37,8 +33,7 @@ days = {
             "Ness' wedding day",
             "https://www.youtube.com/watch?v=du-TY1GUFGk",
         ],
-        "templates": [
-        ],
+        "templates": [],
     },
     3: {
         "names": [
@@ -47,8 +42,7 @@ days = {
             "civ day",
             "Thursday",
         ],
-        "templates": [
-        ],
+        "templates": [],
     },
     4: {
         "names": [
@@ -56,8 +50,7 @@ days = {
             "Friday, Friday, gotta get down on Friday",
             "Friday",
         ],
-        "templates": [
-        ],
+        "templates": [],
     },
     5: {
         "names": [
@@ -104,7 +97,6 @@ templates = [
 
 
 class AnnounceDay(commands.Cog):
-
     def __init__(self, bot, start_tasks=True):
         self.bot = bot
         self.tz = pytz.timezone("US/Eastern")
