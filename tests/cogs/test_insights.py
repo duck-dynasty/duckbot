@@ -77,3 +77,12 @@ async def test_check_should_respond_old_message_sent_by_special_user(bot, channe
         await clazz._Insights__check_should_respond()
         channels.get_general_channel.assert_called()
         channel.send.assert_called()
+
+
+@pytest.mark.asyncio
+@patch_async_mock
+@mock.patch('discord.ext.commands.Context')
+async def test_insight_command_sends_message(context):
+    clazz = Insights(None, start_tasks=False)
+    await clazz._Insights__insight(context)
+    context.send.assert_called()
