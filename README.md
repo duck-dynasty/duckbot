@@ -16,8 +16,9 @@ Should be run whenever you pull from `upstream/main`.
 . scripts/build/install.sh
 ```
 
-### Run Tests and Linter
+### Run Formatter, Tests and Linter
 ```sh
+. scripts/build/format.sh
 . scripts/build/test.sh
 . scripts/build/lint.sh
 ```
