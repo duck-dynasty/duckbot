@@ -29,7 +29,7 @@ If you like containers, you can also run all the tests as part of a docker image
 ```
 
 ### Run DuckBot
-Requires `duckbut/.env` to be present, and the `TOKEN` environment variable to be set therein.
-```sh
+Requires `duckbut/.env` to be present, and the `TOKEN` environment variable to be set therein. The process will be killed after an hour.
+```
 . scripts/duckbot.sh
 ```
