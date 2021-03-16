@@ -30,7 +30,13 @@ If you like containers, you can also run all the tests as part of a docker image
 ```
 
 ### Run DuckBot
-Requires `duckbut/.env` to be present, and the `TOKEN` environment variable to be set therein. The process will be killed after an hour.
+Requires `duckbut/.env` to be present, and the `DISCORD_TOKEN` environment variable to be set therein. The process will be killed after an hour.
 ```
 . scripts/duckbot.sh
+```
+
+The `duckbot/.env` file should look something like this:
+```
+duck@pond$ cat duckbot/.env
+DISCORD_TOKEN=thesecrettoken
 ```
