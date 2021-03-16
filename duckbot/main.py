@@ -39,4 +39,4 @@ if __name__ == "__main__":
         # load the token from .env file
         dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
         dotenv.load_dotenv(dotenv_path)
-        bot.run(os.environ["TOKEN"])
+        bot.run(os.environ["DISCORD_TOKEN"])
