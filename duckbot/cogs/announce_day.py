@@ -19,7 +19,11 @@ days = {
         ],
     },
     1: {
-        "names": ["Tyr's day", "Tuesday", "Dndndndndndndnd"],
+        "names": [
+            "Tyr's day",
+            "Tuesday",
+            "Dndndndndndndnd",
+        ],
         "templates": [
             "Yo, one of my favourite days ever: {0}.",
         ],
