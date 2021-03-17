@@ -2,6 +2,8 @@ import urllib.request
 from bs4 import BeautifulSoup
 from discord.ext import commands, tasks
 from textblob import TextBlob
+
+
 class Typos(commands.Cog):
 
     def __init__(self, bot, start_tasks=True):
@@ -18,7 +20,7 @@ class Typos(commands.Cog):
         html_content = urllib.request.urlopen(request).read()
         soup = BeautifulSoup(html_content, 'html.parser')
         text = soup.findAll("pre")[-1].get_text()
-        return { l[0]: l[1].split(", ") for l in (x.split("->") for x in text.splitlines()) }
+        return {line[0]: line[1].split(", ") for line in (x.split("->") for x in text.splitlines())}
 
     def __get_custom_corrections(self):
         return {
@@ -33,13 +35,13 @@ class Typos(commands.Cog):
             "wat": ["what"],
         }
 
-    @tasks.loop(hours = 24.0)
+    @tasks.loop(hours=24.0)
     async def refresh_corrections(self):
-        self.corrections = { **self.get_wiki_corrections(), **self.__get_custom_corrections() }
+        self.corrections = {**self.get_wiki_corrections(), **self.__get_custom_corrections()}
 
     @refresh_corrections.before_loop
     async def before_refresh_corrections(self):
-        self.corrections = { **self.get_wiki_corrections(), **self.__get_custom_corrections() }
+        self.corrections = {**self.get_wiki_corrections(), **self.__get_custom_corrections()}
         await self.bot.wait_until_ready()
 
     @commands.Cog.listener('on_message')
@@ -60,9 +62,9 @@ class Typos(commands.Cog):
         correction = []
         modified = False
         for w in words:
-            l = w.lower()
-            if l in self.corrections:
-                correction.append(self.corrections[l][0])
+            word = w.lower()
+            if word in self.corrections:
+                correction.append(self.corrections[word][0])
                 modified = True
             else:
                 correction.append(w)
@@ -73,8 +75,8 @@ class Typos(commands.Cog):
 
     async def __get_previous_message(self, message):
         # limit of 20 may be restricting, since it includes everyone's messages
-        hist = await message.channel.history(limit = 20, before = message).flatten()
-        by_same_author = list(x for x in hist if x.author.id ==  message.author.id)
+        hist = await message.channel.history(limit=20, before=message).flatten()
+        by_same_author = list(x for x in hist if x.author.id == message.author.id)
         if not by_same_author:
             return None
         else:
