@@ -45,8 +45,11 @@ class Typos(commands.Cog):
 
     @commands.Cog.listener('on_message')
     async def correct_typos(self, message):
+        await self.__correct_typos(message)
+
+    async def __correct_typos(self, message):
         """Try to correct common typos for user's previous message."""
-        if message.content.strip().lower() == "fuck":
+        if message.author != self.bot.user and message.content.strip().lower() == "fuck":
             prev = await self.__get_previous_message(message)
             if prev is not None:
                 c = self.correct(prev.content)

@@ -1,11 +1,9 @@
 import pytest
 import mock
-from async_mock_ext import patch_async_mock
 from server.channels import Channels
 
 
 @pytest.mark.asyncio
-@patch_async_mock
 @mock.patch('discord.ext.commands.Bot')
 @mock.patch('discord.Guild')
 @mock.patch('discord.TextChannel')
@@ -17,7 +15,6 @@ async def test_get_channel_channel_exists(bot, guild, channel):
 
 
 @pytest.mark.asyncio
-@patch_async_mock
 @mock.patch('discord.ext.commands.Bot')
 @mock.patch('discord.Guild')
 @mock.patch('discord.TextChannel')
@@ -30,7 +27,6 @@ async def test_get_channel_not_exists(bot, guild, channel):
 
 
 @pytest.mark.asyncio
-@patch_async_mock
 @mock.patch('discord.ext.commands.Bot')
 @mock.patch('discord.Guild')
 @mock.patch('discord.TextChannel')
@@ -42,7 +38,6 @@ async def test_get_channel_by_name_matches(bot, guild, channel):
 
 
 @pytest.mark.asyncio
-@patch_async_mock
 @mock.patch('discord.ext.commands.Bot')
 @mock.patch('discord.Guild')
 @mock.patch('discord.TextChannel')
@@ -55,7 +50,6 @@ async def test_get_channel_by_name_not_exists(bot, guild, channel):
 
 
 @pytest.mark.asyncio
-@patch_async_mock
 @mock.patch('discord.ext.commands.Bot')
 @mock.patch('discord.Guild')
 @mock.patch('discord.TextChannel')
@@ -67,7 +61,6 @@ async def test_get_general_channel_exists(bot, guild, channel):
 
 
 @pytest.mark.asyncio
-@patch_async_mock
 @mock.patch('discord.ext.commands.Bot')
 @mock.patch('discord.Guild')
 @mock.patch('discord.TextChannel')

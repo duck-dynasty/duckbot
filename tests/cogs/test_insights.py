@@ -1,14 +1,12 @@
 import pytest
 import mock
 import datetime
-from async_mock_ext import patch_async_mock
 from duckmock.discord import MockAsyncIterator
 from cogs.insights import Insights
 from duckmock.datetime import patch_utcnow
 
 
 @pytest.mark.asyncio
-@patch_async_mock
 @mock.patch('discord.ext.commands.Bot')
 @mock.patch('server.channels')
 @mock.patch('discord.TextChannel')
@@ -23,7 +21,6 @@ async def test_check_should_respond_no_messages(bot, channels, channel):
 
 
 @pytest.mark.asyncio
-@patch_async_mock
 @mock.patch('discord.ext.commands.Bot')
 @mock.patch('server.channels')
 @mock.patch('discord.TextChannel')
@@ -42,7 +39,6 @@ async def test_check_should_respond_new_message(bot, channels, channel, message)
 
 
 @pytest.mark.asyncio
-@patch_async_mock
 @mock.patch('discord.ext.commands.Bot')
 @mock.patch('server.channels')
 @mock.patch('discord.TextChannel')
@@ -61,7 +57,6 @@ async def test_check_should_respond_not_special_user(bot, channels, channel, mes
 
 
 @pytest.mark.asyncio
-@patch_async_mock
 @mock.patch('discord.ext.commands.Bot')
 @mock.patch('server.channels')
 @mock.patch('discord.TextChannel')
@@ -80,7 +75,6 @@ async def test_check_should_respond_old_message_sent_by_special_user(bot, channe
 
 
 @pytest.mark.asyncio
-@patch_async_mock
 @mock.patch('discord.ext.commands.Context')
 async def test_insight_command_sends_message(context):
     clazz = Insights(None, start_tasks=False)
