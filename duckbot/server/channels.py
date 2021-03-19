@@ -15,7 +15,7 @@ class Channels(commands.Cog, name="channels"):
     def cog_unload(self):
         self.refresh.cancel()
 
-    @commands.Cog.listener('on_ready')
+    @commands.Cog.listener("on_ready")
     async def populate(self):
         self.__refresh(print_channels=True)
 

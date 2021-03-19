@@ -2,11 +2,10 @@ from discord.ext import commands
 
 
 class Bitcoin(commands.Cog):
-
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.Cog.listener('on_message')
+    @commands.Cog.listener("on_message")
     async def correct_bitcoin(self, message):
         """Corrections for bitcoin"""
 

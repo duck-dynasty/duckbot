@@ -4,3 +4,4 @@ pytest-mock
 mock
 
 flake8
+black

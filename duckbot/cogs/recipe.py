@@ -7,7 +7,6 @@ from discord.ext import commands
 
 
 class Recipe(commands.Cog):
-
     def __init__(self, bot):
         self.bot = bot
 
@@ -20,16 +19,16 @@ class Recipe(commands.Cog):
     def parse_recipes(html_content):
         """Parse raw HTML from allrecipes to find a list of recipes."""
         recipe_list = []
-        soup = BeautifulSoup(html_content, 'html.parser')
+        soup = BeautifulSoup(html_content, "html.parser")
 
         articles = soup.findAll("div", {"class": "component card card__recipe card__facetedSearchResult"})
 
         for article in articles:
             data = {}
             try:
-                data["name"] = article.find("h3", {"class": "card__title"}).get_text().strip(' \t\n\r')
-                data["description"] = article.find("div", {"class": "card__summary"}).get_text().strip(' \t\n\r')
-                data["url"] = article.find("a", href=re.compile('^https://www.allrecipes.com/recipe/'))['href']
+                data["name"] = article.find("h3", {"class": "card__title"}).get_text().strip(" \t\n\r")
+                data["description"] = article.find("div", {"class": "card__summary"}).get_text().strip(" \t\n\r")
+                data["url"] = article.find("a", href=re.compile("^https://www.allrecipes.com/recipe/"))["href"]
                 data["rating"] = len(article.findAll("span", {"class": "rating-star active"}))
 
                 recipe_list.append(data)
@@ -48,7 +47,7 @@ class Recipe(commands.Cog):
             query_url = urllib.parse.urlencode(query_dict)
             url = f"https://www.allrecipes.com/element-api/content-proxy/faceted-searches-load-more?{query_url}"
             req = urllib.request.Request(url)
-            req.add_header('Cookie', 'euConsent=true')
+            req.add_header("Cookie", "euConsent=true")
 
             result = json.loads(urllib.request.urlopen(req).read())
             html_content += result.get("html", "")
@@ -60,8 +59,8 @@ class Recipe(commands.Cog):
 
     async def __recipe(self, context, *args):
         # clean up the arguments to make a valid recipe search
-        search_term = ' '.join(args)
-        search_term = re.sub(r'[^\w\s]', '', search_term)
+        search_term = " ".join(args)
+        search_term = re.sub(r"[^\w\s]", "", search_term)
 
         try:
             # search for recipes on allrecipes.com
