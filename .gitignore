@@ -130,5 +130,16 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# https://github.com/github/gitignore/blob/master/Global/VisualStudioCode.gitignore
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Local History for Visual Studio Code
+.history/
+
 # include scripts/build directory
 !scripts/build/
