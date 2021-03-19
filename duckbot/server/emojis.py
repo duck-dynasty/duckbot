@@ -42,9 +42,7 @@ class Emojis(commands.Cog, name="emojis"):
 
     def get_emoji_by_name(self, name):
         """Returns the emoji with the given name. Throws if it does not exist."""
-        return next(
-            emoji for emoji in self.emojis[self.guild].values() if emoji.name == name
-        )
+        return next(emoji for emoji in self.emojis[self.guild].values() if emoji.name == name)
 
     def get_emoji(self, id):
         """Returns the emoji with the given id. Throws if it does not exist."""

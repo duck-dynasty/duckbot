@@ -48,11 +48,7 @@ class Insights(commands.Cog):
 
     def should_respond(self, message):
         stamp = datetime.datetime.utcnow() - datetime.timedelta(minutes=23)
-        return (
-            message is not None
-            and stamp >= message.created_at
-            and message.author.id == 244629273191645184
-        )
+        return message is not None and stamp >= message.created_at and message.author.id == 244629273191645184
 
     @check_should_respond.before_loop
     async def before_loop(self):

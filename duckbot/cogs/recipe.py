@@ -21,9 +21,7 @@ class Recipe(commands.Cog):
         recipe_list = []
         soup = BeautifulSoup(html_content, "html.parser")
 
-        articles = soup.findAll(
-            "div", {"class": "component card card__recipe card__facetedSearchResult"}
-        )
+        articles = soup.findAll("div", {"class": "component card card__recipe card__facetedSearchResult"})
 
         for article in articles:
             data = {}
@@ -77,9 +75,7 @@ class Recipe(commands.Cog):
                 recipe = self.select_recipe(recipe_list)
                 response = f"How about a nice {recipe['name']}. {recipe['description']} This recipe has a {recipe['rating']}/5 rating! {recipe['url']}"
         except Exception:
-            response = (
-                "I am terribly sorry. I am having problems reading All Recipes for you."
-            )
+            response = "I am terribly sorry. I am having problems reading All Recipes for you."
 
         await context.send(response)
 

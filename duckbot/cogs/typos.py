@@ -14,16 +14,11 @@ class Typos(commands.Cog):
         self.refresh_corrections.cancel()
 
     def get_wiki_corrections(self):
-        request = urllib.request.Request(
-            "https://en.wikipedia.org/wiki/Wikipedia:Lists_of_common_misspellings/For_machines"
-        )
+        request = urllib.request.Request("https://en.wikipedia.org/wiki/Wikipedia:Lists_of_common_misspellings/For_machines")
         html_content = urllib.request.urlopen(request).read()
         soup = BeautifulSoup(html_content, "html.parser")
         text = soup.findAll("pre")[-1].get_text()
-        return {
-            line[0]: line[1].split(", ")
-            for line in (x.split("->") for x in text.splitlines())
-        }
+        return {line[0]: line[1].split(", ") for line in (x.split("->") for x in text.splitlines())}
 
     def __get_custom_corrections(self):
         return {
@@ -40,29 +35,17 @@ class Typos(commands.Cog):
 
     @tasks.loop(hours=24.0)
     async def refresh_corrections(self):
-        self.corrections = {
-            **self.get_wiki_corrections(),
-            **self.__get_custom_corrections(),
-        }
+        self.corrections = {**self.get_wiki_corrections(), **self.__get_custom_corrections()}
 
     @refresh_corrections.before_loop
     async def before_refresh_corrections(self):
-        self.corrections = {
-            **self.get_wiki_corrections(),
-            **self.__get_custom_corrections(),
-        }
+        self.corrections = {**self.get_wiki_corrections(), **self.__get_custom_corrections()}
         await self.bot.wait_until_ready()
 
     @commands.Cog.listener("on_message")
     async def correct_typos(self, message):
-        await self.__correct_typos(message)
-
-    async def __correct_typos(self, message):
         """Try to correct common typos for user's previous message."""
-        if (
-            message.author != self.bot.user
-            and message.content.strip().lower() == "fuck"
-        ):
+        if message.content.strip().lower() == "fuck":
             prev = await self.__get_previous_message(message)
             if prev is not None:
                 c = self.correct(prev.content)
@@ -70,9 +53,7 @@ class Typos(commands.Cog):
                     msg = f"> {c}\nThink I fixed it, {message.author.mention}!"
                     await message.channel.send(msg)
                 else:
-                    await message.channel.send(
-                        f"There's no need for harsh words, {message.author.mention}."
-                    )
+                    await message.channel.send(f"There's no need for harsh words, {message.author.mention}.")
 
     def correct(self, str):
         words = str.split()

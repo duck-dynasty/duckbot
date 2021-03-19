@@ -12,12 +12,7 @@ class ThankingRobot(commands.Cog):
         if message.author == self.bot.user:
             return
 
-        thanks = [
-            "thank you duckbot",
-            "thanks duckbot",
-            "thank you duck bot",
-            "thanks duck bot",
-        ]
+        thanks = ["thank you duckbot", "thanks duckbot", "thank you duck bot", "thanks duck bot"]
         for t in thanks:
             if t in message.content.lower().replace(",", ""):
                 author = str(message.author).split("#")[0]
