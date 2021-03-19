@@ -61,9 +61,7 @@ async def test_check_should_respond_not_special_user(bot, channels, channel, mes
 @mock.patch("server.channels")
 @mock.patch("discord.TextChannel")
 @mock.patch("discord.Message")
-async def test_check_should_respond_old_message_sent_by_special_user(
-    bot, channels, channel, message
-):
+async def test_check_should_respond_old_message_sent_by_special_user(bot, channels, channel, message):
     with patch_utcnow(datetime.datetime(2000, 1, 1, hour=12, minute=00)):
         bot.get_cog.return_value = channels
         channels.get_general_channel.return_value = channel

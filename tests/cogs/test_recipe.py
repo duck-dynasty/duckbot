@@ -6,15 +6,11 @@ from cogs.recipe import Recipe
 
 
 def get_mock_data(name, rating):
-    return {
-        "name": name,
-        "description": f"This is the {name} recipe.",
-        "url": f"https://www.allrecipes.com/recipe/10759/{name}/",
-        "rating": rating,
-    }
+    return {"name": name, "description": f"This is the {name} recipe.", "url": f"https://www.allrecipes.com/recipe/10759/{name}/", "rating": rating}
 
 
 @pytest.mark.asyncio
+@patch_async_mock
 @mock.patch("discord.ext.commands.Bot")
 async def test_search_recipes_returns_scraped_html(bot):
     mock_data = get_mock_data("test1", 5)

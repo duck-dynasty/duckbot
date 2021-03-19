@@ -18,9 +18,9 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: '3.8'
-    - name: Install dependencies
+    - name: Install Dependencies
       run: . scripts/build/install.sh
-    - name: Test with pytest
+    - name: Run Tests
       run: . scripts/build/test.sh
   build:
     runs-on: ubuntu-latest
@@ -31,9 +31,9 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: '3.8'
-    - name: Install dependencies
+    - name: Install Dependencies
       run: . scripts/build/install.sh
-    - name: Ensure main interprets
+    - name: Ensure main Interprets
       run: . scripts/build/compile.sh
-    - name: Lint with flake8
+    - name: Run Lint Checks
       run: . scripts/build/lint.sh
