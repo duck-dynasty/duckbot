@@ -1,11 +1,10 @@
 import pytest
 import mock
-from async_mock_ext import patch_async_mock, async_value
+from async_mock_ext import async_value
 from cogs.tito import Tito
 
 
 @pytest.mark.asyncio
-@patch_async_mock
 @mock.patch("discord.Message")
 async def test_react_to_tito_with_yugoslavia_no_tito_emoji(message):
     message.content = "josip bro tito, brother"
@@ -16,7 +15,6 @@ async def test_react_to_tito_with_yugoslavia_no_tito_emoji(message):
 
 
 @pytest.mark.asyncio
-@patch_async_mock
 @mock.patch("discord.Message")
 async def test_react_to_tito_with_yugoslavia_message_contains_tito_text(message):
     message.content = "josip bro :tito:, brother"
@@ -27,7 +25,6 @@ async def test_react_to_tito_with_yugoslavia_message_contains_tito_text(message)
 
 
 @pytest.mark.asyncio
-@patch_async_mock
 @mock.patch("discord.Message")
 async def test_react_to_tito_with_yugoslavia_message_contains_tito_emoji(message):
     message.content = "josip bro <:tito:780954015285641276>, brother"
@@ -38,7 +35,6 @@ async def test_react_to_tito_with_yugoslavia_message_contains_tito_emoji(message
 
 
 @pytest.mark.asyncio
-@patch_async_mock
 @mock.patch("discord.ext.commands.Bot")
 @mock.patch("discord.RawReactionActionEvent")
 async def test_react_to_tito_reaction_no_tito_emoji(bot, payload):
@@ -49,7 +45,6 @@ async def test_react_to_tito_reaction_no_tito_emoji(bot, payload):
 
 
 @pytest.mark.asyncio
-@patch_async_mock
 @mock.patch("discord.ext.commands.Bot")
 @mock.patch("discord.RawReactionActionEvent")
 @mock.patch("discord.TextChannel")
