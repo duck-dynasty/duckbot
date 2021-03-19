@@ -130,12 +130,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# vscode local settings
-.vscode
-*.code-workspace
-
-# Local History for Visual Studio Code
-.history/
-
 # include scripts/build directory
 !scripts/build/
