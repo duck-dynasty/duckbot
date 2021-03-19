@@ -10,7 +10,6 @@ def get_mock_data(name, rating):
 
 
 @pytest.mark.asyncio
-@patch_async_mock
 @mock.patch("discord.ext.commands.Bot")
 async def test_search_recipes_returns_scraped_html(bot):
     mock_data = get_mock_data("test1", 5)
