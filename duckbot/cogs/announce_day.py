@@ -181,4 +181,3 @@ class SpecialDays(holidays.Canada):
         self[datetime.date(year, 12, 2)] = f"Female Kelly's Birthday. She's {year-1989} years old"
         self[datetime.date(year, 12, 3)] = "DuckBot's Inception Day"
         self[datetime.date(year, 12, 5)] = f"Taras' Birthday. He's {year-1989} years old"
-
