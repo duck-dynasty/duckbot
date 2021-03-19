@@ -1,7 +1,7 @@
 import pytest
 import mock
-from async_mock_ext import patch_async_mock
-from cogs.duck import Duck
+from tests.async_mock_ext import patch_async_mock
+from duckbot.cogs import Duck
 
 
 @pytest.mark.asyncio

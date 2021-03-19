@@ -1,8 +1,8 @@
 import pytest
 import mock
-from async_mock_ext import patch_async_mock
-from duckmock.urllib import patch_urlopen
-from cogs.typos import Typos
+from tests.async_mock_ext import patch_async_mock
+from tests.duckmock.urllib import patch_urlopen
+from duckbot.cogs import Typos
 
 URLOPEN = "urllib.request.urlopen"
 

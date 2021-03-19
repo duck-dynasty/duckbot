@@ -1,7 +1,7 @@
 import pytest
 import mock
-from async_mock_ext import patch_async_mock
-from server.emojis import Emojis
+from tests.async_mock_ext import patch_async_mock
+from duckbot.server.emojis import Emojis
 
 
 @pytest.mark.asyncio

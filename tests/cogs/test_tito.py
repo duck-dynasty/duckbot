@@ -1,7 +1,7 @@
 import pytest
 import mock
-from async_mock_ext import patch_async_mock, async_value
-from cogs.tito import Tito
+from tests.async_mock_ext import patch_async_mock, async_value
+from duckbot.cogs import Tito
 
 
 @pytest.mark.asyncio
