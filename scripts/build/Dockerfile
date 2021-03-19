@@ -7,3 +7,4 @@ RUN python -m pip install --upgrade pip
 RUN [ "/bin/bash", "-c", ". scripts/build/install.sh" ]
 RUN [ "/bin/bash", "-c", ". scripts/build/compile.sh" ]
 RUN [ "/bin/bash", "-c", ". scripts/build/test.sh" ]
+RUN [ "/bin/bash", "-c", ". scripts/build/lint.sh" ]

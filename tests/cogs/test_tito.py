@@ -6,7 +6,7 @@ from cogs.tito import Tito
 
 @pytest.mark.asyncio
 @patch_async_mock
-@mock.patch('discord.Message')
+@mock.patch("discord.Message")
 async def test_react_to_tito_with_yugoslavia_no_tito_emoji(message):
     message.content = "josip bro tito, brother"
     clazz = Tito(None)
@@ -17,7 +17,7 @@ async def test_react_to_tito_with_yugoslavia_no_tito_emoji(message):
 
 @pytest.mark.asyncio
 @patch_async_mock
-@mock.patch('discord.Message')
+@mock.patch("discord.Message")
 async def test_react_to_tito_with_yugoslavia_message_contains_tito_text(message):
     message.content = "josip bro :tito:, brother"
     clazz = Tito(None)
@@ -28,7 +28,7 @@ async def test_react_to_tito_with_yugoslavia_message_contains_tito_text(message)
 
 @pytest.mark.asyncio
 @patch_async_mock
-@mock.patch('discord.Message')
+@mock.patch("discord.Message")
 async def test_react_to_tito_with_yugoslavia_message_contains_tito_emoji(message):
     message.content = "josip bro <:tito:780954015285641276>, brother"
     clazz = Tito(None)
@@ -39,8 +39,8 @@ async def test_react_to_tito_with_yugoslavia_message_contains_tito_emoji(message
 
 @pytest.mark.asyncio
 @patch_async_mock
-@mock.patch('discord.ext.commands.Bot')
-@mock.patch('discord.RawReactionActionEvent')
+@mock.patch("discord.ext.commands.Bot")
+@mock.patch("discord.RawReactionActionEvent")
 async def test_react_to_tito_reaction_no_tito_emoji(bot, payload):
     payload.emoji.name = "not-tito"
     clazz = Tito(bot)
@@ -50,10 +50,10 @@ async def test_react_to_tito_reaction_no_tito_emoji(bot, payload):
 
 @pytest.mark.asyncio
 @patch_async_mock
-@mock.patch('discord.ext.commands.Bot')
-@mock.patch('discord.RawReactionActionEvent')
-@mock.patch('discord.TextChannel')
-@mock.patch('discord.Message')
+@mock.patch("discord.ext.commands.Bot")
+@mock.patch("discord.RawReactionActionEvent")
+@mock.patch("discord.TextChannel")
+@mock.patch("discord.Message")
 async def test_react_to_tito_reaction_tito_emoji(bot, payload, channel, message):
     payload.channel_id = 123
     payload.message_id = 456

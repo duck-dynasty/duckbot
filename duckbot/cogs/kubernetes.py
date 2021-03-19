@@ -2,11 +2,10 @@ from discord.ext import commands
 
 
 class Kubernetes(commands.Cog):
-
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.Cog.listener('on_message')
+    @commands.Cog.listener("on_message")
     async def correct_kubernets(self, message):
         """Corrections for kubernetes"""
 
@@ -20,7 +19,7 @@ class Kubernetes(commands.Cog):
                 correction = f"I think {author} means K8s"
                 await message.channel.send(correction)
 
-    @commands.Cog.listener('on_message')
+    @commands.Cog.listener("on_message")
     async def correct_k8s(self, message):
         """Corrections for K8s"""
 

@@ -17,7 +17,7 @@ from server.emojis import Emojis
 
 
 if __name__ == "__main__":
-    bot = commands.Bot(command_prefix='!', help_command=None)
+    bot = commands.Bot(command_prefix="!", help_command=None)
 
     # server cogs must be loaded first; any references to
     # them should happen in or after the `on_ready` event
@@ -37,6 +37,6 @@ if __name__ == "__main__":
 
     if "dry-run" not in sys.argv:
         # load the token from .env file
-        dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+        dotenv_path = os.path.join(os.path.dirname(__file__), ".env")
         dotenv.load_dotenv(dotenv_path)
         bot.run(os.environ["DISCORD_TOKEN"])

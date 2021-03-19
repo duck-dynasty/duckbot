@@ -15,7 +15,7 @@ class Emojis(commands.Cog, name="emojis"):
     def cog_unload(self):
         self.refresh.cancel()
 
-    @commands.Cog.listener('on_ready')
+    @commands.Cog.listener("on_ready")
     async def populate(self):
         self.__refresh(print_emojis=True)
 
