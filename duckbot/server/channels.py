@@ -15,7 +15,7 @@ class Channels(commands.Cog, name="channels"):
     def cog_unload(self):
         self.refresh.cancel()
 
-    @commands.Cog.listener('on_ready')
+    @commands.Cog.listener("on_ready")
     async def populate(self):
         self.__refresh(print_channels=True)
 
@@ -42,7 +42,11 @@ class Channels(commands.Cog, name="channels"):
 
     def get_channel_by_name(self, name):
         """Returns the channel with the given name. Throws if it does not exist."""
-        return next(channel for channel in self.channels[self.guild].values() if channel.name == name)
+        return next(
+            channel
+            for channel in self.channels[self.guild].values()
+            if channel.name == name
+        )
 
     def get_channel(self, id):
         """Returns the channel with the given id. Throws if it does not exist."""

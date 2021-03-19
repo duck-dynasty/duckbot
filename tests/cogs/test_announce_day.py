@@ -6,9 +6,9 @@ from duckmock.datetime import patch_now
 
 
 @pytest.mark.asyncio
-@mock.patch('discord.ext.commands.Bot')
-@mock.patch('server.channels')
-@mock.patch('discord.TextChannel')
+@mock.patch("discord.ext.commands.Bot")
+@mock.patch("server.channels")
+@mock.patch("discord.TextChannel")
 async def test_on_hour_7am_eastern(bot, channels, channel):
     with patch_now(datetime.datetime(2002, 1, 1, hour=7)):
         bot.get_cog.return_value = channels
@@ -20,9 +20,9 @@ async def test_on_hour_7am_eastern(bot, channels, channel):
 
 
 @pytest.mark.asyncio
-@mock.patch('discord.ext.commands.Bot')
-@mock.patch('server.channels')
-@mock.patch('discord.TextChannel')
+@mock.patch("discord.ext.commands.Bot")
+@mock.patch("server.channels")
+@mock.patch("discord.TextChannel")
 async def test_on_hour_not_7am(bot, channels, channel):
     with patch_now(datetime.datetime(2002, 1, 1, hour=8)):
         bot.get_cog.return_value = channels

@@ -7,9 +7,9 @@ from duckmock.datetime import patch_utcnow
 
 
 @pytest.mark.asyncio
-@mock.patch('discord.ext.commands.Bot')
-@mock.patch('server.channels')
-@mock.patch('discord.TextChannel')
+@mock.patch("discord.ext.commands.Bot")
+@mock.patch("server.channels")
+@mock.patch("discord.TextChannel")
 async def test_check_should_respond_no_messages(bot, channels, channel):
     bot.get_cog.return_value = channels
     channels.get_general_channel.return_value = channel
@@ -21,10 +21,10 @@ async def test_check_should_respond_no_messages(bot, channels, channel):
 
 
 @pytest.mark.asyncio
-@mock.patch('discord.ext.commands.Bot')
-@mock.patch('server.channels')
-@mock.patch('discord.TextChannel')
-@mock.patch('discord.Message')
+@mock.patch("discord.ext.commands.Bot")
+@mock.patch("server.channels")
+@mock.patch("discord.TextChannel")
+@mock.patch("discord.Message")
 async def test_check_should_respond_new_message(bot, channels, channel, message):
     with patch_utcnow(datetime.datetime(2000, 1, 1, hour=12, minute=00)):
         bot.get_cog.return_value = channels
@@ -39,10 +39,10 @@ async def test_check_should_respond_new_message(bot, channels, channel, message)
 
 
 @pytest.mark.asyncio
-@mock.patch('discord.ext.commands.Bot')
-@mock.patch('server.channels')
-@mock.patch('discord.TextChannel')
-@mock.patch('discord.Message')
+@mock.patch("discord.ext.commands.Bot")
+@mock.patch("server.channels")
+@mock.patch("discord.TextChannel")
+@mock.patch("discord.Message")
 async def test_check_should_respond_not_special_user(bot, channels, channel, message):
     with patch_utcnow(datetime.datetime(2000, 1, 1, hour=12, minute=00)):
         bot.get_cog.return_value = channels
@@ -57,11 +57,13 @@ async def test_check_should_respond_not_special_user(bot, channels, channel, mes
 
 
 @pytest.mark.asyncio
-@mock.patch('discord.ext.commands.Bot')
-@mock.patch('server.channels')
-@mock.patch('discord.TextChannel')
-@mock.patch('discord.Message')
-async def test_check_should_respond_old_message_sent_by_special_user(bot, channels, channel, message):
+@mock.patch("discord.ext.commands.Bot")
+@mock.patch("server.channels")
+@mock.patch("discord.TextChannel")
+@mock.patch("discord.Message")
+async def test_check_should_respond_old_message_sent_by_special_user(
+    bot, channels, channel, message
+):
     with patch_utcnow(datetime.datetime(2000, 1, 1, hour=12, minute=00)):
         bot.get_cog.return_value = channels
         channels.get_general_channel.return_value = channel
@@ -75,7 +77,7 @@ async def test_check_should_respond_old_message_sent_by_special_user(bot, channe
 
 
 @pytest.mark.asyncio
-@mock.patch('discord.ext.commands.Context')
+@mock.patch("discord.ext.commands.Context")
 async def test_insight_command_sends_message(context):
     clazz = Insights(None, start_tasks=False)
     await clazz._Insights__insight(context)

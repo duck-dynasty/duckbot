@@ -15,7 +15,9 @@ async def test_correct_kubernetes_bot_author(message, bot):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("text", [("koober nets"), ("kuber nets"), ("kubernets"), ("kubernetes")])
+@pytest.mark.parametrize(
+    "text", [("koober nets"), ("kuber nets"), ("kubernets"), ("kubernetes")]
+)
 @mock.patch("discord.Message")
 @mock.patch("discord.ext.commands.Bot")
 async def test_correct_kubernetes_message_is_kubernetes(message, bot, text):
@@ -48,4 +50,6 @@ async def test_correct_k8s_message_is_k8s(message, bot, text):
     message.content = text
     clazz = Kubernetes(bot)
     assert await clazz.correct_k8s(message) is None
-    message.channel.send.assert_called_once_with(f"I think {message.author} means Kubernetes")
+    message.channel.send.assert_called_once_with(
+        f"I think {message.author} means Kubernetes"
+    )

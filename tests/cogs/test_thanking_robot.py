@@ -4,8 +4,8 @@ from cogs.thanking_robot import ThankingRobot
 
 
 @pytest.mark.asyncio
-@mock.patch('discord.Message')
-@mock.patch('discord.ext.commands.Bot')
+@mock.patch("discord.Message")
+@mock.patch("discord.ext.commands.Bot")
 async def test_correct_giving_thanks_bot_author(message, bot):
     bot.user = "THEBOT"
     message.author = bot.user
@@ -16,8 +16,8 @@ async def test_correct_giving_thanks_bot_author(message, bot):
 
 
 @pytest.mark.asyncio
-@mock.patch('discord.Message')
-@mock.patch('discord.ext.commands.Bot')
+@mock.patch("discord.Message")
+@mock.patch("discord.ext.commands.Bot")
 async def test_correct_bitcoin_message_is_bitcoin(message, bot):
     bot.user = "but"
     message.author = "author"
@@ -25,12 +25,14 @@ async def test_correct_bitcoin_message_is_bitcoin(message, bot):
     clazz = ThankingRobot(bot)
     msg = await clazz.correct_giving_thanks(message)
     assert msg is None
-    message.channel.send.assert_called_once_with(f"I am just a robot.  Do not personify me, {message.author}")
+    message.channel.send.assert_called_once_with(
+        f"I am just a robot.  Do not personify me, {message.author}"
+    )
 
 
 @pytest.mark.asyncio
-@mock.patch('discord.Message')
-@mock.patch('discord.ext.commands.Bot')
+@mock.patch("discord.Message")
+@mock.patch("discord.ext.commands.Bot")
 async def test_correct_bitcoin_message_contains_bitcoin(message, bot):
     bot.user = "but"
     message.author = "author"
@@ -38,4 +40,6 @@ async def test_correct_bitcoin_message_contains_bitcoin(message, bot):
     clazz = ThankingRobot(bot)
     msg = await clazz.correct_giving_thanks(message)
     assert msg is None
-    message.channel.send.assert_called_once_with(f"I am just a robot.  Do not personify me, {message.author}")
+    message.channel.send.assert_called_once_with(
+        f"I am just a robot.  Do not personify me, {message.author}"
+    )

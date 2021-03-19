@@ -4,9 +4,9 @@ from server.emojis import Emojis
 
 
 @pytest.mark.asyncio
-@mock.patch('discord.ext.commands.Bot')
-@mock.patch('discord.Guild')
-@mock.patch('discord.Emoji')
+@mock.patch("discord.ext.commands.Bot")
+@mock.patch("discord.Guild")
+@mock.patch("discord.Emoji")
 async def test_get_emoji_emoji_exists(bot, guild, emoji):
     setup_mocks(bot, guild, emoji)
     clazz = Emojis(bot, start_tasks=False)
@@ -15,9 +15,9 @@ async def test_get_emoji_emoji_exists(bot, guild, emoji):
 
 
 @pytest.mark.asyncio
-@mock.patch('discord.ext.commands.Bot')
-@mock.patch('discord.Guild')
-@mock.patch('discord.Emoji')
+@mock.patch("discord.ext.commands.Bot")
+@mock.patch("discord.Guild")
+@mock.patch("discord.Emoji")
 async def test_get_emoji_not_exists(bot, guild, emoji):
     setup_mocks(bot, guild, emoji)
     clazz = Emojis(bot, start_tasks=False)
@@ -27,9 +27,9 @@ async def test_get_emoji_not_exists(bot, guild, emoji):
 
 
 @pytest.mark.asyncio
-@mock.patch('discord.ext.commands.Bot')
-@mock.patch('discord.Guild')
-@mock.patch('discord.Emoji')
+@mock.patch("discord.ext.commands.Bot")
+@mock.patch("discord.Guild")
+@mock.patch("discord.Emoji")
 async def test_get_emoji_by_name_matches(bot, guild, emoji):
     setup_mocks(bot, guild, emoji)
     clazz = Emojis(bot, start_tasks=False)
@@ -38,9 +38,9 @@ async def test_get_emoji_by_name_matches(bot, guild, emoji):
 
 
 @pytest.mark.asyncio
-@mock.patch('discord.ext.commands.Bot')
-@mock.patch('discord.Guild')
-@mock.patch('discord.Emoji')
+@mock.patch("discord.ext.commands.Bot")
+@mock.patch("discord.Guild")
+@mock.patch("discord.Emoji")
 async def test_get_emoji_by_name_not_exists(bot, guild, emoji):
     setup_mocks(bot, guild, emoji)
     clazz = Emojis(bot, start_tasks=False)
