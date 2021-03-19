@@ -94,9 +94,7 @@ async def test_correct_typos_no_typos_in_previous(bot, message, channel, prev_me
     clazz = Typos(bot, start_tasks=False)
     clazz.corrections = {"henlo": ["hello"]}
     await clazz._Typos__correct_typos(message) is None
-    message.channel.send.assert_called_once_with(
-        f"There's no need for harsh words, {message.author.mention}."
-    )
+    message.channel.send.assert_called_once_with(f"There's no need for harsh words, {message.author.mention}.")
 
 
 @pytest.mark.asyncio
@@ -115,9 +113,7 @@ async def test_correct_typos_sends_correction(bot, message, channel, prev_messag
     clazz = Typos(bot, start_tasks=False)
     clazz.corrections = {"henlo": ["hello"]}
     await clazz._Typos__correct_typos(message) is None
-    message.channel.send.assert_called_once_with(
-        f"> hello\nThink I fixed it, {message.author.mention}!"
-    )
+    message.channel.send.assert_called_once_with(f"> hello\nThink I fixed it, {message.author.mention}!")
 
 
 def content(*args):

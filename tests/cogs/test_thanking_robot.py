@@ -25,9 +25,7 @@ async def test_correct_bitcoin_message_is_bitcoin(message, bot):
     clazz = ThankingRobot(bot)
     msg = await clazz.correct_giving_thanks(message)
     assert msg is None
-    message.channel.send.assert_called_once_with(
-        f"I am just a robot.  Do not personify me, {message.author}"
-    )
+    message.channel.send.assert_called_once_with(f"I am just a robot.  Do not personify me, {message.author}")
 
 
 @pytest.mark.asyncio
@@ -40,6 +38,4 @@ async def test_correct_bitcoin_message_contains_bitcoin(message, bot):
     clazz = ThankingRobot(bot)
     msg = await clazz.correct_giving_thanks(message)
     assert msg is None
-    message.channel.send.assert_called_once_with(
-        f"I am just a robot.  Do not personify me, {message.author}"
-    )
+    message.channel.send.assert_called_once_with(f"I am just a robot.  Do not personify me, {message.author}")

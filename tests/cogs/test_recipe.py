@@ -100,9 +100,7 @@ async def test_command_without_articles_return_sorry(bot, context):
 async def test_command_without_content_return_sorry(bot, context):
     with patch_urlopen(without_content()):
         search_term = "test1"
-        expected_response = (
-            "I am terribly sorry. I am having problems reading All Recipes for you."
-        )
+        expected_response = "I am terribly sorry. I am having problems reading All Recipes for you."
         clazz = Recipe(bot)
         await clazz._Recipe__recipe(context, search_term)
         context.send.assert_called_once_with(expected_response)
