@@ -130,7 +130,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# https://github.com/github/gitignore/blob/master/Global/VisualStudioCode.gitignore
+# vscode local settings
 .vscode
 *.code-workspace
 
