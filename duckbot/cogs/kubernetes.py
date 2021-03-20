@@ -6,7 +6,7 @@ class Kubernetes(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener("on_message")
-    async def correct_kubernets(self, message):
+    async def correct_kubernetes(self, message):
         """Corrections for kubernetes"""
 
         if message.author == self.bot.user:
