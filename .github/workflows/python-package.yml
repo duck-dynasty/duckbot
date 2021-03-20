@@ -5,9 +5,11 @@ name: DuckBot CI
 
 on:
   push:
-    branches: [ main ]
+    branches:
+    - main
   pull_request:
-    branches: [ main ]
+    branches:
+    - main
 
 jobs:
   test:
@@ -22,17 +24,6 @@ jobs:
       run: . scripts/build/install.sh
     - name: Run Tests
       run: . scripts/build/test.sh
-  build:
-    runs-on: ubuntu-latest
-    needs: test
-    steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.8'
-    - name: Install Dependencies
-      run: . scripts/build/install.sh
     - name: Ensure main Interprets
       run: . scripts/build/compile.sh
     - name: Run Lint Checks
