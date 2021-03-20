@@ -12,7 +12,7 @@ on:
     - main
 
 jobs:
-  test:
+  release:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
