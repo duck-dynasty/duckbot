@@ -1,11 +1,9 @@
 import pytest
 import mock
-from async_mock_ext import patch_async_mock
 from cogs.thanking_robot import ThankingRobot
 
 
 @pytest.mark.asyncio
-@patch_async_mock
 @mock.patch("discord.Message")
 @mock.patch("discord.ext.commands.Bot")
 async def test_correct_giving_thanks_bot_author(message, bot):
@@ -18,7 +16,6 @@ async def test_correct_giving_thanks_bot_author(message, bot):
 
 
 @pytest.mark.asyncio
-@patch_async_mock
 @mock.patch("discord.Message")
 @mock.patch("discord.ext.commands.Bot")
 async def test_correct_bitcoin_message_is_bitcoin(message, bot):
@@ -32,7 +29,6 @@ async def test_correct_bitcoin_message_is_bitcoin(message, bot):
 
 
 @pytest.mark.asyncio
-@patch_async_mock
 @mock.patch("discord.Message")
 @mock.patch("discord.ext.commands.Bot")
 async def test_correct_bitcoin_message_contains_bitcoin(message, bot):
