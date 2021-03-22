@@ -8,7 +8,8 @@
             "name": "duckbot",
             "type": "python",
             "request": "launch",
-            "program": "${workspaceFolder}/duckbot/main.py",
+            "cwd": "${workspaceFolder}",
+            "module": "duckbot",
             "console": "integratedTerminal"
         }
     ]
