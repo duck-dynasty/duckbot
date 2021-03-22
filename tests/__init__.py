@@ -1,1 +1,1 @@
-from .async_mock_ext import *
+from .async_mock_ext import async_value

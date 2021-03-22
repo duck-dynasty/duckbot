@@ -2,8 +2,8 @@ import os
 import sys
 import dotenv
 from discord.ext import commands
-from duckbot.cogs import *
-from duckbot.server import *
+from duckbot.cogs import Duck, Tito, Typos, Recipe, Bitcoin, Insights, Kubernetes, AnnounceDay, ThankingRobot
+from duckbot.server import Channels, Emojis
 
 
 if __name__ == "__main__":
