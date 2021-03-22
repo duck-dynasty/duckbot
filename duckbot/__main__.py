@@ -2,7 +2,7 @@ import os
 import sys
 import dotenv
 from discord.ext import commands
-from duckbot.cogs import Duck, Tito, Typos, Recipe, Bitcoin, Insights, Kubernetes, AnnounceDay, ThankingRobot
+from duckbot.cogs import Duck, Tito, Typos, Recipe, Bitcoin, Insights, Kubernetes, AnnounceDay, ThankingRobot, WhoCanItBeNow
 from duckbot.server import Channels, Emojis
 
 
@@ -23,6 +23,7 @@ if __name__ == "__main__":
     bot.add_cog(Kubernetes(bot))
     bot.add_cog(AnnounceDay(bot))
     bot.add_cog(ThankingRobot(bot))
+    bot.add_cog(WhoCanItBeNow(bot))
 
     if "dry-run" not in sys.argv:
         # load the token from .env file
