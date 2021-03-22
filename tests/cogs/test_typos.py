@@ -1,6 +1,7 @@
 import pytest
 import mock
 from tests.duckmock.urllib import patch_urlopen
+from tests.duckmock.discord import MockAsyncIterator
 from duckbot.cogs import Typos
 
 

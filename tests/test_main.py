@@ -1,2 +1,2 @@
 # a do nothing file for coverage sake
-import main
+import duckbot.__main__
