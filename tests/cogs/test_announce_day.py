@@ -1,13 +1,11 @@
 import pytest
 import mock
 import datetime
-from tests.async_mock_ext import patch_async_mock
 from duckbot.cogs import AnnounceDay
 from tests.duckmock.datetime import patch_now
 
 
 @pytest.mark.asyncio
-@patch_async_mock
 @mock.patch("discord.ext.commands.Bot")
 @mock.patch("duckbot.server.Channels")
 @mock.patch("discord.TextChannel")
@@ -22,7 +20,6 @@ async def test_on_hour_7am_eastern(bot, channels, channel):
 
 
 @pytest.mark.asyncio
-@patch_async_mock
 @mock.patch("discord.ext.commands.Bot")
 @mock.patch("duckbot.server.Channels")
 @mock.patch("discord.TextChannel")

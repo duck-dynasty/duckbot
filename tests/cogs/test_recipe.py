@@ -1,7 +1,6 @@
 import pytest
 import mock
 import json
-from tests.async_mock_ext import patch_async_mock
 from tests.duckmock.urllib import patch_urlopen
 from duckbot.cogs import Recipe
 
@@ -11,7 +10,6 @@ def get_mock_data(name, rating):
 
 
 @pytest.mark.asyncio
-@patch_async_mock
 @mock.patch("discord.ext.commands.Bot")
 async def test_search_recipes_returns_scraped_html(bot):
     mock_data = get_mock_data("test1", 5)
@@ -23,7 +21,6 @@ async def test_search_recipes_returns_scraped_html(bot):
 
 
 @pytest.mark.asyncio
-@patch_async_mock
 @mock.patch("discord.ext.commands.Bot")
 async def test_parse_recipes_returns_articles(bot):
     mock_data = get_mock_data("test1", 5)
@@ -35,7 +32,6 @@ async def test_parse_recipes_returns_articles(bot):
 
 
 @pytest.mark.asyncio
-@patch_async_mock
 @mock.patch("discord.ext.commands.Bot")
 async def test_parse_recipes_returns_empty(bot):
     expected_response = []
@@ -46,7 +42,6 @@ async def test_parse_recipes_returns_empty(bot):
 
 
 @pytest.mark.asyncio
-@patch_async_mock
 @mock.patch("discord.ext.commands.Bot")
 async def test_parse_recipes_no_content_returns_empty(bot):
     expected_response = []
@@ -57,7 +52,6 @@ async def test_parse_recipes_no_content_returns_empty(bot):
 
 
 @pytest.mark.asyncio
-@patch_async_mock
 @mock.patch("discord.ext.commands.Bot")
 async def test_select_recipes_with_one_return_one(bot):
     recipe_list = [get_mock_data("test1", 5)]
@@ -67,7 +61,6 @@ async def test_select_recipes_with_one_return_one(bot):
 
 
 @pytest.mark.asyncio
-@patch_async_mock
 @mock.patch("discord.ext.commands.Bot")
 async def test_select_recipes_with_many_return_one(bot):
     recipe_list = [get_mock_data("test1", 5), get_mock_data("test2", 4)]
@@ -77,7 +70,6 @@ async def test_select_recipes_with_many_return_one(bot):
 
 
 @pytest.mark.asyncio
-@patch_async_mock
 @mock.patch("discord.ext.commands.Bot")
 @mock.patch("discord.ext.commands.Context")
 async def test_command_with_content_return_recipe(bot, context):
@@ -91,7 +83,6 @@ async def test_command_with_content_return_recipe(bot, context):
 
 
 @pytest.mark.asyncio
-@patch_async_mock
 @mock.patch("discord.ext.commands.Bot")
 @mock.patch("discord.ext.commands.Context")
 async def test_command_without_articles_return_sorry(bot, context):
@@ -104,7 +95,6 @@ async def test_command_without_articles_return_sorry(bot, context):
 
 
 @pytest.mark.asyncio
-@patch_async_mock
 @mock.patch("discord.ext.commands.Bot")
 @mock.patch("discord.ext.commands.Context")
 async def test_command_without_content_return_sorry(bot, context):
