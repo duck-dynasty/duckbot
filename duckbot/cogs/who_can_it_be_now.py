@@ -41,6 +41,9 @@ class WhoCanItBeNow(commands.Cog):
 
     @commands.command("stop")
     async def stop(self, context):
+        await self.__stop(context)
+
+    async def __stop(self, context):
         """Stops the music loop if it is playing."""
         if self.streaming:
             self.streaming = False

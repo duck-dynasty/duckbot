@@ -8,9 +8,12 @@ class Resources(commands.Cog, name="resources"):
     def __init__(self, bot):
         self.bot = bot
 
-    def get(self, *args):
+    def get(self, path, *paths):
+        """Returns the path to a resources file. `path` and `paths` are joined via `os.path.join`
+        to form a complete path to the resource file.
+        raises FileNotFoundError: when the resource does not exist"""
         base_path = os.path.join(os.path.dirname(__file__), "..", "..", "resources")
-        resource = os.path.join(base_path, *args)
+        resource = os.path.join(base_path, path, *paths)
         if os.path.exists(resource):
             return resource
         else:
