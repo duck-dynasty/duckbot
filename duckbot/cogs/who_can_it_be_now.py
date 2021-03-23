@@ -14,6 +14,7 @@ class WhoCanItBeNow(commands.Cog):
 
     @commands.command("start")
     async def start(self, context):
+        """Starts the music loop if it is not already playing."""
         if not self.streaming:
             self.streaming = True
             self.player = self.bot.loop.create_task(self.stream_audio())
@@ -21,11 +22,13 @@ class WhoCanItBeNow(commands.Cog):
             await context.send("Already streaming, you fool!")
 
     async def stream_audio(self):
+        """The music loop. Connect to channel and stream. We await on `self.stream` to block on the song being played."""
         while self.streaming:
             self.stream.clear()
             if self.client is None or not self.client.is_connected():
                 channel = self.bot.get_cog("channels").get_channel_by_name("Hangout 1")
                 self.client = await channel.connect()
+            # need to load the song every time, it seems to keep internal state
             song = FFmpegPCMAudio(os.path.join(os.path.dirname(__file__), "..", "..", "resources", "who-can-it-be-now.mp3"), options='-filter:a "volume=0.125"')
             self.client.play(song, after=self.trigger_next_song)
             await self.stream.wait()
@@ -35,6 +38,7 @@ class WhoCanItBeNow(commands.Cog):
 
     @commands.command("stop")
     async def stop(self, context):
+        """Stops the music loop if it is playing."""
         if self.streaming:
             self.streaming = False
             if self.client is not None:
