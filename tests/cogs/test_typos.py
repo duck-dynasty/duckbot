@@ -1,8 +1,8 @@
 import pytest
 import mock
-from duckmock.urllib import patch_urlopen
-from duckmock.discord import MockAsyncIterator
-from cogs.typos import Typos
+from tests.duckmock.urllib import patch_urlopen
+from tests.duckmock.discord import MockAsyncIterator
+from duckbot.cogs import Typos
 
 
 @pytest.mark.asyncio

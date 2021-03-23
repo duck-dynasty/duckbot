@@ -1,6 +1,6 @@
 import pytest
 import mock
-from cogs.duck import Duck
+from duckbot.cogs import Duck
 
 
 @pytest.mark.asyncio

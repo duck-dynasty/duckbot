@@ -1,8 +1,8 @@
 import pytest
 import mock
 import json
-from duckmock.urllib import patch_urlopen
-from cogs.recipe import Recipe
+from tests.duckmock.urllib import patch_urlopen
+from duckbot.cogs import Recipe
 
 
 def get_mock_data(name, rating):
