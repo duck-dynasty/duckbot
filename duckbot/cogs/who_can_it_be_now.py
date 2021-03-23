@@ -14,6 +14,9 @@ class WhoCanItBeNow(commands.Cog):
 
     @commands.command("start")
     async def start(self, context):
+        await self.__start(context)
+
+    async def __start(self, context):
         """Starts the music loop if it is not already playing."""
         if not self.streaming:
             self.streaming = True
