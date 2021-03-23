@@ -1,6 +1,6 @@
 discord.py
+pynacl
 python-dotenv
-validators
 beautifulsoup4
 pytz
 holidays
