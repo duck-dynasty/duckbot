@@ -32,7 +32,7 @@ class WhoCanItBeNow(commands.Cog):
                 channel = self.bot.get_cog("channels").get_channel_by_name("Hangout 1")
                 self.client = await channel.connect()
             # need to load the song every time, it seems to keep internal state
-            song = FFmpegPCMAudio(os.path.join(os.path.dirname(__file__), "..", "..", "resources", "who-can-it-be-now.mp3"), options='-filter:a "volume=0.125"')
+            song = FFmpegPCMAudio(self.bot.get_cog("resources").get("who-can-it-be-now.mp3"), options='-filter:a "volume=0.125"')
             self.client.play(song, after=self.trigger_next_song)
             await self.stream.wait()
 

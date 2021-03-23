@@ -4,6 +4,7 @@ import dotenv
 from discord.ext import commands
 from duckbot.cogs import Duck, Tito, Typos, Recipe, Bitcoin, Insights, Kubernetes, AnnounceDay, ThankingRobot, WhoCanItBeNow
 from duckbot.server import Channels, Emojis
+from duckbot.util import Resources
 
 
 if __name__ == "__main__":
@@ -13,6 +14,7 @@ if __name__ == "__main__":
     # them should happen in or after the `on_ready` event
     bot.add_cog(Channels(bot))
     bot.add_cog(Emojis(bot))
+    bot.add_cog(Resources(bot))
 
     bot.add_cog(Duck(bot))
     bot.add_cog(Tito(bot))
