@@ -15,6 +15,6 @@ class Resources(commands.Cog, name="resources"):
         base_path = os.path.join(os.path.dirname(__file__), "..", "..", "resources")
         resource = os.path.join(base_path, path, *paths)
         if os.path.exists(resource):
-            return resource
+            return os.path.abspath(resource)
         else:
             raise FileNotFoundError(resource)
