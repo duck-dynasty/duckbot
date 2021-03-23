@@ -1,6 +1,6 @@
 import pytest
 import mock
-from duckbot.server.channels import Channels
+from duckbot.server import Channels
 
 
 @pytest.mark.asyncio
