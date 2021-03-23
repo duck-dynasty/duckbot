@@ -1,6 +1,6 @@
 import pytest
 import mock
-from cogs.thanking_robot import ThankingRobot
+from duckbot.cogs import ThankingRobot
 
 
 @pytest.mark.asyncio

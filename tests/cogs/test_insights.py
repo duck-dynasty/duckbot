@@ -1,14 +1,14 @@
 import pytest
 import mock
 import datetime
-from duckmock.discord import MockAsyncIterator
-from cogs.insights import Insights
-from duckmock.datetime import patch_utcnow
+from tests.duckmock.discord import MockAsyncIterator
+from duckbot.cogs import Insights
+from tests.duckmock.datetime import patch_utcnow
 
 
 @pytest.mark.asyncio
 @mock.patch("discord.ext.commands.Bot")
-@mock.patch("server.channels")
+@mock.patch("duckbot.server.Channels")
 @mock.patch("discord.TextChannel")
 async def test_check_should_respond_no_messages(bot, channels, channel):
     bot.get_cog.return_value = channels
@@ -22,7 +22,7 @@ async def test_check_should_respond_no_messages(bot, channels, channel):
 
 @pytest.mark.asyncio
 @mock.patch("discord.ext.commands.Bot")
-@mock.patch("server.channels")
+@mock.patch("duckbot.server.Channels")
 @mock.patch("discord.TextChannel")
 @mock.patch("discord.Message")
 async def test_check_should_respond_new_message(bot, channels, channel, message):
@@ -40,7 +40,7 @@ async def test_check_should_respond_new_message(bot, channels, channel, message)
 
 @pytest.mark.asyncio
 @mock.patch("discord.ext.commands.Bot")
-@mock.patch("server.channels")
+@mock.patch("duckbot.server.Channels")
 @mock.patch("discord.TextChannel")
 @mock.patch("discord.Message")
 async def test_check_should_respond_not_special_user(bot, channels, channel, message):
@@ -58,7 +58,7 @@ async def test_check_should_respond_not_special_user(bot, channels, channel, mes
 
 @pytest.mark.asyncio
 @mock.patch("discord.ext.commands.Bot")
-@mock.patch("server.channels")
+@mock.patch("duckbot.server.Channels")
 @mock.patch("discord.TextChannel")
 @mock.patch("discord.Message")
 async def test_check_should_respond_old_message_sent_by_special_user(bot, channels, channel, message):

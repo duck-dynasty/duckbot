@@ -1,19 +1,9 @@
 import os
 import sys
 import dotenv
-from cogs.duck import Duck
-from cogs.tito import Tito
-from cogs.typos import Typos
-from cogs.recipe import Recipe
-from cogs.weather import Weather
-from cogs.bitcoin import Bitcoin
-from cogs.insights import Insights
-from cogs.kubernetes import Kubernetes
-from cogs.announce_day import AnnounceDay
-from cogs.thanking_robot import ThankingRobot
 from discord.ext import commands
-from server.channels import Channels
-from server.emojis import Emojis
+from duckbot.cogs import Duck, Tito, Typos, Recipe, Bitcoin, Insights, Kubernetes, AnnounceDay, ThankingRobot, Weather
+from duckbot.server import Channels, Emojis
 
 
 if __name__ == "__main__":

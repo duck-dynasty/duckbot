@@ -8,8 +8,13 @@
 
 A Discord bot for personal friend group. If you don't know me personally, consider how freaking weird it'd be to ask for the access token. Feel free to steal the code though.
 
+View the [wiki](https://github.com/Chippers255/duckbot/wiki) for a short description on what the Duck does.
+
 ## Development
-The `scripts/build` directory contains scripts for development.
+DuckBot uses `python3.8`. All of the scripts expect `python3.8` to be on the `$PATH`.  
+Scripts should be run from the repository root. When run from elsewhere, you may get moved to the repository root.
+
+The `scripts/` directory contains scripts for development.
 
 ### Install Dependencies
 Should be run whenever you pull from `upstream/main`.
@@ -17,15 +22,17 @@ Should be run whenever you pull from `upstream/main`.
 . scripts/build/install.sh
 ```
 
-### Run Formatter, Tests and Linter
+### Run Tests, Formatter and Linter
 ```sh
-. scripts/build/format.sh
 . scripts/build/test.sh
+. scripts/build/format.sh
 . scripts/build/lint.sh
 ```
 
-### Containerized Tests
-If you like containers, you can also run all the tests as part of a docker image build. If the docker image is built, all the tests passed. The script deletes the image afterwards, pass or fail.
+The `test` script also performs code coverage checks. [View the script](https://github.com/Chippers255/duckbot/blob/main/scripts/build/test.sh) to see the minimum required coverage. Discord.py decorators make it difficult to cover methods directly, so don't aim for 100% coverage.
+
+#### Containerized Tests
+If you like containers, you can also run all the tests as part of a docker image build. If the docker image is built, all the tests passed. The script deletes the image afterwards, pass or fail. Requires `docker` to be on the `$PATH`.
 ```sh
 . scripts/build/docker-test.sh
 ```
