@@ -12,6 +12,10 @@ class WhoCanItBeNow(commands.Cog):
         self.player = None
         self.streaming = False
 
+    def cog_unload(self):
+        if self.streaming:
+            asyncio.run(self.__stop(None))
+
     @commands.command("start")
     async def start(self, context):
         await self.__start(context)
@@ -20,7 +24,7 @@ class WhoCanItBeNow(commands.Cog):
         """Starts the music loop if it is not already playing."""
         if not self.streaming:
             self.streaming = True
-            self.player = self.bot.loop.create_task(self.stream_audio())
+            self.player = asyncio.create_task(self.stream_audio())
         else:
             await context.send("Already streaming, you fool!")
 
@@ -46,12 +50,11 @@ class WhoCanItBeNow(commands.Cog):
         """Stops the music loop if it is playing."""
         if self.streaming:
             self.streaming = False
-            self.trigger_next_song()
             if self.client is not None:
+                if self.client.is_playing():
+                    self.client.stop()
                 await self.client.disconnect()
             self.client = None
-            if self.player is not None:
-                self.player.cancel()
-                self.player = None
+            self.player = None
         else:
             await context.send("Nothing to stop, you fool!")
