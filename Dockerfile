@@ -4,6 +4,6 @@ COPY requirements.txt /
 RUN python -m pip install --upgrade pip
 RUN python -m pip install -r /requirements.txt
 COPY duckbot/ /duckbot/duckbot
-COPY .env /duckbot/.env
+COPY .env /duckbot/duckbot/.env
 WORKDIR /duckbot
 CMD [ "python", "-m", "duckbot" ]
