@@ -5,6 +5,7 @@ import asyncio
 from tests.async_mock_ext import async_value
 from duckbot.cogs import WhoCanItBeNow
 
+
 def play(*args, **kwargs):
     kwargs.get("after")(None)
 
@@ -17,7 +18,7 @@ def play(*args, **kwargs):
 @mock.patch("discord.VoiceChannel")
 @mock.patch("discord.VoiceClient")
 async def test_task_loop(bot, context, channels, resources, voice, client):
-    bot.get_cog.side_effect = [ channels, resources ]
+    bot.get_cog.side_effect = [channels, resources]
     channels.get_channel_by_name.return_value = voice
     resources.get.return_value = os.path.join(os.path.dirname(__file__), "..", "..", "resources", "bruh.mp3")
     voice.connect.return_value = async_value(client)
@@ -31,7 +32,6 @@ async def test_task_loop(bot, context, channels, resources, voice, client):
     assert clazz.streaming is False
     assert clazz.player is None
     assert clazz.client is None
-
 
 
 @pytest.mark.asyncio
