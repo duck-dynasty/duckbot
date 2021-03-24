@@ -22,7 +22,7 @@ class Typos(commands.Cog):
         text = soup.findAll("pre")[-1].get_text()
         return {line[0]: line[1].split(", ") for line in (x.split("->") for x in text.splitlines())}
 
-    def __get_custom_corrections(self):
+    def get_custom_corrections(self):
         return {
             "fcuk": ["fuck"],
             "fcuking": ["fucking"],
@@ -37,11 +37,11 @@ class Typos(commands.Cog):
 
     @tasks.loop(hours=24.0)
     async def refresh_corrections(self):
-        self.corrections = {**self.get_wiki_corrections(), **self.__get_custom_corrections()}
+        self.corrections = {**self.get_wiki_corrections(), **self.get_custom_corrections()}
 
     @refresh_corrections.before_loop
     async def before_refresh_corrections(self):
-        self.corrections = {**self.get_wiki_corrections(), **self.__get_custom_corrections()}
+        self.corrections = {**self.get_wiki_corrections(), **self.get_custom_corrections()}
         await self.bot.wait_until_ready()
 
     @commands.Cog.listener('on_message')
