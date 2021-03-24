@@ -67,7 +67,7 @@ class Recipe(commands.Cog):
         # parse the html to get all recipes from the search
         recipe_list = self.parse_recipes(html_content)
 
-        if recipe_list is None:
+        if len(recipe_list) == 0:
             response = f"I am terribly sorry. There doesn't seem to be any recipes for {search_term}."
         else:
             recipe = self.select_recipe(recipe_list)
