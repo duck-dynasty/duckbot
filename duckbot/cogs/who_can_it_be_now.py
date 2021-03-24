@@ -29,8 +29,7 @@ class WhoCanItBeNow(commands.Cog):
         while self.streaming:
             self.stream.clear()
             if self.client is None or not self.client.is_connected():
-                channel = self.bot.get_cog("channels").get_channel_by_name("Hangout 1")
-                self.client = await channel.connect()
+                self.client = await self.bot.get_cog("channels").get_channel_by_name("Hangout 1").connect()
             # need to load the song every time, it seems to keep internal state
             song = FFmpegPCMAudio(self.bot.get_cog("resources").get("who-can-it-be-now.mp3"), options='-filter:a "volume=0.125"')
             self.client.play(song, after=self.trigger_next_song)
@@ -47,8 +46,12 @@ class WhoCanItBeNow(commands.Cog):
         """Stops the music loop if it is playing."""
         if self.streaming:
             self.streaming = False
+            self.trigger_next_song()
             if self.client is not None:
                 await self.client.disconnect()
             self.client = None
+            if self.player is not None:
+                self.player.cancel()
+                self.player = None
         else:
             await context.send("Nothing to stop, you fool!")

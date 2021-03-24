@@ -1,16 +1,21 @@
 import pytest
 import mock
+import time
+import asyncio
 from duckbot.cogs import WhoCanItBeNow
 
 
 @pytest.mark.asyncio
 @mock.patch("discord.ext.commands.Bot")
 @mock.patch("discord.ext.commands.Context")
-async def test_start_creates_task(bot, context):
+@mock.patch("asyncio.AbstractEventLoop")
+async def test_start_creates_task(bot, context, loop):
     clazz = WhoCanItBeNow(bot)
+    bot.loop = loop
     await clazz._WhoCanItBeNow__start(context)
     assert clazz.player is not None
     assert clazz.streaming is True
+
 
 @pytest.mark.asyncio
 @mock.patch("discord.ext.commands.Bot")
@@ -29,11 +34,13 @@ async def test_start_already_started(bot, context):
 async def test_stop_disconnects(bot, context, client):
     clazz = WhoCanItBeNow(bot)
     clazz.streaming = True
+    clazz.player = asyncio.get_event_loop().create_task(clazz.stream_audio())
     clazz.client = client
     await clazz._WhoCanItBeNow__stop(context)
     client.disconnect.assert_called()
     assert clazz.client is None
     assert clazz.streaming is False
+
 
 @pytest.mark.asyncio
 @mock.patch("discord.ext.commands.Bot")
@@ -43,17 +50,3 @@ async def test_stop_not_streaming(bot, context):
     clazz.streaming = False
     await clazz._WhoCanItBeNow__stop(context)
     context.send.assert_called_once_with("Nothing to stop, you fool!")
-
-
-@pytest.mark.asyncio
-@mock.patch("discord.ext.commands.Bot")
-@mock.patch("duckbot.server.Channels")
-@mock.patch("discord.VoiceChannel")
-@mock.patch("discord.VoiceClient")
-async def test_stream_audio_loops_song(bot, channels, channel, client):
-    bot.get_cog.return_value = channels 
-    channels.get_channel_by_name.return_value = channel
-    clazz = WhoCanItBeNow(bot)
-    clazz.streaming = True
-    await clazz.stream_audio()
-    channels.get_channel_by_name.assert_called_once_with("Hangout 1")
