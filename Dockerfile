@@ -1,4 +1,4 @@
-# runs duckbot; requires .env to be available which contains api tokens
+# runs duckbot; requires duckbot/.env to be available which contains api tokens
 FROM python:3.8
 RUN apt-get update && apt-get -y install ffmpeg
 COPY requirements.txt /
@@ -6,6 +6,5 @@ RUN python -m pip install --upgrade pip
 RUN python -m pip install -r /requirements.txt
 COPY duckbot/ /duckbot/duckbot
 COPY resources/ /duckbot/resources
-COPY .env /duckbot/.env
 WORKDIR /duckbot
-CMD [ "python", "-m", "duckbot" ]
+CMD [ "python", "-u", "-m", "duckbot" ]
