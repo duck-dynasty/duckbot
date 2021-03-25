@@ -35,4 +35,4 @@ jobs:
         context: .
         tags: "${{ github.actor }}/duckbot:${{ github.sha }}"
     - name: Sanity Check Docker Image
-      run: docker run -v scripts:/duckbot/scripts "${{ github.actor }}/duckbot:${{ github.sha }}" /bin/bash -lc '. scripts/build/compile.sh'
+      run: docker run -v scripts:/duckbot/scripts "${{ github.actor }}/duckbot:${{ github.sha }}" /bin/bash -lc 'cd /duckbot && . scripts/build/compile.sh'
