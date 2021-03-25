@@ -5,4 +5,4 @@ RUN python -m pip install --upgrade pip
 RUN python -m pip install -r /requirements.txt
 COPY duckbot/ /duckbot/duckbot
 WORKDIR /duckbot
-CMD [ "python", "-m", "duckbot" ]
+CMD [ "python", "-u", "-m", "duckbot" ]
