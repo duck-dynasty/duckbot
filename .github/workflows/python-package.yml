@@ -33,4 +33,4 @@ jobs:
       with:
         push: false
         context: .
-        tag: "$GITHUB_ACTOR/duckbot:$GITHUB_SHA"
+        tags: "$GITHUB_ACTOR/duckbot:$GITHUB_SHA"
