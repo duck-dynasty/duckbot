@@ -34,3 +34,5 @@ jobs:
         push: false
         context: .
         tags: "${{ github.actor }}/duckbot:${{ github.sha }}"
+    - name: Sanity Check Docker Image
+      run: docker run "${{ github.actor }}/duckbot:${{ github.sha }}" /bin/bash -lc '. scripts/build/compile.sh'
