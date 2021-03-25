@@ -28,3 +28,9 @@ jobs:
       run: . scripts/build/compile.sh
     - name: Run Lint Checks
       run: . scripts/build/lint.sh
+    - name: Build Docker Image
+      uses: docker/build-push-action@v2
+      with:
+        push: false
+        context: .
+        tag: "$GITHUB_ACTOR/duckbot:$GITHUB_SHA"
