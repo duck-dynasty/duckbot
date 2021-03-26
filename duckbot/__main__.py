@@ -1,13 +1,16 @@
 import os
 import sys
-import signal
 from discord.ext import commands
 from duckbot.cogs import Duck, Tito, Typos, Recipe, Bitcoin, Insights, Kubernetes, AnnounceDay, ThankingRobot
 from duckbot.server import Channels, Emojis
+from duckbot.util import ConnectionTest
 
 
 if __name__ == "__main__":
     bot = commands.Bot(command_prefix="!", help_command=None)
+
+    if "connection-test" in sys.argv:
+        bot.add_cog(ConnectionTest(bot))
 
     # server cogs must be loaded first; any references to
     # them should happen in or after the `on_ready` event
@@ -23,10 +26,6 @@ if __name__ == "__main__":
     bot.add_cog(Kubernetes(bot))
     bot.add_cog(AnnounceDay(bot))
     bot.add_cog(ThankingRobot(bot))
-
-    if "connect" in sys.argv:
-        signal.signal(signal.SIGALRM, lambda sig, frame: sys.exit(0))
-        signal.alarm(2)
 
     if "dry-run" not in sys.argv:
         bot.run(os.getenv("DISCORD_TOKEN"))
