@@ -1,5 +1,6 @@
 import os
 import sys
+import signal
 from discord.ext import commands
 from duckbot.cogs import Duck, Tito, Typos, Recipe, Bitcoin, Insights, Kubernetes, AnnounceDay, ThankingRobot
 from duckbot.server import Channels, Emojis
@@ -22,6 +23,10 @@ if __name__ == "__main__":
     bot.add_cog(Kubernetes(bot))
     bot.add_cog(AnnounceDay(bot))
     bot.add_cog(ThankingRobot(bot))
+
+    if "connect" in sys.argv:
+        signal.signal(signal.SIGALRM, lambda sig, frame: sys.exit(0))
+        signal.alarm(2)
 
     if "dry-run" not in sys.argv:
         bot.run(os.getenv("DISCORD_TOKEN"))
