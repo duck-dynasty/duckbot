@@ -1,6 +1,5 @@
 {
     "files.eol": "\n",
-    "python.pythonPath": "/usr/bin/python3.8",
     "python.testing.pytestArgs": [
         "tests"
     ],
