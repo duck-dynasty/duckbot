@@ -44,7 +44,8 @@ jobs:
         -v $(pwd)/.git:/duckbot/.git \
         "${{ github.actor }}/duckbot:${{ github.sha }}" /bin/bash -c '. scripts/build/compile.sh'
     - name: Test Run Docker Image
-      run: docker run --rm \
+      run: |
+        docker run --rm \
         --env 'DUCKBOT_ARGS=connection-test' \
         --env 'DISCORD_TOKEN=nothing' \
         "${{ github.actor }}/duckbot:${{ github.sha }}"
