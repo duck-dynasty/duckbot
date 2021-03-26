@@ -1,6 +1,5 @@
 discord.py
 pynacl
-python-dotenv
 beautifulsoup4
 pytz
 holidays
