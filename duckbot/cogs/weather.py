@@ -1,7 +1,7 @@
 import urllib.request
 from bs4 import BeautifulSoup
 from discord.ext import commands, tasks
-import request
+import requests
 import json
 
 class Weather(commands.Cog):
