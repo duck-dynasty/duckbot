@@ -16,7 +16,7 @@ Before running DuckBot or any other scripts, you need to create a virtualenv to 
 The `venv.sh` script expects `python3.8` to be on the `$PATH` if it needs to build a new environment.
 
 ```sh
-. scripts/build/venv.sh
+. scripts/venv.sh
 ```
 
 ### Install Dependencies
