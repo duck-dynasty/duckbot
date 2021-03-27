@@ -14,13 +14,11 @@ def play(*args, **kwargs):
 @mock.patch("discord.ext.commands.Bot")
 @mock.patch("discord.ext.commands.Context")
 @mock.patch("duckbot.server.Channels")
-@mock.patch("duckbot.util.Resources")
 @mock.patch("discord.VoiceChannel")
 @mock.patch("discord.VoiceClient")
-async def test_task_loop(bot, context, channels, resources, voice, client):
-    bot.get_cog.side_effect = [channels, resources]
+async def test_task_loop(bot, context, channels, voice, client):
+    bot.get_cog.return_value = channels
     channels.get_channel_by_name.return_value = voice
-    resources.get.return_value = os.path.join(os.path.dirname(__file__), "..", "..", "resources", "bruh.mp3")
     voice.connect.return_value = async_value(client)
     client.play = play
     clazz = WhoCanItBeNow(bot)

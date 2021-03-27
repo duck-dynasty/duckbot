@@ -1,6 +1,7 @@
 import asyncio
 from discord.ext import commands
 from discord import FFmpegPCMAudio
+from importlib.resources import path
 
 
 class WhoCanItBeNow(commands.Cog):
@@ -12,7 +13,7 @@ class WhoCanItBeNow(commands.Cog):
         self.streaming = False
 
     def cog_unload(self):
-        asyncio.run(self.stop_if_running())
+        asyncio.get_event_loop().run_until_complete(self.stop_if_running())
 
     @commands.Cog.listener("on_error")
     @commands.Cog.listener("on_disconnect")
@@ -39,8 +40,10 @@ class WhoCanItBeNow(commands.Cog):
             if self.client is None or not self.client.is_connected():
                 self.client = await self.bot.get_cog("channels").get_channel_by_name("Hangout 1").connect()
             # need to load the song every time, it seems to keep internal state
-            song = FFmpegPCMAudio(self.bot.get_cog("resources").get("who-can-it-be-now.mp3"), options='-filter:a "volume=0.125"')
+            with path("resources", "bruh.mp3") as source:
+                song = FFmpegPCMAudio(source, options='-filter:a "volume=0.125"')
             self.client.play(song, after=self.trigger_next_song)
+            await asyncio.sleep(0)  # give up timeslice for `trigger_next_song`
             await self.stream.wait()
 
     def trigger_next_song(self, error=None):
