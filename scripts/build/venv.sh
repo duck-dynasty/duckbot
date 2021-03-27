@@ -10,3 +10,4 @@ elif [[ "$1" = "deactivate" ]]; then
 else
     . "$(git rev-parse --show-toplevel)/env/$1/bin/activate"
 fi
+# TODO just have `env` ?
