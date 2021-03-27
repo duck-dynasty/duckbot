@@ -11,16 +11,16 @@ A Discord bot for personal friend group. If you don't know me personally, consid
 View the [wiki](https://github.com/Chippers255/duckbot/wiki) for a short description on what the Duck does.
 
 ## Development
-Before running DuckBot or any other scripts, you need to create a virtualenv to run it in. The `venv.sh` script will destroy any existing virtual environments in this repository and create fresh `env/prod` and `env/dev` environments. You won't need to manage these explicitly if you use the scripts to install dependencies, run tests, etc.
+Before running DuckBot or any other scripts, you need to create a virtualenv to run it in. The `venv.sh` script will setup and activate the duckbot virtual environment. Run it before you run any other scripts to ensure you're using the right environment.
 
-The `venv.sh` script expects `python3.8` to be on the `$PATH`.
+The `venv.sh` script expects `python3.8` to be on the `$PATH` if it needs to build a new environment.
 
 ```sh
 . scripts/build/venv.sh
 ```
 
 ### Install Dependencies
-Should be run whenever you pull from `upstream/main`, or after you create the virtualenv for the first time.
+Should be run whenever you pull from `upstream/main`, or after you create the virtual environment for the first time.
 ```sh
 . scripts/build/install.sh
 ```
@@ -33,12 +33,6 @@ Should be run whenever you pull from `upstream/main`, or after you create the vi
 ```
 
 The `test` script also performs code coverage checks. [View the script](https://github.com/Chippers255/duckbot/blob/main/scripts/build/test.sh) to see the minimum required coverage. Discord.py decorators make it difficult to cover methods directly, so don't aim for 100% coverage.
-
-#### Containerized Tests
-If you like containers, you can also run all the tests as part of a docker image build. If the docker image is built, all the tests passed. The script deletes the image afterwards, pass or fail. Requires `docker` to be on the `$PATH`.
-```sh
-. scripts/build/docker-test.sh
-```
 
 ### Run DuckBot
 Requires `duckbut/.env` to be present, and the `DISCORD_TOKEN` environment variable to be set therein. The process will be killed after an hour.
