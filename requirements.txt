@@ -12,3 +12,4 @@ holidays
 # for linter
 flake8
 textblob
+requests
