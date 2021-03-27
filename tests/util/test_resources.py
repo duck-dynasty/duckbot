@@ -5,22 +5,25 @@ from duckbot.util import Resources
 
 
 @mock.patch("discord.ext.commands.Bot")
-def test_get_resource_exists(bot):
+@mock.patch("os.path.exists", return_value=True)
+def test_get_resource_exists(bot, exists):
     clazz = Resources(bot)
-    path = clazz.get("bruh.mp3")
-    expected = os.path.join(os.path.dirname(__file__), "..", "..", "resources", "bruh.mp3")
+    path = clazz.get("name")
+    expected = os.path.join(os.path.dirname(__file__), "..", "..", "resources", "name")
     assert os.path.abspath(expected) == path
 
 
 @mock.patch("discord.ext.commands.Bot")
-def test_get_resource_exists_path_join(bot):
+@mock.patch("os.path.exists", return_value=True)
+def test_get_resource_exists_path_join(bot, exists):
     clazz = Resources(bot)
-    path = clazz.get("tests", "test_resource")
-    expected = os.path.join(os.path.dirname(__file__), "..", "..", "resources", "tests", "test_resource")
+    path = clazz.get("dir", "file")
+    expected = os.path.join(os.path.dirname(__file__), "..", "..", "resources", "dir", "file")
     assert os.path.abspath(expected) == path
 
 
 @mock.patch("discord.ext.commands.Bot")
-def test_get_resource_not_exists(bot):
+@mock.patch("os.path.exists", return_value=False)
+def test_get_resource_not_exists(bot, exists):
     with pytest.raises(FileNotFoundError):
         Resources(bot).get("does not exist")
