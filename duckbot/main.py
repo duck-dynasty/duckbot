@@ -10,6 +10,7 @@ from cogs.insights import Insights
 from cogs.kubernetes import Kubernetes
 from cogs.announce_day import AnnounceDay
 from cogs.thanking_robot import ThankingRobot
+from cogs.weather import Weather
 from discord.ext import commands
 from server.channels import Channels
 from server.emojis import Emojis
@@ -32,6 +33,7 @@ if __name__ == "__main__":
     bot.add_cog(Kubernetes(bot))
     bot.add_cog(AnnounceDay(bot))
     bot.add_cog(ThankingRobot(bot))
+    bot.add_cog(Weather(bot))
 
     if "dry-run" not in sys.argv:
         # load the token from .env file
