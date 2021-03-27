@@ -40,7 +40,7 @@ class WhoCanItBeNow(commands.Cog):
             if self.client is None or not self.client.is_connected():
                 self.client = await self.bot.get_cog("channels").get_channel_by_name("Hangout 1").connect()
             # need to load the song every time, it seems to keep internal state
-            with path("resources", "bruh.mp3") as source:
+            with path("resources", "who-can-it-be-now.mp3") as source:
                 song = FFmpegPCMAudio(source, options='-filter:a "volume=0.125"')
             self.client.play(song, after=self.trigger_next_song)
             await asyncio.sleep(0)  # give up timeslice for `trigger_next_song`
