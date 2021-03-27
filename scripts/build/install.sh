@@ -1,9 +1,5 @@
-. "$(git rev-parse --show-toplevel)/env/prod/bin/activate" && \
-python3.8 -m pip install -r "$(git rev-parse --show-toplevel)/requirements.txt" && \
-deactivate && \
+python -m pip install --upgrade pip && \
 
-# activate test env
-. "$(git rev-parse --show-toplevel)/env/dev/bin/activate" && \
-python3.8 -m pip install -r "$(git rev-parse --show-toplevel)/requirements.txt" && \
-python3.8 -m pip install -r "$(git rev-parse --show-toplevel)/requirements-dev.txt" && \
-deactivate
+python -m pip install -r "$(git rev-parse --show-toplevel)/requirements.txt" && \
+
+python -m pip install -r "$(git rev-parse --show-toplevel)/requirements-dev.txt"
