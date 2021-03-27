@@ -81,7 +81,7 @@ class Typos(commands.Cog):
             return None
         else:
             return by_same_author[0]
-    def correct_sentence(self,str):
-       txt = TextBlob(str)
+    def correct_sentence(self,txtstring):
+       txt = TextBlob(txtstring)
        corrected_string = txt.correct()
        return corrected_string
