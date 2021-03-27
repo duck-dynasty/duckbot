@@ -43,7 +43,7 @@ jobs:
         -v $(pwd)/scripts:/duckbot/scripts \
         -v $(pwd)/.git:/duckbot/.git \
         "${{ github.actor }}/duckbot:${{ github.sha }}" /bin/bash -c '. scripts/build/compile.sh'
-    - name: Test Run Docker Image
+    - name: Test Docker Image Discord Connection
       run: |
         docker run --rm \
         --env 'DUCKBOT_ARGS=connection-test' \
