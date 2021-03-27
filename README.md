@@ -11,13 +11,16 @@ A Discord bot for personal friend group. If you don't know me personally, consid
 View the [wiki](https://github.com/Chippers255/duckbot/wiki) for a short description on what the Duck does.
 
 ## Development
-DuckBot uses `python3.8`. All of the scripts expect `python3.8` to be on the `$PATH`.  
-Scripts should be run from the repository root. When run from elsewhere, you may get moved to the repository root.
+Before running DuckBot or any other scripts, you need to create a virtualenv to run it in. The `venv.sh` script will destroy any existing virtual environments in this repository and create fresh `env/prod` and `env/dev` environments. You won't need to manage these explicitly if you use the scripts to install dependencies, run tests, etc.
 
-The `scripts/` directory contains scripts for development.
+The `venv.sh` script expects `python3.8` to be on the `$PATH`.
+
+```sh
+. scripts/build/venv.sh
+```
 
 ### Install Dependencies
-Should be run whenever you pull from `upstream/main`.
+Should be run whenever you pull from `upstream/main`, or after you create the virtualenv for the first time.
 ```sh
 . scripts/build/install.sh
 ```
