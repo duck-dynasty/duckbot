@@ -11,6 +11,7 @@ if [[ -d "$(git rev-parse --show-toplevel)/venv/" ]]; then
         which deactivate && deactivate
         rm -rf "$(git rev-parse --show-toplevel)/venv/" "$(git rev-parse --show-toplevel)/env/" "$(git rev-parse --show-toplevel)/ENV/" "$(git rev-parse --show-toplevel)/VENV/"
         python3.8 -m venv --clear --prompt duckbot "$(git rev-parse --show-toplevel)/venv/"
+        . "$(git rev-parse --show-toplevel)/venv/bin/activate"
     fi
 else
     # no venv, create one and activate it
