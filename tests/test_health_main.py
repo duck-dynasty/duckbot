@@ -8,7 +8,7 @@ def test_check_healthy(socket):
     socket.return_value.recv.return_value = b"healthy"
     with pytest.raises(SystemExit) as e:
         check()
-    assert e.value.code is 0
+    assert e.value.code == 0
     socket.return_value.close.assert_called()
 
 
@@ -17,7 +17,7 @@ def test_check_unhealthy(socket):
     socket.return_value.recv.return_value = b"unhealthy"
     with pytest.raises(SystemExit) as e:
         check()
-    assert e.value.code is not 0
+    assert e.value.code != 0
     socket.return_value.close.assert_called()
 
 
@@ -26,5 +26,5 @@ def test_check_connection_error(socket):
     socket.return_value.connect.side_effect = Exception("error")
     with pytest.raises(SystemExit) as e:
         check()
-    assert e.value.code is not 0
+    assert e.value.code != 0
     socket.return_value.close.assert_called()
