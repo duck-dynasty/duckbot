@@ -8,14 +8,17 @@ def check():
         sock.settimeout(10)  # seconds
         sock.connect(("127.0.0.1", 8008))
         data = sock.recv(1024)
-    except Exception:
+    except Exception as e:
+        print(f"{e.__class__.__name__}: {e}")
         data = None
     finally:
         sock.close()
 
     if data == b"healthy":
+        print("healthy")
         sys.exit(0)
     else:
+        print("unhealthy")
         sys.exit(1)
 
 
