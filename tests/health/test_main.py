@@ -1,6 +1,6 @@
 import mock
 import pytest
-from healthcheck.__main__ import check
+from duckbot.health.__main__ import check
 
 
 @mock.patch("socket.socket")
