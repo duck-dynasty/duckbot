@@ -65,3 +65,11 @@ def test_healthcheck_healthy(bot, reader, writer):
     clazz.healthcheck(reader, writer)
     writer.write.assert_called_once_with(b"healthy")
     writer.close.assert_called()
+
+
+@pytest.mark.asyncio
+@mock.patch("discord.ext.commands.Bot")
+@mock.patch("asyncio.start_server", return_value=None)
+async def test_start_health_check_tasks(bot, server):
+    clazz = HealthCheck(bot)
+    await clazz.start_health_check_tasks()
