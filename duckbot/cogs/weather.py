@@ -1,7 +1,6 @@
 import os
 import pyowm
 from pyowm.utils import config
-import pytz
 from discord.ext import commands
 
 degrees = "\N{DEGREE SIGN}C"
@@ -10,8 +9,6 @@ degrees = "\N{DEGREE SIGN}C"
 class Weather(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.tz = pytz.timezone("US/Eastern")
-        self.weather = None
         self.owm_client = None
         self.db = {}
 
@@ -23,6 +20,9 @@ class Weather(commands.Cog):
 
     @commands.command(name="weather")
     async def weather_command(self, context, *args):
+        await self.weather(context, *args)
+
+    async def weather(self, context, *args):
         try:
             if len(args) > 0:
                 command = args[0]
@@ -44,7 +44,7 @@ class Weather(commands.Cog):
             city = args[0]
             country = args[1].upper() if len(args) > 1 else None
             if country is not None and len(country) != 2:
-                await context.send(f"Country must be an ISO country code, such as CA for Canada.")
+                await context.send("Country must be an ISO country code, such as CA for Canada.")
                 return None
             locations = cities.locations_for(city, country=country)
             if not locations:
@@ -55,7 +55,7 @@ class Weather(commands.Cog):
                     index = args[2]
                     return locations[int(index) - 1]
                 else:
-                    message = f"Multiple cities found for search, narrow your search or specify an index for the following:\n"
+                    message = "Multiple cities found for search, narrow your search or specify an index for the following:\n"
                     options = [f"{i+1}: {self.__city_string(city)}" for i, city in enumerate(locations)]
                     await context.send(message + "\n".join(options))
                     return None
@@ -78,11 +78,11 @@ class Weather(commands.Cog):
         else:
             city = await self.get_location(context, *args)
         if city is not None:
-            await context.send(self.weather_message(city))
+            weather = self.owm().weather_manager().one_call(lat=city.lat, lon=city.lon, exclude="minutely,hourly", units="metric")
+            await context.send(self.weather_message(city, weather))
 
-    def weather_message(self, city):
+    def weather_message(self, city, weather):
         messages = []
-        weather = self.owm().weather_manager().one_call(lat=city.lat, lon=city.lon, exclude="minutely,hourly", units="metric")
         current = weather.current
         temp = current.temperature()
         now = f"{round(temp['temp'])}{degrees}"
@@ -103,14 +103,14 @@ class Weather(commands.Cog):
             messages.append(f"Today, you can expect a high of {max_today} and a low of {min_today}, with a {rain_chance}% chance of {today.snow['all']}cm of snow.")
         else:
             messages.append(f"Today, you can expect a high of {max_today} and a low of {min_today}.")
-        
+
         if rain_chance > 50 and self.__is_rainy(today):
             messages.append("Don't forget your umbrella!")
         elif rain_chance and self.__is_snowy(today):
             messages.append("Time to hire the old man down the street to shovel the driveway.")
-        elif temp_today['max'] < -10:
+        elif temp_today["max"] < -10:
             messages.append("Thankfully, I don't feel the cold.")
-        elif temp_today['max'] > 35:
+        elif temp_today["max"] > 35:
             messages.append("I might need to take a break today, it hot.")
         return " ".join(messages)
 
