@@ -23,11 +23,14 @@ class Weather(commands.Cog):
 
     @commands.command(name="weather")
     async def weather_command(self, context, *args):
-        if len(args) > 0:
-            command = args[0]
-            if command == "set":
-                return await self.set_weather(context, *args[1:])
-        return await self.get_weather(context, *args)
+        try:
+            if len(args) > 0:
+                command = args[0]
+                if command == "set":
+                    return await self.set_weather(context, *args[1:])
+            return await self.get_weather(context, *args)
+        except:
+            await context.send("Iunno. Figure it out.")
 
     async def set_weather(self, context, *args):
         city = await self.get_location(context, *args)
