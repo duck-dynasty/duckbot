@@ -103,6 +103,15 @@ class Weather(commands.Cog):
             messages.append(f"Today, you can expect a high of {max_today} and a low of {min_today}, with a {rain_chance}% chance of {today.snow['all']}cm of snow.")
         else:
             messages.append(f"Today, you can expect a high of {max_today} and a low of {min_today}.")
+        
+        if rain_chance > 50 and self.__is_rainy(today):
+            messages.append("Don't forget your umbrella!")
+        elif rain_chance and self.__is_snowy(today):
+            messages.append("Time to hire the old man down the street to shovel the driveway.")
+        elif temp_today['max'] < -10:
+            messages.append("Thankfully, I don't feel the cold.")
+        elif temp_today['max'] > 35:
+            messages.append("I might need to take a break today, it hot.")
         return " ".join(messages)
 
     def __is_rainy(self, weather):
