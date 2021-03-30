@@ -18,7 +18,8 @@ def make_city(name):
 
 
 @mock.patch("discord.ext.commands.Bot")
-def test_owm_creates_instance(bot):
+@mock.patch("os.getenv", return_value="token")
+def test_owm_creates_instance(bot, env):
     clazz = Weather(bot)
     assert clazz.owm() == clazz.owm_client
 

@@ -15,7 +15,7 @@ class Weather(commands.Cog):
     def owm(self) -> pyowm.OWM:
         if self.owm_client is None:
             conf = config.get_default_config_for_subscription_type("free")
-            self.owm_client = pyowm.OWM(os.environ["OPENWEATHER_TOKEN"], conf)
+            self.owm_client = pyowm.OWM(os.getenv("OPENWEATHER_TOKEN"), conf)
         return self.owm_client
 
     @commands.command(name="weather")
