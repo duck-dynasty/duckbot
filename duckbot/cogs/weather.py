@@ -27,12 +27,12 @@ class Weather(commands.Cog):
             if len(args) > 0:
                 command = args[0]
                 if command == "set":
-                    return await self.set_weather(context, *args[1:])
+                    return await self.set_default_location(context, *args[1:])
             return await self.get_weather(context, *args)
         except:
             await context.send("Iunno. Figure it out.")
 
-    async def set_weather(self, context, *args):
+    async def set_default_location(self, context, *args):
         city = await self.get_location(context, *args)
         if city is not None:
             self.db[context.author.id] = city

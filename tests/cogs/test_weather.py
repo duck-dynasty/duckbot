@@ -148,7 +148,7 @@ async def test_get_location_multiple_matches_with_index(bot, owm, context, city_
 @mock.patch("discord.ext.commands.Bot")
 @mock.patch("pyowm.OWM")
 @mock.patch("discord.ext.commands.Context")
-async def test_set_weather_location_saved(bot, owm, context):
+async def test_set_default_location_location_saved(bot, owm, context):
     clazz = make_weather(bot, owm)
     context.author.id = 1
 
@@ -156,7 +156,7 @@ async def test_set_weather_location_saved(bot, owm, context):
         return make_city("city")
 
     clazz.get_location = mock_get_location
-    await clazz.set_weather(context)
+    await clazz.set_default_location(context)
     context.send.assert_called()
     assert clazz.db[context.author.id].to_dict() == make_city("city").to_dict()
 
@@ -165,14 +165,14 @@ async def test_set_weather_location_saved(bot, owm, context):
 @mock.patch("discord.ext.commands.Bot")
 @mock.patch("pyowm.OWM")
 @mock.patch("discord.ext.commands.Context")
-async def test_set_weather_location_not_saved(bot, owm, context):
+async def test_set_default_location_location_not_saved(bot, owm, context):
     clazz = make_weather(bot, owm)
 
     async def mock_get_location(context, *args):
         return None
 
     clazz.get_location = mock_get_location
-    await clazz.set_weather(context)
+    await clazz.set_default_location(context)
     assert clazz.db == {}
 
 
