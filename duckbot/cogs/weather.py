@@ -106,7 +106,7 @@ class Weather(commands.Cog):
 
         if rain_chance > 50 and self.__is_rainy(today):
             messages.append("Don't forget your umbrella!")
-        elif rain_chance and self.__is_snowy(today):
+        elif rain_chance > 50 and self.__is_snowy(today):
             messages.append("Time to hire the old man down the street to shovel the driveway.")
         elif temp_today["max"] < -10:
             messages.append("Thankfully, I don't feel the cold.")
@@ -115,7 +115,7 @@ class Weather(commands.Cog):
         return " ".join(messages)
 
     def __is_rainy(self, weather):
-        return "rain" in weather.status.lower() or "rain" in weather.detailed_status.lower()
+        return (weather.status and "rain" in weather.status.lower()) or (weather.detailed_status and "rain" in weather.detailed_status.lower())
 
     def __is_snowy(self, weather):
-        return "snow" in weather.status.lower() or "snow" in weather.detailed_status.lower()
+        return (weather.status and "snow" in weather.status.lower()) or (weather.detailed_status and "snow" in weather.detailed_status.lower())
