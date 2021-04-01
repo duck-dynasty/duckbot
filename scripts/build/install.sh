@@ -1,7 +1,7 @@
 # install apt dependencies
 sudo apt-get update && sudo apt-get install -y \
     ffmpeg \
-    postgresql \
+    postgresql libpq-dev \
     && \
 
 # upgrade venv pip

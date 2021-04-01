@@ -1,0 +1,14 @@
+services:
+    duckbot:
+        build: .
+        env_file: ./duckbot/.env
+
+    postgres:
+        image: postgres
+        environment:
+            # POSTGRES_HOST_AUTH_METHOD: trust
+            POSTGRES_DB: postgres
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+        volumes:
+        - ./data
