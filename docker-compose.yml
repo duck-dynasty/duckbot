@@ -1,12 +1,17 @@
+version: "3.9"
 services:
     duckbot:
         build: .
+        image: duckbot:latest
         env_file: ./duckbot/.env
 
     postgres:
-        image: postgres
+        image: postgres:13.2
         environment:
             POSTGRES_USER: duckbot
             POSTGRES_PASSWORD: pond
         volumes:
-        - ./data
+        - duckbot_dbdata:/var/lib/postgresql/data
+
+volumes:
+    duckbot_dbdata:
