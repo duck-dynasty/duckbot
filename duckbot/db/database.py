@@ -16,3 +16,4 @@ class Database(commands.Cog, name="db"):
             result = conn.execute(text("SELECT x, y FROM some_table"))
             for row in result:
                 print(f"x: {row.x}  y: {row.y}")
+                await context.send(f"x={row.x}  y={row.y}")
