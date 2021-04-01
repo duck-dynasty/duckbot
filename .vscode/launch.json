@@ -10,7 +10,8 @@
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "module": "duckbot",
-            "console": "integratedTerminal"
+            "console": "integratedTerminal",
+            "envFile": "${workspaceFolder}/duckbot/.env"
         }
     ]
 }

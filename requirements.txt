@@ -3,3 +3,5 @@ validators
 beautifulsoup4
 pytz
 holidays
+psycopg2
+sqlalchemy

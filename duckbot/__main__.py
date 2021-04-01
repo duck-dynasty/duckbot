@@ -3,10 +3,13 @@ import sys
 from discord.ext import commands
 from duckbot.cogs import Duck, Tito, Typos, Recipe, Bitcoin, Insights, Kubernetes, AnnounceDay, ThankingRobot
 from duckbot.server import Channels, Emojis
+from duckbot.db import Database
 
 
 if __name__ == "__main__":
     bot = commands.Bot(command_prefix="!", help_command=None)
+
+    bot.add_cog(Database(bot))
 
     # server cogs must be loaded first; any references to
     # them should happen in or after the `on_ready` event
