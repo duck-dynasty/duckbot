@@ -11,11 +11,6 @@ services:
         environment:
             POSTGRES_USER: duckbot
             POSTGRES_PASSWORD: pond
-        healthcheck:
-            test: ["CMD", "pg_isready", "-U", "duckbot"]
-            interval: 60s
-            timeout: 5s
-            retries: 6
         volumes:
         - duckbot_dbdata:/var/lib/postgresql/data
 

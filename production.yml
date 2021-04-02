@@ -1,0 +1,41 @@
+version: "3.9"
+services:
+    duckbot:
+        healthcheck:
+            test: ["CMD", "python", "-m", "duckbot.health"]
+            start_period: 60s
+            interval: 60s
+            retries: 5
+        deploy:
+            mode: replicated
+            replicas: 1
+            restart_policy:
+                condition: any
+                window: 10s
+            update_config:
+                failure_action: rollback
+                monitor: 10s
+                order: start-first
+            rollback_config:
+                monitor: 10s
+                order: start-first
+
+    postgres:
+        healthcheck:
+            test: ["CMD", "pg_isready", "-U", "duckbot"]
+            interval: 60s
+            timeout: 5s
+            retries: 6
+        deploy:
+            mode: replicated
+            replicas: 1
+            restart_policy:
+                condition: any
+                window: 10s
+            update_config:
+                failure_action: rollback
+                monitor: 10s
+                order: start-first
+            rollback_config:
+                monitor: 10s
+                order: start-first
