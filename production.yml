@@ -15,10 +15,10 @@ services:
             update_config:
                 failure_action: rollback
                 monitor: 10s
-                order: start-first
+                order: stop-first
             rollback_config:
                 monitor: 10s
-                order: start-first
+                order: stop-first
 
     postgres:
         healthcheck:
@@ -35,7 +35,7 @@ services:
             update_config:
                 failure_action: rollback
                 monitor: 10s
-                order: start-first
+                order: stop-first
             rollback_config:
                 monitor: 10s
-                order: start-first
+                order: stop-first
