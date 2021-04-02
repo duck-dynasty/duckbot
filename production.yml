@@ -14,10 +14,9 @@ services:
                 window: 10s
             update_config:
                 failure_action: rollback
-                monitor: 90s
+                monitor: 300s
                 order: stop-first
             rollback_config:
-                monitor: 90s
                 order: stop-first
 
     postgres:
@@ -35,8 +34,7 @@ services:
                 window: 10s
             update_config:
                 failure_action: rollback
-                monitor: 90s
+                monitor: 300s
                 order: stop-first
             rollback_config:
-                monitor: 90s
                 order: stop-first
