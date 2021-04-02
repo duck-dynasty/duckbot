@@ -4,10 +4,11 @@ from discord.ext import commands
 from duckbot.cogs import Duck, Tito, Typos, Recipe, Bitcoin, Insights, Kubernetes, AnnounceDay, ThankingRobot, WhoCanItBeNow
 from duckbot.server import Channels, Emojis
 from duckbot.db import Database
+from duckbot.health import HealthCheck
 
 
-if __name__ == "__main__":
-    bot = commands.Bot(command_prefix="!", help_command=None)
+def duckbot(bot):
+    bot.add_cog(HealthCheck(bot))
 
     bot.add_cog(Database(bot))
 
@@ -29,3 +30,8 @@ if __name__ == "__main__":
 
     if "dry-run" not in sys.argv:
         bot.run(os.getenv("DISCORD_TOKEN"))
+
+
+if __name__ == "__main__":
+    bot = commands.Bot(command_prefix="!", help_command=None)
+    duckbot(bot)
