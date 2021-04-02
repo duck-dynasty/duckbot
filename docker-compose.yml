@@ -2,8 +2,9 @@ version: "3.9"
 services:
     duckbot:
         build: .
-        image: duckbot:latest
-        env_file: ./duckbot/.env
+        image: localhost:5000/duckbot
+        environment:
+            DISCORD_TOKEN: ${DISCORD_TOKEN}
 
     postgres:
         image: postgres:13.2
@@ -11,9 +12,9 @@ services:
             POSTGRES_USER: duckbot
             POSTGRES_PASSWORD: pond
         healthcheck:
-            test: ["CMD-SHELL", "pg_isready -U duckbot"]
+            test: ["CMD", "pg_isready", "-U", "duckbot"]
             interval: 60s
-            timeout: 10s
+            timeout: 5s
             retries: 6
         volumes:
         - duckbot_dbdata:/var/lib/postgresql/data
