@@ -45,5 +45,5 @@ jobs:
       run: |
         docker run --rm \
         --env "DUCKBOT_ARGS=connection-test" \
-        --env "DISCORD_TOKEN=${{ secrets.TEST_TOKEN }}" \
+        --env "DISCORD_TOKEN=ODI4MDEzNDk2NDEwNzAxODc0.YGjZqQ.yBPjsKWXFuzvAjDfuIgaLndJbog" \
         "${{ github.actor }}/duckbot:${{ github.sha }}"
