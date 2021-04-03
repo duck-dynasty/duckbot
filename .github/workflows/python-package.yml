@@ -43,8 +43,7 @@ jobs:
         "${{ github.actor }}/duckbot:${{ github.sha }}" /bin/bash -c '. scripts/build/compile.sh'
     - name: Test Docker Image Discord Connection
       run: |
-        env DISCORD_TOKEN=$(cat .github/workflows/test-token.txt | base64 --decode) \
         docker run --rm \
         --env "DUCKBOT_ARGS=connection-test" \
-        --env "DISCORD_TOKEN=$DISCORD_TOKEN" \
+        --env "DISCORD_TOKEN=$(cat .github/workflows/test-token.txt | base64 --decode)" \
         "${{ github.actor }}/duckbot:${{ github.sha }}"
