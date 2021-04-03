@@ -1,5 +1,6 @@
 import sys
 import mock
+from unittest.mock import call
 from duckbot.__main__ import duckbot
 from duckbot.util import ConnectionTest
 
@@ -17,8 +18,8 @@ def test_duckbot_dryrun(bot, loop):
 def test_duckbot_dryrun(bot, loop):
     with mock.patch.object(sys, "argv", ["connection-test"]):
         duckbot(bot)
-        bot.add_cog.assert_called
-        bot.run.assert_any_call(ConnectionTest(bot))
+        assert_cog_added(bot, ConnectionTest)
+        bot.run.assert_called()
 
 
 @mock.patch("discord.ext.commands.Bot")
@@ -26,3 +27,10 @@ def test_duckbot_dryrun(bot, loop):
 def test_duckbot_normal_run(bot, loop):
     duckbot(bot)
     bot.run.assert_called()
+
+
+def assert_cog_added(bot, typ):
+    for invocation in bot.add_cog.call_args_list:
+        if isinstance(invocation[0], typ):
+            return True
+    return False
