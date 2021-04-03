@@ -1,6 +1,5 @@
 import pytest
 import mock
-import os
 import asyncio
 from tests.async_mock_ext import async_value
 from duckbot.cogs import WhoCanItBeNow
