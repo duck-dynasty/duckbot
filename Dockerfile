@@ -9,4 +9,5 @@ RUN python -m pip install -r /requirements.txt
 COPY resources/ /duckbot/resources
 COPY duckbot/ /duckbot/duckbot
 WORKDIR /duckbot
-CMD [ "python", "-u", "-m", "duckbot" ]
+ENV DUCKBOT_ARGS ""
+CMD [ "python", "-m", "duckbot" , "${DUCKBOT_ARGS}" ]

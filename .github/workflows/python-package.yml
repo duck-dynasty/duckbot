@@ -28,3 +28,22 @@ jobs:
       run: . scripts/build/compile.sh
     - name: Run Lint Checks
       run: . scripts/build/lint.sh
+    - name: Build Docker Image
+      uses: docker/build-push-action@v2
+      with:
+        push: false
+        context: .
+        tags: "${{ github.actor }}/duckbot:${{ github.sha }}"
+    - name: Sanity Check Docker Image
+      run: |
+        docker run --rm \
+        --network none \
+        -v $(pwd)/scripts:/duckbot/scripts \
+        -v $(pwd)/.git:/duckbot/.git \
+        "${{ github.actor }}/duckbot:${{ github.sha }}" /bin/bash -c '. scripts/build/compile.sh'
+    - name: Test Docker Image Discord Connection
+      run: |
+        docker run --rm \
+        --env 'DUCKBOT_ARGS=connection-test' \
+        --env 'DISCORD_TOKEN=nothing' \
+        "${{ github.actor }}/duckbot:${{ github.sha }}"
