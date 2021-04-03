@@ -24,8 +24,6 @@ jobs:
       run: . scripts/build/install.sh
     - name: Run Tests
       run: . scripts/build/test.sh
-    - name: Ensure main Interprets
-      run: . scripts/build/compile.sh
     - name: Run Lint Checks
       run: . scripts/build/lint.sh
     - name: Build Docker Image
@@ -37,10 +35,9 @@ jobs:
     - name: Sanity Check Docker Image
       run: |
         docker run --rm \
+        --env 'DUCKBOT_ARGS=dry-run' \
         --network none \
-        -v $(pwd)/scripts:/duckbot/scripts \
-        -v $(pwd)/.git:/duckbot/.git \
-        "${{ github.actor }}/duckbot:${{ github.sha }}" /bin/bash -c '. scripts/build/compile.sh'
+        "${{ github.actor }}/duckbot:${{ github.sha }}"
     - name: Test Docker Image Discord Connection
       run: |
         docker run --rm \
