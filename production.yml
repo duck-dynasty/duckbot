@@ -1,3 +1,4 @@
+# The docker-compose file for production environment, with healthchecks and automatic container restarts.
 version: "3.9"
 services:
     duckbot:
