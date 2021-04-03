@@ -11,13 +11,16 @@ A Discord bot for personal friend group. If you don't know me personally, consid
 View the [wiki](https://github.com/Chippers255/duckbot/wiki) for a short description on what the Duck does.
 
 ## Development
-DuckBot uses `python3.8`. All of the scripts expect `python3.8` to be on the `$PATH`.  
-Scripts should be run from the repository root. When run from elsewhere, you may get moved to the repository root.
+Before running DuckBot or any other scripts, you need to create a virtualenv to run it in. The `venv.sh` script will setup and activate the duckbot virtual environment. Run it before you run any other scripts to ensure you're using the right environment.
 
-The `scripts/` directory contains scripts for development.
+The `venv.sh` script expects `python3.8` to be on the `$PATH` if it needs to build a new environment.
+
+```sh
+. scripts/venv.sh
+```
 
 ### Install Dependencies
-Should be run whenever you pull from `upstream/main`.
+Should be run whenever you pull from `upstream/main`, or after you create the virtual environment for the first time.
 ```sh
 . scripts/build/install.sh
 ```
@@ -30,12 +33,6 @@ Should be run whenever you pull from `upstream/main`.
 ```
 
 The `test` script also performs code coverage checks. [View the script](https://github.com/Chippers255/duckbot/blob/main/scripts/build/test.sh) to see the minimum required coverage. Discord.py decorators make it difficult to cover methods directly, so don't aim for 100% coverage.
-
-#### Containerized Tests
-If you like containers, you can also run all the tests as part of a docker image build. If the docker image is built, all the tests passed. The script deletes the image afterwards, pass or fail. Requires `docker` to be on the `$PATH`.
-```sh
-. scripts/build/docker-test.sh
-```
 
 ### Run DuckBot
 Requires `duckbut/.env` to be present, and the `DISCORD_TOKEN` environment variable to be set therein. The process will be killed after an hour.
