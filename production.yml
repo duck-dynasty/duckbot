@@ -23,3 +23,5 @@ services:
         environment:
             AUTOHEAL_START_PERIOD: "5"
             AUTOHEAL_CONTAINER_LABEL: all
+        volumes:
+        - /var/run/docker.sock:/var/run/docker.sock
