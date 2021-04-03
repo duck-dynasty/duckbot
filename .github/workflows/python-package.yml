@@ -32,13 +32,13 @@ jobs:
         push: false
         context: .
         tags: "${{ github.actor }}/duckbot:${{ github.sha }}"
-    - name: Sanity Check Docker Image
+    - name: Sanity Check
       run: |
         docker run --rm \
         --env 'DUCKBOT_ARGS=dry-run' \
         --network none \
         "${{ github.actor }}/duckbot:${{ github.sha }}"
-    - name: Test Docker Image Discord Connection
+    - name: Test Connection to Discord
       run: |
         docker run --rm \
         --env 'DUCKBOT_ARGS=connection-test' \
