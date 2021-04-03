@@ -1,3 +1,6 @@
+# install apt dependencies
+sudo apt-get update && sudo apt-get install -y ffmpeg && \
+
 # upgrade venv pip
 python -m pip install --upgrade pip && \
 
