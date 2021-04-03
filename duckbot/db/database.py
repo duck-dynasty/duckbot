@@ -1,5 +1,4 @@
 from discord.ext import commands
-import psycopg2
 from sqlalchemy import create_engine, text
 
 

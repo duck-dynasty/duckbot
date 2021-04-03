@@ -15,7 +15,7 @@ def test_duckbot_dryrun(bot, loop):
 
 @mock.patch("discord.ext.commands.Bot")
 @mock.patch("discord.ext.tasks.Loop")
-def test_duckbot_dryrun(bot, loop):
+def test_duckbot_connection_test(bot, loop):
     with mock.patch.object(sys, "argv", ["connection-test"]):
         duckbot(bot)
         assert_cog_added(bot, ConnectionTest)
