@@ -8,6 +8,18 @@ services:
             interval: 60s
             retries: 3
         restart: always
+        deploy:
+            mode: replicated
+            replicas: 1
+            restart_policy:
+                condition: any
+                window: 10s
+            update_config:
+                failure_action: rollback
+                monitor: 300s
+                order: start-first
+            rollback_config:
+                order: stop-first
 
     postgres:
         healthcheck:
@@ -17,6 +29,18 @@ services:
             timeout: 5s
             retries: 3
         restart: always
+        deploy:
+            mode: replicated
+            replicas: 1
+            restart_policy:
+                condition: any
+                window: 10s
+            update_config:
+                failure_action: rollback
+                monitor: 300s
+                order: start-first
+            rollback_config:
+                order: stop-first
 
     # autoheal:
     #     image: willfarrell/autoheal
