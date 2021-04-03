@@ -44,6 +44,6 @@ jobs:
     - name: Test Docker Image Discord Connection
       run: |
         docker run --rm \
-        --env 'DUCKBOT_ARGS=connection-test' \
-        --env 'DISCORD_TOKEN=${{ secrets.TEST_TOKEN }}' \
+        --env "DUCKBOT_ARGS=connection-test" \
+        --env "DISCORD_TOKEN=${{ secrets.TEST_TOKEN }}" \
         "${{ github.actor }}/duckbot:${{ github.sha }}"
