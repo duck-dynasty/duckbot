@@ -46,3 +46,39 @@ jobs:
         --env "DUCKBOT_ARGS=connection-test" \
         --env "DISCORD_TOKEN=$(cat .github/workflows/test-token.txt | base64 --decode)" \
         "${{ github.actor }}/duckbot:${{ github.sha }}"
+
+  deploy:
+    needs: release
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.repository == 'Chippers255/duckbot' && github.ref == 'main'
+    steps:
+    - uses: actions/checkout@v2
+
+    # see also: https://docs.docker.com/ci-cd/github-actions/
+    - name: Login to Docker
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USER }}
+        password: ${{ secrets.DOCKER_PASS }}
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Build and Push Docker Image
+      id: docker_build
+      uses: docker/build-push-action@v2
+      with:
+        push: true
+        context: .
+        tags: "${{ secrets.DOCKER_USER }}/duckbot:latest"
+
+    - name: Display Image Digest
+      run: echo ${{ steps.docker_build.outputs.digest }}
+
+    - name: Trigger Deployment
+      run: |
+        curl -X POST https://api.github.com/repos/${{ secrets.DEPLOY_REPO }}/dispatches \
+          -u "${{ secrets.ACCESS_TOKEN }}" \
+          -H "Accept: application/vnd.github.everest-preview+json" \
+          -H "Content-Type: application/json" \
+          --data '{"event_type": "deploy-duckbot"}'
