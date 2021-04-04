@@ -1,5 +1,5 @@
 discord.py
-validators
+pynacl
 beautifulsoup4
 pytz
 holidays
