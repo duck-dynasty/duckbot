@@ -41,13 +41,3 @@ services:
                 order: start-first
             rollback_config:
                 order: stop-first
-
-    # autoheal:
-    #     image: willfarrell/autoheal
-    #     restart: always
-    #     environment:
-    #         AUTOHEAL_START_PERIOD: "10"
-    #         AUTOHEAL_INTERVAL: "30"
-    #         AUTOHEAL_CONTAINER_LABEL: all
-    #     volumes:
-    #     - /var/run/docker.sock:/var/run/docker.sock
