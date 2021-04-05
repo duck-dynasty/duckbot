@@ -32,8 +32,7 @@ def duckbot(bot):
     bot.add_cog(ThankingRobot(bot))
     bot.add_cog(WhoCanItBeNow(bot))
 
-    if "dry-run" not in sys.argv:
-        bot.run(os.getenv("DISCORD_TOKEN"))
+    bot.run(os.getenv("DISCORD_TOKEN"))
 
 
 if __name__ == "__main__":
