@@ -19,7 +19,7 @@ city = response['region']
 class Weather(commands.Cog):
 
       @commands.Cog.listener('on_message')
-      async def correct_typos(self, message):
+      async def get_weather(self, message):
             """Fetch weather details"""
             if message.content.strip().lower() == "!weather":
                data = await requests.get(f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}")

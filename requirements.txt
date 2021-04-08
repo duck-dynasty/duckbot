@@ -13,3 +13,4 @@ holidays
 flake8
 textblob
 requests
+pathlib
