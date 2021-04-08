@@ -34,9 +34,9 @@ async def test_correct(bot):
 async def test_correct_case_insensitive(bot):
     with patch_urlopen(content("")):
         clazz = Typos(bot, start_tasks=False)
-        clazz.corrections = {"to0": ["too"]}
+        clazz.corrections = {"to0": ["to"]}
         correction = clazz.correct_sentence("toO")
-        assert correction == "too"
+        assert correction == "to"
 
 
 def content(*args):
