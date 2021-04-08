@@ -14,8 +14,10 @@ ip = os.getenv('IP')
 api_key = os.getenv('API_KEY')
 ip_url = "https://api.ipstack.com/"+str(ip)+"access_key="+str(ip_key)
 response = requests.get(ip_url).json()
-city = response['region']
-
+#city = response['region'] 
+#city is taken by default Vienna as the ipurl
+#not working until and unless .env stores the keys in user local
+city = 'Vienna'
 class Weather(commands.Cog):
 
       @commands.Cog.listener('on_message')
