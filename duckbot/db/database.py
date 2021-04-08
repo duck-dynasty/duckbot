@@ -7,7 +7,6 @@ class Database(commands.Cog, name="db"):
         self.bot = bot
         self.db = create_engine("postgresql+psycopg2://duckbot:pond@postgres/duckbot", echo=True, pool_pre_ping=True)
 
-    @commands.command(name="db")
     async def test_command(self, context):
         with self.db.connect() as conn:
             conn.execute(text("CREATE TABLE IF NOT EXISTS some_table (x int, y int)"))
