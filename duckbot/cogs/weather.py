@@ -12,7 +12,7 @@ load_dotenv(dotenv_path=dotenv_path)
 ip_key = os.getenv('IP_KEY')
 ip = os.getenv('IP')
 api_key = os.getenv('API_KEY')
-ip_url = "https://api.ipstack.com/"+ip+"access_key="+ip_key
+ip_url = "https://api.ipstack.com/"+str(ip)+"access_key="+str(ip_key)
 response = requests.get(ip_url).json()
 city = response['region']
 
