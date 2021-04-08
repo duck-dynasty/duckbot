@@ -11,4 +11,5 @@ COPY duckbot/ /duckbot/duckbot
 WORKDIR /duckbot
 HEALTHCHECK --retries=5 --start-period=60s --interval=60s \
   CMD python -m duckbot.health || exit 1
-CMD [ "python", "-u", "-m", "duckbot" ]
+ENV DUCKBOT_ARGS ""
+CMD [ "sh", "-c", "python -u -m duckbot $DUCKBOT_ARGS" ]
