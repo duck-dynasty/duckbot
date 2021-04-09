@@ -40,8 +40,6 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.repository == 'Chippers255/duckbot'
     steps:
-    - uses: actions/checkout@v2
-
     - name: Trigger Deployment
       run: |
         curl -X POST https://api.github.com/repos/${{ secrets.DEPLOY_REPO }}/dispatches \
