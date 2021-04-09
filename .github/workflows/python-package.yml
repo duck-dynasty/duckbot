@@ -49,7 +49,7 @@ jobs:
         username: chippers255
         password: ${{ secrets.DOCKER_PASS }}
     - name: Build Docker Image
-      run: docker-compose build --progress plain
+      run: docker-compose build --progress plain --build-arg platform=linux/arm
     - name: Push Docker Image
       run: docker-compose push
 
