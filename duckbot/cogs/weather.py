@@ -33,12 +33,12 @@ class Weather(commands.Cog):
         await self.set_default_location(context, city, country, index)
 
     async def set_default_location(self, context, city: str, country: str, index: int):
-        location = await self.get_location(context, city, country, index)
+        location = await self.search_location(context, city, country, index)
         if location is not None:
             self.db[context.author.id] = location
             await context.send(f"Location saved! {self.__location_string(location)}")
 
-    async def get_location(self, context, city: str, country: str, index: int):
+    async def search_location(self, context, city: str, country: str, index: int):
         if city is not None:
             cities = self.owm().city_id_registry()
             country = country.upper() if country is not None else None
@@ -74,7 +74,7 @@ class Weather(commands.Cog):
             else:
                 await context.send("Set a default location using `!weather set city country-code`")
         else:
-            location = await self.get_location(context, city, country, index)
+            location = await self.search_location(context, city, country, index)
         if location is not None:
             weather = self.owm().weather_manager().one_call(lat=location.lat, lon=location.lon, exclude="minutely,hourly", units="metric")
             await context.send(self.weather_message(location, weather))

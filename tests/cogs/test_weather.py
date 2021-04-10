@@ -58,9 +58,9 @@ async def test_weather_get_failure(bot, owm, context):
 @mock.patch("discord.ext.commands.Bot")
 @mock.patch("pyowm.OWM")
 @mock.patch("discord.ext.commands.Context")
-async def test_get_location_no_args(bot, owm, context):
+async def test_search_location_no_args(bot, owm, context):
     clazz = make_weather(bot, owm)
-    assert await clazz.get_location(context, None, None, None) is None
+    assert await clazz.search_location(context, None, None, None) is None
     context.send.assert_called_once_with("Not enough arguments to determine weather location, see https://github.com/Chippers255/duckbot/wiki#weather")
 
 
@@ -69,11 +69,11 @@ async def test_get_location_no_args(bot, owm, context):
 @mock.patch("pyowm.OWM")
 @mock.patch("discord.ext.commands.Context")
 @mock.patch("pyowm.commons.cityidregistry.CityIDRegistry")
-async def test_get_location_no_matches(bot, owm, context, city_id):
+async def test_search_location_no_matches(bot, owm, context, city_id):
     clazz = make_weather(bot, owm)
     owm.city_id_registry.return_value = city_id
     city_id.locations_for.return_value = []
-    assert await clazz.get_location(context, "city", None, None) is None
+    assert await clazz.search_location(context, "city", None, None) is None
     context.send.assert_called_once_with("No cities found matching search.")
 
 
@@ -82,11 +82,11 @@ async def test_get_location_no_matches(bot, owm, context, city_id):
 @mock.patch("pyowm.OWM")
 @mock.patch("discord.ext.commands.Context")
 @mock.patch("pyowm.commons.cityidregistry.CityIDRegistry")
-async def test_get_location_single_return_city_only(bot, owm, context, city_id):
+async def test_search_location_single_return_city_only(bot, owm, context, city_id):
     clazz = make_weather(bot, owm)
     owm.city_id_registry.return_value = city_id
     city_id.locations_for.return_value = [make_city("city")]
-    city = await clazz.get_location(context, "city", None, None)
+    city = await clazz.search_location(context, "city", None, None)
     assert city.to_dict() == make_city("city").to_dict()
 
 
@@ -95,11 +95,11 @@ async def test_get_location_single_return_city_only(bot, owm, context, city_id):
 @mock.patch("pyowm.OWM")
 @mock.patch("discord.ext.commands.Context")
 @mock.patch("pyowm.commons.cityidregistry.CityIDRegistry")
-async def test_get_location_single_return_country_arg(bot, owm, context, city_id):
+async def test_search_location_single_return_country_arg(bot, owm, context, city_id):
     clazz = make_weather(bot, owm)
     owm.city_id_registry.return_value = city_id
     city_id.locations_for.return_value = [make_city("city")]
-    city = await clazz.get_location(context, "city", "US", None)
+    city = await clazz.search_location(context, "city", "US", None)
     assert city.to_dict() == make_city("city").to_dict()
 
 
@@ -108,11 +108,11 @@ async def test_get_location_single_return_country_arg(bot, owm, context, city_id
 @mock.patch("pyowm.OWM")
 @mock.patch("discord.ext.commands.Context")
 @mock.patch("pyowm.commons.cityidregistry.CityIDRegistry")
-async def test_get_location_single_return_invalid_country_code(bot, owm, context, city_id):
+async def test_search_location_single_return_invalid_country_code(bot, owm, context, city_id):
     clazz = make_weather(bot, owm)
     owm.city_id_registry.return_value = city_id
     city_id.locations_for.return_value = [make_city("city")]
-    city = await clazz.get_location(context, "city", "invalid", None)
+    city = await clazz.search_location(context, "city", "invalid", None)
     assert city is None
     context.send.assert_called_once_with("Country must be an ISO country code, such as CA for Canada.")
 
@@ -122,11 +122,11 @@ async def test_get_location_single_return_invalid_country_code(bot, owm, context
 @mock.patch("pyowm.OWM")
 @mock.patch("discord.ext.commands.Context")
 @mock.patch("pyowm.commons.cityidregistry.CityIDRegistry")
-async def test_get_location_multiple_matches(bot, owm, context, city_id):
+async def test_search_location_multiple_matches(bot, owm, context, city_id):
     clazz = make_weather(bot, owm)
     owm.city_id_registry.return_value = city_id
     city_id.locations_for.return_value = [make_city("1"), make_city("2")]
-    city = await clazz.get_location(context, "city", None, None)
+    city = await clazz.search_location(context, "city", None, None)
     assert city is None
     context.send.assert_called()
 
@@ -136,11 +136,11 @@ async def test_get_location_multiple_matches(bot, owm, context, city_id):
 @mock.patch("pyowm.OWM")
 @mock.patch("discord.ext.commands.Context")
 @mock.patch("pyowm.commons.cityidregistry.CityIDRegistry")
-async def test_get_location_multiple_matches_with_index(bot, owm, context, city_id):
+async def test_search_location_multiple_matches_with_index(bot, owm, context, city_id):
     clazz = make_weather(bot, owm)
     owm.city_id_registry.return_value = city_id
     city_id.locations_for.return_value = [make_city("1"), make_city("2")]
-    city = await clazz.get_location(context, "city", "US", 1)
+    city = await clazz.search_location(context, "city", "US", 1)
     assert city.to_dict() == make_city("1").to_dict()
 
 
@@ -152,10 +152,10 @@ async def test_set_default_location_location_saved(bot, owm, context):
     clazz = make_weather(bot, owm)
     context.author.id = 1
 
-    async def mock_get_location(context, city, country, index):
+    async def mock_search_location(context, city, country, index):
         return make_city("city")
 
-    clazz.get_location = mock_get_location
+    clazz.search_location = mock_search_location
     await clazz.set_default_location(context, None, None, None)
     context.send.assert_called()
     assert clazz.db[context.author.id].to_dict() == make_city("city").to_dict()
@@ -168,10 +168,10 @@ async def test_set_default_location_location_saved(bot, owm, context):
 async def test_set_default_location_location_not_saved(bot, owm, context):
     clazz = make_weather(bot, owm)
 
-    async def mock_get_location(context, city, country, index):
+    async def mock_search_location(context, city, country, index):
         return None
 
-    clazz.get_location = mock_get_location
+    clazz.search_location = mock_search_location
     await clazz.set_default_location(context, None, None, None)
     assert clazz.db == {}
 
@@ -211,10 +211,10 @@ async def test_get_weather_default_location(bot, owm, context, weather):
 async def test_get_weather_provided_location(bot, owm, context, weather):
     clazz = make_weather(bot, owm)
 
-    async def mock_get_location(context, *args):
+    async def mock_search_location(context, *args):
         return make_city("city")
 
-    clazz.get_location = mock_get_location
+    clazz.search_location = mock_search_location
     clazz.weather_message = stub_weather_msg
     owm.weather_manager.return_value = weather
     await clazz.get_weather(context, "city", None, None)
