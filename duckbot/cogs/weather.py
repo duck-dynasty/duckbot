@@ -18,31 +18,30 @@ class Weather(commands.Cog):
             self.owm_client = pyowm.OWM(os.getenv("OPENWEATHER_TOKEN"), conf)
         return self.owm_client
 
-    @commands.command(name="weather")
-    async def weather_command(self, context, *args):
-        await self.weather(context, *args)
+    @commands.group(name="weather", invoke_without_command=True)
+    async def weather_command(self, context, city: str = None, country: str = None, index: int = None):
+        await self.weather(context, city, country, index)
 
-    async def weather(self, context, *args):
+    async def weather(self, context, city: str, country: str, index: int):
         try:
-            if len(args) > 0:
-                command = args[0]
-                if command == "set":
-                    return await self.set_default_location(context, *args[1:])
-            return await self.get_weather(context, *args)
-        except:
-            await context.send("Iunno. Figure it out.")
+            return await self.get_weather(context, city, country, index)
+        except Exception as e:
+            await context.send(f"Iunno. Figure it out.\n{e}")
 
-    async def set_default_location(self, context, *args):
-        city = await self.get_location(context, *args)
+    @weather_command.command(name="set", invoke_without_command=True)
+    async def weather_set_command(self, context, city: str = None, country: str = None, index: int = None):
+        await self.set_default_location(context, city, country, index)
+
+    async def set_default_location(self, context, city: str, country: str, index: int):
+        location = await self.get_location(context, city, country, index)
+        if location is not None:
+            self.db[context.author.id] = location
+            await context.send(f"Location saved! {self.__location_string(location)}")
+
+    async def get_location(self, context, city: str, country: str, index: int):
         if city is not None:
-            self.db[context.author.id] = city
-            await context.send(f"Location saved! {self.__city_string(city)}")
-
-    async def get_location(self, context, *args):
-        if len(args) > 0:
             cities = self.owm().city_id_registry()
-            city = args[0]
-            country = args[1].upper() if len(args) > 1 else None
+            country = country.upper() if country is not None else None
             if country is not None and len(country) != 2:
                 await context.send("Country must be an ISO country code, such as CA for Canada.")
                 return None
@@ -51,12 +50,11 @@ class Weather(commands.Cog):
                 await context.send("No cities found for city search")
                 return None
             elif len(locations) > 1:
-                if len(args) > 2:
-                    index = args[2]
+                if index is not None:
                     return locations[int(index) - 1]
                 else:
                     message = "Multiple cities found for search, narrow your search or specify an index for the following:\n"
-                    options = [f"{i+1}: {self.__city_string(city)}" for i, city in enumerate(locations)]
+                    options = [f"{i+1}: {self.__location_string(city)}" for i, city in enumerate(locations)]
                     await context.send(message + "\n".join(options))
                     return None
             else:
@@ -65,21 +63,21 @@ class Weather(commands.Cog):
             await context.send("Not enough arguments to determine weather location, see https://github.com/Chippers255/duckbot/wiki#weather")
             return None
 
-    def __city_string(self, city):
+    def __location_string(self, city):
         return f"{city.name}, {city.country}, geolocation = ({city.lat}, {city.lon})"
 
-    async def get_weather(self, context, *args):
-        city = None
-        if not args:
+    async def get_weather(self, context, city: str, country: str, index: int):
+        location = None
+        if city is None:
             if context.author.id in self.db:
-                city = self.db[context.author.id]
+                location = self.db[context.author.id]
             else:
-                await context.send("Set a default location using !weather set city country-code")
+                await context.send("Set a default location using `!weather set city country-code`")
         else:
-            city = await self.get_location(context, *args)
-        if city is not None:
-            weather = self.owm().weather_manager().one_call(lat=city.lat, lon=city.lon, exclude="minutely,hourly", units="metric")
-            await context.send(self.weather_message(city, weather))
+            location = await self.get_location(context, city, country, index)
+        if location is not None:
+            weather = self.owm().weather_manager().one_call(lat=location.lat, lon=location.lon, exclude="minutely,hourly", units="metric")
+            await context.send(self.weather_message(location, weather))
 
     def weather_message(self, city, weather):
         messages = []
