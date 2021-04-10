@@ -90,7 +90,9 @@ class Weather(commands.Cog):
         location = None
         if city is None:
             with self.bot.get_cog("db").session(SavedLocation) as session:
+                print(session)
                 saved = session.get(SavedLocation, context.author.id)
+                print(saved)
             if saved is not None:
                 location = Location(name=saved.name, lon=saved.longitude, lat=saved.latitude, _id=saved.city_id, country=saved.country)
             else:

@@ -1,5 +1,6 @@
 import pytest
 import mock
+import pyowm
 from pyowm.weatherapi25.location import Location
 from pyowm.weatherapi25.one_call import OneCall
 from pyowm.weatherapi25.weather import Weather as pyowmWeather
@@ -179,12 +180,13 @@ async def test_set_default_location_location_not_saved(bot, owm, context):
 @pytest.mark.asyncio
 @mock.patch("discord.ext.commands.Bot")
 @mock.patch("duckbot.db.Database")
-@mock.patch("sqlalchemy.orm.ORMExecuteState")
+@mock.patch("sqlalchemy.orm.session.Session")
 @mock.patch("pyowm.OWM")
 @mock.patch("discord.ext.commands.Context")
 @mock.patch("pyowm.weatherapi25.weather_manager.WeatherManager")
 async def test_get_weather_no_default_no_args(bot, db, session, owm, context, weather):
     bot.get_cog.return_value = db
+    owm.return_value.__enter__.return_value = None
     db.session.return_value = session
     session.get.return_value = None
     clazz = make_weather(bot, owm)
