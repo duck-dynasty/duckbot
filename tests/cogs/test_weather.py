@@ -74,7 +74,7 @@ async def test_get_location_no_matches(bot, owm, context, city_id):
     owm.city_id_registry.return_value = city_id
     city_id.locations_for.return_value = []
     assert await clazz.get_location(context, "city", None, None) is None
-    context.send.assert_called_once_with("No cities found for city search")
+    context.send.assert_called_once_with("No cities found matching search.")
 
 
 @pytest.mark.asyncio

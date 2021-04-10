@@ -47,13 +47,13 @@ class Weather(commands.Cog):
                 return None
             locations = cities.locations_for(city, country=country)
             if not locations:
-                await context.send("No cities found for city search")
+                await context.send("No cities found matching search.")
                 return None
             elif len(locations) > 1:
                 if index is not None:
                     return locations[int(index) - 1]
                 else:
-                    message = "Multiple cities found for search, narrow your search or specify an index for the following:\n"
+                    message = f"Multiple cities found matching search.\nNarrow your search or specify an index to pick one of the following:\n"
                     options = [f"{i+1}: {self.__location_string(city)}" for i, city in enumerate(locations)]
                     await context.send(message + "\n".join(options))
                     return None
