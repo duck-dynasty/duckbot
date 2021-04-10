@@ -5,6 +5,7 @@ services:
         image: chippers255/duckbot:latest
         environment:
             DISCORD_TOKEN: ${DISCORD_TOKEN}
+            OPENWEATHER_TOKEN: ${OPENWEATHER_TOKEN}
 
     postgres:
         image: postgres:13.2
