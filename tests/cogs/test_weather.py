@@ -178,10 +178,15 @@ async def test_set_default_location_location_not_saved(bot, owm, context):
 
 @pytest.mark.asyncio
 @mock.patch("discord.ext.commands.Bot")
+@mock.patch("duckbot.db.Database")
+@mock.patch("sqlalchemy.orm.ORMExecuteState")
 @mock.patch("pyowm.OWM")
 @mock.patch("discord.ext.commands.Context")
 @mock.patch("pyowm.weatherapi25.weather_manager.WeatherManager")
-async def test_get_weather_no_default_no_args(bot, owm, context, weather):
+async def test_get_weather_no_default_no_args(bot, db, session, owm, context, weather):
+    bot.get_cog.return_value = db
+    db.session.return_value = session
+    session.get.return_value = None
     clazz = make_weather(bot, owm)
     owm.weather_manager.return_value = weather
     await clazz.get_weather(context, None, None, None)

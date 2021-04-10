@@ -1,9 +1,25 @@
 import os
 import pyowm
 from pyowm.utils import config
+from pyowm.weatherapi25.location import Location
 from discord.ext import commands
+from sqlalchemy.orm import declarative_base
+from sqlalchemy import Column, BigInteger, String, Float
 
 degrees = "\N{DEGREE SIGN}C"
+
+Base = declarative_base()
+
+
+class SavedLocation(Base):
+    __tablename__ = "weather_locations"
+
+    id = Column(BigInteger, primary_key=True)
+    name = Column(String, nullable=False)
+    country = Column(String, nullable=False)
+    city_id = Column(BigInteger, nullable=False)
+    latitude = Column(Float, nullable=False)
+    longitude = Column(Float, nullable=False)
 
 
 class Weather(commands.Cog):
@@ -36,6 +52,10 @@ class Weather(commands.Cog):
         location = await self.search_location(context, city, country, index)
         if location is not None:
             self.db[context.author.id] = location
+            saved_location = SavedLocation(id=context.author.id, name=location.name, country=location.country, city_id=location.id, latitude=location.lat, longitude=location.lon)
+            with self.bot.get_cog("db").session(SavedLocation) as session:
+                session.merge(saved_location)
+                session.commit()
             await context.send(f"Location saved! {self.__location_string(location)}")
 
     async def search_location(self, context, city: str, country: str, index: int):
@@ -69,8 +89,10 @@ class Weather(commands.Cog):
     async def get_weather(self, context, city: str, country: str, index: int):
         location = None
         if city is None:
-            if context.author.id in self.db:
-                location = self.db[context.author.id]
+            with self.bot.get_cog("db").session(SavedLocation) as session:
+                saved = session.get(SavedLocation, context.author.id)
+            if saved is not None:
+                location = Location(name=saved.name, lon=saved.longitude, lat=saved.latitude, _id=saved.city_id, country=saved.country)
             else:
                 await context.send("Set a default location using `!weather set city country-code`")
         else:
