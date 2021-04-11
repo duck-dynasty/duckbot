@@ -70,7 +70,7 @@ class Weather(commands.Cog):
                 if index is not None:
                     return locations[int(index) - 1]
                 else:
-                    message = f"Multiple cities found matching search.\nNarrow your search or specify an index to pick one of the following:\n"
+                    message = "Multiple cities found matching search.\nNarrow your search or specify an index to pick one of the following:\n"
                     options = [f"{i+1}: {self.__location_string(city)}" for i, city in enumerate(locations)]
                     await context.send(message + "\n".join(options))
                     return None

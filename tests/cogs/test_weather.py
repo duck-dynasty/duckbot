@@ -1,10 +1,8 @@
 import pytest
 import mock
-import pyowm
 from pyowm.weatherapi25.location import Location
 from pyowm.weatherapi25.one_call import OneCall
 from pyowm.weatherapi25.weather import Weather as pyowmWeather
-from tests.async_mock_ext import async_value
 from duckbot.cogs import Weather
 from duckbot.cogs.weather import SavedLocation
 

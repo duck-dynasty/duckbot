@@ -1,9 +1,9 @@
-import pytest
 import mock
 from sqlalchemy.orm import declarative_base
 from duckbot.db import Database
 
 Base = declarative_base()
+
 
 @mock.patch("discord.ext.commands.Bot")
 def test_ctor_creates_engine(bot):
