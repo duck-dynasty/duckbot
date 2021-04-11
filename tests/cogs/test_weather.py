@@ -6,6 +6,7 @@ from pyowm.weatherapi25.one_call import OneCall
 from pyowm.weatherapi25.weather import Weather as pyowmWeather
 from tests.async_mock_ext import async_value
 from duckbot.cogs import Weather
+from duckbot.cogs.weather import SavedLocation
 
 
 def make_weather(bot, owm):
@@ -147,19 +148,24 @@ async def test_search_location_multiple_matches_with_index(bot, owm, context, ci
 
 @pytest.mark.asyncio
 @mock.patch("discord.ext.commands.Bot")
+@mock.patch("duckbot.db.Database")
+@mock.patch("sqlalchemy.orm.session.Session")
 @mock.patch("pyowm.OWM")
 @mock.patch("discord.ext.commands.Context")
-async def test_set_default_location_location_saved(bot, owm, context):
+async def test_set_default_location_location_saved(bot, db, session, owm, context):
     clazz = make_weather(bot, owm)
     context.author.id = 1
+    bot.get_cog.return_value = db
+    db.session.return_value.__enter__.return_value = session
 
     async def mock_search_location(context, city, country, index):
         return make_city("city")
 
+    city = make_city("city")
     clazz.search_location = mock_search_location
     await clazz.set_default_location(context, None, None, None)
-    context.send.assert_called()
-    assert clazz.db[context.author.id].to_dict() == make_city("city").to_dict()
+    context.send.assert_called_once_with(f"Location saved! {city.name}, {city.country}, geolocation = ({city.lat}, {city.lon})")
+    session.merge.assert_called()
 
 
 @pytest.mark.asyncio
@@ -174,7 +180,7 @@ async def test_set_default_location_location_not_saved(bot, owm, context):
 
     clazz.search_location = mock_search_location
     await clazz.set_default_location(context, None, None, None)
-    assert clazz.db == {}
+    bot.get_cog.assert_not_called()
 
 
 @pytest.mark.asyncio
@@ -186,8 +192,7 @@ async def test_set_default_location_location_not_saved(bot, owm, context):
 @mock.patch("pyowm.weatherapi25.weather_manager.WeatherManager")
 async def test_get_weather_no_default_no_args(bot, db, session, owm, context, weather):
     bot.get_cog.return_value = db
-    owm.return_value.__enter__.return_value = None
-    db.session.return_value = session
+    db.session.return_value.__enter__.return_value = session
     session.get.return_value = None
     clazz = make_weather(bot, owm)
     owm.weather_manager.return_value = weather
@@ -197,13 +202,17 @@ async def test_get_weather_no_default_no_args(bot, db, session, owm, context, we
 
 @pytest.mark.asyncio
 @mock.patch("discord.ext.commands.Bot")
+@mock.patch("duckbot.db.Database")
+@mock.patch("sqlalchemy.orm.session.Session")
 @mock.patch("pyowm.OWM")
 @mock.patch("discord.ext.commands.Context")
 @mock.patch("pyowm.weatherapi25.weather_manager.WeatherManager")
-async def test_get_weather_default_location(bot, owm, context, weather):
+async def test_get_weather_default_location(bot, db, session, owm, context, weather):
+    bot.get_cog.return_value = db
+    db.session.return_value.__enter__.return_value = session
+    session.get.return_value = SavedLocation(id=1, name="city", country="country", city_id=123, latitude=1, longitude=2)
     clazz = make_weather(bot, owm)
     context.author.id = 1
-    clazz.db[1] = make_city("city")
     clazz.weather_message = stub_weather_msg
     owm.weather_manager.return_value = weather
     await clazz.get_weather(context, None, None, None)

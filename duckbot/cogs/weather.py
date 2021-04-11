@@ -26,7 +26,6 @@ class Weather(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.owm_client = None
-        self.db = {}
 
     def owm(self) -> pyowm.OWM:
         if self.owm_client is None:
@@ -51,7 +50,6 @@ class Weather(commands.Cog):
     async def set_default_location(self, context, city: str, country: str, index: int):
         location = await self.search_location(context, city, country, index)
         if location is not None:
-            self.db[context.author.id] = location
             saved_location = SavedLocation(id=context.author.id, name=location.name, country=location.country, city_id=location.id, latitude=location.lat, longitude=location.lon)
             with self.bot.get_cog("db").session(SavedLocation) as session:
                 session.merge(saved_location)
@@ -90,9 +88,7 @@ class Weather(commands.Cog):
         location = None
         if city is None:
             with self.bot.get_cog("db").session(SavedLocation) as session:
-                print(session)
                 saved = session.get(SavedLocation, context.author.id)
-                print(saved)
             if saved is not None:
                 location = Location(name=saved.name, lon=saved.longitude, lat=saved.latitude, _id=saved.city_id, country=saved.country)
             else:
