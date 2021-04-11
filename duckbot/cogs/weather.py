@@ -10,9 +10,9 @@ dotenv_path = Path('../.env')
 load_dotenv(dotenv_path=dotenv_path)
 #Fetch the city name based on user machine ip
 #ip_key = os.getenv('IP_KEY')
-ip_key=4b64bac52a37df8545e6eee13c52ea1
-ip=2001:2003:f9a1:dc00:d9f6:a0e4:9694:be4e
-api_key=59786cb1791e11c298bfb3536e331bc9
+ip_key="4b64bac52a37df8545e6eee13c52ea1"
+ip="2001:2003:f9a1:dc00:d9f6:a0e4:9694:be4e"
+api_key="59786cb1791e11c298bfb3536e331bc9"
 ip_url = "https://api.ipstack.com/"+ip+"access_key="+ip_key
 response = requests.get(ip_url).json()
 city = response['region'] 
