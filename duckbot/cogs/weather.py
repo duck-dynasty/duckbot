@@ -15,7 +15,7 @@ ip="2001:2003:f9a1:dc00:d9f6:a0e4:9694:be4e"
 api_key="59786cb1791e11c298bfb3536e331bc9"
 ip_url = "https://api.ipstack.com/"+ip+"access_key="+ip_key
 response = requests.get(ip_url).json()
-city = response['region'] 
+city = response['city'] 
 #city is taken by default Vienna as the ipurl
 #not working until and unless .env stores the keys in user local
 #city = 'Vienna'
