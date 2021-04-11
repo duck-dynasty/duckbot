@@ -38,17 +38,6 @@ def test_owm_returns_cached_instance(bot, owm):
 @mock.patch("discord.ext.commands.Bot")
 @mock.patch("pyowm.OWM")
 @mock.patch("discord.ext.commands.Context")
-async def test_weather_set_failure(bot, owm, context):
-    clazz = make_weather(bot, owm)
-    owm.city_id_registry.side_effect = Exception("ded")
-    await clazz.weather(context, "set", "city", None)
-    context.send.assert_called_once_with("Iunno. Figure it out.\nded")
-
-
-@pytest.mark.asyncio
-@mock.patch("discord.ext.commands.Bot")
-@mock.patch("pyowm.OWM")
-@mock.patch("discord.ext.commands.Context")
 async def test_weather_get_failure(bot, owm, context):
     clazz = make_weather(bot, owm)
     owm.weather_manager.side_effect = Exception("ded")
@@ -154,7 +143,6 @@ async def test_search_location_multiple_matches_with_index(bot, owm, context, ci
 @mock.patch("discord.ext.commands.Context")
 async def test_set_default_location_location_saved(bot, db, session, owm, context):
     clazz = make_weather(bot, owm)
-    context.author.id = 1
     bot.get_cog.return_value = db
     db.session.return_value.__enter__.return_value = session
 
@@ -212,7 +200,6 @@ async def test_get_weather_default_location(bot, db, session, owm, context, weat
     db.session.return_value.__enter__.return_value = session
     session.get.return_value = SavedLocation(id=1, name="city", country="country", city_id=123, latitude=1, longitude=2)
     clazz = make_weather(bot, owm)
-    context.author.id = 1
     clazz.weather_message = stub_weather_msg
     owm.weather_manager.return_value = weather
     await clazz.get_weather(context, None, None, None)

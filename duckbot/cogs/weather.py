@@ -58,12 +58,11 @@ class Weather(commands.Cog):
 
     async def search_location(self, context, city: str, country: str, index: int):
         if city is not None:
-            cities = self.owm().city_id_registry()
             country = country.upper() if country is not None else None
             if country is not None and len(country) != 2:
                 await context.send("Country must be an ISO country code, such as CA for Canada.")
                 return None
-            locations = cities.locations_for(city, country=country)
+            locations = self.owm().city_id_registry().locations_for(city, country=country)
             if not locations:
                 await context.send("No cities found matching search.")
                 return None
