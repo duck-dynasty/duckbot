@@ -5,7 +5,6 @@ from discord.ext import commands
 class FormulaOne(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        regional_indicator_a = 0x0001F1E6
         red_a = "\U0001F170"
         red_b = "\U0001F171"
         self.phrases = [
