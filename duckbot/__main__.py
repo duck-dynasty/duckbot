@@ -1,7 +1,7 @@
 import os
 import sys
 from discord.ext import commands
-from duckbot.cogs import Duck, Tito, Typos, Recipe, Bitcoin, Insights, Kubernetes, AnnounceDay, ThankingRobot, WhoCanItBeNow
+from duckbot.cogs import Duck, Tito, Typos, Recipe, Bitcoin, Insights, Kubernetes, AnnounceDay, ThankingRobot, WhoCanItBeNow, FormulaOne
 from duckbot.server import Channels, Emojis
 from duckbot.db import Database
 from duckbot.health import HealthCheck
@@ -28,6 +28,7 @@ def duckbot(bot):
     bot.add_cog(Bitcoin(bot))
     bot.add_cog(Insights(bot))
     bot.add_cog(Kubernetes(bot))
+    bot.add_cog(FormulaOne(bot))
     bot.add_cog(AnnounceDay(bot))
     bot.add_cog(ThankingRobot(bot))
     bot.add_cog(WhoCanItBeNow(bot))
