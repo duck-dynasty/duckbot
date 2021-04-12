@@ -12,7 +12,7 @@ class Fortune(commands.Cog):
 
     def get_fortune(self):
         message = self.__get_fortune_output()
-        while len(message) > 1900:
+        while len(message) > 1950:  # discord has a 2000 character limit, just leaving a buffer
             message = self.__get_fortune_output()
         return f"```{message}```"
 
