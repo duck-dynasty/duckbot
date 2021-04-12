@@ -13,5 +13,3 @@ COPY resources/ ./resources
 COPY duckbot/ ./duckbot
 ENV DUCKBOT_ARGS ""
 CMD [ "sh", "-c", "python -u -m duckbot $DUCKBOT_ARGS" ]
-
-# fortune -a | cowsay -f $(ls /usr/share/cowsay/cows/ | shuf -n1)
