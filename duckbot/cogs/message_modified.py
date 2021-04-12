@@ -1,7 +1,5 @@
-from discord import Embed
 from discord.ext import commands
 import subprocess
-import difflib
 
 
 class MessageModified(commands.Cog):
