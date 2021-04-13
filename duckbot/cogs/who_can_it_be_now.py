@@ -13,8 +13,9 @@ class WhoCanItBeNow(commands.Cog):
         self.streaming = False
 
     def cog_unload(self):
-        task = self.bot.loop.create_task(self.__stop(None))
+        task = self.bot.loop.create_task(self.stop_if_running())
         self.bot.loop.run_until_complete(task)
+        # asyncio.get_event_loop().run_until_complete(self.stop_if_running())
 
     @commands.Cog.listener("on_error")
     @commands.Cog.listener("on_disconnect")
