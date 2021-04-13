@@ -16,15 +16,6 @@ def test_duckbot_connection_test(bot, loop):
 
 @mock.patch("discord.ext.commands.Bot")
 @mock.patch("discord.ext.tasks.Loop")
-def test_duckbot_connection_test(bot, loop):
-    with mock.patch.object(sys, "argv", ["connection-test"]):
-        duckbot(bot)
-        assert_cog_added(bot, ConnectionTest)
-        bot.run.assert_called()
-
-
-@mock.patch("discord.ext.commands.Bot")
-@mock.patch("discord.ext.tasks.Loop")
 def test_duckbot_normal_run(bot, loop):
     duckbot(bot)
     bot.run.assert_called()
