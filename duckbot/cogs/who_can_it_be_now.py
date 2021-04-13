@@ -12,9 +12,6 @@ class WhoCanItBeNow(commands.Cog):
         self.player = None
         self.streaming = False
 
-    def cog_unload(self):
-        asyncio.get_event_loop().run_until_complete(self.stop_if_running())
-
     @commands.Cog.listener("on_error")
     @commands.Cog.listener("on_disconnect")
     async def stop_if_running(self, error=None):
