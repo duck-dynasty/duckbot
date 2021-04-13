@@ -12,6 +12,9 @@ class WhoCanItBeNow(commands.Cog):
         self.player = None
         self.streaming = False
 
+    def cog_unload(self):
+        self.bot.loop.create_task(self.stop_if_running())
+
     @commands.Cog.listener("on_error")
     @commands.Cog.listener("on_disconnect")
     async def stop_if_running(self, error=None):
