@@ -68,6 +68,7 @@ async def test_stop_not_streaming(bot, context):
 
 @mock.patch("discord.ext.commands.Bot")
 def test_cog_unload_stops_streaming(bot):
+    bot.loop = asyncio.get_event_loop()
     clazz = WhoCanItBeNow(bot)
     clazz.streaming = True
     clazz.cog_unload()
