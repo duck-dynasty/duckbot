@@ -17,7 +17,7 @@ def async_mock_await_fix():
 
 @pytest.fixture
 async def bot() -> Bot:
-    """Returns a spy discord.ext.commands.Bot instance with a stubbed `run` method. The close is destroyed after use."""
+    """Returns a spy discord.ext.commands.Bot instance with a stubbed `run` method. The bot is closed afterwards."""
     b = mock.Mock(wraps=Bot(command_prefix="!", help_command=None))
     with mock.patch.object(Bot, "run"):  # stub run so it does nothing
         yield b
