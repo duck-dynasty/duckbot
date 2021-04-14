@@ -5,18 +5,14 @@ from duckbot.__main__ import duckbot
 from duckbot.util import ConnectionTest
 
 
-@mock.patch("discord.ext.commands.Bot")
-@mock.patch("discord.ext.tasks.Loop")
-def test_duckbot_connection_test(bot, loop):
+def test_duckbot_connection_test(bot):
     with mock.patch.object(sys, "argv", ["connection-test"]):
         duckbot(bot)
         assert_cog_added(bot, ConnectionTest)
         bot.run.assert_called()
 
 
-@mock.patch("discord.ext.commands.Bot")
-@mock.patch("discord.ext.tasks.Loop")
-def test_duckbot_normal_run(bot, loop):
+def test_duckbot_normal_run(bot):
     duckbot(bot)
     bot.run.assert_called()
 
