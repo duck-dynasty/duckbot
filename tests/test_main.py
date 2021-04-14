@@ -5,16 +5,18 @@ from duckbot.__main__ import duckbot
 from duckbot.util import ConnectionTest
 
 
-def test_duckbot_connection_test(bot):
+def test_duckbot_connection_test(bot, monkeypatch):
+    monkeypatch.setenv("DISCORD_TOKEN", "token")
     with mock.patch.object(sys, "argv", ["connection-test"]):
         duckbot(bot)
         assert_cog_added(bot, ConnectionTest)
-        bot.run.assert_called()
+        bot.run.assert_called_once_with("token")
 
 
-def test_duckbot_normal_run(bot):
+def test_duckbot_normal_run(bot, monkeypatch):
+    monkeypatch.setenv("DISCORD_TOKEN", "token")
     duckbot(bot)
-    bot.run.assert_called()
+    bot.run.assert_called_once_with("token")
 
 
 def assert_cog_added(bot, typ):
