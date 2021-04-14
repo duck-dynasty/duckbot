@@ -8,4 +8,5 @@ def assert_cog_added_of_type(bot: Bot, tpye):
         if isinstance(invocation[0][0], tpye):
             called = True
     if not called:
+        # this fails with a decent assertion failure message
         bot.add_cog.assert_any_call(tpye)
