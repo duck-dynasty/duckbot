@@ -16,6 +16,7 @@ responses = [
     ":eyes:",
     ":exploding_head:",
     ":eggplant: :sweat_drops:",
+    ":cricket:",
 ]
 
 
