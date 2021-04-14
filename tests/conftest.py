@@ -1,13 +1,6 @@
-import sys
-import os
 import pytest
 import mock
-
-# allow for importing modules in the tests directory
-sys.path.append(os.path.dirname(__file__))
-
-# unify the module import scheme between src and tst
-sys.path.insert(0, os.path.abspath(os.path.join("..", "duckbot", "duckbot")))
+from discord.ext.commands import Bot
 
 
 @pytest.fixture(autouse=True)
@@ -20,3 +13,12 @@ def async_mock_await_fix():
 
     mock.MagicMock.__await__ = lambda x: async_magic().__await__()
     yield
+
+
+@pytest.fixture
+async def bot():
+    """Returns a spy discord.ext.commands.Bot instance with a stubbed `run` method. The close is destroyed after use."""
+    b = mock.Mock(wraps=Bot(command_prefix="!", help_command=None))
+    with mock.patch.object(Bot, "run"):  # stub run so it does nothing
+        yield b
+    await b.close()
