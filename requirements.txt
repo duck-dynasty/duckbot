@@ -3,5 +3,6 @@ pynacl
 beautifulsoup4
 pytz
 holidays
+pyowm # openweather
 psycopg2
 sqlalchemy
