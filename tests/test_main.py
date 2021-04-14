@@ -1,6 +1,5 @@
 import sys
 import mock
-from unittest.mock import call
 from tests.discord_test_ext import assert_cog_added_of_type
 from duckbot.__main__ import duckbot
 from duckbot.util import ConnectionTest
