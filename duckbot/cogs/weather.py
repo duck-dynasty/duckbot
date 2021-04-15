@@ -111,7 +111,7 @@ class Weather(commands.Cog):
 
         today = weather.forecast_daily[0]
         temp_today = today.temperature()
-        rain_chance = today.precipitation_probability * 100
+        rain_chance = round(today.precipitation_probability * 100)
         max_today = f"{round(temp_today['max'])}{degrees} (feeling like {round(temp_today['feels_like_day'])}{degrees})"
         min_today = f"{round(temp_today['min'])}{degrees} (feeling like {round(temp_today['feels_like_night'])}{degrees})"
         if self.__is_rainy(today):
