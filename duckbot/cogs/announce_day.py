@@ -85,7 +85,7 @@ templates = [
     "Yoooooo, today is {0}! Brother.",
     "The day is {0}. Prepare yourself.",
     "What if I said to you that in fact, today is not {0}? I'd be lying.",
-    "What if I said to you that infact, today is not {1}? I'd be right. It's {0}.",
+    "What if I said to you that in fact, today is not {1}? I'd be right. It's {0}.",
     "Rejoice, for today is {0}.",
     "Don't get it twisted, it's {0}.",
     "{0}",
