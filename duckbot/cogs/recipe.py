@@ -81,4 +81,5 @@ class Recipe(commands.Cog):
 
     @commands.command(name="recipe")
     async def recipe(self, context, *args):
-        await self.__recipe(context, *args)
+        async with context.typing():
+            await self.__recipe(context, *args)
