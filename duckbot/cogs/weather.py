@@ -1,4 +1,5 @@
 import os
+from math import ceil
 import pyowm
 from pyowm.utils import config
 from pyowm.weatherapi25.location import Location
@@ -115,9 +116,9 @@ class Weather(commands.Cog):
         max_today = f"{round(temp_today['max'])}{degrees} (feeling like {round(temp_today['feels_like_day'])}{degrees})"
         min_today = f"{round(temp_today['min'])}{degrees} (feeling like {round(temp_today['feels_like_night'])}{degrees})"
         if self.__is_rainy(today):
-            messages.append(f"Today, you can expect a high of {max_today} and a low of {min_today}, with a {rain_chance}% chance of {today.rain['all']}mm of rain.")
+            messages.append(f"Today, you can expect a high of {max_today} and a low of {min_today}, with a {rain_chance}% chance of {ceil(today.rain['all'])}mm of rain.")
         elif self.__is_snowy(today):
-            messages.append(f"Today, you can expect a high of {max_today} and a low of {min_today}, with a {rain_chance}% chance of {today.snow['all']}cm of snow.")
+            messages.append(f"Today, you can expect a high of {max_today} and a low of {min_today}, with a {rain_chance}% chance of {ceil(today.snow['all'])}cm of snow.")
         else:
             messages.append(f"Today, you can expect a high of {max_today} and a low of {min_today}.")
 
