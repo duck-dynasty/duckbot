@@ -8,7 +8,7 @@ from duckbot.health import HealthCheck
 from duckbot.util import ConnectionTest
 
 
-def duckbot(bot):
+def run_duckbot(bot):
     if "connection-test" in sys.argv:
         bot.add_cog(ConnectionTest(bot))
 
@@ -40,4 +40,4 @@ def duckbot(bot):
 
 if __name__ == "__main__":
     bot = commands.Bot(command_prefix="!", help_command=None)
-    duckbot(bot)
+    run_duckbot(bot)
