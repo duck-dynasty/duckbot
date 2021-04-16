@@ -1,5 +1,6 @@
 import os
 import sys
+from discord import Intents
 from discord.ext import commands
 from duckbot.cogs import Duck, Tito, Typos, Recipe, Bitcoin, Insights, Kubernetes, AnnounceDay, ThankingRobot, Weather, WhoCanItBeNow, Fortune, MessageModified
 from duckbot.server import Channels, Emojis
@@ -8,7 +9,7 @@ from duckbot.health import HealthCheck
 from duckbot.util import ConnectionTest
 
 
-def run_duckbot(bot):
+def run_duckbot(bot: commands.Bot):
     if "connection-test" in sys.argv:
         bot.add_cog(ConnectionTest(bot))
 
@@ -38,6 +39,20 @@ def run_duckbot(bot):
     bot.run(os.getenv("DISCORD_TOKEN"))
 
 
+def intents() -> Intents:
+    intent = Intents.default()
+    intent.members = False
+    intent.presences = False
+    intent.bans = False
+    intent.integrations = False
+    intent.webhooks = False
+    intent.invites = False
+    intent.voice_states = False
+    intent.webhooks = False
+    intent.typing = False
+    return intent
+
+
 if __name__ == "__main__":
-    bot = commands.Bot(command_prefix="!", help_command=None)
+    bot = commands.Bot(command_prefix="!", help_command=None, intents=intents())
     run_duckbot(bot)
