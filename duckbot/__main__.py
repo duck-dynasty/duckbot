@@ -47,7 +47,6 @@ def intents() -> Intents:
     intent.integrations = False
     intent.webhooks = False
     intent.invites = False
-    intent.voice_states = False
     intent.webhooks = False
     intent.typing = False
     return intent
