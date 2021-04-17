@@ -1,8 +1,18 @@
 import sys
 import mock
 from tests.discord_test_ext import assert_cog_added_of_type
-from duckbot.__main__ import duckbot
+from discord import Intents
+from duckbot.__main__ import duckbot, intents
 from duckbot.util import ConnectionTest
+
+
+def test_intents_has_required_permissions():
+    expected = Intents.none()
+    expected.guilds = True
+    expected.emojis = True
+    expected.messages = True
+    expected.reactions = True
+    assert intents() == expected
 
 
 @mock.patch("discord.ext.commands.Bot")
