@@ -27,7 +27,7 @@ def test_duckbot_connection_test(bot, loop, monkeypatch):
 
 @mock.patch("discord.ext.commands.Bot")
 @mock.patch("discord.ext.tasks.Loop")
-def test_duckbot_normal_run(bot, loop, monkeypatch):
+def test_duckbot_normal_run(bot, loop):
     duckbot(bot)
     bot.run.assert_called()
 
