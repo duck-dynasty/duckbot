@@ -6,12 +6,14 @@ from duckbot.cogs import Duck, Tito, Typos, Recipe, Bitcoin, Insights, Kubernete
 from duckbot.server import Channels, Emojis
 from duckbot.db import Database
 from duckbot.health import HealthCheck
-from duckbot.util import ConnectionTest
+from duckbot.util import ConnectionTest, Term
 
 
 def duckbot(bot: commands.Bot):
     if "connection-test" in sys.argv:
         bot.add_cog(ConnectionTest(bot))
+
+    bot.add_cog(Term(bot))
 
     bot.add_cog(HealthCheck(bot))
 
