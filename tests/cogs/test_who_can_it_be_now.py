@@ -16,6 +16,7 @@ def play(*args, **kwargs):
 @mock.patch("discord.VoiceChannel")
 @mock.patch("discord.VoiceClient")
 async def test_task_loop(bot, context, channels, voice, client):
+    bot.loop = asyncio.get_event_loop()
     bot.get_cog.return_value = channels
     channels.get_channel_by_name.return_value = voice
     voice.connect.return_value = async_value(client)
