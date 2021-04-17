@@ -1,5 +1,4 @@
 import os
-import sys
 from discord import Intents
 from discord.ext import commands
 from duckbot.cogs import Duck, Tito, Typos, Recipe, Bitcoin, Insights, Kubernetes, AnnounceDay, ThankingRobot, Weather, WhoCanItBeNow, Fortune, MessageModified
