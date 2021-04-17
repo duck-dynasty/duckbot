@@ -11,4 +11,5 @@ class ConnectionTest(commands.Cog):
     @commands.Cog.listener("on_ready")
     async def connection_success(self):
         print("Connection Successful!")
+        self.bot.loop.stop()
         await self.bot.close()

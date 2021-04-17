@@ -12,25 +12,23 @@ def play(*args, **kwargs):
 @pytest.mark.asyncio
 @mock.patch("discord.ext.commands.Bot")
 @mock.patch("discord.ext.commands.Context")
+@mock.patch("duckbot.server.Channels")
 @mock.patch("discord.VoiceChannel")
 @mock.patch("discord.VoiceClient")
-async def test_task_loop(bot, context, voice, client):
-    bot.loop = asyncio.get_event_loop()
-    context.voice_client = None
-    context.author.voice = voice
-    voice.channel.connect.return_value = async_value(client)
+async def test_task_loop(bot, context, channels, voice, client):
+    bot.get_cog.return_value = channels
+    channels.get_channel_by_name.return_value = voice
+    voice.connect.return_value = async_value(client)
     client.play = play
     clazz = WhoCanItBeNow(bot)
-    await clazz.connect_to_voice(context)
-    assert clazz.voice_client is not None
     await clazz._WhoCanItBeNow__start(context)
-    assert clazz.audio_task is not None
+    assert clazz.player is not None
     assert clazz.streaming is True
     await clazz.stream.wait()
     await clazz._WhoCanItBeNow__stop(context)
     assert clazz.streaming is False
-    assert clazz.audio_task is None
-    assert clazz.voice_client is None
+    assert clazz.player is None
+    assert clazz.client is None
 
 
 @pytest.mark.asyncio
@@ -40,22 +38,21 @@ async def test_start_already_started(bot, context):
     clazz = WhoCanItBeNow(bot)
     clazz.streaming = True
     await clazz._WhoCanItBeNow__start(context)
-    bot.loop.create_task.assert_not_called()
+    context.send.assert_called_once_with("Already streaming, you fool!")
 
 
 @pytest.mark.asyncio
 @mock.patch("discord.ext.commands.Bot")
 @mock.patch("discord.ext.commands.Context")
 @mock.patch("discord.VoiceClient")
-async def test_stop_disconnects(bot, context, voice_client):
+async def test_stop_disconnects(bot, context, client):
     clazz = WhoCanItBeNow(bot)
     clazz.streaming = True
-    clazz.audio_task = asyncio.create_task(clazz.stream_audio())
-    clazz.voice_client = voice_client
+    clazz.player = asyncio.create_task(clazz.stream_audio())
+    clazz.client = client
     await clazz._WhoCanItBeNow__stop(context)
-    voice_client.disconnect.assert_called()
-    assert clazz.voice_client is None
-    assert clazz.audio_task is None
+    client.disconnect.assert_called()
+    assert clazz.client is None
     assert clazz.streaming is False
 
 
@@ -66,20 +63,13 @@ async def test_stop_not_streaming(bot, context):
     clazz = WhoCanItBeNow(bot)
     clazz.streaming = False
     await clazz._WhoCanItBeNow__stop(context)
-    context.send.assert_called_once_with("Brother, no :musical_note: :saxophone: is active.")
+    context.send.assert_called_once_with("Nothing to stop, you fool!")
 
 
 @pytest.mark.asyncio
 @mock.patch("discord.ext.commands.Bot")
-@mock.patch("discord.VoiceClient")
-async def test_cog_unload_stops_streaming(bot, voice_client):
-    bot.loop = asyncio.get_event_loop()
+async def test_stop_if_running_stops_streaming(bot):
     clazz = WhoCanItBeNow(bot)
-    clazz.voice_client = voice_client
-    clazz.audio_task = bot.loop.create_task(clazz.stream_audio())
     clazz.streaming = True
-    task = clazz.cog_unload()
-    await task
+    await clazz.stop_if_running()
     assert clazz.streaming is False
-    assert clazz.voice_client is None
-    assert clazz.audio_task is None
