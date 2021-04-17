@@ -14,5 +14,4 @@ COPY resources/ ./resources
 COPY duckbot/ ./duckbot
 ENV DUCKBOT_ARGS ""
 CMD [ "-u", "-m", "duckbot", "${DUCKBOT_ARGS}" ]
-STOPSIGNAL SIGTERM
 ENTRYPOINT [ "python" ]
