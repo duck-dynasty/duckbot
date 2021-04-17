@@ -18,16 +18,16 @@ def test_intents_has_required_permissions():
 
 @mock.patch("discord.ext.commands.Bot")
 @mock.patch("discord.ext.tasks.Loop")
-def test_duckbot_connection_test(bot, loop):
-    with mock.patch.object(sys, "argv", ["connection-test"]):
-        duckbot(bot)
-        assert_cog_added(bot, ConnectionTest)
-        bot.run.assert_called()
+def test_duckbot_connection_test(bot, loop, monkeypatch):
+    monkeypatch.setenv("DUCKBOT_ARGS", "connection-test")
+    duckbot(bot)
+    assert_cog_added(bot, ConnectionTest)
+    bot.run.assert_called()
 
 
 @mock.patch("discord.ext.commands.Bot")
 @mock.patch("discord.ext.tasks.Loop")
-def test_duckbot_normal_run(bot, loop):
+def test_duckbot_normal_run(bot, loop, monkeypatch):
     duckbot(bot)
     bot.run.assert_called()
 

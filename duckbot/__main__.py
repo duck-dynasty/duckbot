@@ -10,7 +10,7 @@ from duckbot.util import ConnectionTest
 
 
 def duckbot(bot: commands.Bot):
-    if "connection-test" in sys.argv:
+    if "connection-test" in os.getenv("DUCKBOT_ARGS", ""):
         bot.add_cog(ConnectionTest(bot))
 
     bot.add_cog(HealthCheck(bot))

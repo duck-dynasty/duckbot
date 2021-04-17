@@ -9,9 +9,8 @@ RUN python -m pip install --upgrade pip
 WORKDIR /duckbot
 COPY requirements.txt .
 RUN python -m pip install -r ./requirements.txt
-COPY entrypoint.sh .
 COPY resources/ ./resources
 COPY duckbot/ ./duckbot
 ENV DUCKBOT_ARGS ""
-CMD [ "-u", "-m", "duckbot", "${DUCKBOT_ARGS}" ]
 ENTRYPOINT [ "python" ]
+CMD [ "-u", "-m", "duckbot" ]
