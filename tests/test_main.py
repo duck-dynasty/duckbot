@@ -1,10 +1,9 @@
 import sys
 import mock
 import pytest
-from tests.discord_test_ext import assert_cog_added_of_type
 from discord import Intents
+import duckbot
 from duckbot.__main__ import run_duckbot, intents
-from duckbot.util import ConnectionTest
 
 DISCORD_TOKEN = "discord-token"
 
@@ -26,7 +25,7 @@ def test_intents_has_required_permissions():
 def test_run_duckbot_connection_test(bot):
     with mock.patch.object(sys, "argv", ["connection-test"]):
         run_duckbot(bot)
-        assert_cog_added_of_type(bot, ConnectionTest)
+        bot.load_extension.assert_any_call(duckbot.util.connection_test.__name__)
         bot.run.assert_called_once_with(DISCORD_TOKEN)
 
 
