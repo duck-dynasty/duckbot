@@ -1,7 +1,7 @@
 import pytest
 import mock
-from discord.ext.commands import Bot
-from discord import TextChannel, Guild, Emoji
+from discord.ext.commands import Bot, Context
+from discord import TextChannel, Guild, Emoji, Message
 
 
 @pytest.fixture(autouse=True)
@@ -28,6 +28,36 @@ async def bot_spy() -> Bot:
 @pytest.fixture
 async def bot() -> Bot:
     return patch_of("discord.ext.commands.Bot")
+
+
+@pytest.fixture
+async def emoji() -> Emoji:
+    return patch_of("discord.Emoji")
+
+
+@pytest.fixture
+async def guild() -> Guild:
+    return patch_of("discord.Guild")
+
+
+@pytest.fixture
+async def channel(text_channel) -> TextChannel:
+    return text_channel
+
+
+@pytest.fixture
+async def text_channel() -> TextChannel:
+    return patch_of("discord.TextChannel")
+
+
+@pytest.fixture
+async def message() -> Message:
+    return patch_of("discord.Message")
+
+
+@pytest.fixture
+async def context() -> Context:
+    return patch_of("discord.ext.commands.Context")
 
 
 def patch_of(tpye):
