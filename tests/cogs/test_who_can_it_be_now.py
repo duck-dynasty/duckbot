@@ -66,10 +66,10 @@ async def test_stop_not_streaming(bot, context):
     context.send.assert_called_once_with("Nothing to stop, you fool!")
 
 
-@pytest.mark.asyncio
 @mock.patch("discord.ext.commands.Bot")
-async def test_stop_if_running_stops_streaming(bot):
+def test_cog_unload_stops_streaming(bot):
+    bot.loop = asyncio.get_event_loop()
     clazz = WhoCanItBeNow(bot)
     clazz.streaming = True
-    await clazz.stop_if_running()
+    clazz.cog_unload()
     assert clazz.streaming is False
