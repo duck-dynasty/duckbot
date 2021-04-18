@@ -8,6 +8,9 @@ class MessageModified(commands.Cog):
 
     @commands.Cog.listener("on_message_edit")
     async def show_edit_diff(self, before, after):
+        if before.author == self.bot.user or after.author == self.bot.user or before.content == after.content:
+            return
+
         before_file = f"echo $BEFORE > {before.id}.before"
         after_file = f"echo $AFTER > {after.id}.after"
         diff_cmd = f"git diff --no-index -U10000 --word-diff=plain --word-diff-regex=. {before.id}.before {after.id}.after | tail -n +6"
