@@ -5,6 +5,14 @@ from duckbot.cogs.announce_day import AnnounceDay
 from tests.duckmock.datetime import patch_now
 
 
+@pytest.fixture
+def setup_general_channel(bot, guild, channel):
+    bot.get_all_channels.return_value = [channel]
+    guild.name = "Friends Chat"
+    channel.guild = guild
+    channel.name = "general"
+
+
 @pytest.mark.asyncio
 async def test_before_loop_waits_for_bot(bot):
     clazz = AnnounceDay(bot)
@@ -22,12 +30,8 @@ async def test_cog_unload_cancels_task(bot):
 
 
 @pytest.mark.asyncio
-async def test_on_hour_7am_eastern(bot, guild, channel):
+async def test_on_hour_7am_eastern(bot, channel, setup_general_channel):
     with patch_now(datetime.datetime(2002, 1, 1, hour=7)):
-        bot.get_all_channels.return_value = [channel]
-        guild.name = "Friends Chat"
-        channel.guild = guild
-        channel.name = "general"
         clazz = AnnounceDay(bot)
         await clazz._AnnounceDay__on_hour()
         channel.send.assert_called()
