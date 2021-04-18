@@ -23,16 +23,16 @@ def test_intents_has_required_permissions():
     assert intents() == expected
 
 
-def test_duckbot_connection_test(bot):
+def test_duckbot_connection_test(bot_spy):
     with mock.patch.object(sys, "argv", ["connection-test"]):
-        duckbot(bot)
-        assert_cog_added(bot, ConnectionTest)
-        bot.run.assert_called_once_with(DISCORD_TOKEN)
+        duckbot(bot_spy)
+        assert_cog_added(bot_spy, ConnectionTest)
+        bot_spy.run.assert_called_once_with(DISCORD_TOKEN)
 
 
-def test_duckbot_normal_run(bot):
-    duckbot(bot)
-    bot.run.assert_called_once_with(DISCORD_TOKEN)
+def test_duckbot_normal_run(bot_spy):
+    duckbot(bot_spy)
+    bot_spy.run.assert_called_once_with(DISCORD_TOKEN)
 
 
 def assert_cog_added(bot, typ):
