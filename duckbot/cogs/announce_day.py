@@ -4,6 +4,7 @@ import pytz
 import holidays
 import math
 from dateutil.relativedelta import relativedelta as rd, SU
+import discord
 from discord.ext import commands, tasks
 
 
@@ -101,12 +102,11 @@ templates = [
 
 
 class AnnounceDay(commands.Cog):
-    def __init__(self, bot, start_tasks=True):
+    def __init__(self, bot):
         self.bot = bot
         self.tz = pytz.timezone("US/Eastern")
         self.holidays = SpecialDays(bot)
-        if start_tasks:
-            self.on_hour.start()
+        self.on_hour.start()
 
     def cog_unload(self):
         self.on_hour.cancel()
@@ -133,7 +133,7 @@ class AnnounceDay(commands.Cog):
 
     async def __on_hour(self):
         if self.should_announce_day():
-            channel = self.bot.get_cog("channels").get_general_channel()
+            channel = discord.utils.get(self.bot.get_all_channels(), guild__name="Friends Chat", name="general")
             message = self.get_message()
             await channel.send(message)
 
