@@ -1,8 +1,7 @@
 import pytest
-import mock
 import datetime
 from asyncio import CancelledError
-from duckbot.cogs import AnnounceDay
+from duckbot.cogs.announce_day import AnnounceDay
 from tests.duckmock.datetime import patch_now
 
 
