@@ -1,5 +1,4 @@
 import pytest
-import mock
 import datetime
 from asyncio import CancelledError
 from tests.duckmock.discord import MockAsyncIterator
