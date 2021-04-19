@@ -29,4 +29,5 @@ class Weather(commands.Cog):
                data = json.loads(data.text)
                temp = data['main']['temp']
                desc = data['weather'][0]['description']
-               await message.channel.send(f"{city} has temperature {temp} and most probably {desc}")
+               temp_farhenheit = (temp - 273.15) * 9/5 + 32
+               await message.channel.send(f"{city} has temperature {temp}F and most probably {desc}")
