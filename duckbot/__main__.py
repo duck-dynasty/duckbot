@@ -8,7 +8,7 @@ from duckbot.health import HealthCheck
 from duckbot.util import ConnectionTest
 
 
-def duckbot(bot: commands.Bot):
+def run_duckbot(bot: commands.Bot):
     if "connection-test" in os.getenv("DUCKBOT_ARGS", ""):
         bot.add_cog(ConnectionTest(bot))
 
@@ -53,4 +53,4 @@ def intents() -> Intents:
 
 if __name__ == "__main__":
     bot = commands.Bot(command_prefix="!", help_command=None, intents=intents())
-    duckbot(bot)
+    run_duckbot(bot)
