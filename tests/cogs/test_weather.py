@@ -237,7 +237,7 @@ def test_weather_message_rainy(bot, owm):
     clazz = make_weather(bot, owm)
     message = clazz.weather_message(make_city("city"), one_call("rainy"))
     assert "In city, it is currently 3°C with rainy, but feels like 5°C." in message
-    assert "Today, you can expect a high of 10°C (feeling like 15°C) and a low of 0°C (feeling like -10°C), with a 50.0% chance of 2mm of rain." in message
+    assert "Today, you can expect a high of 10°C (feeling like 15°C) and a low of 0°C (feeling like -10°C), with a 50% chance of 2mm of rain." in message
 
 
 @mock.patch("discord.ext.commands.Bot")
@@ -246,7 +246,7 @@ def test_weather_message_snowy(bot, owm):
     clazz = make_weather(bot, owm)
     message = clazz.weather_message(make_city("city"), one_call("snowy"))
     assert "In city, it is currently 3°C with snowy, but feels like 5°C." in message
-    assert "Today, you can expect a high of 10°C (feeling like 15°C) and a low of 0°C (feeling like -10°C), with a 50.0% chance of 3cm of snow." in message
+    assert "Today, you can expect a high of 10°C (feeling like 15°C) and a low of 0°C (feeling like -10°C), with a 50% chance of 3cm of snow." in message
 
 
 @mock.patch("discord.ext.commands.Bot")
@@ -285,7 +285,7 @@ def stub_weather_msg(city, weather):
     return "weather"
 
 
-def one_call(status=None, prec_chance=50, max_temp=10):
+def one_call(status=None, prec_chance=49.9, max_temp=10):
     wea = weather(status, prec_chance, max_temp)
     return OneCall(lat=1, lon=1, timezone="UTC", current=wea, forecast_daily=[wea])
 
@@ -296,8 +296,8 @@ def weather(status, prec_chance, max_temp):
         sunset_time=0,
         sunrise_time=0,
         clouds=0,
-        rain={"all": 2},
-        snow={"all": 3},
+        rain={"all": 1.9},
+        snow={"all": 2.9},
         wind=None,
         humidity=0,
         pressure=None,
