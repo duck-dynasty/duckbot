@@ -16,7 +16,7 @@ class WhoCanItBeNow(commands.Cog):
         if self.streaming:
             return self.bot.loop.create_task(self.__stop(None))
 
-    @commands.command("stort")
+    @commands.command("start")
     async def start(self, context):
         await self.__start(context)
 
@@ -39,6 +39,7 @@ class WhoCanItBeNow(commands.Cog):
 
     async def stream_audio(self):
         """The music loop. Connect to channel and stream. We await on `self.stream` to block on the song being played."""
+        self.client = await self.bot.get_cog("channels").get_channel_by_name("Hangout 1").connect()
         while self.streaming:
             self.stream.clear()
             # need to load the song every time, it seems to keep internal state
@@ -53,7 +54,7 @@ class WhoCanItBeNow(commands.Cog):
         if error:
             raise commands.CommandError(str(error))
 
-    @commands.command("stap")
+    @commands.command("stop")
     async def stop(self, context):
         await self.__stop(context)
 
