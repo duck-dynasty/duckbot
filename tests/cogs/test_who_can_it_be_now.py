@@ -2,6 +2,7 @@ import pytest
 import mock
 import asyncio
 from tests.async_mock_ext import async_value
+from discord.ext.commands import CommandError
 from duckbot.cogs import WhoCanItBeNow
 
 
@@ -31,6 +32,41 @@ async def test_task_loop(bot, context, voice, client):
     assert clazz.streaming is False
     assert clazz.audio_task is None
     assert clazz.voice_client is None
+
+
+@pytest.mark.asyncio
+@mock.patch("discord.ext.commands.Bot")
+@mock.patch("discord.ext.commands.Context")
+@mock.patch("discord.VoiceClient")
+async def test_connect_to_voice_author_in_channel(bot, context, client):
+    context.voice_client = None
+    context.author.voice.channel.connect.return_value = async_value(client)
+    clazz = WhoCanItBeNow(bot)
+    await clazz.connect_to_voice(context)
+    assert clazz.voice_client == client
+
+
+@pytest.mark.asyncio
+@mock.patch("discord.ext.commands.Bot")
+@mock.patch("discord.ext.commands.Context")
+async def test_connect_to_voice_author_not_in_channel(bot, context):
+    context.voice_client = None
+    context.author.voice = None
+    clazz = WhoCanItBeNow(bot)
+    with pytest.raises(CommandError):
+        await clazz.connect_to_voice(context)
+    context.send.assert_called_once_with("Connect to a voice channel so I know where to `!start`.")
+
+
+@pytest.mark.asyncio
+@mock.patch("discord.ext.commands.Bot")
+@mock.patch("discord.ext.commands.Context")
+@mock.patch("discord.VoiceClient")
+async def test_connect_to_voice_already_connected(bot, context, client):
+    context.voice_client = client
+    clazz = WhoCanItBeNow(bot)
+    await clazz.connect_to_voice(context)
+    client.stop.assert_called()
 
 
 @pytest.mark.asyncio
