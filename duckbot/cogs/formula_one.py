@@ -30,6 +30,8 @@ class FormulaOne(commands.Cog):
                 self.chr("i"),
                 self.chr("n"),
             ],
+            [ self.chr("h"), self.chr("y"), self.chr("p"), self.chr("e") ],
+            [ self.chr("p"), self.chr("o"), self.chr("g") ],
         ]
 
     def chr(self, letter):
