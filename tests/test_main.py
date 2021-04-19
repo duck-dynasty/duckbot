@@ -1,7 +1,7 @@
 import sys
 import mock
 import pytest
-from unittest.mock import call
+from tests.discord_test_ext import assert_cog_added_of_type
 from discord import Intents
 from duckbot.__main__ import run_duckbot, intents
 from duckbot.util import ConnectionTest
@@ -26,17 +26,10 @@ def test_intents_has_required_permissions():
 def test_run_duckbot_connection_test(bot_spy):
     with mock.patch.object(sys, "argv", ["connection-test"]):
         run_duckbot(bot_spy)
-        assert_cog_added(bot_spy, ConnectionTest)
+        assert_cog_added_of_type(bot_spy, ConnectionTest)
         bot_spy.run.assert_called_once_with(DISCORD_TOKEN)
 
 
 def test_run_duckbot_normal_run(bot_spy):
     run_duckbot(bot_spy)
     bot_spy.run.assert_called_once_with(DISCORD_TOKEN)
-
-
-def assert_cog_added(bot, typ):
-    for invocation in bot.add_cog.call_args_list:
-        if isinstance(invocation[0], typ):
-            return True
-    return False
