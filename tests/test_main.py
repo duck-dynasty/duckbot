@@ -19,6 +19,7 @@ def test_intents_has_required_permissions():
     expected.emojis = True
     expected.messages = True
     expected.reactions = True
+    expected.voice_states = True
     assert intents() == expected
 
 
