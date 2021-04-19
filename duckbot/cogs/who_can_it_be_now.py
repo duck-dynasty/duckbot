@@ -14,7 +14,7 @@ class WhoCanItBeNow(commands.Cog):
 
     def cog_unload(self):
         if self.streaming:
-            return self.bot.loop.create_task(self.__stop(None))
+            return self.bot.loop.create_task(self.__stop())
 
     @commands.command("start")
     async def start(self, context):
