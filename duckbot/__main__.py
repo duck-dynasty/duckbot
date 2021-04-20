@@ -5,12 +5,12 @@ from duckbot.cogs import Duck, Tito, Typos, Recipe, Bitcoin, Insights, Kubernete
 from duckbot.server import Channels, Emojis
 from duckbot.db import Database
 import duckbot.health
-from duckbot.util import ConnectionTest
+import duckbot.util.connection_test
 
 
 def run_duckbot(bot: commands.Bot):
     if "connection-test" in os.getenv("DUCKBOT_ARGS", ""):
-        bot.add_cog(ConnectionTest(bot))
+        bot.load_extension(duckbot.util.connection_test.__name__)
 
     bot.load_extension(duckbot.health.__name__)
 
