@@ -1,7 +1,6 @@
 import os
 from discord import Intents
 from discord.ext import commands
-import duckbot
 import duckbot.cogs.audio
 from duckbot.cogs import Duck, Tito, Typos, Recipe, Bitcoin, Insights, Kubernetes, AnnounceDay, ThankingRobot, Weather, FormulaOne, Fortune, MessageModified
 from duckbot.server import Channels, Emojis
