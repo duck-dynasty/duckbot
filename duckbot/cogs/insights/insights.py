@@ -18,7 +18,10 @@ class Insights(commands.Cog):
         await self.__check_should_respond()
 
     async def __check_should_respond(self):
+        for x in self.bot.get_all_channels():
+            print(x)
         channel = discord.utils.get(self.bot.get_all_channels(), guild__name="Friends Chat", name="general")
+        print(channel)
         message = await self.__get_last_message(channel)
         if self.should_respond(message):
             response = random.choice(responses)
