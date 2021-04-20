@@ -30,6 +30,26 @@ async def bot() -> Bot:
     return patch_of("discord.ext.commands.Bot")
 
 
+@pytest.fixture
+async def emoji() -> Emoji:
+    return patch_of("discord.Emoji")
+
+
+@pytest.fixture
+async def guild() -> Guild:
+    return patch_of("discord.Guild")
+
+
+@pytest.fixture
+async def channel(text_channel) -> TextChannel:
+    return text_channel
+
+
+@pytest.fixture
+async def text_channel() -> TextChannel:
+    return patch_of("discord.TextChannel")
+
+
 def patch_of(tpye):
     with mock.patch(tpye) as o:
         return o
