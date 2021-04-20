@@ -1,4 +1,3 @@
-import pytest
 import mock
 from duckbot.cogs import Fortune
 
