@@ -3,7 +3,7 @@ import mock
 import asyncio
 from tests.async_mock_ext import async_value
 from discord.ext.commands import CommandError
-from duckbot.cogs import WhoCanItBeNow
+from duckbot.cogs.audio import WhoCanItBeNow
 
 
 def play(*args, **kwargs):
@@ -11,17 +11,13 @@ def play(*args, **kwargs):
 
 
 @pytest.mark.asyncio
-@mock.patch("discord.ext.commands.Bot")
-@mock.patch("discord.ext.commands.Context")
-@mock.patch("discord.VoiceChannel")
-@mock.patch("discord.VoiceClient")
-async def test_task_loop(bot, context, voice, client):
-    bot.loop = asyncio.get_event_loop()
+async def test_task_loop(bot_spy, context, voice_channel, voice_client):
+    # bot.loop = asyncio.get_event_loop()
     context.voice_client = None
-    context.author.voice = voice
-    voice.channel.connect.return_value = async_value(client)
-    client.play = play
-    clazz = WhoCanItBeNow(bot)
+    context.author.voice = voice_channel
+    voice_channel.channel.connect.return_value = async_value(voice_client)
+    voice_client.play = play
+    clazz = WhoCanItBeNow(bot_spy)
     await clazz.connect_to_voice(context)
     assert clazz.voice_client is not None
     await clazz._WhoCanItBeNow__start(context)
