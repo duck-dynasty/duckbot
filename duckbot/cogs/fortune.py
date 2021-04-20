@@ -17,5 +17,5 @@ class Fortune(commands.Cog):
         return f"```{message}```"
 
     def __get_fortune_output(self):
-        process = subprocess.run(f"fortune -a | cowsay -f $(ls /usr/share/cowsay/cows/ | shuf -n1)", shell=True, capture_output=True)
+        process = subprocess.run("fortune -a | cowsay -f $(ls /usr/share/cowsay/cows/ | shuf -n1)", shell=True, capture_output=True)
         return process.stdout.decode()
