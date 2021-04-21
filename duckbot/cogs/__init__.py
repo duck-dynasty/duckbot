@@ -11,4 +11,3 @@ from .weather import Weather
 from .who_can_it_be_now import WhoCanItBeNow
 from .formula_one import FormulaOne
 from .fortune import Fortune
-from .message_modified import MessageModified
