@@ -1,10 +1,11 @@
 import os
 from discord import Intents
 from discord.ext import commands
-from duckbot.cogs import Duck, Tito, Typos, Recipe, Bitcoin, Insights, Kubernetes, AnnounceDay, ThankingRobot, Weather, WhoCanItBeNow, FormulaOne, Fortune, MessageModified
+import duckbot.cogs.announce_day
+from duckbot.cogs import Duck, Tito, Typos, Recipe, Bitcoin, Insights, Kubernetes, ThankingRobot, Weather, WhoCanItBeNow, FormulaOne, Fortune, MessageModified
 from duckbot.server import Channels, Emojis
 from duckbot.db import Database
-from duckbot.health import HealthCheck
+import duckbot.health
 import duckbot.util.connection_test
 
 
@@ -12,7 +13,7 @@ def run_duckbot(bot: commands.Bot):
     if "connection-test" in os.getenv("DUCKBOT_ARGS", ""):
         bot.load_extension(duckbot.util.connection_test.__name__)
 
-    bot.add_cog(HealthCheck(bot))
+    bot.load_extension(duckbot.health.__name__)
 
     bot.add_cog(Database(bot))
 
@@ -31,7 +32,7 @@ def run_duckbot(bot: commands.Bot):
     bot.add_cog(Insights(bot))
     bot.add_cog(Kubernetes(bot))
     bot.add_cog(FormulaOne(bot))
-    bot.add_cog(AnnounceDay(bot))
+    bot.load_extension(duckbot.cogs.announce_day.__name__)
     bot.add_cog(ThankingRobot(bot))
     bot.add_cog(WhoCanItBeNow(bot))
     bot.add_cog(MessageModified(bot))
