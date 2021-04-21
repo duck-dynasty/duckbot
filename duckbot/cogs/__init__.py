@@ -1,4 +1,3 @@
-from .announce_day import AnnounceDay
 from .bitcoin import Bitcoin
 from .duck import Duck
 from .kubernetes import Kubernetes
