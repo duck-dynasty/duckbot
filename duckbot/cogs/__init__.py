@@ -3,7 +3,6 @@ from .duck import Duck
 from .insights import Insights
 from .kubernetes import Kubernetes
 from .recipe import Recipe
-from .thanking_robot import ThankingRobot
 from .tito import Tito
 from .typos import Typos
 from .weather import Weather

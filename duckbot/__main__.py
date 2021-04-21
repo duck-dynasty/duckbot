@@ -1,8 +1,9 @@
 import os
 from discord import Intents
 from discord.ext import commands
+import duckbot.cogs.robot
 import duckbot.cogs.announce_day
-from duckbot.cogs import Duck, Tito, Typos, Recipe, Bitcoin, Insights, Kubernetes, ThankingRobot, Weather, WhoCanItBeNow, FormulaOne, Fortune, MessageModified
+from duckbot.cogs import Duck, Tito, Typos, Recipe, Bitcoin, Insights, Kubernetes, Weather, WhoCanItBeNow, FormulaOne, Fortune, MessageModified
 from duckbot.server import Channels, Emojis
 from duckbot.db import Database
 import duckbot.health
@@ -33,7 +34,7 @@ def run_duckbot(bot: commands.Bot):
     bot.add_cog(Kubernetes(bot))
     bot.add_cog(FormulaOne(bot))
     bot.load_extension(duckbot.cogs.announce_day.__name__)
-    bot.add_cog(ThankingRobot(bot))
+    bot.load_extension(duckbot.cogs.robot.__name__)
     bot.add_cog(WhoCanItBeNow(bot))
     bot.add_cog(MessageModified(bot))
 
