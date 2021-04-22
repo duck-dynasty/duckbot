@@ -2,9 +2,10 @@ import os
 from discord import Intents
 from discord.ext import commands
 import duckbot.cogs.audio
+import duckbot.cogs.recipe
 import duckbot.cogs.insights
 import duckbot.cogs.announce_day
-from duckbot.cogs import Duck, Tito, Typos, Recipe, Bitcoin, Kubernetes, ThankingRobot, Weather, FormulaOne, Fortune, MessageModified
+from duckbot.cogs import Duck, Tito, Typos, Bitcoin, Kubernetes, ThankingRobot, Weather, FormulaOne, Fortune, MessageModified
 from duckbot.server import Channels, Emojis
 from duckbot.db import Database
 import duckbot.health
@@ -27,7 +28,7 @@ def run_duckbot(bot: commands.Bot):
     bot.add_cog(Duck(bot))
     bot.add_cog(Tito(bot))
     bot.add_cog(Typos(bot))
-    bot.add_cog(Recipe(bot))
+    bot.load_extension(duckbot.cogs.recipe.__name__)
     bot.add_cog(Fortune(bot))
     bot.add_cog(Weather(bot))
     bot.add_cog(Bitcoin(bot))
