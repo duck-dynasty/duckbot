@@ -7,6 +7,5 @@ from .thanking_robot import ThankingRobot
 from .tito import Tito
 from .typos import Typos
 from .weather import Weather
-from .who_can_it_be_now import WhoCanItBeNow
 from .formula_one import FormulaOne
 from .fortune import Fortune
