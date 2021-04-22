@@ -1,11 +1,9 @@
 import pytest
 import mock
-from duckbot.cogs import FormulaOne
+from duckbot.cogs.formula_one import FormulaOne
 
 
 @pytest.mark.asyncio
-@mock.patch("discord.Message")
-@mock.patch("discord.TextChannel")
 async def test_car_do_be_going_fast_though_not_dank_channel(message, channel):
     message.channel = channel
     channel.name = "general"
@@ -15,10 +13,8 @@ async def test_car_do_be_going_fast_though_not_dank_channel(message, channel):
 
 
 @pytest.mark.asyncio
-@mock.patch("discord.Message")
-@mock.patch("discord.TextChannel")
 @mock.patch("random.choice", return_value=["\U0001F170"])
-async def test_car_do_be_going_fast_though_dank_channel(message, channel, random):
+async def test_car_do_be_going_fast_though_dank_channel(random, message, channel):
     message.channel = channel
     channel.name = "dank"
     clazz = FormulaOne(None)
