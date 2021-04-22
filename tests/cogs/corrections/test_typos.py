@@ -1,89 +1,93 @@
 import pytest
 import mock
+from asyncio import CancelledError
 from tests.duckmock.urllib import patch_urlopen
 from tests.duckmock.discord import MockAsyncIterator
-from duckbot.cogs import Typos
+from duckbot.cogs.corrections import Typos
 
 
 @pytest.mark.asyncio
-async def test_get_custom_corrections():
-    clazz = Typos(None, start_tasks=False)
+async def test_before_refresh_corrections_waits_for_bot(bot):
+    clazz = Typos(bot)
+    await clazz.before_refresh_corrections()
+    bot.wait_until_ready.assert_called()
+
+
+@pytest.mark.asyncio
+async def test_cog_unload_cancels_task(bot):
+    clazz = Typos(bot)
+    clazz.cog_unload()
+    with pytest.raises(CancelledError):
+        await clazz.refresh_corrections.get_task()
+    assert not clazz.refresh_corrections.is_running()
+
+
+@pytest.mark.asyncio
+async def test_get_custom_corrections(bot):
+    clazz = Typos(bot)
     assert clazz._Typos__get_custom_corrections() is not None
 
 
 @pytest.mark.asyncio
-@mock.patch("discord.ext.commands.Bot")
 async def test_get_wiki_corrections(bot):
     with patch_urlopen(content("poo->oops")):
-        clazz = Typos(bot, start_tasks=False)
+        clazz = Typos(bot)
         corrections = clazz.get_wiki_corrections()
         assert corrections == {"poo": ["oops"]}
 
 
 @pytest.mark.asyncio
-@mock.patch("discord.ext.commands.Bot")
 async def test_correct(bot):
     with patch_urlopen(content("")):
-        clazz = Typos(bot, start_tasks=False)
+        clazz = Typos(bot)
         clazz.corrections = {"poo": ["oops"]}
         correction = clazz.correct("poo")
         assert correction == "oops"
 
 
 @pytest.mark.asyncio
-@mock.patch("discord.ext.commands.Bot")
 async def test_correct_case_insensitive(bot):
     with patch_urlopen(content("")):
-        clazz = Typos(bot, start_tasks=False)
+        clazz = Typos(bot)
         clazz.corrections = {"poo": ["oops"]}
         correction = clazz.correct("PoO")
         assert correction == "oops"
 
 
 @pytest.mark.asyncio
-@mock.patch("discord.ext.commands.Bot")
-@mock.patch("discord.Message")
 async def test_correct_typos_bot_user(bot, message):
     bot.user = "THEBOT"
     message.author = bot.user
-    clazz = Typos(bot, start_tasks=False)
+    clazz = Typos(bot)
     await clazz._Typos__correct_typos(message) is None
     message.channel.send.assert_not_called()
 
 
 @pytest.mark.asyncio
-@mock.patch("discord.ext.commands.Bot")
-@mock.patch("discord.Message")
 async def test_correct_typos_message_is_not_fuck(bot, message):
     bot.user = "THEBOT"
     message.author = "not the bot"
     message.content = "poopy"
-    clazz = Typos(bot, start_tasks=False)
+    clazz = Typos(bot)
     await clazz._Typos__correct_typos(message) is None
     message.channel.send.assert_not_called()
 
 
 @pytest.mark.asyncio
-@mock.patch("discord.ext.commands.Bot")
-@mock.patch("discord.Message")
-@mock.patch("discord.TextChannel")
 async def test_correct_typos_no_previous_message(bot, message, channel):
     bot.user = "THEBOT"
     message.author = "not the bot"
     message.content = "fuck"
     message.channel = channel
     channel.history.return_value = MockAsyncIterator(None)
-    clazz = Typos(bot, start_tasks=False)
+    clazz = Typos(bot)
     await clazz._Typos__correct_typos(message) is None
     message.channel.send.assert_not_called()
 
 
 @pytest.mark.asyncio
-@mock.patch("discord.ext.commands.Bot")
 @mock.patch("discord.Message")
-@mock.patch("discord.TextChannel")
-@mock.patch("discord.Message")
-async def test_correct_typos_no_typos_in_previous(bot, message, channel, prev_message):
+async def test_correct_typos_no_typos_in_previous(prev_message, bot, message, channel):
     bot.user = "THEBOT"
     message.author.id = 1
     prev_message.author = message.author
@@ -91,18 +95,15 @@ async def test_correct_typos_no_typos_in_previous(bot, message, channel, prev_me
     prev_message.content = "hello"
     message.channel = channel
     channel.history.return_value = MockAsyncIterator(prev_message)
-    clazz = Typos(bot, start_tasks=False)
+    clazz = Typos(bot)
     clazz.corrections = {"henlo": ["hello"]}
     await clazz._Typos__correct_typos(message) is None
     message.channel.send.assert_called_once_with(f"There's no need for harsh words, {message.author.mention}.")
 
 
 @pytest.mark.asyncio
-@mock.patch("discord.ext.commands.Bot")
 @mock.patch("discord.Message")
-@mock.patch("discord.TextChannel")
-@mock.patch("discord.Message")
-async def test_correct_typos_sends_correction(bot, message, channel, prev_message):
+async def test_correct_typos_sends_correction(prev_message, bot, message, channel):
     bot.user = "THEBOT"
     message.author.id = 1
     prev_message.author = message.author
@@ -110,7 +111,7 @@ async def test_correct_typos_sends_correction(bot, message, channel, prev_messag
     message.channel = channel
     prev_message.content = "henlo"
     channel.history.return_value = MockAsyncIterator(prev_message)
-    clazz = Typos(bot, start_tasks=False)
+    clazz = Typos(bot)
     clazz.corrections = {"henlo": ["hello"]}
     await clazz._Typos__correct_typos(message) is None
     message.channel.send.assert_called_once_with(f"> hello\nThink I fixed it, {message.author.mention}!")

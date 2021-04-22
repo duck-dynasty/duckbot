@@ -1,11 +1,9 @@
 import pytest
 import mock
-from duckbot.cogs import Bitcoin
+from duckbot.cogs.corrections import Bitcoin
 
 
 @pytest.mark.asyncio
-@mock.patch("discord.Message")
-@mock.patch("discord.ext.commands.Bot")
 async def test_correct_bitcoin_bot_author(message, bot):
     bot.user = "THEBOT"
     message.author = bot.user
@@ -16,8 +14,6 @@ async def test_correct_bitcoin_bot_author(message, bot):
 
 
 @pytest.mark.asyncio
-@mock.patch("discord.Message")
-@mock.patch("discord.ext.commands.Bot")
 async def test_correct_bitcoin_message_is_bitcoin(message, bot):
     bot.user = "but"
     message.author = "author"
@@ -29,8 +25,6 @@ async def test_correct_bitcoin_message_is_bitcoin(message, bot):
 
 
 @pytest.mark.asyncio
-@mock.patch("discord.Message")
-@mock.patch("discord.ext.commands.Bot")
 async def test_correct_bitcoin_message_contains_bitcoin(message, bot):
     bot.user = "but"
     message.author = "author"
