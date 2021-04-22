@@ -1,7 +1,7 @@
 import pytest
 import mock
 from discord.ext.commands import Bot, Context
-from discord import TextChannel, Guild, Emoji, Message
+from discord import TextChannel, VoiceChannel, Guild, Emoji, Message, VoiceClient
 
 
 @pytest.fixture(autouse=True)
@@ -31,6 +31,11 @@ async def bot() -> Bot:
 
 
 @pytest.fixture
+async def context() -> Context:
+    return patch_of("discord.ext.commands.Context")
+
+
+@pytest.fixture
 async def emoji() -> Emoji:
     return patch_of("discord.Emoji")
 
@@ -38,6 +43,11 @@ async def emoji() -> Emoji:
 @pytest.fixture
 async def guild() -> Guild:
     return patch_of("discord.Guild")
+
+
+@pytest.fixture
+async def message() -> Message:
+    return patch_of("discord.Message")
 
 
 @pytest.fixture
@@ -51,13 +61,13 @@ async def text_channel() -> TextChannel:
 
 
 @pytest.fixture
-async def message() -> Message:
-    return patch_of("discord.Message")
+async def voice_channel() -> VoiceChannel:
+    return patch_of("discord.VoiceChannel")
 
 
 @pytest.fixture
-async def context() -> Context:
-    return patch_of("discord.ext.commands.Context")
+async def voice_client() -> VoiceClient:
+    return patch_of("discord.VoiceClient")
 
 
 def patch_of(tpye):
