@@ -1,7 +1,7 @@
 import pytest
 import mock
 from discord.ext.commands import Bot, Context
-from discord import TextChannel, VoiceChannel, Guild, Emoji, VoiceClient
+from discord import TextChannel, VoiceChannel, Guild, Emoji, Message, VoiceClient
 
 
 @pytest.fixture(autouse=True)
@@ -43,6 +43,11 @@ async def emoji() -> Emoji:
 @pytest.fixture
 async def guild() -> Guild:
     return patch_of("discord.Guild")
+
+
+@pytest.fixture
+async def message() -> Message:
+    return patch_of("discord.Message")
 
 
 @pytest.fixture

@@ -1,30 +1,14 @@
 import random
 import datetime
+import discord
 from discord.ext import commands, tasks
-
-responses = [
-    "Wow, that was insightful!",
-    "That was both educational and intelligent.",
-    "Wow!",
-    "Thanks for sharing!",
-    "You sparked my curiousity.",
-    "I have been enlightened.",
-    "A-Ok.",
-    "I appreciate the information!",
-    "Thanks for bringing that up.",
-    ":raised_hands:",
-    ":eyes:",
-    ":exploding_head:",
-    ":eggplant: :sweat_drops:",
-    ":cricket:",
-]
+from .phrases import responses
 
 
 class Insights(commands.Cog):
-    def __init__(self, bot, start_tasks=True):
+    def __init__(self, bot):
         self.bot = bot
-        if start_tasks:
-            self.check_should_respond.start()
+        self.check_should_respond.start()
 
     def cog_unload(self):
         self.check_should_respond.cancel()
@@ -34,7 +18,7 @@ class Insights(commands.Cog):
         await self.__check_should_respond()
 
     async def __check_should_respond(self):
-        channel = self.bot.get_cog("channels").get_general_channel()
+        channel = discord.utils.get(self.bot.get_all_channels(), guild__name="Friends Chat", name="general")
         message = await self.__get_last_message(channel)
         if self.should_respond(message):
             response = random.choice(responses)

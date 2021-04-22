@@ -1,0 +1,16 @@
+responses = [
+    "Wow, that was insightful!",
+    "That was both educational and intelligent.",
+    "Wow!",
+    "Thanks for sharing!",
+    "You sparked my curiousity.",
+    "I have been enlightened.",
+    "A-Ok.",
+    "I appreciate the information!",
+    "Thanks for bringing that up.",
+    ":raised_hands:",
+    ":eyes:",
+    ":exploding_head:",
+    ":eggplant: :sweat_drops:",
+    ":cricket:",
+]
