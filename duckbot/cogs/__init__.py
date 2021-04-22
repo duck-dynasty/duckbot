@@ -1,6 +1,5 @@
 from .bitcoin import Bitcoin
 from .duck import Duck
-from .insights import Insights
 from .kubernetes import Kubernetes
 from .recipe import Recipe
 from .tito import Tito
