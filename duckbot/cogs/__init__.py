@@ -7,4 +7,3 @@ from .typos import Typos
 from .weather import Weather
 from .formula_one import FormulaOne
 from .fortune import Fortune
-from .message_modified import MessageModified
