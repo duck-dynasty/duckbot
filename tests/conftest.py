@@ -32,28 +32,28 @@ async def bot(b) -> discord.ext.commands.Bot:
 
 
 @pytest.fixture
-@mock.patch("discord.Message")
+@mock.patch("discord.Message", autospec=True)
 async def message(m, channel) -> discord.Message:
+    m.channel = channel
     return m
 
 
 @pytest.fixture
 @mock.patch("discord.ext.commands.Context")
-async def context(c, bot, message) -> discord.ext.commands.Context:
+async def context(c, message) -> discord.ext.commands.Context:
     c.message = message
-    message.channel = channel
     c.channel = message.channel
     return c
 
 
 @pytest.fixture
-@mock.patch("discord.Emoji")
+@mock.patch("discord.Emoji", autospec=True)
 async def emoji(e) -> discord.Emoji:
     return e
 
 
 @pytest.fixture
-@mock.patch("discord.Guild")
+@mock.patch("discord.Guild", autospec=True)
 async def guild(g) -> discord.Guild:
     return g
 
@@ -107,6 +107,6 @@ async def voice_channel(vc) -> discord.VoiceChannel:
 
 
 @pytest.fixture
-@mock.patch("discord.VoiceClient")
+@mock.patch("discord.VoiceClient", autospec=True)
 async def voice_client(vc) -> discord.VoiceClient:
     return vc

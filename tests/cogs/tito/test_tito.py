@@ -44,7 +44,7 @@ async def test_react_to_tito_reaction_tito_emoji(payload, bot, channel, message)
     payload.message_id = 456
     payload.emoji.name = "tito"
     bot.fetch_channel.return_value = async_value(channel)
-    channel.fetch_message.return_value = async_value(message)
+    channel.fetch_message.return_value = message
     clazz = Tito(bot)
     await clazz.react_to_tito_reaction(payload)
     bot.fetch_channel.assert_called_once_with(payload.channel_id)
