@@ -1,4 +1,5 @@
 import random
+from discord import ChannelType
 from discord.ext import commands
 from .phrases import phrases
 
@@ -14,4 +15,4 @@ class FormulaOne(commands.Cog):
                 await message.add_reaction(letter)
 
     def is_dank_channel(self, channel):
-        return channel.name == "dank"
+        return channel.type == ChannelType.text and channel.name == "dank"

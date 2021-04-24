@@ -1,5 +1,6 @@
 import pytest
 import mock
+import discord
 from discord.ext.commands import Bot, Context
 from discord import TextChannel, VoiceChannel, Guild, Emoji, Message, VoiceClient
 
@@ -61,8 +62,17 @@ async def channel(text_channel) -> TextChannel:
 
 
 @pytest.fixture
-async def text_channel() -> TextChannel:
-    return patch_of("discord.TextChannel")
+@mock.patch("discord.TextChannel", autospec=True)
+async def text_channel(tex) -> TextChannel:
+    tex.type = discord.ChannelType.text
+    return tex
+
+
+@pytest.fixture
+@mock.patch("discord.DMChannel", autospec=True)
+async def dm_channel(dm) -> discord.DMChannel:
+    dm.type = discord.ChannelType.private
+    return dm
 
 
 @pytest.fixture
