@@ -5,6 +5,12 @@ from tests.duckmock.urllib import patch_urlopen
 from tests.duckmock.discord import MockAsyncIterator
 from duckbot.cogs.corrections import Typos
 
+@pytest.fixture(autouse=True)
+def stub_wiki_fetch():
+    """Stub the call to wiki to prevent the task from actually fetching data."""
+    with patch_urlopen(content("poo->poop")):
+        yield
+
 
 @pytest.mark.asyncio
 async def test_before_refresh_corrections_waits_for_bot(bot):
