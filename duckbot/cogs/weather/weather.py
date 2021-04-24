@@ -4,23 +4,9 @@ import pyowm
 from pyowm.utils import config
 from pyowm.weatherapi25.location import Location
 from discord.ext import commands
-from sqlalchemy.orm import declarative_base
-from sqlalchemy import Column, BigInteger, String, Float
+from .saved_location import SavedLocation
 
 degrees = "\N{DEGREE SIGN}C"
-
-Base = declarative_base()
-
-
-class SavedLocation(Base):
-    __tablename__ = "weather_locations"
-
-    id = Column(BigInteger, primary_key=True)
-    name = Column(String, nullable=False)
-    country = Column(String, nullable=False)
-    city_id = Column(BigInteger, nullable=False)
-    latitude = Column(Float, nullable=False)
-    longitude = Column(Float, nullable=False)
 
 
 class Weather(commands.Cog):
