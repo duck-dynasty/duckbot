@@ -4,5 +4,4 @@ from .kubernetes import Kubernetes
 from .recipe import Recipe
 from .tito import Tito
 from .typos import Typos
-from .weather import Weather
 from .fortune import Fortune
