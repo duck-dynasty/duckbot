@@ -5,6 +5,7 @@ from tests.duckmock.urllib import patch_urlopen
 from tests.duckmock.discord import MockAsyncIterator
 from duckbot.cogs.corrections import Typos
 
+
 @pytest.fixture(autouse=True)
 def stub_wiki_fetch():
     """Stub the call to wiki to prevent the task from actually fetching data."""
