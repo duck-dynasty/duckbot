@@ -39,7 +39,10 @@ async def message(m) -> discord.Message:
 
 @pytest.fixture
 @mock.patch("discord.ext.commands.Context")
-async def context(c) -> discord.ext.commands.Context:
+async def context(c, bot, message, channel) -> discord.ext.commands.Context:
+    c.message = message
+    message.channel = channel
+    c.channel = channel
     return c
 
 
@@ -55,20 +58,51 @@ async def guild(g) -> discord.Guild:
     return g
 
 
-@pytest.fixture
-async def channel(text_channel) -> discord.TextChannel:
-    return text_channel
+@pytest.fixture(params=["discord.TextChannel", "discord.VoiceChannel"])
+async def guild_channel(request, text_channel, voice_channel):
+    if request.param == "discord.TextChannel":
+        return text_channel
+    elif request.param == "discord.VoiceChannel":
+        return voice_channel
+    raise AssertionError
+
+
+@pytest.fixture(params=["discord.TextChannel", "discord.DMChannel", "discord.GroupChannel"])
+async def channel(request, text_channel, dm_channel, group_channel):
+    if request.param == "discord.TextChannel":
+        return text_channel
+    elif request.param == "discord.DMChannel":
+        return dm_channel
+    elif request.param == "discord.GroupChannel":
+        return group_channel
+    raise AssertionError
 
 
 @pytest.fixture
-@mock.patch("discord.TextChannel")
+@mock.patch("discord.TextChannel", autospec=True)
 async def text_channel(tc) -> discord.TextChannel:
+    tc.type = discord.ChannelType.text
     return tc
 
 
 @pytest.fixture
-@mock.patch("discord.VoiceChannel")
+@mock.patch("discord.DMChannel", autospec=True)
+async def dm_channel(dm) -> discord.DMChannel:
+    dm.type = discord.ChannelType.private
+    return dm
+
+
+@pytest.fixture
+@mock.patch("discord.GroupChannel", autospec=True)
+async def group_channel(g) -> discord.GroupChannel:
+    g.type = discord.ChannelType.group
+    return g
+
+
+@pytest.fixture
+@mock.patch("discord.VoiceChannel", autospec=True)
 async def voice_channel(vc) -> discord.VoiceChannel:
+    vc.type = discord.ChannelType.voice
     return vc
 
 

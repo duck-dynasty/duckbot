@@ -1,16 +1,9 @@
 import pytest
 import datetime
+from discord import ChannelType
 from asyncio import CancelledError
 from duckbot.cogs.announce_day import AnnounceDay
 from tests.duckmock.datetime import patch_now
-
-
-@pytest.fixture
-def setup_general_channel(bot, guild, channel):
-    bot.get_all_channels.return_value = [channel]
-    guild.name = "Friends Chat"
-    channel.guild = guild
-    channel.name = "general"
 
 
 @pytest.mark.asyncio
@@ -30,11 +23,15 @@ async def test_cog_unload_cancels_task(bot):
 
 
 @pytest.mark.asyncio
-async def test_on_hour_7am_eastern(bot, channel, setup_general_channel):
+async def test_on_hour_7am_eastern(bot, guild, guild_channel):
+    bot.get_all_channels.return_value = [guild_channel]
+    guild.name = "Friends Chat"
+    guild_channel.guild = guild
+    guild_channel.name = "general"
     with patch_now(datetime.datetime(2002, 1, 1, hour=7)):
         clazz = AnnounceDay(bot)
         await clazz._AnnounceDay__on_hour()
-        channel.send.assert_called()
+        guild_channel.send.assert_called() if guild_channel.type == ChannelType.text else guild_channel.assert_not_called()
 
 
 @pytest.mark.asyncio

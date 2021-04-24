@@ -12,8 +12,7 @@ def play(*args, **kwargs):
 @pytest.mark.asyncio
 async def test_task_loop(bot_spy, context, voice_channel, voice_client):
     context.voice_client = None
-    context.author.voice = voice_channel
-    voice_channel.channel.connect.return_value = async_value(voice_client)
+    context.author.voice.channel.connect.return_value = async_value(voice_client)
     voice_client.play = play
     clazz = WhoCanItBeNow(bot_spy)
     await clazz.connect_to_voice(context)
