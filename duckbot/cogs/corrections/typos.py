@@ -4,11 +4,10 @@ from discord.ext import commands, tasks
 
 
 class Typos(commands.Cog):
-    def __init__(self, bot, start_tasks=True):
+    def __init__(self, bot):
         self.bot = bot
         self.corrections = {}
-        if start_tasks:
-            self.refresh_corrections.start()
+        self.refresh_corrections.start()
 
     def cog_unload(self):
         self.refresh_corrections.cancel()
