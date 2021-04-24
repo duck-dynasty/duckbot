@@ -3,7 +3,7 @@ from duckbot.cogs.robot import ThankingRobot
 
 
 @pytest.mark.asyncio
-async def test_correct_giving_thanks_bot_author(message, bot):
+async def test_correct_giving_thanks_bot_author(bot, message):
     bot.user = "THEBOT"
     message.content = "Thank you DuckBot."
     message.author = bot.user
@@ -14,7 +14,7 @@ async def test_correct_giving_thanks_bot_author(message, bot):
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("text", ["Thank you DuckBot. You're becoming so much more polite.", " tHaNks, DuCK BOt"])
-async def test_correct_giving_thanks_message_is_thanks(message, bot, text):
+async def test_correct_giving_thanks_message_is_thanks(bot, message, text):
     bot.user = "but"
     message.author = "author"
     message.content = text
@@ -24,7 +24,7 @@ async def test_correct_giving_thanks_message_is_thanks(message, bot, text):
 
 
 @pytest.mark.asyncio
-async def test_correct_giving_thanks_message_has_no_thanks(message, bot):
+async def test_correct_giving_thanks_message_has_no_thanks(bot, message):
     bot.user = "but"
     message.author = "author"
     message.content = "you duck, suckbot"
