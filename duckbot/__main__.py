@@ -3,11 +3,12 @@ from discord import Intents
 from discord.ext import commands
 import duckbot.cogs.robot
 import duckbot.cogs.audio
+import duckbot.cogs.weather
 import duckbot.cogs.messages
 import duckbot.cogs.insights
 import duckbot.cogs.corrections
 import duckbot.cogs.announce_day
-from duckbot.cogs import Duck, Tito, Recipe, Weather, FormulaOne, Fortune
+from duckbot.cogs import Duck, Tito, Recipe, FormulaOne, Fortune
 from duckbot.server import Channels, Emojis
 from duckbot.db import Database
 import duckbot.health
@@ -31,7 +32,7 @@ def run_duckbot(bot: commands.Bot):
     bot.add_cog(Tito(bot))
     bot.add_cog(Recipe(bot))
     bot.add_cog(Fortune(bot))
-    bot.add_cog(Weather(bot))
+    bot.load_extension(duckbot.cogs.weather.__name__)
     bot.load_extension(duckbot.cogs.insights.__name__)
     bot.load_extension(duckbot.cogs.corrections.__name__)
     bot.add_cog(FormulaOne(bot))
