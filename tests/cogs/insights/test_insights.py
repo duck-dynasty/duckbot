@@ -1,4 +1,5 @@
 import pytest
+import mock
 import datetime
 from discord import ChannelType
 from asyncio import CancelledError
@@ -45,7 +46,8 @@ async def test_check_should_respond_no_history(bot, guild, guild_channel):
 
 
 @pytest.mark.asyncio
-async def test_check_should_respond_new_message(bot, text_channel, message, setup_general_channel):
+@mock.patch("discord.Message", autospec=True)
+async def test_check_should_respond_new_message(message, bot, text_channel, setup_general_channel):
     with patch_utcnow(datetime.datetime(2000, 1, 1, hour=12, minute=00)):
         message.created_at = datetime.datetime(2000, 1, 1, hour=11, minute=38)
         message.author.id = 244629273191645184
@@ -56,7 +58,8 @@ async def test_check_should_respond_new_message(bot, text_channel, message, setu
 
 
 @pytest.mark.asyncio
-async def test_check_should_respond_not_special_user(bot, text_channel, message, setup_general_channel):
+@mock.patch("discord.Message", autospec=True)
+async def test_check_should_respond_not_special_user(message, bot, text_channel, setup_general_channel):
     with patch_utcnow(datetime.datetime(2000, 1, 1, hour=12, minute=00)):
         message.created_at = datetime.datetime(2000, 1, 1, hour=11, minute=00)
         message.author.id = 0
@@ -67,7 +70,8 @@ async def test_check_should_respond_not_special_user(bot, text_channel, message,
 
 
 @pytest.mark.asyncio
-async def test_check_should_respond_old_message_sent_by_special_user(bot, text_channel, message, setup_general_channel):
+@mock.patch("discord.Message", autospec=True)
+async def test_check_should_respond_old_message_sent_by_special_user(message, bot, text_channel, setup_general_channel):
     with patch_utcnow(datetime.datetime(2000, 1, 1, hour=12, minute=00)):
         message.created_at = datetime.datetime(2000, 1, 1, hour=11, minute=00)
         message.author.id = 244629273191645184
