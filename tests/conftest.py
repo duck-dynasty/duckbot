@@ -1,7 +1,7 @@
 import pytest
 import mock
-from discord.ext.commands import Bot, Context
-from discord import TextChannel, VoiceChannel, Guild, Emoji, Message, VoiceClient
+import discord
+import discord.ext.commands
 
 
 @pytest.fixture(autouse=True)
@@ -17,64 +17,62 @@ def async_mock_await_fix():
 
 
 @pytest.fixture
-async def bot_spy() -> Bot:
+async def bot_spy() -> discord.ext.commands.Bot:
     """Returns a spy discord.ext.commands.Bot instance with a stubbed `run` method. The bot is closed afterwards."""
-    b = mock.Mock(wraps=Bot(command_prefix="!", help_command=None))
-    with mock.patch.object(Bot, "run"):  # stub run so it does nothing
+    b = mock.Mock(wraps=discord.ext.commands.Bot(command_prefix="!", help_command=None))
+    with mock.patch.object(discord.ext.commands.Bot, "run"):  # stub run so it does nothing
         yield b
     await b.close()
 
 
 @pytest.fixture
-async def bot() -> Bot:
-    return patch_of("discord.ext.commands.Bot")
+@mock.patch("discord.ext.commands.Bot")
+async def bot(b) -> discord.ext.commands.Bot:
+    return b
 
 
 @pytest.fixture
-async def message() -> Message:
-    return patch_of("discord.Message")
+@mock.patch("discord.Message")
+async def message(m) -> discord.Message:
+    return m
 
 
 @pytest.fixture
-async def context() -> Context:
-    return patch_of("discord.ext.commands.Context")
+@mock.patch("discord.ext.commands.Context")
+async def context(c) -> discord.ext.commands.Context:
+    return c
 
 
 @pytest.fixture
-async def emoji() -> Emoji:
-    return patch_of("discord.Emoji")
+@mock.patch("discord.Emoji")
+async def emoji(e) -> discord.Emoji:
+    return e
 
 
 @pytest.fixture
-async def guild() -> Guild:
-    return patch_of("discord.Guild")
+@mock.patch("discord.Guild")
+async def guild(g) -> discord.Guild:
+    return g
 
 
 @pytest.fixture
-async def message() -> Message:
-    return patch_of("discord.Message")
-
-
-@pytest.fixture
-async def channel(text_channel) -> TextChannel:
+async def channel(text_channel) -> discord.TextChannel:
     return text_channel
 
 
 @pytest.fixture
-async def text_channel() -> TextChannel:
-    return patch_of("discord.TextChannel")
+@mock.patch("discord.TextChannel")
+async def text_channel(tc) -> discord.TextChannel:
+    return tc
 
 
 @pytest.fixture
-async def voice_channel() -> VoiceChannel:
-    return patch_of("discord.VoiceChannel")
+@mock.patch("discord.VoiceChannel")
+async def voice_channel(vc) -> discord.VoiceChannel:
+    return vc
 
 
 @pytest.fixture
-async def voice_client() -> VoiceClient:
-    return patch_of("discord.VoiceClient")
-
-
-def patch_of(tpye):
-    with mock.patch(tpye) as o:
-        return o
+@mock.patch("discord.VoiceClient")
+async def voice_client(vc) -> discord.VoiceClient:
+    return vc
