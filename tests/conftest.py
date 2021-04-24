@@ -31,6 +31,11 @@ async def bot() -> Bot:
 
 
 @pytest.fixture
+async def message() -> Message:
+    return patch_of("discord.Message")
+
+
+@pytest.fixture
 async def context() -> Context:
     return patch_of("discord.ext.commands.Context")
 
