@@ -45,4 +45,4 @@ class FormulaOne(commands.Cog):
                 await message.add_reaction(letter)
 
     def is_dank_channel(self, channel):
-        return channel.name == "dank"
+        return hasattr(channel, "name") and channel.name == "dank"
