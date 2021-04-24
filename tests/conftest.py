@@ -1,12 +1,7 @@
 import pytest
 import mock
 import discord
-<<<<<<< HEAD
 import discord.ext.commands
-=======
-from discord.ext.commands import Bot, Context
-from discord import TextChannel, VoiceChannel, Guild, Emoji, Message, VoiceClient
->>>>>>> origin/extension/cogs/f1
 
 
 @pytest.fixture(autouse=True)
