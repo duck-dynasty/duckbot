@@ -14,7 +14,7 @@ async def test_correct_bitcoin_bot_author(bot, message):
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("text", ["bitcoin", "BITCOIN", "BiTcOiN"])
-async def test_correct_bitcoin_message_is_bitcoin(bot, message,text):
+async def test_correct_bitcoin_message_is_bitcoin(bot, message, text):
     bot.user = "but"
     message.author = "author"
     message.content = text
