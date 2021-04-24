@@ -33,16 +33,16 @@ async def bot(b) -> discord.ext.commands.Bot:
 
 @pytest.fixture
 @mock.patch("discord.Message")
-async def message(m) -> discord.Message:
+async def message(m, channel) -> discord.Message:
     return m
 
 
 @pytest.fixture
 @mock.patch("discord.ext.commands.Context")
-async def context(c, bot, message, channel) -> discord.ext.commands.Context:
+async def context(c, bot, message) -> discord.ext.commands.Context:
     c.message = message
     message.channel = channel
-    c.channel = channel
+    c.channel = message.channel
     return c
 
 
