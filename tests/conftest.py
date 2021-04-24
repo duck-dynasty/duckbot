@@ -39,6 +39,13 @@ async def message(m, channel) -> discord.Message:
 
 
 @pytest.fixture
+@mock.patch("discord.Message", autospec=True)
+async def text_message(m, text_channel) -> discord.Message:
+    m.channel = text_channel
+    return m
+
+
+@pytest.fixture
 @mock.patch("discord.ext.commands.Context")
 async def context(c, message) -> discord.ext.commands.Context:
     c.message = message
