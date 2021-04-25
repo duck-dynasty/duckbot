@@ -5,6 +5,7 @@ python -m pytest -ra \
     --black \
     --flake8 \
     --cov=duckbot/ \
+    --cov-branch \
     --cov-fail-under=85 \
     --cov-report html \
     --cov-report term-missing:skip-covered \
