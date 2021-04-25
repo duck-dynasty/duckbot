@@ -51,11 +51,6 @@ async def guild() -> Guild:
 
 
 @pytest.fixture
-async def message() -> Message:
-    return patch_of("discord.Message")
-
-
-@pytest.fixture
 async def channel(text_channel) -> TextChannel:
     return text_channel
 
