@@ -1,10 +1,16 @@
 . $(git rev-parse --show-toplevel)/scripts/ensure-toplevel.sh && \
 
 # test with pytest and gather code coverage
-python -m coverage run --source=duckbot/ -m pytest -ra --black --flake8 -n auto --blockage && \
+python -m pytest -ra \
+    --black \
+    --flake8 \
+    --cov=duckbot/ \
+    --cov-fail-under=85 \
+    --cov-report html \
+    --cov-report term-missing:skip-covered \
+    -n auto \
+    --dist loadfile \
+    --blockage
 
-# when tests pass, output coverage report
-python -m coverage report --show-missing --skip-empty --skip-covered --fail-under=80 && \
+echo "html report: file://$(pwd)/htmlcov/index.html"
 
-# generate html coverage report
-python -m coverage html && echo "html report: file://$(pwd)/htmlcov/index.html"
