@@ -27,11 +27,10 @@ Should be run whenever you pull from `upstream/main`, or after you create the vi
 . scripts/build/install.sh
 ```
 
-### Run Tests, Formatter and Linter
+### Run Tests/Lint, Formatter
 ```sh
 . scripts/build/test.sh
 . scripts/build/format.sh
-. scripts/build/lint.sh
 ```
 
 The `test` script also performs code coverage checks. [View the script](https://github.com/Chippers255/duckbot/blob/main/scripts/build/test.sh) to see the minimum required coverage. Discord.py decorators make it difficult to cover methods directly, so don't aim for 100% coverage.
