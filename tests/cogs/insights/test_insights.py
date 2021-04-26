@@ -1,5 +1,5 @@
 import pytest
-import mock
+from unittest import mock
 import datetime
 from discord import ChannelType
 from asyncio import CancelledError

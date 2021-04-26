@@ -9,7 +9,6 @@ pytest-blockage
 pytest-sugar
 pytest-icdiff
 pytest-cov
-mock
 
 flake8
 black

@@ -1,4 +1,4 @@
-import mock
+from unittest import mock
 from subprocess import CompletedProcess
 from duckbot.cogs.fortune import Fortune
 

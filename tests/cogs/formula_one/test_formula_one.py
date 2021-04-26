@@ -1,5 +1,5 @@
 import pytest
-import mock
+from unittest import mock
 from discord import ChannelType
 from duckbot.cogs.formula_one import FormulaOne
 
