@@ -42,7 +42,10 @@ async def test_check_should_respond_no_history(bot, guild, guild_channel):
         guild_channel.history.return_value = MockAsyncIterator(None)
     clazz = Insights(bot)
     await clazz._Insights__check_should_respond()
-    guild_channel.send.assert_not_called() if guild_channel.type == ChannelType.text else guild_channel.assert_not_called()
+    if guild_channel.type == ChannelType.text:
+        guild_channel.send.assert_not_called()
+    else:
+        assert not guild_channel.method_calls
 
 
 @pytest.mark.asyncio
