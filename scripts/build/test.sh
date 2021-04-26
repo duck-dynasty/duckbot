@@ -5,12 +5,13 @@ python -m pytest \
     -ra \
     --black \
     --flake8 \
-    --cov=duckbot/ \
+    --cov=$(d="${1/tests/duckbot}" ; echo "${d:-duckbot}") \
     --cov-branch \
     --cov-fail-under=85 \
     --cov-report html \
     --cov-report term-missing:skip-covered \
     -n auto \
-    --blockage
+    --blockage \
+    "$1"
 
 echo "html report: file://$(pwd)/htmlcov/index.html"
