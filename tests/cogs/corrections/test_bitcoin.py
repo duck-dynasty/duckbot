@@ -31,3 +31,14 @@ async def test_correct_bitcoin_message_contains_bitcoin(bot, message, text):
     clazz = Bitcoin(bot)
     await clazz.correct_bitcoin(message)
     message.channel.send.assert_called_once_with("Magic Beans*")
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("text", ["bit coin", "dogecoin", "hi"])
+async def test_correct_bitcoin_message_is_not_bitcoin(bot, message, text):
+    bot.user = "but"
+    message.author = "author"
+    message.content = text
+    clazz = Bitcoin(bot)
+    await clazz.correct_bitcoin(message)
+    message.channel.assert_not_called()
