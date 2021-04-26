@@ -23,7 +23,7 @@ async def test_cog_unload_cancels_task(bot):
 
 
 @pytest.mark.asyncio
-async def test_on_hour_7am_eastern(bot, guild, guild_channel):
+async def test_on_hour_7am_eastern_special_day(bot, guild, guild_channel):
     bot.get_all_channels.return_value = [guild_channel]
     guild.name = "Friends Chat"
     guild_channel.guild = guild
@@ -31,7 +31,25 @@ async def test_on_hour_7am_eastern(bot, guild, guild_channel):
     with patch_now(datetime.datetime(2002, 1, 1, hour=7)):
         clazz = AnnounceDay(bot)
         await clazz._AnnounceDay__on_hour()
-        guild_channel.send.assert_called() if guild_channel.type == ChannelType.text else guild_channel.assert_not_called()
+        if guild_channel.type == ChannelType.text:
+            guild_channel.send.assert_called()
+        else:
+            assert not guild_channel.method_calls
+
+
+@pytest.mark.asyncio
+async def test_on_hour_7am_eastern_not_special_day(bot, guild, guild_channel):
+    bot.get_all_channels.return_value = [guild_channel]
+    guild.name = "Friends Chat"
+    guild_channel.guild = guild
+    guild_channel.name = "general"
+    with patch_now(datetime.datetime(2002, 1, 2, hour=7)):
+        clazz = AnnounceDay(bot)
+        await clazz._AnnounceDay__on_hour()
+        if guild_channel.type == ChannelType.text:
+            guild_channel.send.assert_called()
+        else:
+            assert not guild_channel.method_calls
 
 
 @pytest.mark.asyncio
