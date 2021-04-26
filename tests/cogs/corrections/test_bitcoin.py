@@ -41,4 +41,4 @@ async def test_correct_bitcoin_message_is_not_bitcoin(bot, message, text):
     message.content = text
     clazz = Bitcoin(bot)
     await clazz.correct_bitcoin(message)
-    message.channel.assert_not_called()
+    message.channel.send.assert_not_called()
