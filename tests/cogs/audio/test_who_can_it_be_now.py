@@ -109,6 +109,13 @@ async def test_stop_not_streaming(bot, context):
 
 
 @pytest.mark.asyncio
+async def test_stop_null_context_not_streaming(bot):
+    clazz = WhoCanItBeNow(bot)
+    clazz.streaming = False
+    await clazz._WhoCanItBeNow__stop()
+
+
+@pytest.mark.asyncio
 async def test_cog_unload_stops_streaming(bot, voice_client):
     bot.loop = asyncio.get_event_loop()
     clazz = WhoCanItBeNow(bot)
