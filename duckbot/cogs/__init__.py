@@ -4,4 +4,3 @@ from .kubernetes import Kubernetes
 from .recipe import Recipe
 from .tito import Tito
 from .typos import Typos
-from .formula_one import FormulaOne
