@@ -1,5 +1,5 @@
 import mock
-from duckbot.cogs import Fortune
+from duckbot.cogs.fortune import Fortune
 
 
 @mock.patch("discord.ext.commands.Bot")
