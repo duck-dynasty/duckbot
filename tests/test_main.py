@@ -1,5 +1,5 @@
 import sys
-import mock
+from unittest import mock
 import pytest
 from discord import Intents
 import duckbot
