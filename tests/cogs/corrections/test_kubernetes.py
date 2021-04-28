@@ -1,11 +1,9 @@
 import pytest
 import mock
-from duckbot.cogs import Kubernetes
+from duckbot.cogs.corrections import Kubernetes
 
 
 @pytest.mark.asyncio
-@mock.patch("discord.Message")
-@mock.patch("discord.ext.commands.Bot")
 async def test_correct_kubernetes_bot_author(message, bot):
     bot.user = "THEBOT"
     message.author = bot.user
@@ -16,8 +14,6 @@ async def test_correct_kubernetes_bot_author(message, bot):
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("text", [("koober nets"), ("kuber nets"), ("kubernets"), ("kubernetes")])
-@mock.patch("discord.Message")
-@mock.patch("discord.ext.commands.Bot")
 async def test_correct_kubernetes_message_is_kubernetes(message, bot, text):
     bot.user = "but"
     message.author = "author"
@@ -28,8 +24,6 @@ async def test_correct_kubernetes_message_is_kubernetes(message, bot, text):
 
 
 @pytest.mark.asyncio
-@mock.patch("discord.Message")
-@mock.patch("discord.ext.commands.Bot")
 async def test_correct_k8s_bot_author(message, bot):
     bot.user = "THEBOT"
     message.author = bot.user
@@ -40,8 +34,6 @@ async def test_correct_k8s_bot_author(message, bot):
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("text", [("k8"), ("k8s"), ("K8"), ("K8s"), ("K8S")])
-@mock.patch("discord.Message")
-@mock.patch("discord.ext.commands.Bot")
 async def test_correct_k8s_message_is_k8s(message, bot, text):
     bot.user = "but"
     message.author = "author"
