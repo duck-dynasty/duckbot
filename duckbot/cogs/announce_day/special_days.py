@@ -1,3 +1,4 @@
+import discord
 import datetime
 import holidays
 import math
@@ -17,6 +18,8 @@ class SpecialDays(holidays.Canada):
     def _populate(self, year):
         holidays.Canada._populate(self, year)
 
+        tito = discord.utils.get(self.bot.emojis, guild__name="Friends Chat", name="tito")
+
         self[datetime.date(year, 1, 31)] = f"Erin and Taras' Anniversary. It's been {year-2010} entire years"
         self[datetime.date(year, 2, 2)] = "Groundhog Day"
         self[datetime.date(year, 2, 14)] = "Valentine's Day"
@@ -27,7 +30,7 @@ class SpecialDays(holidays.Canada):
         self[datetime.date(year, 3, 25)] = "The Day the One Ring was cast into the fires of Mt. Doom, bringing about the fall of Sauron"
         self[datetime.date(year, 4, 12)] = "National Grilled Cheese Day"
         self[datetime.date(year, 5, 1) + rd(weekday=SU(+2))] = "Mother's Day"
-        self[datetime.date(year, 5, 7)] = f"Bro Tito Day {self.bot.get_cog('emojis').get_emoji_by_name('tito')}"
+        self[datetime.date(year, 5, 7)] = f"Bro Tito Day {tito}"
         self[datetime.date(year, 6, 1) + rd(weekday=SU(+3))] = "Father's Day"
         self[datetime.date(year, 6, 21)] = f"Erin's Birthday. She's {year-1991} years old"
         self[datetime.date(year, 9, 8)] = f"Dan's Birthday. He {year-1989} old"
