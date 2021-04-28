@@ -1,43 +1,36 @@
 import pytest
 import mock
 from tests.async_mock_ext import async_value
-from duckbot.cogs import Tito
+from duckbot.cogs.tito import Tito
 
 
 @pytest.mark.asyncio
-@mock.patch("discord.Message")
-async def test_react_to_tito_with_yugoslavia_no_tito_emoji(message):
+async def test_react_to_tito_with_yugoslavia_no_tito_emoji(bot, message):
     message.content = "josip bro tito, brother"
-    clazz = Tito(None)
-    msg = await clazz.react_to_tito_with_yugoslavia(message)
-    assert msg is None
+    clazz = Tito(bot)
+    await clazz.react_to_tito_with_yugoslavia(message)
     message.add_reaction.assert_not_called()
 
 
 @pytest.mark.asyncio
-@mock.patch("discord.Message")
-async def test_react_to_tito_with_yugoslavia_message_contains_tito_text(message):
+async def test_react_to_tito_with_yugoslavia_message_contains_tito_text(bot, message):
     message.content = "josip bro :tito:, brother"
-    clazz = Tito(None)
-    msg = await clazz.react_to_tito_with_yugoslavia(message)
-    assert msg is None
+    clazz = Tito(bot)
+    await clazz.react_to_tito_with_yugoslavia(message)
     assert_flags_sent(message)
 
 
 @pytest.mark.asyncio
-@mock.patch("discord.Message")
-async def test_react_to_tito_with_yugoslavia_message_contains_tito_emoji(message):
+async def test_react_to_tito_with_yugoslavia_message_contains_tito_emoji(bot, message):
     message.content = "josip bro <:tito:780954015285641276>, brother"
-    clazz = Tito(None)
-    msg = await clazz.react_to_tito_with_yugoslavia(message)
-    assert msg is None
+    clazz = Tito(bot)
+    await clazz.react_to_tito_with_yugoslavia(message)
     assert_flags_sent(message)
 
 
 @pytest.mark.asyncio
-@mock.patch("discord.ext.commands.Bot")
 @mock.patch("discord.RawReactionActionEvent")
-async def test_react_to_tito_reaction_no_tito_emoji(bot, payload):
+async def test_react_to_tito_reaction_no_tito_emoji(payload, bot):
     payload.emoji.name = "not-tito"
     clazz = Tito(bot)
     await clazz.react_to_tito_reaction(payload)
@@ -45,16 +38,13 @@ async def test_react_to_tito_reaction_no_tito_emoji(bot, payload):
 
 
 @pytest.mark.asyncio
-@mock.patch("discord.ext.commands.Bot")
 @mock.patch("discord.RawReactionActionEvent")
-@mock.patch("discord.TextChannel")
-@mock.patch("discord.Message")
-async def test_react_to_tito_reaction_tito_emoji(bot, payload, channel, message):
+async def test_react_to_tito_reaction_tito_emoji(payload, bot, channel, message):
     payload.channel_id = 123
     payload.message_id = 456
     payload.emoji.name = "tito"
     bot.fetch_channel.return_value = async_value(channel)
-    channel.fetch_message.return_value = async_value(message)
+    channel.fetch_message.return_value = message
     clazz = Tito(bot)
     await clazz.react_to_tito_reaction(payload)
     bot.fetch_channel.assert_called_once_with(payload.channel_id)
