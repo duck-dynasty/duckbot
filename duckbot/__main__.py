@@ -4,13 +4,13 @@ from discord.ext import commands
 import duckbot.cogs.tito
 import duckbot.cogs.robot
 import duckbot.cogs.audio
-import duckbot.cogs.recipe
 import duckbot.cogs.fortune
+import duckbot.cogs.recipe
 import duckbot.cogs.weather
 import duckbot.cogs.messages
 import duckbot.cogs.insights
-import duckbot.cogs.formula_one
 import duckbot.cogs.corrections
+import duckbot.cogs.formula_one
 import duckbot.cogs.announce_day
 from duckbot.cogs import Duck
 from duckbot.server import Channels, Emojis
