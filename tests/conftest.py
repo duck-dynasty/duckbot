@@ -36,6 +36,7 @@ async def bot(b) -> discord.ext.commands.Bot:
 @pytest.fixture
 @mock.patch("discord.Message", autospec=True)
 async def message(m, channel) -> discord.Message:
+    """Returns a message with the channel property set, for each channel type a message can be sent to."""
     m.channel = channel
     return m
 
@@ -43,6 +44,7 @@ async def message(m, channel) -> discord.Message:
 @pytest.fixture
 @mock.patch("discord.Message", autospec=True)
 async def text_message(m, text_channel) -> discord.Message:
+    """Returns a guild TextChannel message with the channel property set."""
     m.channel = text_channel
     return m
 
@@ -50,6 +52,7 @@ async def text_message(m, text_channel) -> discord.Message:
 @pytest.fixture
 @mock.patch("discord.ext.commands.Context")
 async def context(c, message) -> discord.ext.commands.Context:
+    """Returns a context with the message and channel properties set, for each channel type a command can be sent to."""
     c.message = message
     c.channel = message.channel
     return c
@@ -69,6 +72,7 @@ async def guild(g) -> discord.Guild:
 
 @pytest.fixture(params=["discord.TextChannel", "discord.VoiceChannel"])
 async def guild_channel(request, text_channel, voice_channel):
+    """Returns a guild TextChannel and a VoiceChannel."""
     if request.param == "discord.TextChannel":
         return text_channel
     elif request.param == "discord.VoiceChannel":
@@ -78,6 +82,7 @@ async def guild_channel(request, text_channel, voice_channel):
 
 @pytest.fixture(params=["discord.TextChannel", "discord.DMChannel", "discord.GroupChannel"])
 async def channel(request, text_channel, dm_channel, group_channel):
+    """Returns a text based channel."""
     if request.param == "discord.TextChannel":
         return text_channel
     elif request.param == "discord.DMChannel":
