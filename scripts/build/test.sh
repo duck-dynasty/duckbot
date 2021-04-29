@@ -3,7 +3,6 @@
 # test with pytest and gather code coverage
 python -m pytest \
     -ra \
-    --collect-in-virtualenv \
     --black \
     --flake8 \
     --cov=$(d="${1/tests/duckbot}" ; echo "${d:-duckbot}") \
