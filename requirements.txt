@@ -1,8 +1,7 @@
-discord.py
-pynacl
+discord.py[voice]>=1.7,<2
 beautifulsoup4
 pytz
 holidays
-pyowm # openweather
+pyowm>=3.2,<4 # openweather
 psycopg2
-sqlalchemy
+sqlalchemy>=1.4,<2
