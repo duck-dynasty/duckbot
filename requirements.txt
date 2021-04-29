@@ -1,5 +1,4 @@
 discord.py
-discord.py[voice]
 pynacl
 beautifulsoup4
 pytz
