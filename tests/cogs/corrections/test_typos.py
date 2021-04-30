@@ -6,6 +6,13 @@ from tests.duckmock.discord import MockAsyncIterator
 from duckbot.cogs.corrections import Typos
 
 
+@pytest.fixture(autouse=True)
+def stub_wiki_fetch():
+    """Stub the call to wiki to prevent the task from actually fetching data."""
+    with patch_urlopen(content("poo->poop")):
+        yield
+
+
 @pytest.mark.asyncio
 async def test_before_refresh_corrections_waits_for_bot(bot):
     clazz = Typos(bot)
@@ -74,12 +81,11 @@ async def test_correct_typos_message_is_not_fuck(bot, message):
 
 
 @pytest.mark.asyncio
-async def test_correct_typos_no_previous_message(bot, message, channel):
+async def test_correct_typos_no_previous_message(bot, message):
     bot.user = "THEBOT"
     message.author = "not the bot"
     message.content = "fuck"
-    message.channel = channel
-    channel.history.return_value = MockAsyncIterator(None)
+    message.channel.history.return_value = MockAsyncIterator(None)
     clazz = Typos(bot)
     await clazz._Typos__correct_typos(message) is None
     message.channel.send.assert_not_called()
@@ -87,14 +93,13 @@ async def test_correct_typos_no_previous_message(bot, message, channel):
 
 @pytest.mark.asyncio
 @mock.patch("discord.Message")
-async def test_correct_typos_no_typos_in_previous(prev_message, bot, message, channel):
+async def test_correct_typos_no_typos_in_previous(prev_message, bot, message):
     bot.user = "THEBOT"
     message.author.id = 1
     prev_message.author = message.author
     message.content = "fuck"
     prev_message.content = "hello"
-    message.channel = channel
-    channel.history.return_value = MockAsyncIterator(prev_message)
+    message.channel.history.return_value = MockAsyncIterator(prev_message)
     clazz = Typos(bot)
     clazz.corrections = {"henlo": ["hello"]}
     await clazz._Typos__correct_typos(message) is None
@@ -103,14 +108,13 @@ async def test_correct_typos_no_typos_in_previous(prev_message, bot, message, ch
 
 @pytest.mark.asyncio
 @mock.patch("discord.Message")
-async def test_correct_typos_sends_correction(prev_message, bot, message, channel):
+async def test_correct_typos_sends_correction(prev_message, bot, message):
     bot.user = "THEBOT"
     message.author.id = 1
     prev_message.author = message.author
     message.content = "fuck"
-    message.channel = channel
     prev_message.content = "henlo"
-    channel.history.return_value = MockAsyncIterator(prev_message)
+    message.channel.history.return_value = MockAsyncIterator(prev_message)
     clazz = Typos(bot)
     clazz.corrections = {"henlo": ["hello"]}
     await clazz._Typos__correct_typos(message) is None

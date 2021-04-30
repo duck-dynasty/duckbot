@@ -1,7 +1,13 @@
 pytest
 pytest-asyncio
 pytest-mock
-coverage
+pytest-xdist[psutil]
+pytest-flake8
+pytest-black
+pytest-blockage
+pytest-sugar
+pytest-icdiff
+pytest-cov
 
 flake8
 black

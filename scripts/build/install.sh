@@ -1,8 +1,7 @@
-# install apt dependencies
+# install apt dependencies; ffmpeg and postgres are needed to run unit tests
 sudo apt-get update && sudo apt-get install -y \
     ffmpeg \
-    postgresql libpq-dev \
-    fortune-mod cowsay \
+    libpq-dev \
     && \
 
 # upgrade venv pip

@@ -25,8 +25,6 @@ jobs:
       run: . scripts/build/install.sh
     - name: Run Tests
       run: . scripts/build/test.sh
-    - name: Run Lint Checks
-      run: . scripts/build/lint.sh
 
     - name: Test Connection to Discord
       run: |
