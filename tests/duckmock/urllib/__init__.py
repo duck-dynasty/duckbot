@@ -1,4 +1,4 @@
-import mock
+from unittest import mock
 from .request import MockResponse
 
 URLOPEN = "urllib.request.urlopen"

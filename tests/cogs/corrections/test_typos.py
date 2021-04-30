@@ -1,5 +1,5 @@
 import pytest
-import mock
+from unittest import mock
 from asyncio import CancelledError
 from tests.duckmock.urllib import patch_urlopen
 from tests.duckmock.discord import MockAsyncIterator
