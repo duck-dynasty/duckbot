@@ -55,7 +55,7 @@ async def test_correct_k8s_message_is_k8s(bot, message, text):
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("text", ["kubernetes", "duckbot"])
-async def test_correct_kubernetes_message_is_not_k8s(bot, message, text):
+async def test_correct_k8s_message_is_not_k8s(bot, message, text):
     bot.user = "but"
     message.author = "author"
     message.content = text
