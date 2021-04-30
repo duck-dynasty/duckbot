@@ -1,7 +1,6 @@
 pytest
 pytest-asyncio
 pytest-mock
-mock
 coverage
 
 flake8
