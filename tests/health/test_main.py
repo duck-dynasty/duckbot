@@ -1,4 +1,4 @@
-import mock
+from unittest import mock
 import pytest
 from duckbot.health.__main__ import check
 

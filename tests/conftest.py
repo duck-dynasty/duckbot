@@ -1,5 +1,5 @@
 import pytest
-import mock
+from unittest import mock
 import discord
 from discord.ext.commands import Bot, Context
 from discord import TextChannel, VoiceChannel, Guild, Emoji, Message, VoiceClient
