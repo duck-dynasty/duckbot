@@ -13,7 +13,7 @@ import duckbot.cogs.corrections
 import duckbot.cogs.formula_one
 import duckbot.cogs.announce_day
 from duckbot.cogs import Duck
-from duckbot.server import Channels, Emojis
+from duckbot.server import Emojis
 from duckbot.db import Database
 import duckbot.health
 import duckbot.util.connection_test
@@ -29,7 +29,6 @@ def run_duckbot(bot: commands.Bot):
 
     # server cogs must be loaded first; any references to
     # them should happen in or after the `on_ready` event
-    bot.add_cog(Channels(bot))
     bot.add_cog(Emojis(bot))
 
     bot.add_cog(Duck(bot))
