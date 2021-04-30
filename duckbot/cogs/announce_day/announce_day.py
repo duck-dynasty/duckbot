@@ -2,6 +2,7 @@ import random
 import datetime
 import pytz
 import discord
+from discord import ChannelType
 from discord.ext import commands, tasks
 from .special_days import SpecialDays
 from .phrases import days, templates
@@ -39,9 +40,10 @@ class AnnounceDay(commands.Cog):
 
     async def __on_hour(self):
         if self.should_announce_day():
-            channel = discord.utils.get(self.bot.get_all_channels(), guild__name="Friends Chat", name="general")
-            message = self.get_message()
-            await channel.send(message)
+            channel = discord.utils.get(self.bot.get_all_channels(), guild__name="Friends Chat", name="general", type=ChannelType.text)
+            if channel:
+                message = self.get_message()
+                await channel.send(message)
 
     @on_hour.before_loop
     async def before_loop(self):

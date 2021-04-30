@@ -10,10 +10,9 @@ def play(*args, **kwargs):
 
 
 @pytest.mark.asyncio
-async def test_task_loop(bot_spy, context, voice_channel, voice_client):
+async def test_task_loop_once(bot_spy, context, voice_channel, voice_client):
     context.voice_client = None
-    context.author.voice = voice_channel
-    voice_channel.channel.connect.return_value = async_value(voice_client)
+    context.author.voice.channel.connect.return_value = async_value(voice_client)
     voice_client.play = play
     clazz = WhoCanItBeNow(bot_spy)
     await clazz.connect_to_voice(context)
@@ -21,6 +20,31 @@ async def test_task_loop(bot_spy, context, voice_channel, voice_client):
     await clazz._WhoCanItBeNow__start(context)
     assert clazz.audio_task is not None
     assert clazz.streaming is True
+    await clazz.stream.wait()
+    await clazz._WhoCanItBeNow__stop(context)
+    assert clazz.streaming is False
+    assert clazz.audio_task is None
+    assert clazz.voice_client is None
+
+
+@pytest.mark.asyncio
+async def test_task_loop_repeats(bot_spy, context, voice_channel, voice_client):
+    context.voice_client = None
+    context.author.voice.channel.connect.return_value = async_value(voice_client)
+
+    def loop_first(*args, **kwargs):
+        voice_client.play = play
+        play(*args, **kwargs)
+
+    voice_client.play = loop_first
+    clazz = WhoCanItBeNow(bot_spy)
+    await clazz.connect_to_voice(context)
+    assert clazz.voice_client is not None
+    await clazz._WhoCanItBeNow__start(context)
+    assert clazz.audio_task is not None
+    assert clazz.streaming is True
+    await clazz.stream.wait()
+    await asyncio.sleep(0)
     await clazz.stream.wait()
     await clazz._WhoCanItBeNow__stop(context)
     assert clazz.streaming is False
@@ -82,6 +106,13 @@ async def test_stop_not_streaming(bot, context):
     clazz.streaming = False
     await clazz._WhoCanItBeNow__stop(context)
     context.send.assert_called_once_with("Brother, no :musical_note: :saxophone: is active.")
+
+
+@pytest.mark.asyncio
+async def test_stop_null_context_not_streaming(bot):
+    clazz = WhoCanItBeNow(bot)
+    clazz.streaming = False
+    await clazz._WhoCanItBeNow__stop()
 
 
 @pytest.mark.asyncio

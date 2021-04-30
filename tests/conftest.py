@@ -1,8 +1,7 @@
 import pytest
 from unittest import mock
 import discord
-from discord.ext.commands import Bot, Context
-from discord import TextChannel, VoiceChannel, Guild, Emoji, Message, VoiceClient
+import discord.ext.commands
 
 
 @pytest.fixture(autouse=True)
@@ -18,54 +17,86 @@ def async_mock_await_fix():
 
 
 @pytest.fixture
-async def bot_spy() -> Bot:
+async def bot_spy() -> discord.ext.commands.Bot:
     """Returns a spy discord.ext.commands.Bot instance with a stubbed `run` method. The bot is closed afterwards."""
-    b = mock.Mock(wraps=Bot(command_prefix="!", help_command=None))
-    with mock.patch.object(Bot, "run"):  # stub run so it does nothing
-        yield b
+    b = discord.ext.commands.Bot(command_prefix="!", help_command=None)
+    m = mock.Mock(wraps=b)
+    m.loop = b.loop
+    with mock.patch.object(discord.ext.commands.Bot, "run"):  # stub run so it does nothing
+        yield m
     await b.close()
 
 
 @pytest.fixture
-async def bot() -> Bot:
-    return patch_of("discord.ext.commands.Bot")
+@mock.patch("discord.ext.commands.Bot")
+async def bot(b) -> discord.ext.commands.Bot:
+    return b
 
 
 @pytest.fixture
-async def message() -> Message:
-    return patch_of("discord.Message")
+@mock.patch("discord.Message", autospec=True)
+async def message(m, channel) -> discord.Message:
+    """Returns a message with the channel property set, for each channel type a message can be sent to."""
+    m.channel = channel
+    return m
 
 
 @pytest.fixture
-async def context() -> Context:
-    return patch_of("discord.ext.commands.Context")
+@mock.patch("discord.Message", autospec=True)
+async def text_message(m, text_channel) -> discord.Message:
+    """Returns a guild TextChannel message with the channel property set."""
+    m.channel = text_channel
+    return m
 
 
 @pytest.fixture
-async def emoji() -> Emoji:
-    return patch_of("discord.Emoji")
+@mock.patch("discord.ext.commands.Context")
+async def context(c, message) -> discord.ext.commands.Context:
+    """Returns a context with the message and channel properties set, for each channel type a command can be sent to."""
+    c.message = message
+    c.channel = message.channel
+    return c
 
 
 @pytest.fixture
-async def guild() -> Guild:
-    return patch_of("discord.Guild")
+@mock.patch("discord.Emoji", autospec=True)
+async def emoji(e) -> discord.Emoji:
+    return e
 
 
 @pytest.fixture
-async def message() -> Message:
-    return patch_of("discord.Message")
+@mock.patch("discord.Guild", autospec=True)
+async def guild(g) -> discord.Guild:
+    return g
 
 
-@pytest.fixture
-async def channel(text_channel) -> TextChannel:
-    return text_channel
+@pytest.fixture(params=["discord.TextChannel", "discord.VoiceChannel"])
+async def guild_channel(request, text_channel, voice_channel):
+    """Returns a guild TextChannel and a VoiceChannel."""
+    if request.param == "discord.TextChannel":
+        return text_channel
+    elif request.param == "discord.VoiceChannel":
+        return voice_channel
+    raise AssertionError
+
+
+@pytest.fixture(params=["discord.TextChannel", "discord.DMChannel", "discord.GroupChannel"])
+async def channel(request, text_channel, dm_channel, group_channel):
+    """Returns a text based channel."""
+    if request.param == "discord.TextChannel":
+        return text_channel
+    elif request.param == "discord.DMChannel":
+        return dm_channel
+    elif request.param == "discord.GroupChannel":
+        return group_channel
+    raise AssertionError
 
 
 @pytest.fixture
 @mock.patch("discord.TextChannel", autospec=True)
-async def text_channel(tex) -> TextChannel:
-    tex.type = discord.ChannelType.text
-    return tex
+async def text_channel(tc) -> discord.TextChannel:
+    tc.type = discord.ChannelType.text
+    return tc
 
 
 @pytest.fixture
@@ -76,15 +107,20 @@ async def dm_channel(dm) -> discord.DMChannel:
 
 
 @pytest.fixture
-async def voice_channel() -> VoiceChannel:
-    return patch_of("discord.VoiceChannel")
+@mock.patch("discord.GroupChannel", autospec=True)
+async def group_channel(g) -> discord.GroupChannel:
+    g.type = discord.ChannelType.group
+    return g
 
 
 @pytest.fixture
-async def voice_client() -> VoiceClient:
-    return patch_of("discord.VoiceClient")
+@mock.patch("discord.VoiceChannel", autospec=True)
+async def voice_channel(vc) -> discord.VoiceChannel:
+    vc.type = discord.ChannelType.voice
+    return vc
 
 
-def patch_of(tpye):
-    with mock.patch(tpye) as o:
-        return o
+@pytest.fixture
+@mock.patch("discord.VoiceClient", autospec=True)
+async def voice_client(vc) -> discord.VoiceClient:
+    return vc
