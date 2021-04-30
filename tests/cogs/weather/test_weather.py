@@ -1,5 +1,5 @@
 import pytest
-import mock
+from unittest import mock
 from pyowm.weatherapi25.location import Location
 from pyowm.weatherapi25.one_call import OneCall
 from pyowm.weatherapi25.weather import Weather as pyowmWeather

@@ -1,4 +1,4 @@
-import mock
+from unittest import mock
 from sqlalchemy.orm import declarative_base
 from duckbot.db import Database
 

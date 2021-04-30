@@ -1,5 +1,3 @@
-import sys
-import mock
 import pytest
 from discord import Intents
 import duckbot
