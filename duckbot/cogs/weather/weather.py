@@ -5,13 +5,15 @@ from pyowm.utils import config
 from pyowm.weatherapi25.location import Location
 from discord.ext import commands
 from .saved_location import SavedLocation
+from duckbot.db import Database
 
 degrees = "\N{DEGREE SIGN}C"
 
 
 class Weather(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot, db: Database):
         self.bot = bot
+        self.db = db
         self.owm_client = None
 
     def owm(self) -> pyowm.OWM:
@@ -38,7 +40,7 @@ class Weather(commands.Cog):
         location = await self.search_location(context, city, country, index)
         if location is not None:
             saved_location = SavedLocation(id=context.author.id, name=location.name, country=location.country, city_id=location.id, latitude=location.lat, longitude=location.lon)
-            with self.bot.get_cog("db").session(SavedLocation) as session:
+            with self.db.session(SavedLocation) as session:
                 session.merge(saved_location)
                 session.commit()
             await context.send(f"Location saved! {self.__location_string(location)}")
@@ -73,7 +75,7 @@ class Weather(commands.Cog):
     async def get_weather(self, context, city: str, country: str, index: int):
         location = None
         if city is None:
-            with self.bot.get_cog("db").session(SavedLocation) as session:
+            with self.db.session(SavedLocation) as session:
                 saved = session.get(SavedLocation, context.author.id)
             if saved is not None:
                 location = Location(name=saved.name, lon=saved.longitude, lat=saved.latitude, _id=saved.city_id, country=saved.country)
