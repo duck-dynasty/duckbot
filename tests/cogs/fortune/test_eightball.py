@@ -23,7 +23,7 @@ async def test_eightball_not_given_question(bot, context):
 async def test_eightball_only_question_marks(bot, context, question):
     clazz = EightBall(bot)
     await clazz.eightball(context, question)
-    context.send.assert_called_once_with("Who do you think you are, I am.")
+    context.send.assert_called_once_with("Who do you think you are? I AM!\nhttps://youtu.be/gKQOXYB2cd8?t=10")
 
 
 @pytest.mark.asyncio

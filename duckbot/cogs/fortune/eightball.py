@@ -17,7 +17,7 @@ class EightBall(commands.Cog):
         if question is None:
             await context.send("You need to ask a question to get an answer. :unamused:")
         elif len(question.replace("?", "")) == 0:
-            await context.send("Who do you think you are, I am.")
+            await context.send("Who do you think you are? I AM!\nhttps://youtu.be/gKQOXYB2cd8?t=10")
         elif not question.endswith("?"):
             await context.send("I can't tell if that's a question, brother.")
         else:
