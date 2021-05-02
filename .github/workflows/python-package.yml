@@ -32,7 +32,10 @@ jobs:
       run: . scripts/build/install.sh
     - name: Run Tests
       run: . scripts/build/test.sh
-
+    
+    - name: Setup Docker Cache
+      uses: satackey/action-docker-layer-caching@v0.0.11
+      continue-on-error: true
     - name: Test Connection to Discord
       run: |
         docker-compose run --rm \
