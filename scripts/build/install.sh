@@ -1,6 +1,6 @@
 # install apt dependencies; ffmpeg and postgres are needed to run unit tests
 sudo apt-get install -y --no-install-recommends \
-    ffmpeg \
+#     ffmpeg \
     libpq-dev \
     && \
 
