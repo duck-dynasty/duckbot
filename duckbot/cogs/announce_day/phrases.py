@@ -14,6 +14,7 @@ days = {
             "Tyr's day",
             "Tuesday",
             "Dndndndndndndnd",
+            "Taco Tuesday",
         ],
         "templates": [
             "Yo, one of my favourite days ever: {0}.",
@@ -43,6 +44,7 @@ days = {
         "names": [
             "Frigga's day",
             "Friday, Friday, gotta get down on Friday",
+            "Stir Fry day",
             "Friday",
         ],
         "templates": [],
