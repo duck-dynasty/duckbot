@@ -18,4 +18,4 @@ class EditDiff(commands.Cog):
         env = {"BEFORE": before.content, "AFTER": after.content}
 
         process = subprocess.run(f"{before_file} && {after_file} && {diff_cmd} ; {cleanup}", shell=True, capture_output=True, env=env)
-        await after.channel.send(f":eyes: {after.author.mention}.\n{process.stdout.decode()}")
+        await after.channel.send(f":eyes: {after.author.mention}.\n{process.stdout.decode()}", delete_after=300)
