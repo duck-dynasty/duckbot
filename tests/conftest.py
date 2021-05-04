@@ -149,6 +149,7 @@ def patch_embed_equals():
 
     def embed_equals(self, other):
         return self.to_dict() == other.to_dict()
+
     def embed_str(self):
         return str(self.to_dict())
 
