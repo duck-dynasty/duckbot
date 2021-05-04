@@ -149,6 +149,10 @@ def patch_embed_equals():
 
     def embed_equals(self, other):
         return self.to_dict() == other.to_dict()
+    def embed_str(self):
+        return str(self.to_dict())
 
     discord.Embed.__eq__ = embed_equals
+    discord.Embed.__str__ = embed_str
+    discord.Embed.__repr__ = embed_str
     yield
