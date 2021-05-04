@@ -17,6 +17,20 @@ def async_mock_await_fix():
 
 
 @pytest.fixture
+@mock.patch("sqlalchemy.orm.session.Session")
+def session(s):
+    return s
+
+
+@pytest.fixture
+@mock.patch("duckbot.db.Database")
+def db(d, session):
+    """Returns a database with a stubbed session value."""
+    d.session.return_value.__enter__.return_value = session
+    return d
+
+
+@pytest.fixture
 async def bot_spy() -> discord.ext.commands.Bot:
     """Returns a spy discord.ext.commands.Bot instance with a stubbed `run` method. The bot is closed afterwards."""
     b = discord.ext.commands.Bot(command_prefix="!", help_command=None)
