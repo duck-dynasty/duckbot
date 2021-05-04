@@ -28,22 +28,8 @@ def owm(o, city_id, weather_manager):
 
 
 @pytest.fixture
-@mock.patch("sqlalchemy.orm.session.Session")
-def session(s):
-    return s
-
-
-@pytest.fixture
-@mock.patch("duckbot.db.Database")
-def db(database_cog, session, bot):
-    database_cog.session.return_value.__enter__.return_value = session
-    return database_cog
-
-
-@pytest.fixture
 def clazz(bot, owm, db):
-    bot.get_cog.return_value = db
-    claz = Weather(bot)
+    claz = Weather(bot, db)
     claz.owm_client = owm
     return claz
 
@@ -52,9 +38,9 @@ def make_city(name):
     return Location(name, 1, 1, 1)
 
 
-def test_owm_creates_instance(bot, monkeypatch):
+def test_owm_creates_instance(bot, db, monkeypatch):
     monkeypatch.setenv("OPENWEATHER_TOKEN", "token")
-    claz = Weather(bot)
+    claz = Weather(bot, db)
     assert claz.owm() == claz.owm_client
 
 

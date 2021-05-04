@@ -17,6 +17,20 @@ def async_mock_await_fix():
 
 
 @pytest.fixture
+@mock.patch("sqlalchemy.orm.session.Session")
+def session(s):
+    return s
+
+
+@pytest.fixture
+@mock.patch("duckbot.db.Database")
+def db(d, session):
+    """Returns a database with a stubbed session value."""
+    d.session.return_value.__enter__.return_value = session
+    return d
+
+
+@pytest.fixture
 async def bot_spy() -> discord.ext.commands.Bot:
     """Returns a spy discord.ext.commands.Bot instance with a stubbed `run` method. The bot is closed afterwards."""
     b = discord.ext.commands.Bot(command_prefix="!", help_command=None)
@@ -124,3 +138,17 @@ async def voice_channel(vc) -> discord.VoiceChannel:
 @mock.patch("discord.VoiceClient", autospec=True)
 async def voice_client(vc) -> discord.VoiceClient:
     return vc
+
+
+@pytest.fixture(autouse=True)
+def patch_embed_equals():
+    """Replaces discord.Embed equality test with comparing the `to_dict` of each side.
+    This allows for writing `context.send.assert_called_once_with(embed=expected)`,
+    as discord.Embed doesn't implement equals itself.
+    See also: https://github.com/Rapptz/discord.py/issues/5962"""
+
+    def embed_equals(self, other):
+        return self.to_dict() == other.to_dict()
+
+    discord.Embed.__eq__ = embed_equals
+    yield
