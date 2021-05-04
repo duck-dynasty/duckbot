@@ -2,4 +2,6 @@ from .weather import Weather
 
 
 def setup(bot):
-    bot.add_cog(Weather(bot))
+    from duckbot.db import Database
+
+    bot.add_cog(Weather(bot, Database()))
