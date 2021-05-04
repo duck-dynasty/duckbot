@@ -13,7 +13,6 @@ import duckbot.cogs.insights
 import duckbot.cogs.corrections
 import duckbot.cogs.formula_one
 import duckbot.cogs.announce_day
-from duckbot.db import Database
 import duckbot.health
 import duckbot.util.connection_test
 
@@ -23,8 +22,6 @@ def run_duckbot(bot: commands.Bot):
         bot.load_extension(duckbot.util.connection_test.__name__)
 
     bot.load_extension(duckbot.health.__name__)
-
-    bot.add_cog(Database(bot))
 
     bot.load_extension(duckbot.cogs.duck.__name__)
     bot.load_extension(duckbot.cogs.tito.__name__)

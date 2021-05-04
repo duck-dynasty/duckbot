@@ -5,16 +5,20 @@ from duckbot.db import Database
 Base = declarative_base()
 
 
-@mock.patch("discord.ext.commands.Bot")
-def test_ctor_creates_engine(bot):
-    clazz = Database(bot)
+def test_ctor_creates_engine():
+    clazz = Database()
     assert clazz.db is not None
 
 
-@mock.patch("discord.ext.commands.Bot")
+def test_ctor_ensures_singleton_instance():
+    c1 = Database()
+    c2 = Database()
+    assert c1 is c2
+
+
 @mock.patch("tests.db.test_database.Base")
-def test_session_creates_tables(bot, base):
-    clazz = Database(bot)
+def test_session_creates_tables(base):
+    clazz = Database()
     session = clazz.session(base)
     base.metadata.create_all.assert_called_once_with(clazz.db)
     assert session is not None
