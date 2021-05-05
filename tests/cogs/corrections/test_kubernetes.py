@@ -12,7 +12,7 @@ async def test_correct_kubernetes_bot_author(bot, message):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("text", ["koober nets", "kuber nets", "kubernets", "kubernetes"])
+@pytest.mark.parametrize("text", ["koober nets", "kuber nets", "kubernets", "kubernetes", "kubernetes kubernets"])
 async def test_correct_kubernetes_message_is_kubernetes(bot, message, text):
     bot.user = "but"
     message.author = "author"

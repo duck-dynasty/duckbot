@@ -5,6 +5,7 @@ from discord.ext import commands
 class Kubernetes(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.k8s = self.kubernetes = None
 
     @commands.Cog.listener("on_ready")
     async def store_emojis(self):
@@ -26,6 +27,7 @@ class Kubernetes(commands.Cog):
                 if k in message.content.lower():
                     correction = f"I think {message.author.nick} means K8s"
                     await message.channel.send(correction)
+                    return
 
     @commands.Cog.listener("on_message")
     async def correct_k8s(self, message):
