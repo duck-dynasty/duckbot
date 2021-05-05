@@ -15,27 +15,20 @@ class Kubernetes(commands.Cog):
     @commands.Cog.listener("on_message")
     async def correct_kubernetes(self, message):
         """Corrections for kubernetes"""
-
-        if message.author == self.bot.user:
-            return
-
-        if self.kubernetes is not None and str(self.kubernetes) in message.content:
-            await message.channel.send(f"I think {message.author.display_name} means {self.k8s}")
-        else:
-            kubes = ["koober nets", "kuber nets", "kubernets", "kubernetes"]
-            for k in kubes:
-                if k in message.content.lower():
-                    await message.channel.send(f"I think {message.author.display_name} means K8s")
-                    return
+        await self.correct(message, ["koober nets", "kuber nets", "kubernets", "kubernetes"], "K8s", self.kubernetes, self.k8s)
 
     @commands.Cog.listener("on_message")
     async def correct_k8s(self, message):
         """Corrections for K8s"""
+        await self.correct(message, ["k8"], "Kubernetes", self.k8s, self.kubernetes)
 
-        if message.author == self.bot.user:
+    async def correct(self, message, wrongs, right, wrong_emoji, right_emoji):
+        if message.author == self.bot.author:
             return
-
-        if self.k8s is not None and str(self.k8s) in message.content:
-            await message.channel.send(f"I think {message.author.display_name} means {self.kubernetes}")
-        elif "k8" in message.content.lower():
-            await message.channel.send(f"I think {message.author.display_name} means Kubernetes")
+        if str(wrong_emoji) in message.content:
+            await message.channel.send(f"I think {message.author.display_name} means {right_emoji}")
+        else:
+            for s in wrongs:
+                if s in message.content.lower():
+                    await message.channel.send(f"I think {message.author.display_name} means {right}")
+                    return
