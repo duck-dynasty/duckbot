@@ -49,6 +49,7 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         context: .
+        tags: chippers255/duckbot:latest
         push: false
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache-new
