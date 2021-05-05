@@ -1,4 +1,3 @@
-import pytest
 import d20
 from duckbot.cogs.games.dice import DiceStringifier
 
