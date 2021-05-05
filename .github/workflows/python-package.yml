@@ -34,26 +34,6 @@ jobs:
       run: . scripts/build/install.sh actions
     - name: Run Tests
       run: . scripts/build/test.sh
-    
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
-    - name: Set up Docker Cache
-      uses: actions/cache@v2
-      with:
-        path: /tmp/.buildx-cache
-        key: ${{ runner.os }}-buildx-${{ github.sha }}
-        restore-keys: |
-          ${{ runner.os }}-buildx-
-
-    - name: Build DuckBot Docker Image
-      uses: docker/build-push-action@v2
-      with:
-        context: .
-        tags: chippers255/duckbot:latest
-        push: false
-        load: true
-        cache-from: type=local,src=/tmp/.buildx-cache
-        cache-to: type=local,dest=/tmp/.buildx-cache-new
 
     - name: Test Connection to Discord
       run: |
@@ -61,12 +41,6 @@ jobs:
         -e 'DUCKBOT_ARGS=connection-test' \
         -e "DISCORD_TOKEN=$(cat .github/workflows/test-token.txt | base64 --decode)" \
         duckbot
-
-    # see https://github.com/docker/build-push-action/blob/master/docs/advanced/cache.md
-    - name: Move Docker Cache
-      run: |
-        rm -rf /tmp/.buildx-cache
-        mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
   deploy:
     needs: release
