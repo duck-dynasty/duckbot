@@ -34,7 +34,10 @@ jobs:
       run: . scripts/build/install.sh actions
     - name: Run Tests
       run: . scripts/build/test.sh
-    
+
+  sanity:
+    runs-on: ubuntu-latest
+    steps:
     - name: Setup Docker Cache
       uses: satackey/action-docker-layer-caching@v0.0.11
       continue-on-error: true
@@ -47,7 +50,9 @@ jobs:
         duckbot
 
   deploy:
-    needs: release
+    needs:
+    - release
+    - sanity
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.repository == 'Chippers255/duckbot'
     steps:
