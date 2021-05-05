@@ -33,7 +33,7 @@ async def test_eightball_only_question_marks(bot, context, question):
 async def test_eightball_gives_response(sleep, choice, random, bot, context):
     clazz = EightBall(bot)
     await clazz.eightball(context, "will this test pass?")
-    embed = Embed(colour=Colour.purple()).add_field(name=f"{context.author.name}, my :crystal_ball: says:", value="_8ball_")
+    embed = Embed(colour=Colour.purple()).add_field(name=f"{context.author.display_name}, my :crystal_ball: says:", value="_8ball_")
     context.send.assert_called_once_with(embed=embed)
 
 
@@ -45,5 +45,5 @@ async def test_eightball_gives_joke_response(sleep, choice, random, bot, context
     clazz = EightBall(bot)
     await clazz.eightball(context, "will this test pass?")
     context.send.assert_any_call("joke")
-    embed = Embed(colour=Colour.purple()).add_field(name=f"{context.author.name}, my :crystal_ball: says:", value="_fortune_")
+    embed = Embed(colour=Colour.purple()).add_field(name=f"{context.author.display_name}, my :crystal_ball: says:", value="_fortune_")
     context.send.assert_any_call(embed=embed)
