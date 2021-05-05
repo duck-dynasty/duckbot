@@ -5,7 +5,6 @@ pytest-xdist[psutil]
 pytest-flake8
 pytest-black
 pytest-blockage
-pytest-repeat
 pytest-sugar
 pytest-icdiff
 pytest-cov
