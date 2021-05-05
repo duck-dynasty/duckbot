@@ -51,6 +51,7 @@ jobs:
         context: .
         tags: chippers255/duckbot:latest
         push: false
+        load: true
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache-new
 
