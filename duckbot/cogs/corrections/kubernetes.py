@@ -19,7 +19,7 @@ class Kubernetes(commands.Cog):
         if message.author == self.bot.user:
             return
 
-        if str(self.kubernetes) in message.content:
+        if self.kubernetes is not None and str(self.kubernetes) in message.content:
             await message.channel.send(f"I think {message.author.display_name} means {self.k8s}")
         else:
             kubes = ["koober nets", "kuber nets", "kubernets", "kubernetes"]
@@ -35,7 +35,7 @@ class Kubernetes(commands.Cog):
         if message.author == self.bot.user:
             return
 
-        if str(self.k8s) in message.content:
+        if self.k8s is not None and str(self.k8s) in message.content:
             await message.channel.send(f"I think {message.author.display_name} means {self.kubernetes}")
         elif "k8" in message.content.lower():
             await message.channel.send(f"I think {message.author.display_name} means Kubernetes")
