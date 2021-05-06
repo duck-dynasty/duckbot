@@ -8,6 +8,14 @@ from tests.duckmock.datetime import patch_now
 
 
 @pytest.fixture
+def setup_general_channel(bot, guild, guild_channel):
+    bot.get_all_channels.return_value = [guild_channel]
+    guild.name = "Friends Chat"
+    guild_channel.guild = guild
+    guild_channel.name = "general"
+
+
+@pytest.fixture
 @mock.patch("duckbot.cogs.dogs.DogPhotos")
 def dog_photos(d):
     return d
@@ -31,11 +39,7 @@ async def test_cog_unload_cancels_task(bot, dog_photos):
 
 @pytest.mark.asyncio
 @mock.patch("random.random", return_value=0.5)
-async def test_on_hour_7am_eastern_special_day(random, bot, dog_photos, guild, guild_channel):
-    bot.get_all_channels.return_value = [guild_channel]
-    guild.name = "Friends Chat"
-    guild_channel.guild = guild
-    guild_channel.name = "general"
+async def test_on_hour_7am_eastern_special_day(random, bot, dog_photos, guild_channel, setup_general_channel):
     with patch_now(datetime.datetime(2002, 1, 1, hour=7)):
         clazz = AnnounceDay(bot, dog_photos)
         await clazz._AnnounceDay__on_hour()
@@ -47,11 +51,7 @@ async def test_on_hour_7am_eastern_special_day(random, bot, dog_photos, guild, g
 
 @pytest.mark.asyncio
 @mock.patch("random.random", return_value=0.5)
-async def test_on_hour_7am_eastern_not_special_day(random, bot, dog_photos, guild, guild_channel):
-    bot.get_all_channels.return_value = [guild_channel]
-    guild.name = "Friends Chat"
-    guild_channel.guild = guild
-    guild_channel.name = "general"
+async def test_on_hour_7am_eastern_not_special_day(random, bot, dog_photos, guild_channel, setup_general_channel):
     with patch_now(datetime.datetime(2002, 1, 21, hour=7)):
         clazz = AnnounceDay(bot, dog_photos)
         await clazz._AnnounceDay__on_hour()
@@ -63,11 +63,7 @@ async def test_on_hour_7am_eastern_not_special_day(random, bot, dog_photos, guil
 
 @pytest.mark.asyncio
 @mock.patch("random.random", return_value=0.09)
-async def test_on_hour_7am_eastern_send_dog_photo(random, bot, dog_photos, guild, guild_channel):
-    bot.get_all_channels.return_value = [guild_channel]
-    guild.name = "Friends Chat"
-    guild_channel.guild = guild
-    guild_channel.name = "general"
+async def test_on_hour_7am_eastern_send_dog_photo(random, bot, dog_photos, guild_channel, setup_general_channel):
     with patch_now(datetime.datetime(2002, 1, 21, hour=7)):
         clazz = AnnounceDay(bot, dog_photos)
         await clazz._AnnounceDay__on_hour()
@@ -80,11 +76,7 @@ async def test_on_hour_7am_eastern_send_dog_photo(random, bot, dog_photos, guild
 
 @pytest.mark.asyncio
 @mock.patch("random.random", return_value=0.09)
-async def test_on_hour_7am_eastern_send_dog_photo_failure(random, bot, dog_photos, guild, guild_channel):
-    bot.get_all_channels.return_value = [guild_channel]
-    guild.name = "Friends Chat"
-    guild_channel.guild = guild
-    guild_channel.name = "general"
+async def test_on_hour_7am_eastern_send_dog_photo_failure(random, bot, dog_photos, guild_channel, setup_general_channel):
     dog_photos.get_dog_image.side_effect = RuntimeError("ded")
     with patch_now(datetime.datetime(2002, 1, 21, hour=7)):
         clazz = AnnounceDay(bot, dog_photos)
