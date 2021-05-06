@@ -48,7 +48,7 @@ class AnnounceDay(commands.Cog):
                 if random.random() < 1.0 / 10.0:
                     try:
                         dogs = [":dog:", ":dog2:", ":guide_dog:", ":service_dog:"]
-                        await channel.send(f"Also, here's a dog! f{random.choice(dogs)}\n{self.dog_photos.get_dog_image()}")
+                        await channel.send(f"Also, here's a dog! {random.choice(dogs)}\n{self.dog_photos.get_dog_image()}")
                     except Exception:
                         pass  # ignore failures for sending dog photo
 
