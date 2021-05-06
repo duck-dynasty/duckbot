@@ -5,3 +5,4 @@ holidays>=0.11,<0.12
 pyowm>=3.2,<4 # openweather
 psycopg2
 sqlalchemy>=1.4,<2
+d20>=1.1.0,<2
