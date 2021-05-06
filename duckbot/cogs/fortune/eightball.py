@@ -27,4 +27,4 @@ class EightBall(commands.Cog):
                     await context.send(random.choice(joke_phrases))
             async with context.typing():
                 await asyncio.sleep(5.0)
-                await context.send(embed=Embed(colour=Colour.purple()).add_field(name=f"{context.author.name}, my :crystal_ball: says:", value=f"_{random.choice(phrases)}_"))
+                await context.send(embed=Embed(colour=Colour.purple()).add_field(name=f"{context.author.display_name}, my :crystal_ball: says:", value=f"_{random.choice(phrases)}_"))
