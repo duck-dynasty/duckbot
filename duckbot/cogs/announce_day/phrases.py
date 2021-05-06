@@ -90,4 +90,5 @@ templates = [
     "Beep boop: {0}.",
     "I take no pleasure in announcing that today is {0}, for I am a robot.",
     "I take no displeasure in announcing that today is {0}, for I am a robot.",
+    "Fek, figure it out.",
 ]
