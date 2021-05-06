@@ -1,21 +1,16 @@
 import pytest
-from tests.duckmock.urllib import patch_urlopen
+from unittest import mock
 from discord import Embed, Colour
 from duckbot.cogs.messages import Haiku
 
 
 @pytest.mark.asyncio
-async def test_build_syllable_dictionary_builds_table(bot):
-    table = b"""
-; a comment
-A A1
-    AND A1
-BATMAN A1 A1
-"""
-    with patch_urlopen(table):
-        clazz = Haiku(bot)
-        await clazz.build_syllable_dictionary()
-        assert clazz.syllables == {"a": 1, "and": 1, "batman": 2}
+@mock.patch("nltk.download", return_value=None)
+@mock.patch("nltk.corpus.cmudict.dict", return_value={"a": [["A1"]], "and": [["A1"]], "batman": [["A1", "A1"]]})
+async def test_build_syllable_dictionary_builds_table(download, cmu, bot):
+    clazz = Haiku(bot)
+    await clazz.build_syllable_dictionary()
+    assert clazz.syllables == {"a": 1, "and": 1, "batman": 2}
 
 
 @pytest.mark.asyncio

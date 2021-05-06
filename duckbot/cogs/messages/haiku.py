@@ -1,5 +1,6 @@
 from discord.ext import commands
-import urllib
+import nltk
+from nltk.corpus import cmudict
 from discord import Embed, Colour
 
 
@@ -10,15 +11,8 @@ class Haiku(commands.Cog):
 
     @commands.Cog.listener("on_ready")
     async def build_syllable_dictionary(self):
-        data = urllib.request.urlopen(urllib.request.Request("https://raw.githubusercontent.com/Alexir/CMUdict/master/cmudict-0.7b"))
-        syllables = {}
-        for bline in data:
-            line = bline.decode("latin1").strip()
-            if line and line[0] != ";":  # ; are comments
-                tokens = line.split()
-                count = len([t for t in tokens[1:] if t[-1].isdigit()])
-                syllables[tokens[0].lower()] = count
-        self.syllables = syllables
+        nltk.download("cmudict")
+        self.syllables = {word: len([t for t in pronounce[0] if t[-1].isdigit()]) for word, pronounce in cmudict.dict().items()}
 
     @commands.Cog.listener("on_message")
     async def detect_haiku(self, message):
