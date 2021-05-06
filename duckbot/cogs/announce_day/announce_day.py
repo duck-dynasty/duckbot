@@ -49,7 +49,7 @@ class AnnounceDay(commands.Cog):
                     try:
                         dogs = [":dog:", ":dog2:", ":guide_dog:", ":service_dog:"]
                         await channel.send(f"Also, here's a dog! f{random.choice(dogs)}\n{self.dog_photos.get_dog_image()}")
-                    except:
+                    except Exception:
                         pass  # ignore failures for sending dog photo
 
     @on_hour.before_loop
