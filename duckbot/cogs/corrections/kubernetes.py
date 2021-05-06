@@ -28,7 +28,8 @@ class Kubernetes(commands.Cog):
         if str(wrong_emoji) in message.content:
             await message.channel.send(f"I think {message.author.display_name} means {right_emoji}")
         else:
+            content = message.content.lower()
             for s in wrongs:
-                if s in message.content.lower():
+                if s in content:
                     await message.channel.send(f"I think {message.author.display_name} means {right}")
                     return
