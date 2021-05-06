@@ -7,7 +7,7 @@ class MockResponse:
     def __init__(self, *, data: bytes):
         self.data = data
         self.num = 0
-        self.lines = data.decode().splitlines()
+        self.lines = data.decode().splitlines() if isinstance(data, bytes) else data.splitlines()
 
     def read(self):
         self.status = 200 if self.data is not None else 500
