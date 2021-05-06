@@ -1,5 +1,5 @@
 import os
-from discord import Intents
+from discord import Intents, Game
 from discord.ext import commands
 import duckbot.cogs.duck
 import duckbot.cogs.tito
@@ -53,5 +53,5 @@ def intents() -> Intents:
 
 
 if __name__ == "__main__":
-    bot = commands.Bot(command_prefix="!", help_command=None, intents=intents())
+    bot = commands.Bot(command_prefix="!", help_command=None, intents=intents(), activity=Game(name="Duck Game"))
     run_duckbot(bot)
