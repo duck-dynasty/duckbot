@@ -34,9 +34,10 @@ class Haiku(commands.Cog):
                 lines.append(" ".join(line))
             else:
                 return  # it's not a haiku
-        haiku = "\n".join(lines)
-        embed = Embed(colour=Colour.dark_red()).add_field(name=":cherry_blossom: **Haiku Detected** :cherry_blossom:", value=f"_{haiku}_")
-        await message.channel.send(embed=embed)
+        if i == len(words):
+            haiku = "\n".join(lines)
+            embed = Embed(colour=Colour.dark_red()).add_field(name=":cherry_blossom: **Haiku Detected** :cherry_blossom:", value=f"_{haiku}_")
+            await message.channel.send(embed=embed)
 
     def get_words(self, message):
         return message.clean_content.replace(",", "").replace(".", "").replace("!", "").replace("?", "").split()

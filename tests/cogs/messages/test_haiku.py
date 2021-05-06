@@ -67,6 +67,15 @@ async def test_detect_haiku_finds_multiple_word_haiki(bot, message):
 
 
 @pytest.mark.asyncio
+async def test_detect_haiku_starts_with_haiku_but_has_extra_words(bot, message):
+    message.clean_content = "five seven five and some other stuff"
+    clazz = Haiku(bot)
+    clazz.syllables = {"five": 5, "seven": 7}
+    await clazz.detect_haiku(message)
+    message.channel.send.assert_not_called()
+
+
+@pytest.mark.asyncio
 async def test_detect_haiku_no_haiku(bot, message):
     message.clean_content = "four one four one four two one"
     clazz = Haiku(bot)
