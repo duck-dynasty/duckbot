@@ -11,11 +11,11 @@ class EditDiff(commands.Cog):
         if before.author == self.bot.user or after.author == self.bot.user or before.content == after.content:
             return
 
-        before_file = f"echo $BEFORE > {before.id}.before"
-        after_file = f"echo $AFTER > {after.id}.after"
+        before_file = f'echo "$BEFORE" > {before.id}.before'
+        after_file = f'echo "$AFTER" > {after.id}.after'
         diff_cmd = f"git diff --no-index -U10000 --word-diff=plain --word-diff-regex=. {before.id}.before {after.id}.after | tail -n +6"
         cleanup = f"rm -rf {before.id}.before {after.id}.after"
         env = {"BEFORE": before.content, "AFTER": after.content}
 
         process = subprocess.run(f"{before_file} && {after_file} && {diff_cmd} ; {cleanup}", shell=True, capture_output=True, env=env)
-        await after.channel.send(f":eyes: {after.author.mention}.\n{process.stdout.decode()}")
+        await after.channel.send(f":eyes: {after.author.mention}.\n{process.stdout.decode()}", delete_after=300)

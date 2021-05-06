@@ -9,8 +9,9 @@ from .phrases import days, templates
 
 
 class AnnounceDay(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot, dog_photos):
         self.bot = bot
+        self.dog_photos = dog_photos
         self.tz = pytz.timezone("US/Eastern")
         self.holidays = SpecialDays(bot)
         self.on_hour.start()
@@ -44,6 +45,12 @@ class AnnounceDay(commands.Cog):
             if channel:
                 message = self.get_message()
                 await channel.send(message)
+                if random.random() < 1.0 / 10.0:
+                    try:
+                        dogs = [":dog:", ":dog2:", ":guide_dog:", ":service_dog:"]
+                        await channel.send(f"Also, here's a dog! {random.choice(dogs)}\n{self.dog_photos.get_dog_image()}")
+                    except Exception:
+                        pass  # ignore failures for sending dog photo
 
     @on_hour.before_loop
     async def before_loop(self):

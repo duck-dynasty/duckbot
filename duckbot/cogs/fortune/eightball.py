@@ -21,10 +21,9 @@ class EightBall(commands.Cog):
         elif not question.endswith("?"):
             await context.send("I can't tell if that's a question, brother.")
         else:
-            if random.random() < 3.0 / 10.0:
-                async with context.typing():
+            async with context.typing():
+                if random.random() < 3.0 / 10.0:
                     await asyncio.sleep(3.0)
                     await context.send(random.choice(joke_phrases))
-            async with context.typing():
                 await asyncio.sleep(5.0)
-                await context.send(embed=Embed(colour=Colour.purple()).add_field(name=f"{context.author.nick}, my :crystal_ball: says:", value=f"_{random.choice(phrases)}_"))
+                await context.send(embed=Embed(colour=Colour.purple()).add_field(name=f"{context.author.display_name}, my :crystal_ball: says:", value=f"_{random.choice(phrases)}_"))
