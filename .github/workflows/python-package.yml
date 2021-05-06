@@ -35,6 +35,10 @@ jobs:
     - name: Run Tests
       run: . scripts/build/test.sh
 
+  sanity:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
     - name: Test Connection to Discord
       run: |
         docker-compose run --rm \
@@ -43,7 +47,9 @@ jobs:
         duckbot
 
   deploy:
-    needs: release
+    needs:
+    - release
+    - sanity
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.repository == 'Chippers255/duckbot'
     steps:

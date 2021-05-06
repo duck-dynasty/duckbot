@@ -15,8 +15,7 @@ class Kubernetes(commands.Cog):
         kubes = ["koober nets", "kuber nets", "kubernets", "kubernetes"]
         for k in kubes:
             if k in message.content.lower():
-                author = str(message.author).split("#")[0]
-                correction = f"I think {author} means K8s"
+                correction = f"I think {message.author.display_name} means K8s"
                 await message.channel.send(correction)
 
     @commands.Cog.listener("on_message")
@@ -27,6 +26,5 @@ class Kubernetes(commands.Cog):
             return
 
         if "k8" in message.content.lower():
-            author = str(message.author).split("#")[0]
-            correction = f"I think {author} means Kubernetes"
+            correction = f"I think {message.author.display_name} means Kubernetes"
             await message.channel.send(correction)
