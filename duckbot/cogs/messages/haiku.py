@@ -43,7 +43,6 @@ class Haiku(commands.Cog):
 
     def get_haiku_line(self, words, target):
         i = 0
-        syls = 0
         line = []
         while target > 0 and i < len(words):
             word = words[i].lower()
