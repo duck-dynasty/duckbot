@@ -12,6 +12,7 @@ RUN apt-get update && apt-get -y install \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 ENV PATH "$PATH:/usr/games"
 WORKDIR /duckbot
+COPY --from=compile /root/nltk_data /root/nltk_data
 COPY --from=compile /wheels /tmp/wheels
 COPY setup.py .
 COPY resources/ ./resources
