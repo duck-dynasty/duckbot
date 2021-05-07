@@ -5,7 +5,7 @@ from duckbot.cogs.messages import Haiku
 
 
 @pytest.mark.asyncio
-@mock.patch("nltk.download", return_value=None)
+@mock.patch("nltk.download")
 @mock.patch("nltk.corpus.cmudict.dict", return_value={"a": [["A1"]], "and": [["A1"]], "batman": [["A1", "A1"]]})
 async def test_build_syllable_dictionary_builds_table(download, cmu, bot):
     clazz = Haiku(bot)
