@@ -11,44 +11,51 @@ A Discord bot for personal friend group. If you don't know me personally, consid
 View the [wiki](https://github.com/Chippers255/duckbot/wiki) for a short description on what the Duck does.
 
 ## Development
-Before running DuckBot or any other scripts, you need to create a virtualenv to develop in. The `venv.sh` script will setup and activate the duckbot virtual environment. Run it before you run any other scripts to ensure you're using the right environment.
-
-The `venv.sh` script expects `python3.8` to be on the `$PATH` if it needs to build a new environment.
+Before running DuckBot, you want to create a virtualenv to develop in. DuckBot runs on `python3.8`, so prefer to use that.
 
 ```sh
-. scripts/venv.sh
+python3.8 -m venv --clear --prompt duckbot venv
+. venv/bin/activate
+pip install --upgrade pip setuptools wheel
+pip install --editable .[dev]
 ```
 
-This creates a `venv` directory for your virtual environment, which you can use in whatever IDE you prefer.
 
-### Install Dependencies
-Should be run whenever you pull from `upstream/main`, or after you create the virtual environment for the first time.
+### Run Tests & Formatter
+There are a few additional packages required to be able to run tests locally.
+
 ```sh
-. scripts/build/install.sh
+sudo apt-get install -y --no-install-recommends ffmpeg libpq-dev
 ```
 
-### Run Tests/Lint, Formatter
+Then, you can run tests.
+
 ```sh
-. scripts/build/test.sh
-. scripts/build/format.sh
+pytest   # runs tests, lint and format checks
+black .  # formats the code base
 ```
 
-The `test` script performs code coverage checks. [View the script](https://github.com/Chippers255/duckbot/blob/main/scripts/build/test.sh) to see the minimum required coverage. Discord.py decorators make it difficult to cover methods directly, so don't aim for 100% coverage.
+The tests also collects code coverage. [View the configuration](https://github.com/Chippers255/duckbot/blob/main/pyproject.toml) to see the minimum required coverage. Discord.py decorators make it difficult to cover methods directly, so don't aim for 100% coverage.
 
-`test` also performs lint and formatter checks. These can take a while, so for development, you can choose a directory of tests to run by providing an argument to the `test` script.
-```sh
-. scripts/build/test.sh tests/util  #  only run tests from tests/util; calculate code coverage for duckbot/util
-```
 
 ### Run DuckBot
-DuckBot runs using [docker-compose](https://docs.docker.com/compose/), so ensure that is installed along with docker itself.  
-Requires `duckbut/.env` to be present, and the `DISCORD_TOKEN` environment variable to be set therein. The process will be killed after an hour.
-```
-. scripts/duckbot.sh
-```
+Before running DuckBot, you need to have a `duckbot/.env` file with the API tokens.
 
-The `duckbot/.env` file should look something like this:
 ```
 duck@pond$ cat duckbot/.env
 DISCORD_TOKEN=thesecrettoken
+OPENWEATHER_TOKEN=thesecrettoken  # optional, for weather information only
 ```
+
+With your tokens available, you can jam them into your environment so you can run DuckBot. You may want to put this into your bashrc for convenience.
+```sh
+export $(cat duckbot/.env | xargs)
+```
+
+
+Finally, there's two ways to run DuckBot. For a production-like environment, you should run using [docker-compose](https://docs.docker.com/compose/).
+```sh
+docker-compose up --build
+```
+
+If your work doesn't need a full setup, you can just run `python -m duckbot` itself. Depending on what packages you have installed, some features may not work. For testing simple new commands though, this works fine enough.
