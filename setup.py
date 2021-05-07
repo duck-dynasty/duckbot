@@ -7,7 +7,10 @@ from setuptools.command.install import install
 def download_nltk_data():
     import nltk
 
-    nltk.download("cmudict", download_dir=os.path.join(os.getenv("VIRTUAL_ENV"), "nltk_data"))
+    venv = os.getenv("VIRTUAL_ENV")
+    base = venv if venv else os.getenv("HOME")
+    download_dir = os.path.join(base, "nltk_data")
+    nltk.download("cmudict", download_dir=download_dir)
 
 
 class PostDevelop(develop):
