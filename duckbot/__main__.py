@@ -2,7 +2,9 @@ import os
 from discord import Intents, Game
 from discord.ext import commands
 import duckbot.cogs.duck
+import duckbot.cogs.dogs
 import duckbot.cogs.tito
+import duckbot.cogs.games
 import duckbot.cogs.robot
 import duckbot.cogs.audio
 import duckbot.cogs.fortune
@@ -24,7 +26,9 @@ def run_duckbot(bot: commands.Bot):
     bot.load_extension(duckbot.health.__name__)
 
     bot.load_extension(duckbot.cogs.duck.__name__)
+    bot.load_extension(duckbot.cogs.dogs.__name__)
     bot.load_extension(duckbot.cogs.tito.__name__)
+    bot.load_extension(duckbot.cogs.games.__name__)
     bot.load_extension(duckbot.cogs.recipe.__name__)
     bot.load_extension(duckbot.cogs.fortune.__name__)
     bot.load_extension(duckbot.cogs.weather.__name__)
