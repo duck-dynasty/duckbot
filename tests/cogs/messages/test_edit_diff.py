@@ -8,8 +8,8 @@ from duckbot.cogs.messages import EditDiff
 @mock.patch("discord.Message")
 async def test_show_edit_diff_typical_case(before, after, bot):
     before.id = after.id = 1
-    before.content = "abc"
-    after.content = "abd"
+    before.clean_content = "abc"
+    after.clean_content = "abd"
     clazz = EditDiff(bot)
     await clazz.show_edit_diff(before, after)
     after.channel.send.assert_called_once_with(f":eyes: {after.author.mention}.\nab[-c-]{{+d+}}\n", delete_after=300)

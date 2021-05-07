@@ -1,12 +1,4 @@
-# alternate letter emojis
-red_a = "\U0001F170"
-red_b = "\U0001F171"
-
-
-def regional_indicator(letter):
-    assert len(letter) == 1 and "a" <= letter <= "z"
-    regional_indicator_a = 0x0001F1E6
-    return chr(ord(letter) - ord("a") + regional_indicator_a)
+from duckbot.util.emojis import regional_indicator, red_a, red_b
 
 
 phrases = [
@@ -17,7 +9,7 @@ phrases = [
         regional_indicator("g"),
         regional_indicator("o"),
         regional_indicator("f"),
-        red_a,
+        red_a(),
         regional_indicator("s"),
         regional_indicator("t"),
     ],
@@ -28,7 +20,7 @@ phrases = [
         regional_indicator("g"),
         regional_indicator("o"),
         regional_indicator("s"),
-        red_b,
+        red_b(),
         regional_indicator("i"),
         regional_indicator("n"),
     ],
