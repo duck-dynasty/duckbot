@@ -20,6 +20,7 @@ pip install --upgrade pip setuptools wheel
 pip install --editable .[dev]
 ```
 
+The `dev` extras will also install development dependencies, like `pytest`. The install commands should be run whenever you merge from upstream.
 
 ### Run Tests & Formatter
 There are a few additional packages required to be able to run tests locally.
@@ -39,12 +40,12 @@ The tests also collects code coverage. [View the configuration](https://github.c
 
 
 ### Run DuckBot
-Before running DuckBot, you need to have a `duckbot/.env` file with the API tokens.
+Before running DuckBot, you need to have a `duckbot/.env` file with the API tokens. It should look something like this:
 
 ```
 duck@pond$ cat duckbot/.env
 DISCORD_TOKEN=thesecrettoken
-OPENWEATHER_TOKEN=thesecrettoken  # optional, for weather information only
+OPENWEATHER_TOKEN=thesecrettoken
 ```
 
 With your tokens available, you can jam them into your environment so you can run DuckBot. You may want to put this into your bashrc for convenience.
@@ -52,10 +53,9 @@ With your tokens available, you can jam them into your environment so you can ru
 export $(cat duckbot/.env | xargs)
 ```
 
-
 Finally, there's two ways to run DuckBot. For a production-like environment, you should run using [docker-compose](https://docs.docker.com/compose/).
 ```sh
 docker-compose up --build
 ```
 
-If your work doesn't need a full setup, you can just run `python -m duckbot` itself. Depending on what packages you have installed, some features may not work. For testing simple new commands though, this works fine enough.
+If your work doesn't need a full setup, you can just run `python -m duckbot` for less wait time. Depending on what packages you have installed, some features may not work, see the [Dockerfile](https://github.com/Chippers255/duckbot/blob/main/Dockerfile) for what packages you'd need. For testing simple new commands though, this works fine enough.
