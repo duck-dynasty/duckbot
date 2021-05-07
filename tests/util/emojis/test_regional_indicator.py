@@ -1,5 +1,5 @@
 import pytest
-from duckbot.cogs.formula_one.phrases import regional_indicator
+from duckbot.util.emojis import regional_indicator
 
 
 @pytest.mark.parametrize("letter,emoji", [(chr(ord("a") + x), chr(x + 0x0001F1E6)) for x in range(0, 26)])
