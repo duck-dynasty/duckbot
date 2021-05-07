@@ -3,6 +3,8 @@ from unittest import mock
 from discord import Embed, Colour
 from duckbot.cogs.messages import Haiku
 
+EMBED_NAME = ":cherry_blossom: **Haiku Detected** :cherry_blossom:"
+
 
 @pytest.mark.asyncio
 @mock.patch("nltk.download")
@@ -27,7 +29,7 @@ async def test_detect_haiku_finds_one_word_per_line_haiku(bot, message):
     clazz = Haiku(bot)
     clazz.syllables = {"five": 5, "seven": 7}
     await clazz.detect_haiku(message)
-    embed = Embed(colour=Colour.dark_red()).add_field(name=":cherry_blossom: **Haiku Detected** :cherry_blossom:", value="_five\nseven\nfive_")
+    embed = Embed(colour=Colour.dark_red()).add_field(name=EMBED_NAME, value="_five\nseven\nfive_")
     message.channel.send.assert_called_once_with(embed=embed)
 
 
@@ -37,7 +39,7 @@ async def test_detect_haiku_ignores_punctuation(bot, message):
     clazz = Haiku(bot)
     clazz.syllables = {"five": 5, "seven": 7}
     await clazz.detect_haiku(message)
-    embed = Embed(colour=Colour.dark_red()).add_field(name=":cherry_blossom: **Haiku Detected** :cherry_blossom:", value="_five\nseven\nfive_")
+    embed = Embed(colour=Colour.dark_red()).add_field(name=EMBED_NAME, value="_five\nseven\nfive_")
     message.channel.send.assert_called_once_with(embed=embed)
 
 
@@ -47,7 +49,7 @@ async def test_detect_haiku_finds_case_insensitive_haiku(bot, message):
     clazz = Haiku(bot)
     clazz.syllables = {"five": 5, "seven": 7}
     await clazz.detect_haiku(message)
-    embed = Embed(colour=Colour.dark_red()).add_field(name=":cherry_blossom: **Haiku Detected** :cherry_blossom:", value="_FiVe\nSEVEN\nfIve_")
+    embed = Embed(colour=Colour.dark_red()).add_field(name=EMBED_NAME, value="_FiVe\nSEVEN\nfIve_")
     message.channel.send.assert_called_once_with(embed=embed)
 
 
@@ -57,7 +59,7 @@ async def test_detect_haiku_finds_multiple_word_haiki(bot, message):
     clazz = Haiku(bot)
     clazz.syllables = {"one": 1, "two": 2, "three": 3, "four": 4}
     await clazz.detect_haiku(message)
-    embed = Embed(colour=Colour.dark_red()).add_field(name=":cherry_blossom: **Haiku Detected** :cherry_blossom:", value="_two two one\nthree two one one\none four_")
+    embed = Embed(colour=Colour.dark_red()).add_field(name=EMBED_NAME, value="_two two one\nthree two one one\none four_")
     message.channel.send.assert_called_once_with(embed=embed)
 
 
