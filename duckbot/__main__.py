@@ -57,5 +57,5 @@ def intents() -> Intents:
 
 
 if __name__ == "__main__":
-    bot = commands.Bot(command_prefix="!", help_command=None, intents=intents(), activity=Game(name="Duck Game"))
+    bot = commands.Bot(command_prefix=commands.when_mentioned_or("!", "/"), help_command=None, intents=intents(), activity=Game(name="Duck Game"))
     run_duckbot(bot)
