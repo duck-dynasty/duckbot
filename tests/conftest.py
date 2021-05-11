@@ -2,6 +2,7 @@ import pytest
 from unittest import mock
 import discord
 import discord.ext.commands
+from duckbot import DuckBot
 
 
 @pytest.fixture(autouse=True)
@@ -31,19 +32,19 @@ def db(d, session):
 
 
 @pytest.fixture
-async def bot_spy() -> discord.ext.commands.Bot:
-    """Returns a spy discord.ext.commands.Bot instance with a stubbed `run` method. The bot is closed afterwards."""
-    b = discord.ext.commands.Bot(command_prefix="!", help_command=None)
+async def bot_spy() -> DuckBot:
+    """Returns a spy DuckBot instance with a stubbed `run` method. The bot is closed afterwards."""
+    b = DuckBot(slash_commands=False)
     m = mock.Mock(wraps=b)
     m.loop = b.loop
-    with mock.patch.object(discord.ext.commands.Bot, "run"):  # stub run so it does nothing
+    with mock.patch.object(DuckBot, "run"):  # stub run so it does nothing
         yield m
     await b.close()
 
 
 @pytest.fixture
-@mock.patch("discord.ext.commands.Bot")
-async def bot(b) -> discord.ext.commands.Bot:
+@mock.patch("duckbot.DuckBot")
+async def bot(b) -> DuckBot:
     return b
 
 
