@@ -4,7 +4,6 @@ import pytz
 import discord
 from discord import ChannelType
 from discord.ext import commands, tasks
-from discord_slash import cog_ext, SlashContext
 from .special_days import SpecialDays
 from .phrases import days, templates
 
@@ -60,7 +59,3 @@ class AnnounceDay(commands.Cog):
     @commands.command(name="day")
     async def day_command(self, context):
         await context.send(self.get_message())
-
-    # @cog_ext.cog_slash(name="day", description="Tells you the current day of the week.")
-    # async def day_slash(self, context: SlashContext):
-    #     await context.send(self.get_message())
