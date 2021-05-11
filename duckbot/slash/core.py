@@ -8,5 +8,6 @@ class SlashCommand:
     async def dispatch_error(self, context: Context, error):
         pass
 
+
 def slash(name, description=None):
     pass

@@ -17,7 +17,7 @@ def intents() -> Intents:
 
 class DuckBot(commands.Bot):
     def __init__(self):
-        super().__init__(command_prefix="!", help_command=None, intents=intents(), activity=Game(name="Duck Game"))
+        super().__init__(command_prefix=commands.when_mentioned_or("!", "/"), help_command=None, intents=intents(), activity=Game(name="Duck Game"))
         self.add_listener(self.ready, name="on_ready")
 
     async def ready(self):
