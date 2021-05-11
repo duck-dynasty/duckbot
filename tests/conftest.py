@@ -34,7 +34,7 @@ def db(d, session):
 @pytest.fixture
 async def bot_spy() -> DuckBot:
     """Returns a spy DuckBot instance with a stubbed `run` method. The bot is closed afterwards."""
-    b = DuckBot(slash_commands=False)
+    b = DuckBot()
     m = mock.Mock(wraps=b)
     m.loop = b.loop
     with mock.patch.object(DuckBot, "run"):  # stub run so it does nothing

@@ -15,14 +15,12 @@ def test_intents_has_required_permissions():
 
 
 @pytest.mark.asyncio
-@mock.patch("discord_slash.SlashCommand")
-async def test_duckbot_constructor(slash):
+async def test_duckbot_constructor():
     bot = DuckBot()
     assert bot.command_prefix == "!"
     assert bot.help_command is None
     assert bot.intents == intents()
     assert bot.activity == Game("Duck Game")
-    assert bot.slash is not None
     await bot.close()
 
 
