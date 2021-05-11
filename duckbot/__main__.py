@@ -1,5 +1,4 @@
 import os
-from discord import Intents, Game
 from discord.ext import commands
 import duckbot.cogs.duck
 import duckbot.cogs.dogs
@@ -17,6 +16,7 @@ import duckbot.cogs.formula_one
 import duckbot.cogs.announce_day
 import duckbot.health
 import duckbot.util.connection_test
+from duckbot import DuckBot
 
 
 def run_duckbot(bot: commands.Bot):
@@ -43,19 +43,6 @@ def run_duckbot(bot: commands.Bot):
     bot.run(os.getenv("DISCORD_TOKEN"))
 
 
-def intents() -> Intents:
-    intent = Intents.default()
-    intent.members = False
-    intent.presences = False
-    intent.bans = False
-    intent.integrations = False
-    intent.webhooks = False
-    intent.invites = False
-    intent.webhooks = False
-    intent.typing = False
-    return intent
-
-
 if __name__ == "__main__":
-    bot = commands.Bot(command_prefix=commands.when_mentioned_or("!", "/"), help_command=None, intents=intents(), activity=Game(name="Duck Game"))
+    bot = DuckBot()
     run_duckbot(bot)
