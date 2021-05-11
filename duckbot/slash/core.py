@@ -1,5 +1,5 @@
 import typing
-from discord.ext.commands import Command, Group, Bot, Cog
+from discord.ext.commands import Command, Bot, Cog
 from discord.ext.commands.view import StringView
 from discord.http import Route
 from duckbot.slash import Interaction
@@ -83,8 +83,6 @@ class SlashCommandPatch(Cog):
 
     @Cog.listener("on_ready")
     async def register_commands(self):
-        route = Route8("DELETE", f"/applications/{self.bot.user.id}/commands/841757089650835497")
-        # await self.bot.http.request(route)
         create_requests = []
         for command in self.bot.commands:
             if not command.hidden and hasattr(command, "slash_ext") and command.slash_ext is True:
@@ -95,29 +93,38 @@ class SlashCommandPatch(Cog):
                     "options": [x.__dict__ for x in command._slash_options],
                 }
                 create_requests.append(json)
-                # await self.bot.http.request(route, json=json)
 
-        print(create_requests)
-        slash = await self.bot.http.request(Route8("GET", f"/applications/{self.bot.user.id}/commands"))
-        print(f"slash = {slash}")
-        common = []
-        for x in create_requests:
-            for y in slash:
-                if self.json_eq_slash_command(x, y):
-                    common.append(x)
-        print(f"common = {common}")
+        raw_slash = await self.bot.http.request(Route8("GET", f"/applications/{self.bot.user.id}/commands"))
+        existing = self.convert_response(raw_slash)
+        expected_names = [x["name"] for x in create_requests]
+        needs_update = [x for x in create_requests if x not in existing]
+        needs_delete = [x for x in existing if x["name"] not in expected_names]
 
-    def json_eq_slash_command(self, l, r):
-        if l["name"] == r["name"] and l["description"] == r["description"]:
-            lopts = [ {"name": x["name"], "description": x["description"], "type": x["type"]} for x in l.get("options", [])]
-            ropts = [ {"name": x["name"], "description": x["description"], "type": x["type"]} for x in r.get("options", [])]
-            return lopts == ropts
-        else:
-            return False
+        for x in needs_update:
+            route = Route8("POST", f"/applications/{self.bot.user.id}/commands")
+            await self.bot.http.request(route, json=x)
+        for x in needs_delete:
+            id = next(y for y in raw_slash if y["name"] == x["name"])
+            route = Route8("DELETE", f"/applications/{self.bot.user.id}/commands/{id}")
+            await self.bot.http.request(route)
 
-
-    def json_eq_slash_command_option(self, l, r):
-        return l["name"] == r["name"] and l["description"] == r["description"] and l["type"] == r["type"]
+    def convert_response(self, raw_slash):
+        return [
+            {
+                "name": c["name"],
+                "description": c["description"],
+                "options": [
+                    {
+                        "name": o["name"],
+                        "description": o["description"],
+                        "type": o["type"],
+                        "required": o.get("required", False),
+                    }
+                    for o in c.get("options", [])
+                ],
+            }
+            for c in raw_slash
+        ]
 
 
 def patch_slash_commands(bot: Bot):

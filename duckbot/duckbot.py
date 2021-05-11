@@ -1,4 +1,3 @@
-import json
 from discord import Intents, Game
 from discord.ext import commands
 from duckbot.slash import patch_slash_commands
