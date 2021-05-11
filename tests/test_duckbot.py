@@ -1,5 +1,4 @@
 import pytest
-from unittest import mock
 from discord import Intents, Game
 from duckbot.duckbot import DuckBot, intents
 
