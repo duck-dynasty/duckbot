@@ -4,6 +4,7 @@ import pytz
 import discord
 from discord import ChannelType
 from discord.ext import commands, tasks
+from duckbot.slash import slash_command
 from .special_days import SpecialDays
 from .phrases import days, templates
 
@@ -56,6 +57,7 @@ class AnnounceDay(commands.Cog):
     async def before_loop(self):
         await self.bot.wait_until_ready()
 
-    @commands.command(name="day")
+    @slash_command()
+    @commands.command(name="day", description="Says the current day of the week.")
     async def day_command(self, context):
         await context.send(self.get_message())

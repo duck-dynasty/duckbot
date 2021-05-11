@@ -1,4 +1,5 @@
 from discord.ext import commands
+from duckbot.slash import slash_command, Option
 import d20
 
 
@@ -6,7 +7,8 @@ class Dice(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="roll", aliases=["r"])
+    @slash_command(options=[Option(name="dice-expression", description="The number and type of dice to roll. Default is 1d20")])
+    @commands.command(name="roll", aliases=["r"], description="Roll some game dice!")
     async def roll_command(self, context, *, expression: str = "1d20"):
         await self.roll(context, expression)
 
