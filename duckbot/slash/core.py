@@ -2,31 +2,11 @@ import typing
 from discord.ext.commands import Command, Bot, Cog
 from discord.ext.commands.view import StringView
 from discord.http import Route
-from duckbot.slash import Interaction
+from duckbot.slash import Interaction, Option
 
 
 class Route8(Route):
     BASE = "https://discord.com/api/v8"
-
-
-class OptionType:
-    SUB_COMMAND = 1
-    SUB_COMMAND_GROUP = 2
-    STRING = 3
-    INTEGER = 4
-    BOOLEAN = 5
-    USER = 6
-    CHANNEL = 7
-    ROLE = 8
-    MENTIONABLE = 9
-
-
-class Option:
-    def __init__(self, *, name: str, description: str = None, option_type: OptionType = OptionType.STRING, required: bool = False):
-        self.name = name
-        self.description = description if description is not None else name
-        self.type = option_type
-        self.required = required
 
 
 def slash_command(*, options: typing.List[Option] = []):

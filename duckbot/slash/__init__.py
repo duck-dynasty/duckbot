@@ -1,2 +1,3 @@
 from .interaction import Interaction
-from .core import patch_slash_commands, slash_command, Option, OptionType
+from .option import Option, OptionType
+from .core import patch_slash_commands, slash_command
