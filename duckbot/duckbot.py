@@ -19,7 +19,7 @@ def intents() -> Intents:
 class DuckBot(commands.Bot):
     def __init__(self, slash_commands=True):
         super().__init__(command_prefix="!", help_command=None, intents=intents(), activity=Game(name="Duck Game"))
-        self.slash = SlashCommand(self, sync_commands=True) if slash_commands else None
+        self.slash = SlashCommand(self, sync_commands=True, delete_from_unused_guilds=True) if slash_commands else None
         self.add_listener(self.ready, name="on_ready")
 
     async def ready(self):
