@@ -1,4 +1,5 @@
 import os
+import logging
 from discord.ext import commands
 import duckbot.cogs.duck
 import duckbot.cogs.dogs
@@ -44,5 +45,6 @@ def run_duckbot(bot: commands.Bot):
 
 
 if __name__ == "__main__":
+    # logging.basicConfig(level=logging.DEBUG)
     bot = DuckBot()
     run_duckbot(bot)
