@@ -4,6 +4,7 @@ import pyowm
 from pyowm.utils import config
 from pyowm.weatherapi25.location import Location
 from discord.ext import commands
+from duckbot.slash import slash_command, Option, OptionType
 from .saved_location import SavedLocation
 from duckbot.db import Database
 
@@ -22,6 +23,23 @@ class Weather(commands.Cog):
             self.owm_client = pyowm.OWM(os.getenv("OPENWEATHER_TOKEN"), conf)
         return self.owm_client
 
+    # @slash_command(options=[
+    #     Option(name="set", type=OptionType.SUB_COMMAND_GROUP, description="Update your default city for this command."),
+    #     Option(name="city", description="The city name to get the weather for."),
+    #     Option(name="country", description="The two letter country code (eg CA for Canada), or two letter state code."),
+    #     Option(name="index", type=OptionType.INTEGER, description="Index to disamiguate city when city/country are not enough."),
+    # ])
+    @slash_command(
+        root="weather",
+        name="get",
+        description="Gives weather information for your default location or the provided city.",
+        options=[
+            Option(name="city", description="The city name to get the weather for."),
+            Option(name="country", description="The two letter country code (eg CA for Canada), or two letter state code."),
+            Option(name="index", type=OptionType.INTEGER, description="Index to disamiguate city when city/country are not enough."),
+        ],
+        discordpy_adapt_name=False,
+    )
     @commands.group(name="weather", invoke_without_command=True)
     async def weather_command(self, context, city: str = None, country: str = None, index: int = None):
         await self.weather(context, city, country, index)
@@ -32,6 +50,16 @@ class Weather(commands.Cog):
         except Exception as e:
             await context.send(f"Iunno. Figure it out.\n{e}")
 
+    @slash_command(
+        root="weather",
+        name="set",
+        description="Updates your default location for /weather get",
+        options=[
+            Option(name="city", description="The city name to get the weather for.", required=True),
+            Option(name="country", description="The two letter country code (eg CA for Canada), or two letter state code."),
+            Option(name="index", type=OptionType.INTEGER, description="Index to disamiguate city when city/country are not enough."),
+        ],
+    )
     @weather_command.command(name="set", invoke_without_command=True)
     async def weather_set_command(self, context, city: str = None, country: str = None, index: int = None):
         await self.set_default_location(context, city, country, index)

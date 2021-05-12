@@ -11,8 +11,9 @@ class OptionType:
 
 
 class Option:
-    def __init__(self, *, name: str, description: str = None, option_type: OptionType = OptionType.STRING, required: bool = False):
+    def __init__(self, *, name: str, description: str = None, type: OptionType = OptionType.STRING, required: bool = False):
         self.name = name
         self.description = description if description is not None else name
-        self.type = option_type
+        self.type = type
         self.required = required
+        self.options = []

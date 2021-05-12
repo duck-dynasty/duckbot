@@ -45,6 +45,6 @@ def run_duckbot(bot: commands.Bot):
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.DEBUG)
+    # logging.basicConfig(level=logging.DEBUG)
     bot = DuckBot()
     run_duckbot(bot)

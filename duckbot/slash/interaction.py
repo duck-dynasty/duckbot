@@ -5,6 +5,7 @@ class Interaction:
     """https://discord.com/developers/docs/interactions/slash-commands#interaction"""
 
     def __init__(self, *, bot, data):
+        print(data)
         self.bot = bot
         self.id = int(data["id"])
         self.application_id = int(data["application_id"])
