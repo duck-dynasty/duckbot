@@ -46,6 +46,8 @@ def slash_command(*, root: str = None, name: str = None, description: str = None
                 command.parent._slash_discordpy_adapt_name = {}
             command.parent._slash_discordpy_adapt_name[name] = discordpy_adapt_name
         command._slash_root = root
+
+        # override copy to keep the patched slash properties
         original_copy = command.copy
 
         def copy():
