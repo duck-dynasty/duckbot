@@ -25,6 +25,7 @@ def slash_command(*, root: str = None, name: str = None, description: str = None
     def decorator(command):
         if not isinstance(command, Command):
             raise TypeError("callback must be a discord.ext.commads.Command")
+        # patch the command instance with extra info so we can register it with discord
         command.slash_ext = True
         if root and not name or not root and name:
             raise BadArgument("root and name must both be provided if either is")
@@ -66,33 +67,35 @@ def slash_command(*, root: str = None, name: str = None, description: str = None
 class SlashCommandPatch(Cog):
     def __init__(self, bot: Bot):
         self.bot = bot
+        # patch handler for discord slash command events
         bot._connection.parsers["INTERACTION_CREATE"] = self.parse_interaction_create
 
     def parse_interaction_create(self, data):
         interaction = Interaction(bot=self.bot, data=data)
-        self.bot.dispatch("slash", interaction)
+        self.bot.dispatch("slash", interaction)  # creates `on_slash` bot event
 
     @Cog.listener("on_slash")
     async def handle_slash_interaction(self, interaction: Interaction):
         for command in self.bot.commands:
+            # slash_ext is patched in @slash_command
             if hasattr(command, "slash_ext") and command.slash_ext is True and command.name == interaction.data["name"]:
                 context = InteractionContext(bot=self.bot, interaction=interaction, command=command)
                 await command.invoke(context)
+                return
 
     @Cog.listener("on_ready")
     async def register_commands(self):
         create_requests = []
         for command in self.bot.walk_commands():
             if not command.hidden and hasattr(command, "slash_ext") and command.slash_ext is True:
-                route = Route8("POST", f"/applications/{self.bot.user.id}/commands")
                 json = {
                     "name": command._slash_name or command.name,
                     "description": command._slash_description or command.description or command._slash_name or command.name,
                     "options": [x.__dict__ for x in command._slash_options],
                 }
                 group = [x for x in create_requests if x["name"] == json["name"]]
-                if group and group[0]:
-                    group[0]["options"] += json["options"]
+                if group and group[0]:  # if a command with the same basename was already registered
+                    group[0]["options"] += json["options"]  # append the options, for sub-command registration
                 else:
                     create_requests.append(json)
 
@@ -101,9 +104,6 @@ class SlashCommandPatch(Cog):
         expected_names = [x["name"] for x in create_requests]
         needs_update = [x for x in create_requests if x not in existing]
         needs_delete = [x for x in existing if x["name"] not in expected_names]
-        print(f"existing = {existing}")
-        print(f"needs_update = {needs_update}")
-        print(f"needs_delete = {needs_delete}")
 
         for x in needs_update:
             route = Route8("POST", f"/applications/{self.bot.user.id}/commands")
