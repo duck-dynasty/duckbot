@@ -1,9 +1,11 @@
 import typing
+import contextlib
 from discord.ext.commands import Command, Bot, Cog
 from discord.ext.commands.errors import BadArgument
 from discord.ext.commands.view import StringView
 from discord.http import Route
-from duckbot.slash import Interaction, Option, OptionType, option
+from discord.context_managers import Typing
+from duckbot.slash import Interaction, Option, OptionType
 
 
 class Route8(Route):
@@ -89,13 +91,31 @@ class InteractionContext:
                 self.view = " ".join([x.get("value", "") for x in options[0].get("options", [])])
         else:
             self.view = " ".join([x.get("value", "") for x in options])
-        print(self.view)
         self.view = StringView(self.view)
+        self.follow_up = False
 
-    async def send(self, content=None, *, embed=None):
-        route = Route8("POST", f"/interactions/{self.interaction.id}/{self.interaction.token}/callback")
-        json = {"type": 4, "data": {"content": content}}
+    async def send(self, content="", *, embed=None):
+        if self.follow_up:
+            json = {"content": content, "embeds": [embed.to_dict()] if embed else [], "tts": False}
+            route = Route8("POST", f"/webhooks/{self.interaction.application_id}/{self.interaction.token}")
+        else:
+            json = {"type": 4, "data": {"content": content, "embeds": [embed.to_dict()] if embed else [], "tts": False}}
+            route = Route8("POST", f"/interactions/{self.interaction.id}/{self.interaction.token}/callback")
         await self.bot.http.request(route, json=json)
+
+    def typing(self):
+        return self
+
+    async def __aenter__(self):
+        assert not self.follow_up
+        json = {"type": 5, "data": {"content": ":thinking:"}}
+        route = Route8("POST", f"/interactions/{self.interaction.id}/{self.interaction.token}/callback")
+        await self.bot.http.request(route, json=json)
+        self.follow_up = True
+        return self
+
+    async def __aexit__(self, exc_type, exc, tb):
+        return None
 
 
 class SlashCommandPatch(Cog):
@@ -140,13 +160,13 @@ class SlashCommandPatch(Cog):
         print(f"needs_update = {needs_update}")
         print(f"needs_delete = {needs_delete}")
 
-        # for x in needs_update:
-        #     route = Route8("POST", f"/applications/{self.bot.user.id}/commands")
-        #     await self.bot.http.request(route, json=x)
-        # for x in needs_delete:
-        #     id = next(y["id"] for y in raw_slash if y["name"] == x["name"])
-        #     route = Route8("DELETE", f"/applications/{self.bot.user.id}/commands/{id}")
-        #     await self.bot.http.request(route)
+        for x in needs_update:
+            route = Route8("POST", f"/applications/{self.bot.user.id}/commands")
+            await self.bot.http.request(route, json=x)
+        for x in needs_delete:
+            id = next(y["id"] for y in raw_slash if y["name"] == x["name"])
+            route = Route8("DELETE", f"/applications/{self.bot.user.id}/commands/{id}")
+            await self.bot.http.request(route)
 
     def convert_response(self, raw_slash):
         return [
