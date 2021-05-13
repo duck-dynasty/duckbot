@@ -1,3 +1,4 @@
+import logging
 import os
 from discord import Intents, Game
 from discord.ext import commands
@@ -17,6 +18,15 @@ import duckbot.cogs.formula_one
 import duckbot.cogs.announce_day
 import duckbot.health
 import duckbot.util.connection_test
+
+
+# Logging setup
+# Stole right from Discord
+logger = logging.getLogger("discord")
+logger.setLevel(logging.DEBUG)
+handler = logging.FileHandler(filename="connie.log", encoding="utf-8", mode="w")
+handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
+logger.addHandler(handler)
 
 
 def run_duckbot(bot: commands.Bot):
