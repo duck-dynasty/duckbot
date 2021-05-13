@@ -1,6 +1,5 @@
 import pytest
 from unittest import mock
-from tests.async_mock_ext import async_value
 from duckbot.cogs.tito import Tito
 
 
