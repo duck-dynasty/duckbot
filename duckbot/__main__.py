@@ -62,7 +62,7 @@ def logger_setup():
     logger = logging.getLogger("discord")
     logger.setLevel(logging.INFO)
 
-    handler = logging.handlers.RotatingFileHandler(filename="./logs/duck.log", mode="a", maxBytes=256000, backupCount=10)
+    handler = logging.handlers.RotatingFileHandler(filename="duck.log", mode="a", maxBytes=256000, backupCount=10)
     handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
     logger.addHandler(handler)
 
