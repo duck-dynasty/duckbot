@@ -5,7 +5,15 @@ import discord
 import discord.ext.commands
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(scope="session")
+def event_loop():
+    """Create an instance of the default event loop for each test case."""
+    loop = asyncio.get_event_loop_policy().new_event_loop()
+    yield loop
+    loop.close()
+
+
+@pytest.fixture(scope="session", autouse=True)
 def async_mock_await_fix():
     """Make it so @mock.patch works for async methods."""
 
@@ -42,11 +50,16 @@ async def bot_spy() -> discord.ext.commands.Bot:
     await b.close()
 
 
-@pytest.fixture(scope="package")
-@mock.patch("discord.ext.commands.Bot", autospec=True)
+@pytest.fixture(scope="session")
+@mock.patch("discord.ext.commands.Bot", autospec=discord.ext.commands.Bot(command_prefix="!"))
 async def bot(b) -> discord.ext.commands.Bot:
-    b.loop = mock.Mock(wraps=asyncio.get_event_loop())
+    # b.loop = mock.Mock("asyncio.AbstractEventLoop", autospec=True)
     return b
+
+
+@pytest.fixture(autouse=True)
+def reset_bot(bot):
+    bot.reset_mock()
 
 
 @pytest.fixture
@@ -142,7 +155,7 @@ async def voice_client(vc) -> discord.VoiceClient:
     return vc
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(scope="session", autouse=True)
 def patch_embed_equals():
     """Replaces discord.Embed equality test with comparing the `to_dict` of each side.
     This allows for writing `context.send.assert_called_once_with(embed=expected)`,
