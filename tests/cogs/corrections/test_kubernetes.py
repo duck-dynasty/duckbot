@@ -50,6 +50,7 @@ async def test_store_emojis_no_emojis_found(bot):
 @pytest.mark.asyncio
 async def test_correct_kubernetes_bot_author(bot, message):
     message.author = bot.user
+    message.content = "kubernetes"
     clazz = Kubernetes(bot)
     await clazz.correct_kubernetes(message)
     message.channel.send.assert_not_called()
@@ -93,6 +94,7 @@ async def test_correct_kubernetes_message_is_kubernetes_emoji(bot, message, kube
 @pytest.mark.asyncio
 async def test_correct_k8s_bot_author(bot, message):
     message.author = bot.user
+    message.content = "k8s"
     clazz = Kubernetes(bot)
     await clazz.correct_k8s(message)
     message.channel.send.assert_not_called()
