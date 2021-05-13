@@ -20,15 +20,6 @@ import duckbot.health
 import duckbot.util.connection_test
 
 
-# Logging setup
-# Stole right from Discord
-logger = logging.getLogger("discord")
-logger.setLevel(logging.DEBUG)
-handler = logging.FileHandler(filename="connie.log", encoding="utf-8", mode="w")
-handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
-logger.addHandler(handler)
-
-
 def run_duckbot(bot: commands.Bot):
     if "connection-test" in os.getenv("DUCKBOT_ARGS", ""):
         bot.load_extension(duckbot.util.connection_test.__name__)
@@ -65,7 +56,17 @@ def intents() -> Intents:
     intent.typing = False
     return intent
 
+def logger_setup():
+    logger = logging.getLogger("discord")
+    logger.setLevel(logging.DEBUG)
+    
+    # The choice of maxBytes=256000=250kB is arbitrary
+    handler = RotatingFileHandler(filename="./logs/duck.log", mode='a', maxBytes=256000, backupCount=10)
+    handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
+    logger.addHandler(handler)
+    
 
 if __name__ == "__main__":
+    logger_setup()
     bot = commands.Bot(command_prefix="!", help_command=None, intents=intents(), activity=Game(name="Duck Game"))
     run_duckbot(bot)
