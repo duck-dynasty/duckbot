@@ -33,7 +33,7 @@ jobs:
     - name: Install Dependencies
       run: . scripts/build/install.sh actions
     - name: Run Tests
-      run: . scripts/build/test.sh
+      run: pytest
 
   sanity:
     runs-on: ubuntu-latest
