@@ -1,5 +1,6 @@
 import pytest
 from unittest import mock
+import asyncio
 import discord
 import discord.ext.commands
 
@@ -41,9 +42,10 @@ async def bot_spy() -> discord.ext.commands.Bot:
     await b.close()
 
 
-@pytest.fixture
-@mock.patch("discord.ext.commands.Bot")
+@pytest.fixture(scope="package")
+@mock.patch("discord.ext.commands.Bot", autospec=True)
 async def bot(b) -> discord.ext.commands.Bot:
+    b.loop = mock.Mock(wraps=asyncio.get_event_loop())
     return b
 
 
