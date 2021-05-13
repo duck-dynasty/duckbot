@@ -1,4 +1,5 @@
 from discord.ext import commands
+from duckbot.slash import slash_command
 import subprocess
 
 
@@ -6,7 +7,8 @@ class Fortune(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="fortune")
+    @slash_command()
+    @commands.command(name="fortune", description="Get a fortune told to you by a cow.")
     async def fortune(self, context):
         await context.send(self.get_fortune())
 
