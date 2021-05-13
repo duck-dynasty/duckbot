@@ -59,10 +59,14 @@ def intents() -> Intents:
 
 
 def logger_setup():
+    log_directory = "logs"
+    if not os.path.exists(log_directory):
+        os.makedirs(log_directory)
+        
     logger = logging.getLogger("discord")
     logger.setLevel(logging.INFO)
 
-    handler = logging.handlers.RotatingFileHandler(filename="duck.log", mode="a", maxBytes=256000, backupCount=10)
+    handler = logging.handlers.RotatingFileHandler(filename=os.path.join(log_directory, "duck.log"), mode="a", maxBytes=256000, backupCount=10)
     handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
     logger.addHandler(handler)
 
