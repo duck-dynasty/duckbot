@@ -23,12 +23,6 @@ class Weather(commands.Cog):
             self.owm_client = pyowm.OWM(os.getenv("OPENWEATHER_TOKEN"), conf)
         return self.owm_client
 
-    # @slash_command(options=[
-    #     Option(name="set", type=OptionType.SUB_COMMAND_GROUP, description="Update your default city for this command."),
-    #     Option(name="city", description="The city name to get the weather for."),
-    #     Option(name="country", description="The two letter country code (eg CA for Canada), or two letter state code."),
-    #     Option(name="index", type=OptionType.INTEGER, description="Index to disamiguate city when city/country are not enough."),
-    # ])
     @slash_command(
         root="weather",
         name="get",
