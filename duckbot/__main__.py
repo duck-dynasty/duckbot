@@ -1,4 +1,5 @@
 import logging
+import logging.handlers
 import os
 from discord import Intents, Game
 from discord.ext import commands
@@ -59,10 +60,9 @@ def intents() -> Intents:
 
 def logger_setup():
     logger = logging.getLogger("discord")
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
 
-    # The choice of maxBytes=256000=250kB is arbitrary
-    handler = logging.RotatingFileHandler(filename="./logs/duck.log", mode="a", maxBytes=256000, backupCount=10)
+    handler = logging.handlers.RotatingFileHandler(filename="./logs/duck.log", mode="a", maxBytes=256000, backupCount=10)
     handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
     logger.addHandler(handler)
 
