@@ -1,4 +1,5 @@
 from discord.ext import commands
+from duckbot.slash import slash_command
 import urllib
 import json
 
@@ -7,7 +8,9 @@ class DogPhotos(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="dog")
+    # TODO add breed option https://dog.ceo/dog-api/documentation/
+    @slash_command()
+    @commands.command(name="dog", description=":dog:")
     async def dog_command(self, context):
         await context.send(self.get_dog_image())
 
