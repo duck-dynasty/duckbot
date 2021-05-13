@@ -4,6 +4,7 @@ import random
 import urllib
 from bs4 import BeautifulSoup
 from discord.ext import commands
+from duckbot.slash import slash_command, Option
 
 
 class Recipe(commands.Cog):
@@ -79,6 +80,11 @@ class Recipe(commands.Cog):
 
         await context.send(response)
 
+    @slash_command(
+        options=[
+            Option(name="search-term", description="The recipe search terms."),
+        ]
+    )
     @commands.command(name="recipe")
     async def recipe(self, context, *args):
         async with context.typing():
