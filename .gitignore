@@ -129,6 +129,3 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
-
-# include scripts/build directory
-!scripts/build/
