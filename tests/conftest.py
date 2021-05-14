@@ -3,6 +3,7 @@ from unittest import mock
 import asyncio
 import discord
 import discord.ext.commands
+from duckbot import DuckBot
 
 
 @pytest.fixture(scope="session")
@@ -40,19 +41,19 @@ def db(d, session):
 
 
 @pytest.fixture
-async def bot_spy() -> discord.ext.commands.Bot:
-    """Returns a spy discord.ext.commands.Bot instance with a stubbed `run` method. The bot is closed afterwards."""
-    b = discord.ext.commands.Bot(command_prefix="!", help_command=None)
+async def bot_spy() -> DuckBot:
+    """Returns a spy DuckBot instance with a stubbed `run` method. The bot is closed afterwards."""
+    b = DuckBot()
     m = mock.Mock(wraps=b)
     m.loop = b.loop
-    with mock.patch.object(discord.ext.commands.Bot, "run"):  # stub run so it does nothing
+    with mock.patch.object(DuckBot, "run"):  # stub run so it does nothing
         yield m
     await b.close()
 
 
 @pytest.fixture(scope="session")
-@mock.patch("discord.ext.commands.Bot", autospec=discord.ext.commands.Bot(command_prefix="!"))
-async def bot(b) -> discord.ext.commands.Bot:
+@mock.patch("duckbot.DuckBot")
+async def bot(b) -> DuckBot:
     # b.loop = mock.Mock("asyncio.AbstractEventLoop", autospec=True)
     return b
 
