@@ -1,0 +1,1 @@
+from .duckbot import DuckBot
