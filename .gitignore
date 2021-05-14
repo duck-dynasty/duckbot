@@ -132,3 +132,7 @@ dmypy.json
 
 # include scripts/build directory
 !scripts/build/
+
+# log files
+logs
+
