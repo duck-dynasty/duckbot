@@ -8,7 +8,7 @@ RUN pip install --upgrade pip setuptools wheel
 COPY setup.py .
 RUN pip install .
 
-FROM python:3.8 as prod
+FROM python:3.8-slim as prod
 RUN apt-get update && apt-get -y install \
     ffmpeg \
     libpq-dev \
