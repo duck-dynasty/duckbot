@@ -32,8 +32,8 @@ sudo apt-get install -y --no-install-recommends ffmpeg libpq-dev
 Then, you can run tests.
 
 ```sh
-pytest   # runs tests, lint and format checks
-black .  # formats the code base
+pytest  # runs tests, lint and format checks
+black . # reformats the entire code base
 ```
 
 The tests also collects code coverage. [View the configuration](https://github.com/Chippers255/duckbot/blob/main/pyproject.toml) to see the minimum required coverage. Discord.py decorators make it difficult to cover methods directly, so don't aim for 100% coverage.
