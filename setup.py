@@ -33,7 +33,7 @@ if __name__ == "__main__":
         python_requires=">=3.8",
         packages=find_packages(),
         cmdclass={"develop": PostDevelop, "install": PostInstall},
-        setup_requires=["wheel", "nltk>=3.6,<4"],
+        setup_requires=["nltk>=3.6,<4"],
         install_requires=[
             "discord.py[voice]>=1.7,<2",
             "beautifulsoup4",

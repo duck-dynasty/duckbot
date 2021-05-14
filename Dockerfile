@@ -5,6 +5,7 @@ RUN python -m venv $VIRTUAL_ENV
 ENV PATH "$VIRTUAL_ENV/bin:$PATH"
 WORKDIR /pip-dependencies
 RUN pip install --upgrade pip setuptools wheel
+COPY pyproject.toml .
 COPY setup.py .
 RUN pip install .
 
