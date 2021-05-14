@@ -1,7 +1,6 @@
 import pytest
-from discord import Intents
 import duckbot
-from duckbot.__main__ import run_duckbot, intents
+from duckbot.__main__ import run_duckbot
 
 DISCORD_TOKEN = "discord-token"
 
@@ -9,16 +8,6 @@ DISCORD_TOKEN = "discord-token"
 @pytest.fixture(autouse=True)
 def set_discord_token_env(monkeypatch):
     monkeypatch.setenv("DISCORD_TOKEN", DISCORD_TOKEN)
-
-
-def test_intents_has_required_permissions():
-    expected = Intents.none()
-    expected.guilds = True
-    expected.emojis = True
-    expected.messages = True
-    expected.reactions = True
-    expected.voice_states = True
-    assert intents() == expected
 
 
 def test_run_duckbot_connection_test(bot_spy, monkeypatch):
