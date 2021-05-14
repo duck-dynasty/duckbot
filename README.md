@@ -30,7 +30,7 @@ Should be run whenever you pull from `upstream/main`, or after you create the vi
 ### Run Tests & Formatter
 ```sh
 pytest  # runs tests, lint and format checks
-. scripts/build/format.sh
+black . # reformats the entire code base
 ```
 
 The tests also collects code coverage. [View the configuration](https://github.com/Chippers255/duckbot/blob/main/pyproject.toml) to see the minimum required coverage. Discord.py decorators make it difficult to cover methods directly, so don't aim for 100% coverage.
