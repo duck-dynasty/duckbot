@@ -1,7 +1,6 @@
 [tool.black]
 line-length = 200
 target-version = ['py38']
-exclude = '(\.git | \.venv)'
 
 [tool.pytest.ini_options]
 addopts = """\
