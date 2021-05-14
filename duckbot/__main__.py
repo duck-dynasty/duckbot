@@ -61,7 +61,7 @@ def intents() -> Intents:
 def logger_setup():
     log_directory = "logs"
     os.makedirs(log_directory, exist_ok=True)
-    
+
     logger = logging.getLogger("discord")
     logger.setLevel(logging.INFO)
 
