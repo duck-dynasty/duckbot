@@ -1,9 +1,10 @@
 import pytest
 from tests.discord_test_ext import assert_cog_added_of_type
-from duckbot.cogs.games import setup as extension_setup, Dice
+from duckbot.cogs.games import setup as extension_setup, Dice, AgeOfEmpires
 
 
 @pytest.mark.asyncio
 async def test_setup(bot_spy):
     extension_setup(bot_spy)
     assert_cog_added_of_type(bot_spy, Dice)
+    assert_cog_added_of_type(bot_spy, AgeOfEmpires)

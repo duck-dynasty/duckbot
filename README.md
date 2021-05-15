@@ -27,18 +27,14 @@ Should be run whenever you pull from `upstream/main`, or after you create the vi
 . scripts/build/install.sh
 ```
 
-### Run Tests/Lint, Formatter
+### Run Tests & Formatter
 ```sh
-. scripts/build/test.sh
-. scripts/build/format.sh
+pytest  # runs tests, lint and format checks
+black . # reformats the entire code base
 ```
 
-The `test` script performs code coverage checks. [View the script](https://github.com/Chippers255/duckbot/blob/main/scripts/build/test.sh) to see the minimum required coverage. Discord.py decorators make it difficult to cover methods directly, so don't aim for 100% coverage.
+The tests also collects code coverage. [View the configuration](https://github.com/Chippers255/duckbot/blob/main/pyproject.toml) to see the minimum required coverage. Discord.py decorators make it difficult to cover methods directly, so don't aim for 100% coverage.
 
-`test` also performs lint and formatter checks. These can take a while, so for development, you can choose a directory of tests to run by providing an argument to the `test` script.
-```sh
-. scripts/build/test.sh tests/util  #  only run tests from tests/util; calculate code coverage for duckbot/util
-```
 
 ### Run DuckBot
 DuckBot runs using [docker-compose](https://docs.docker.com/compose/), so ensure that is installed along with docker itself.  

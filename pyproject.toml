@@ -1,4 +1,15 @@
 [tool.black]
 line-length = 200
 target-version = ['py38']
-exclude = '\.git'
+
+[tool.pytest.ini_options]
+addopts = """\
+    -ra \
+    --black \
+    --flake8 \
+    --cov=duckbot \
+    --cov-branch \
+    --cov-fail-under=85 \
+    --cov-report html --cov-report term-missing:skip-covered \
+    -n auto \
+    --blockage"""
