@@ -7,7 +7,7 @@ from typing import Union
 from duckbot import DuckBot
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(scope="session", autouse=True)
 def async_mock_await_fix():
     """Make it so @mock.patch works for async methods."""
 
@@ -45,9 +45,23 @@ async def bot_spy() -> DuckBot:
 
 
 @pytest.fixture
-@mock.patch("duckbot.DuckBot")
-async def bot(b) -> DuckBot:
-    return b
+@mock.patch("duckbot.DuckBot", autospec=True)
+def bot(b) -> DuckBot:
+    b.loop = mock.Mock()
+    with mock.patch("discord.ext.tasks.Loop"):  # mock out loop, it uses `asyncio.get_event_loop()` by default
+        return b
+
+
+@pytest.fixture
+@mock.patch("discord.User", autospec=True)
+def user(u) -> discord.User:
+    return u
+
+
+@pytest.fixture
+@mock.patch("discord.Member", autospec=True)
+def member(m) -> discord.Member:
+    return m
 
 
 @pytest.fixture
@@ -64,28 +78,39 @@ async def user(u) -> discord.User:
 
 @pytest.fixture
 @mock.patch("discord.Message", autospec=True)
-async def message(m, channel, user, member) -> discord.Message:
-    """Returns a message with the channel property set, for each channel type a message can be sent to."""
+def message(m, channel, user, member) -> discord.Message:
+    """Returns a message with nested properties set, for each channel type a message can be sent to."""
     m.channel = channel
-    m.author = member if channel.type in [discord.ChannelType.text, discord.ChannelType.voice] else user
+    m.author = user if channel.type in [discord.ChannelType.private, discord.ChannelType.group] else member
     return m
 
 
 @pytest.fixture
 @mock.patch("discord.Message", autospec=True)
-async def text_message(m, text_channel) -> discord.Message:
+def text_message(m, text_channel, member) -> discord.Message:
     """Returns a guild TextChannel message with the channel property set."""
     m.channel = text_channel
+    m.author = member
     return m
 
 
 @pytest.fixture
 @mock.patch("discord.ext.commands.Context", autospec=True)
-async def context(c, message) -> discord.ext.commands.Context:
-    """Returns a context with the message and channel properties set, for each channel type a command can be sent to."""
+def context(c, message) -> discord.ext.commands.Context:
+    """Returns a context with nested properties set, for each channel type a command can be sent to."""
     c.message = message
     c.channel = message.channel
     c.author = message.author
+    return c
+
+
+@pytest.fixture
+@mock.patch("discord.ext.commands.Context", autospec=True)
+def text_context(c, text_message) -> discord.ext.commands.Context:
+    """Returns a guild context with nested properties set."""
+    c.message = text_message
+    c.channel = text_message.channel
+    c.author = text_message.author
     return c
 
 
@@ -97,18 +122,18 @@ async def icontext(c, context) -> Union[discord.ext.commands.Context, duckbot.sl
 
 @pytest.fixture
 @mock.patch("discord.Emoji", autospec=True)
-async def emoji(e) -> discord.Emoji:
+def emoji(e) -> discord.Emoji:
     return e
 
 
 @pytest.fixture
 @mock.patch("discord.Guild", autospec=True)
-async def guild(g) -> discord.Guild:
+def guild(g) -> discord.Guild:
     return g
 
 
 @pytest.fixture(params=["discord.TextChannel", "discord.VoiceChannel"])
-async def guild_channel(request, text_channel, voice_channel):
+def guild_channel(request, text_channel, voice_channel):
     """Returns a guild TextChannel and a VoiceChannel."""
     if request.param == "discord.TextChannel":
         return text_channel
@@ -118,7 +143,7 @@ async def guild_channel(request, text_channel, voice_channel):
 
 
 @pytest.fixture(params=["discord.TextChannel", "discord.DMChannel", "discord.GroupChannel"])
-async def channel(request, text_channel, dm_channel, group_channel):
+def channel(request, text_channel, dm_channel, group_channel):
     """Returns a text based channel."""
     if request.param == "discord.TextChannel":
         return text_channel
@@ -131,39 +156,39 @@ async def channel(request, text_channel, dm_channel, group_channel):
 
 @pytest.fixture
 @mock.patch("discord.TextChannel", autospec=True)
-async def text_channel(tc) -> discord.TextChannel:
+def text_channel(tc) -> discord.TextChannel:
     tc.type = discord.ChannelType.text
     return tc
 
 
 @pytest.fixture
 @mock.patch("discord.DMChannel", autospec=True)
-async def dm_channel(dm) -> discord.DMChannel:
+def dm_channel(dm) -> discord.DMChannel:
     dm.type = discord.ChannelType.private
     return dm
 
 
 @pytest.fixture
 @mock.patch("discord.GroupChannel", autospec=True)
-async def group_channel(g) -> discord.GroupChannel:
+def group_channel(g) -> discord.GroupChannel:
     g.type = discord.ChannelType.group
     return g
 
 
 @pytest.fixture
 @mock.patch("discord.VoiceChannel", autospec=True)
-async def voice_channel(vc) -> discord.VoiceChannel:
+def voice_channel(vc) -> discord.VoiceChannel:
     vc.type = discord.ChannelType.voice
     return vc
 
 
 @pytest.fixture
 @mock.patch("discord.VoiceClient", autospec=True)
-async def voice_client(vc) -> discord.VoiceClient:
+def voice_client(vc) -> discord.VoiceClient:
     return vc
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(scope="session", autouse=True)
 def patch_embed_equals():
     """Replaces discord.Embed equality test with comparing the `to_dict` of each side.
     This allows for writing `context.send.assert_called_once_with(embed=expected)`,
