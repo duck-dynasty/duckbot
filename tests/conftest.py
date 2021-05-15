@@ -84,7 +84,7 @@ def text_message(m, text_channel, member) -> discord.Message:
 
 @pytest.fixture
 @mock.patch("discord.ext.commands.Context", autospec=True)
-def context(c, message) -> discord.ext.commands.Context:
+def command_context(c, message) -> discord.ext.commands.Context:
     """Returns a context with nested properties set, for each channel type a command can be sent to."""
     c.message = message
     c.channel = message.channel
@@ -94,7 +94,7 @@ def context(c, message) -> discord.ext.commands.Context:
 
 @pytest.fixture
 @mock.patch("discord.ext.commands.Context", autospec=True)
-def text_context(c, text_message) -> discord.ext.commands.Context:
+def command_text_context(c, text_message) -> discord.ext.commands.Context:
     """Returns a guild context with nested properties set."""
     c.message = text_message
     c.channel = text_message.channel
@@ -104,8 +104,15 @@ def text_context(c, text_message) -> discord.ext.commands.Context:
 
 @pytest.fixture
 @mock.patch("duckbot.slash.InteractionContext", autospec=True)
-async def icontext(c, context) -> Union[discord.ext.commands.Context, duckbot.slash.InteractionContext]:
-    pass
+def interaction_context(c, message) -> duckbot.slash.InteractionContext:
+    c.channel = message.channel
+    c.author = message.author
+    return c
+
+
+@pytest.fixture(params=["command", "slash"])
+def context(request, command_context, interaction_context) -> Union[discord.ext.commands.Context, duckbot.slash.InteractionContext]:
+    return command_context if request.param == "command" else interaction_context
 
 
 @pytest.fixture

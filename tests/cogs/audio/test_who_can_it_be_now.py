@@ -10,27 +10,27 @@ def play(*args, **kwargs):
 
 
 @pytest.mark.asyncio
-async def test_task_loop_once(bot_spy, text_context, voice_client):
-    text_context.voice_client = None
-    text_context.author.voice.channel.connect.return_value = async_value(voice_client)
+async def test_task_loop_once(bot_spy, command_text_context, voice_client):
+    command_text_context.voice_client = None
+    command_text_context.author.voice.channel.connect.return_value = async_value(voice_client)
     voice_client.play = play
     clazz = WhoCanItBeNow(bot_spy)
-    await clazz.connect_to_voice(text_context)
+    await clazz.connect_to_voice(command_text_context)
     assert clazz.voice_client is not None
-    await clazz._WhoCanItBeNow__start(text_context)
+    await clazz._WhoCanItBeNow__start(command_text_context)
     assert clazz.audio_task is not None
     assert clazz.streaming is True
     await clazz.stream.wait()
-    await clazz._WhoCanItBeNow__stop(text_context)
+    await clazz._WhoCanItBeNow__stop(command_text_context)
     assert clazz.streaming is False
     assert clazz.audio_task is None
     assert clazz.voice_client is None
 
 
 @pytest.mark.asyncio
-async def test_task_loop_repeats(bot_spy, text_context, voice_client):
-    text_context.voice_client = None
-    text_context.author.voice.channel.connect.return_value = async_value(voice_client)
+async def test_task_loop_repeats(bot_spy, command_text_context, voice_client):
+    command_text_context.voice_client = None
+    command_text_context.author.voice.channel.connect.return_value = async_value(voice_client)
 
     def loop_first(*args, **kwargs):
         voice_client.play = play
@@ -38,71 +38,71 @@ async def test_task_loop_repeats(bot_spy, text_context, voice_client):
 
     voice_client.play = loop_first
     clazz = WhoCanItBeNow(bot_spy)
-    await clazz.connect_to_voice(text_context)
+    await clazz.connect_to_voice(command_text_context)
     assert clazz.voice_client is not None
-    await clazz._WhoCanItBeNow__start(text_context)
+    await clazz._WhoCanItBeNow__start(command_text_context)
     assert clazz.audio_task is not None
     assert clazz.streaming is True
     await clazz.stream.wait()
     await asyncio.sleep(0)
     await clazz.stream.wait()
-    await clazz._WhoCanItBeNow__stop(text_context)
+    await clazz._WhoCanItBeNow__stop(command_text_context)
     assert clazz.streaming is False
     assert clazz.audio_task is None
     assert clazz.voice_client is None
 
 
 @pytest.mark.asyncio
-async def test_connect_to_voice_no_voice(bot, context):
-    context.voice_client = None
-    delattr(context.author, "voice")
+async def test_connect_to_voice_no_voice(bot, command_context):
+    command_context.voice_client = None
+    delattr(command_context.author, "voice")
     clazz = WhoCanItBeNow(bot)
-    await clazz.connect_to_voice(context)
-    context.send.assert_called_once_with("Music can only be played in a discord service, not a private channel.")
+    await clazz.connect_to_voice(command_context)
+    command_context.send.assert_called_once_with("Music can only be played in a discord service, not a private channel.")
 
 
 @pytest.mark.asyncio
-async def test_connect_to_voice_author_in_channel(bot, text_context, voice_client):
-    text_context.voice_client = None
-    text_context.author.voice.channel.connect.return_value = async_value(voice_client)
+async def test_connect_to_voice_author_in_channel(bot, command_text_context, voice_client):
+    command_text_context.voice_client = None
+    command_text_context.author.voice.channel.connect.return_value = async_value(voice_client)
     clazz = WhoCanItBeNow(bot)
-    await clazz.connect_to_voice(text_context)
+    await clazz.connect_to_voice(command_text_context)
     assert clazz.voice_client == voice_client
 
 
 @pytest.mark.asyncio
-async def test_connect_to_voice_author_not_in_channel(bot, context):
-    context.voice_client = None
-    context.author.voice = None
+async def test_connect_to_voice_author_not_in_channel(bot, command_context):
+    command_context.voice_client = None
+    command_context.author.voice = None
     clazz = WhoCanItBeNow(bot)
     with pytest.raises(CommandError):
-        await clazz.connect_to_voice(context)
-    context.send.assert_called_once_with("Connect to a voice channel so I know where to `!start`.")
+        await clazz.connect_to_voice(command_context)
+    command_context.send.assert_called_once_with("Connect to a voice channel so I know where to `!start`.")
 
 
 @pytest.mark.asyncio
-async def test_connect_to_voice_already_connected(bot, context, voice_client):
-    context.voice_client = voice_client
+async def test_connect_to_voice_already_connected(bot, command_context, voice_client):
+    command_context.voice_client = voice_client
     clazz = WhoCanItBeNow(bot)
-    await clazz.connect_to_voice(context)
+    await clazz.connect_to_voice(command_context)
     voice_client.stop.assert_called()
 
 
 @pytest.mark.asyncio
-async def test_start_already_started(bot, context):
+async def test_start_already_started(bot, command_context):
     clazz = WhoCanItBeNow(bot)
     clazz.streaming = True
-    await clazz._WhoCanItBeNow__start(context)
+    await clazz._WhoCanItBeNow__start(command_context)
     bot.loop.create_task.assert_not_called()
 
 
 @pytest.mark.asyncio
-async def test_stop_disconnects(bot, context, voice_client):
+async def test_stop_disconnects(bot, command_context, voice_client):
     clazz = WhoCanItBeNow(bot)
     clazz.streaming = True
     clazz.audio_task = asyncio.create_task(clazz.stream_audio())
     clazz.voice_client = voice_client
-    await clazz._WhoCanItBeNow__stop(context)
+    await clazz._WhoCanItBeNow__stop(command_context)
     voice_client.disconnect.assert_called()
     assert clazz.voice_client is None
     assert clazz.audio_task is None
@@ -110,11 +110,11 @@ async def test_stop_disconnects(bot, context, voice_client):
 
 
 @pytest.mark.asyncio
-async def test_stop_not_streaming(bot, context):
+async def test_stop_not_streaming(bot, command_context):
     clazz = WhoCanItBeNow(bot)
     clazz.streaming = False
-    await clazz._WhoCanItBeNow__stop(context)
-    context.send.assert_called_once_with("Brother, no :musical_note: :saxophone: is active.")
+    await clazz._WhoCanItBeNow__stop(command_context)
+    command_context.send.assert_called_once_with("Brother, no :musical_note: :saxophone: is active.")
 
 
 @pytest.mark.asyncio
