@@ -1,6 +1,8 @@
 import pytest
+
+from duckbot.cogs.duck import Duck
+from duckbot.cogs.duck import setup as extension_setup
 from tests.discord_test_ext import assert_cog_added_of_type
-from duckbot.cogs.duck import setup as extension_setup, Duck
 
 
 @pytest.mark.asyncio

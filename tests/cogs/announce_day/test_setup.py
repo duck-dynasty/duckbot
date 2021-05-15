@@ -1,6 +1,8 @@
 import pytest
+
+from duckbot.cogs.announce_day import AnnounceDay
+from duckbot.cogs.announce_day import setup as extension_setup
 from tests.discord_test_ext import assert_cog_added_of_type
-from duckbot.cogs.announce_day import setup as extension_setup, AnnounceDay
 
 
 @pytest.mark.asyncio

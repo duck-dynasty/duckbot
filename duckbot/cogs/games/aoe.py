@@ -1,5 +1,7 @@
 from discord.ext import commands
+
 from duckbot.util.messages import try_delete
+
 from .aoe_phrases import taunts
 
 

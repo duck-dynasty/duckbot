@@ -1,9 +1,11 @@
-import pytest
-from unittest import mock
 from asyncio import CancelledError
-from tests.duckmock.urllib import patch_urlopen
-from tests.duckmock.discord import MockAsyncIterator
+from unittest import mock
+
+import pytest
+
 from duckbot.cogs.corrections import Typos
+from tests.duckmock.discord import MockAsyncIterator
+from tests.duckmock.urllib import patch_urlopen
 
 
 @pytest.fixture(autouse=True)

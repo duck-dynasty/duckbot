@@ -1,8 +1,10 @@
-import pytest
-from unittest import mock
 import datetime
-from discord import ChannelType
 from asyncio import CancelledError
+from unittest import mock
+
+import pytest
+from discord import ChannelType
+
 from duckbot.cogs.announce_day import AnnounceDay
 from tests.duckmock.datetime import patch_now
 

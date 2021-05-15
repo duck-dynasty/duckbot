@@ -1,6 +1,8 @@
 import pytest
+
+from duckbot.cogs.dogs import DogPhotos
+from duckbot.cogs.dogs import setup as extension_setup
 from tests.discord_test_ext import assert_cog_added_of_type
-from duckbot.cogs.dogs import setup as extension_setup, DogPhotos
 
 
 @pytest.mark.asyncio

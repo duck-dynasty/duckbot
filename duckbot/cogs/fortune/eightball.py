@@ -1,8 +1,10 @@
-from discord.ext import commands
-from discord import Embed, Colour
-import random
 import asyncio
-from .eightball_phrases import phrases, joke_phrases
+import random
+
+from discord import Colour, Embed
+from discord.ext import commands
+
+from .eightball_phrases import joke_phrases, phrases
 
 
 class EightBall(commands.Cog):

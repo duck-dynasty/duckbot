@@ -1,5 +1,6 @@
-from discord.ext import commands
 import subprocess
+
+from discord.ext import commands
 
 
 class EditDiff(commands.Cog):

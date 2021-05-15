@@ -1,7 +1,8 @@
 import asyncio
-from discord.ext import commands
-from discord import FFmpegPCMAudio, PCMVolumeTransformer, VoiceClient
 from importlib.resources import path
+
+from discord import FFmpegPCMAudio, PCMVolumeTransformer, VoiceClient
+from discord.ext import commands
 
 
 class WhoCanItBeNow(commands.Cog):
