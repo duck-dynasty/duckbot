@@ -4,6 +4,7 @@ pytest-mock
 pytest-xdist[psutil]
 pytest-flake8
 pytest-black
+pytest-isort
 pytest-blockage
 pytest-sugar
 pytest-icdiff
@@ -11,3 +12,4 @@ pytest-cov
 
 flake8
 black
+isort
