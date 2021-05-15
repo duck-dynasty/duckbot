@@ -1,4 +1,8 @@
+from discord import Client
+from discord.ext.commands import Command
 from discord.ext.commands.view import StringView
+from duckbot.slash import Interaction
+
 from .route import Route8
 
 
@@ -12,13 +16,10 @@ class InteractionContext:
     will be added on an as-needed basis.
     """
 
-    def __init__(self, *, bot, interaction, command):
+    def __init__(self, *, bot: Client, interaction: Interaction, command: Command):
         self.bot = bot
-        self.interaction = interaction
-        self.channel = interaction.channel
-        self.guild = interaction.guild
-        self.author = interaction.author
-        self.command = command
+        self._interaction = interaction
+        self._command = command
         self.invoked_with = None
         self.invoked_parents = []
         self.invoked_subcommand = None
@@ -38,6 +39,26 @@ class InteractionContext:
             self.view = " ".join([x.get("value", "") for x in options])
         self.view = StringView(self.view)
         self.follow_up = False
+
+    @property
+    def interaction(self) -> Interaction:
+        return self.interaction
+
+    @property
+    def channel(self):
+        return self.interaction.channel
+
+    @property
+    def guild(self):
+        return self.interaction.guild
+
+    @property
+    def author(self):
+        return self.interaction.author
+
+    @property
+    def command(self):
+        return self._command
 
     async def send(self, content="", *, embed=None):
         """Send a message as a response to an interaction.
