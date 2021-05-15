@@ -65,18 +65,6 @@ def member(m) -> discord.Member:
 
 
 @pytest.fixture
-@mock.patch("discord.Member", autospec=True)
-async def member(m) -> discord.Member:
-    return m
-
-
-@pytest.fixture
-@mock.patch("discord.User", autospec=True)
-async def user(u) -> discord.User:
-    return u
-
-
-@pytest.fixture
 @mock.patch("discord.Message", autospec=True)
 def message(m, channel, user, member) -> discord.Message:
     """Returns a message with nested properties set, for each channel type a message can be sent to."""
