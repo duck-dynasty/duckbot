@@ -1,19 +1,43 @@
-from discord import Member, User
+from typing import Optional, Union
+
+from discord import Client, Guild, Member, User
+from discord.abc import GuildChannel, PrivateChannel
 
 
 class Interaction:
     """https://discord.com/developers/docs/interactions/slash-commands#interaction"""
 
-    def __init__(self, *, bot, data):
+    def __init__(self, *, bot: Client, data):
         self.bot = bot
-        self.id = int(data["id"])
-        self.application_id = int(data["application_id"])
-        self.token = data["token"]
-        self.channel = bot.get_channel(data["channel_id"])
-        self.data = data["data"]
-        if "guild_id" in data:
-            self.guild = bot.get_guild(data["guild_id"])
-            self.author = Member(data=data["member"], guild=self.guild, state=bot._connection)
+        self.raw_data = data
+
+    @property
+    def id(self) -> int:
+        return int(self.raw_data["id"])
+
+    @property
+    def application_id(self) -> int:
+        return int(self.raw_data["application_id"])
+
+    @property
+    def token(self) -> str:
+        return self.raw_data["token"]
+
+    @property
+    def channel(self) -> Optional[Union[GuildChannel, PrivateChannel]]:
+        return self.bot.get_channel(self.raw_data["channel_id"])
+
+    @property
+    def guild(self) -> Optional[Guild]:
+        return self.bot.get_guild(self.raw_data["guild_id"]) if "guild_id" in self.raw_data else None
+
+    @property
+    def author(self) -> Union[Member, User]:
+        if "guild_id" in self.raw_data:
+            return Member(data=self.raw_data["member"], guild=self.guild, state=self.bot._connection)
         else:
-            self.guild = None
-            self.author = User(data=data["user"], state=bot._connection)
+            return User(data=self.raw_data["user"], state=self.bot._connection)
+
+    @property
+    def data(self):
+        return self.raw_data["data"]
