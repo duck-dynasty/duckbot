@@ -6,14 +6,6 @@ import discord.ext.commands
 from duckbot import DuckBot
 
 
-@pytest.fixture(scope="session")
-def event_loop():
-    """Create an instance of the default event loop for each test case."""
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
-
-
 @pytest.fixture(scope="session", autouse=True)
 def async_mock_await_fix():
     """Make it so @mock.patch works for async methods."""
@@ -51,16 +43,12 @@ async def bot_spy() -> DuckBot:
     await b.close()
 
 
-@pytest.fixture(scope="session")
-@mock.patch("duckbot.DuckBot")
-async def bot(b) -> DuckBot:
-    # b.loop = mock.Mock("asyncio.AbstractEventLoop", autospec=True)
+@pytest.fixture
+@mock.patch("duckbot.DuckBot", autospec=True)
+@mock.patch("discord.ext.tasks.Loop")
+async def bot(b, l) -> DuckBot:
+    b.loop = mock.Mock()
     return b
-
-
-@pytest.fixture(autouse=True)
-def reset_bot(bot):
-    bot.reset_mock()
 
 
 @pytest.fixture
