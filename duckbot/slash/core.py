@@ -1,9 +1,11 @@
 import typing
-from discord.ext.commands import Command, Bot, Cog
+
+from discord.ext.commands import Bot, Cog, Command
 from discord.ext.commands.errors import BadArgument
 from duckbot.slash import Interaction, Option, OptionType
-from .route import Route8
+
 from .context import InteractionContext
+from .route import Route8
 
 
 class SubCommand:
@@ -22,6 +24,8 @@ class SubCommand:
 
 
 def slash_command(*, root: str = None, name: str = None, description: str = None, options: typing.List[Option] = [], discordpy_adapt_name: bool = True):
+    """Returns a discord-py command as a slash command as well."""
+
     def decorator(command):
         if not isinstance(command, Command):
             raise TypeError("callback must be a discord.ext.commads.Command")
@@ -129,8 +133,3 @@ class SlashCommandPatch(Cog):
         return [
             {"name": o["name"], "description": o["description"], "type": o["type"], "required": o.get("required", False), "options": self.convert_options(o.get("options", []))} for o in raw_options
         ]
-
-
-def patch_slash_commands(bot: Bot):
-    bot._patch_slash_commands = SlashCommandPatch(bot)
-    bot.add_cog(bot._patch_slash_commands)
