@@ -46,7 +46,8 @@ async def bot_spy() -> DuckBot:
 @mock.patch("duckbot.DuckBot", autospec=True)
 def bot(b) -> DuckBot:
     b.loop = mock.Mock()
-    return b
+    with mock.patch("discord.ext.tasks.Loop"):  # mock out loop, it uses `asyncio.get_event_loop()` by default
+        return b
 
 
 @pytest.fixture
