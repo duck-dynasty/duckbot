@@ -23,7 +23,9 @@ class WhoCanItBeNow(commands.Cog):
     @start.before_invoke
     async def connect_to_voice(self, context):
         if context.voice_client is None:
-            if context.author.voice:
+            if not hasattr(context.author, "voice"):
+                await context.send("Music can only be played in a discord service, not a private channel.")
+            elif context.author.voice:
                 self.voice_client = await context.author.voice.channel.connect()
             else:
                 await context.send("Connect to a voice channel so I know where to `!start`.")
