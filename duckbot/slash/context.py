@@ -42,7 +42,7 @@ class InteractionContext:
 
     @property
     def interaction(self) -> Interaction:
-        return self.interaction
+        return self._interaction
 
     @property
     def channel(self):
@@ -59,6 +59,10 @@ class InteractionContext:
     @property
     def command(self):
         return self._command
+
+    @command.setter
+    def command(self, value):
+        self._command = value
 
     async def send(self, content="", *, embed=None):
         """Send a message as a response to an interaction.
