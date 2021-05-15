@@ -2,6 +2,8 @@ import pytest
 from unittest import mock
 import discord
 import discord.ext.commands
+import duckbot.slash
+from typing import Union
 from duckbot import DuckBot
 
 
@@ -49,10 +51,23 @@ async def bot(b) -> DuckBot:
 
 
 @pytest.fixture
+@mock.patch("discord.Member", autospec=True)
+async def member(m) -> discord.Member:
+    return m
+
+
+@pytest.fixture
+@mock.patch("discord.User", autospec=True)
+async def user(u) -> discord.User:
+    return u
+
+
+@pytest.fixture
 @mock.patch("discord.Message", autospec=True)
-async def message(m, channel) -> discord.Message:
+async def message(m, channel, user, member) -> discord.Message:
     """Returns a message with the channel property set, for each channel type a message can be sent to."""
     m.channel = channel
+    m.author = member if channel.type in [discord.ChannelType.text, discord.ChannelType.voice] else user
     return m
 
 
@@ -65,12 +80,19 @@ async def text_message(m, text_channel) -> discord.Message:
 
 
 @pytest.fixture
-@mock.patch("discord.ext.commands.Context")
+@mock.patch("discord.ext.commands.Context", autospec=True)
 async def context(c, message) -> discord.ext.commands.Context:
     """Returns a context with the message and channel properties set, for each channel type a command can be sent to."""
     c.message = message
     c.channel = message.channel
+    c.author = message.author
     return c
+
+
+@pytest.fixture
+@mock.patch("duckbot.slash.InteractionContext", autospec=True)
+async def icontext(c, context) -> Union[discord.ext.commands.Context, duckbot.slash.InteractionContext]:
+    pass
 
 
 @pytest.fixture
