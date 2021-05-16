@@ -8,7 +8,7 @@ class GetLogs(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         # TODO Verify the paths are setup correctly
-        self.duck_dir = os.path.join(os.sep, "duckbot")
+        self.duck_dir = os.getcwd()
         self.log_dir = os.path.join(self.duck_dir, "logs")
         self.log_archive_path = os.path.join(self.duck_dir, "logs.tar.gz")
         self.compress_command = ["tar", "-zc", "-f", self.log_archive_path, self.log_dir]
@@ -19,5 +19,6 @@ class GetLogs(commands.Cog):
 
     async def __logs(self, context):
         await subprocess.call(self.compress_command)
-        log_archive = discord.File(self.log_archive_path, "duck.logs")
+        log_archive = await discord.File(self.log_archive_path, "duck.logs")
         await context.send(file=log_archive)
+        # await subprocess.call(["rm", self.log_archive_path])
