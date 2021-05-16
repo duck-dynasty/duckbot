@@ -1,6 +1,5 @@
 from tests.discord_test_ext import assert_cog_added_of_type
-from duckbot.slash import setup as extension_setup
-from duckbot.slash.core import SlashCommandPatch
+from duckbot.slash import setup as extension_setup, SlashCommandPatch
 
 
 def test_setup(bot_spy):
