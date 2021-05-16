@@ -13,12 +13,12 @@ from duckbot.logging import GetLogs
 @pytest.mark.asyncio
 async def test_archive_sent(bot, context):
     clazz = GetLogs(bot)
-    clazz._GetLogs__logs(context)
+    await clazz._GetLogs__logs(context)
     context.send.assert_called_once_with("duck.logs")
 
 
 @pytest.mark.asyncio
 async def test_archive_removed(bot, context):
     clazz = GetLogs(bot)
-    clazz._GetLogs__logs(context)
+    await clazz._GetLogs__logs(context)
     assert not os.path.exists(os.path.join(os.getcwd(), "logs.tar.gz"))
