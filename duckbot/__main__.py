@@ -17,6 +17,7 @@ import duckbot.cogs.insights
 import duckbot.cogs.corrections
 import duckbot.cogs.formula_one
 import duckbot.cogs.announce_day
+import duckbot.cogs.get_logs
 import duckbot.health
 import duckbot.util.connection_test
 
@@ -41,11 +42,12 @@ def run_duckbot(bot: commands.Bot):
     bot.load_extension(duckbot.cogs.robot.__name__)
     bot.load_extension(duckbot.cogs.audio.__name__)
     bot.load_extension(duckbot.cogs.messages.__name__)
+    bot.load_extension(duckbot.cogs.get_logs.__name__)
 
     bot.run(os.getenv("DISCORD_TOKEN"))
 
 
-def intents() -> Intents:
+def intents() -> Intents:git
     intent = Intents.default()
     intent.members = False
     intent.presences = False
