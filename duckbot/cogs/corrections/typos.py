@@ -20,7 +20,17 @@ class Typos(commands.Cog):
         return {line[0]: line[1].split(", ") for line in (x.split("->") for x in text.splitlines())}
 
     def __get_custom_corrections(self):
-        return {"fcuk": ["fuck"], "fcuking": ["fucking"], "gud": ["good"], "hye": ["hey"], "prety": ["pretty"], "ta": ["at"], "thats": ["that's"], "wut": ["what"], "wat": ["what"]}
+        return {
+            "fcuk": ["fuck"],
+            "fcuking": ["fucking"],
+            "gud": ["good"],
+            "hye": ["hey"],
+            "prety": ["pretty"],
+            "ta": ["at"],
+            "thats": ["that's"],
+            "wut": ["what"],
+            "wat": ["what"],
+        }
 
     @tasks.loop(hours=24.0)
     async def refresh_corrections(self):
