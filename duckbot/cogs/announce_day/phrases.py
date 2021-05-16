@@ -1,74 +1,11 @@
 days = {
-    0: {
-        "names": [
-            "the day of the moon",
-            "Moonday",
-            "Monday",
-        ],
-        "templates": [
-            "Screw this, it is {0}.",
-        ],
-    },
-    1: {
-        "names": [
-            "Tyr's day",
-            "Tuesday",
-            "Dndndndndndndnd",
-            "Taco Tuesday",
-        ],
-        "templates": [
-            "Yo, one of my favourite days ever: {0}.",
-        ],
-    },
-    2: {
-        "names": [
-            "Odin's day",
-            "Wednesday",
-            "Wednesday, my dudes",
-            "hump day",
-            "Ness' wedding day",
-            "https://www.youtube.com/watch?v=du-TY1GUFGk",
-        ],
-        "templates": [],
-    },
-    3: {
-        "names": [
-            "Thor's day",
-            "Thorsday",
-            "civ day",
-            "Thursday",
-        ],
-        "templates": [],
-    },
-    4: {
-        "names": [
-            "Frigga's day",
-            "Friday, Friday, gotta get down on Friday",
-            "Stir Fry day",
-            "Friday",
-        ],
-        "templates": [],
-    },
-    5: {
-        "names": [
-            "Tom's Movie Night",
-            "Saturn's day",
-            "Saturday",
-        ],
-        "templates": [
-            "WEEKEND ALERT: {0}!",
-        ],
-    },
-    6: {
-        "names": [
-            "the day of the sun",
-            "Sunday",
-            "Sunday, Sunday, Sunday",
-        ],
-        "templates": [
-            "WEEKEND ALERT: {0}!",
-        ],
-    },
+    0: {"names": ["the day of the moon", "Moonday", "Monday"], "templates": ["Screw this, it is {0}."]},
+    1: {"names": ["Tyr's day", "Tuesday", "Dndndndndndndnd", "Taco Tuesday"], "templates": ["Yo, one of my favourite days ever: {0}."]},
+    2: {"names": ["Odin's day", "Wednesday", "Wednesday, my dudes", "hump day", "Ness' wedding day", "https://www.youtube.com/watch?v=du-TY1GUFGk"], "templates": []},
+    3: {"names": ["Thor's day", "Thorsday", "civ day", "Thursday"], "templates": []},
+    4: {"names": ["Frigga's day", "Friday, Friday, gotta get down on Friday", "Stir Fry day", "Friday"], "templates": []},
+    5: {"names": ["Tom's Movie Night", "Saturn's day", "Saturday"], "templates": ["WEEKEND ALERT: {0}!"]},
+    6: {"names": ["the day of the sun", "Sunday", "Sunday, Sunday, Sunday"], "templates": ["WEEKEND ALERT: {0}!"]},
 }
 
 templates = [
