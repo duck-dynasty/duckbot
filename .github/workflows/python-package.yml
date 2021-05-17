@@ -60,7 +60,7 @@ jobs:
       uses: docker/setup-buildx-action@v1
 
     # docker login can only happen once; force wait for previous runs before continuing
-    - name: block concurrent workflow executions
+    - name: Block Concurrent Workflow Executions
       uses: softprops/turnstyle@v1
       with:
         poll-interval-seconds: 60
