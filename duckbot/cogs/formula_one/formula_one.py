@@ -1,6 +1,8 @@
 import random
+
 from discord import ChannelType
 from discord.ext import commands
+
 from .phrases import phrases
 
 

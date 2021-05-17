@@ -1,8 +1,10 @@
-import pytest
 import asyncio
-from tests.async_mock_ext import async_value
+
+import pytest
 from discord.ext.commands import CommandError
+
 from duckbot.cogs.audio import WhoCanItBeNow
+from tests.async_mock_ext import async_value
 
 
 def play(*args, **kwargs):
@@ -10,27 +12,27 @@ def play(*args, **kwargs):
 
 
 @pytest.mark.asyncio
-async def test_task_loop_once(bot_spy, context, voice_channel, voice_client):
-    context.voice_client = None
-    context.author.voice.channel.connect.return_value = async_value(voice_client)
+async def test_task_loop_once(bot_spy, text_context, voice_client):
+    text_context.voice_client = None
+    text_context.author.voice.channel.connect.return_value = async_value(voice_client)
     voice_client.play = play
     clazz = WhoCanItBeNow(bot_spy)
-    await clazz.connect_to_voice(context)
+    await clazz.connect_to_voice(text_context)
     assert clazz.voice_client is not None
-    await clazz._WhoCanItBeNow__start(context)
+    await clazz._WhoCanItBeNow__start(text_context)
     assert clazz.audio_task is not None
     assert clazz.streaming is True
     await clazz.stream.wait()
-    await clazz._WhoCanItBeNow__stop(context)
+    await clazz._WhoCanItBeNow__stop(text_context)
     assert clazz.streaming is False
     assert clazz.audio_task is None
     assert clazz.voice_client is None
 
 
 @pytest.mark.asyncio
-async def test_task_loop_repeats(bot_spy, context, voice_channel, voice_client):
-    context.voice_client = None
-    context.author.voice.channel.connect.return_value = async_value(voice_client)
+async def test_task_loop_repeats(bot_spy, text_context, voice_client):
+    text_context.voice_client = None
+    text_context.author.voice.channel.connect.return_value = async_value(voice_client)
 
     def loop_first(*args, **kwargs):
         voice_client.play = play
@@ -38,26 +40,35 @@ async def test_task_loop_repeats(bot_spy, context, voice_channel, voice_client):
 
     voice_client.play = loop_first
     clazz = WhoCanItBeNow(bot_spy)
-    await clazz.connect_to_voice(context)
+    await clazz.connect_to_voice(text_context)
     assert clazz.voice_client is not None
-    await clazz._WhoCanItBeNow__start(context)
+    await clazz._WhoCanItBeNow__start(text_context)
     assert clazz.audio_task is not None
     assert clazz.streaming is True
     await clazz.stream.wait()
     await asyncio.sleep(0)
     await clazz.stream.wait()
-    await clazz._WhoCanItBeNow__stop(context)
+    await clazz._WhoCanItBeNow__stop(text_context)
     assert clazz.streaming is False
     assert clazz.audio_task is None
     assert clazz.voice_client is None
 
 
 @pytest.mark.asyncio
-async def test_connect_to_voice_author_in_channel(bot, context, voice_client):
+async def test_connect_to_voice_no_voice(bot, context):
     context.voice_client = None
-    context.author.voice.channel.connect.return_value = async_value(voice_client)
+    delattr(context.author, "voice")
     clazz = WhoCanItBeNow(bot)
     await clazz.connect_to_voice(context)
+    context.send.assert_called_once_with("Music can only be played in a discord service, not a private channel.")
+
+
+@pytest.mark.asyncio
+async def test_connect_to_voice_author_in_channel(bot, text_context, voice_client):
+    text_context.voice_client = None
+    text_context.author.voice.channel.connect.return_value = async_value(voice_client)
+    clazz = WhoCanItBeNow(bot)
+    await clazz.connect_to_voice(text_context)
     assert clazz.voice_client == voice_client
 
 

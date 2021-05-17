@@ -1,15 +1,16 @@
-import pytest
 from unittest import mock
-from discord import Embed, Colour
+
+import pytest
+from discord import Colour, Embed
+
 from duckbot.cogs.messages import Haiku
 
 EMBED_NAME = ":cherry_blossom: **Haiku Detected** :cherry_blossom:"
 
 
 @pytest.mark.asyncio
-@mock.patch("nltk.download")
-@mock.patch("nltk.corpus.cmudict.dict", return_value={"a": [["A1"]], "and": [["A1"]], "batman": [["A1", "A1"]]})
-async def test_build_syllable_dictionary_builds_table(download, cmu, bot):
+@mock.patch("nltk.corpus.cmudict.dict", return_value={"a": [["A1"]], "and": [["A1"], ["A1", "A1"]], "batman": [["A1", "A1"]]})
+async def test_build_syllable_dictionary_builds_table(cmu, bot):
     clazz = Haiku(bot)
     await clazz.build_syllable_dictionary()
     assert clazz.syllables == {"a": 1, "and": 1, "batman": 2}

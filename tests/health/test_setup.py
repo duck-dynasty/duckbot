@@ -1,6 +1,8 @@
 import pytest
+
+from duckbot.health import HealthCheck
+from duckbot.health import setup as extension_setup
 from tests.discord_test_ext import assert_cog_added_of_type
-from duckbot.health import setup as extension_setup, HealthCheck
 
 
 @pytest.mark.asyncio

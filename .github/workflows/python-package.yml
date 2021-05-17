@@ -25,13 +25,15 @@ jobs:
       uses: actions/cache@v2
       with:
         path: ${{ env.pythonLocation }}
-        key: ${{ env.pythonLocation }}-${{ hashFiles('**/requirements*.txt') }}
+        key: ${{ env.pythonLocation }}-${{ hashFiles('setup.py') }}
         restore-keys: ${{ env.pythonLocation }}-
     - name: Setup FFmpeg
       uses: FedericoCarboni/setup-ffmpeg@v1
 
-    - name: Install Dependencies
-      run: . scripts/build/install.sh actions
+    - name: Install Packages
+      run: |
+        pip install --upgrade pip setuptools wheel
+        pip install --editable .[dev]
     - name: Run Tests
       run: pytest
 

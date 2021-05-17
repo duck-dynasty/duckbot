@@ -1,4 +1,5 @@
 import pytest
+
 from duckbot.cogs.corrections import Bitcoin
 
 
