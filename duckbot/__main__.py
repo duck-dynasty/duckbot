@@ -1,7 +1,6 @@
 import logging
 import logging.handlers
 import os
-from discord import Intents, Game
 from discord.ext import commands
 import duckbot.cogs.duck
 import duckbot.cogs.dogs
@@ -20,6 +19,7 @@ import duckbot.cogs.announce_day
 import duckbot.logging
 import duckbot.health
 import duckbot.util.connection_test
+from duckbot import DuckBot
 
 
 def run_duckbot(bot: commands.Bot):
@@ -47,19 +47,6 @@ def run_duckbot(bot: commands.Bot):
     bot.run(os.getenv("DISCORD_TOKEN"))
 
 
-def intents() -> Intents:
-    intent = Intents.default()
-    intent.members = False
-    intent.presences = False
-    intent.bans = False
-    intent.integrations = False
-    intent.webhooks = False
-    intent.invites = False
-    intent.webhooks = False
-    intent.typing = False
-    return intent
-
-
 def logger_setup():
     log_directory = "logs"
     os.makedirs(log_directory, exist_ok=True)
@@ -74,5 +61,5 @@ def logger_setup():
 
 if __name__ == "__main__":
     logger_setup()
-    bot = commands.Bot(command_prefix="!", help_command=None, intents=intents(), activity=Game(name="Duck Game"))
+    bot = DuckBot()
     run_duckbot(bot)
