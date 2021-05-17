@@ -21,4 +21,3 @@ class GetLogs(commands.Cog):
         archive.close()
         log_archive = discord.File(self.log_archive_path, "logs.tar.gz")
         await context.send(file=log_archive)
-        os.remove(self.log_archive_path)
