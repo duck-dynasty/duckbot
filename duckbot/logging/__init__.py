@@ -1,4 +1,4 @@
-from .logs import GetLogs
+from .get_logs import GetLogs
 
 
 def setup(bot):
