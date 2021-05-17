@@ -3,8 +3,6 @@ import random
 from discord import Game, Intents
 from discord.ext import commands
 
-from duckbot.cogs import games
-
 
 def intents() -> Intents:
     intent = Intents.default()
