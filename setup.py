@@ -52,14 +52,16 @@ if __name__ == "__main__":
                 "pytest-asyncio",
                 "pytest-mock",
                 "pytest-xdist[psutil]",
+                "flake8",
                 "pytest-flake8",
+                "black",
                 "pytest-black",
+                "isort",
+                "pytest-isort",
                 "pytest-blockage",
                 "pytest-sugar",
                 "pytest-icdiff",
                 "pytest-cov",
-                "flake8",
-                "black",
             ]
         },
     )
