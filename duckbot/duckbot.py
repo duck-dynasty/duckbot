@@ -1,5 +1,9 @@
+import random
+
 from discord import Game, Intents
 from discord.ext import commands
+
+from duckbot.cogs import games
 
 
 def intents() -> Intents:
@@ -17,7 +21,8 @@ def intents() -> Intents:
 
 class DuckBot(commands.Bot):
     def __init__(self):
-        super().__init__(command_prefix="!", help_command=None, intents=intents(), activity=Game(name="Duck Game"))
+        game = ["Duck Game", "the Banjo", "Gloomhaven", "with Fire", "with the Boys"]
+        super().__init__(command_prefix="!", help_command=None, intents=intents(), activity=Game(name=random.choice(game)))
         self.add_listener(self.ready, name="on_ready")
 
     async def ready(self):
