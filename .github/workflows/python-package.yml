@@ -65,6 +65,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - uses: actions/checkout@v2
+    - name: Set up QEMU for ARM docker platforms
+      uses: docker/setup-qemu-action@v1
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
       id: buildx
