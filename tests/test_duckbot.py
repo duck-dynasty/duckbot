@@ -20,7 +20,7 @@ async def test_duckbot_constructor():
     assert bot.command_prefix == "!"
     assert bot.help_command is None
     assert bot.intents == intents()
-    assert bot.activity == Game("Duck Game")
+    assert bot.activity in [Game("Duck Game"), Game("the Banjo"), Game("Gloomhaven"), Game("with Fire"), Game("with the Boys")]
     await bot.close()
 
 
