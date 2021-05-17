@@ -74,7 +74,7 @@ jobs:
     - name: Create Platform List
       id: platforms
       run: |
-        platforms=$(python -c 'p="${{ steps.buildx.outputs.platforms }}".split(","); print([x for x in p if "arm" in x or "amd" in x]))')
+        platforms=$(python -c 'p="${{ steps.buildx.outputs.platforms }}".split(","); print(",".join([x for x in p if "arm" in x or "amd" in x]))')
         echo "::set-output name=platforms::$platforms"
     - name: Login to Docker
       uses: docker/login-action@v1
