@@ -3,7 +3,8 @@ import typing
 from discord.ext.commands import Bot, Cog, Command
 from discord.ext.commands.errors import BadArgument
 
-from duckbot.slash import Interaction, Option, OptionType
+from duckbot.slash.interaction import Interaction
+from duckbot.slash.option import Option, OptionType
 
 from .context import InteractionContext
 from .route import Route8
