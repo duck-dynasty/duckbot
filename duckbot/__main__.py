@@ -1,21 +1,23 @@
 import logging
 import logging.handlers
 import os
+
 from discord.ext import commands
-import duckbot.cogs.duck
-import duckbot.cogs.dogs
-import duckbot.cogs.tito
-import duckbot.cogs.games
-import duckbot.cogs.robot
-import duckbot.cogs.audio
-import duckbot.cogs.fortune
-import duckbot.cogs.recipe
-import duckbot.cogs.weather
-import duckbot.cogs.messages
-import duckbot.cogs.insights
-import duckbot.cogs.corrections
-import duckbot.cogs.formula_one
+
 import duckbot.cogs.announce_day
+import duckbot.cogs.audio
+import duckbot.cogs.corrections
+import duckbot.cogs.dogs
+import duckbot.cogs.duck
+import duckbot.cogs.formula_one
+import duckbot.cogs.fortune
+import duckbot.cogs.games
+import duckbot.cogs.insights
+import duckbot.cogs.messages
+import duckbot.cogs.recipe
+import duckbot.cogs.robot
+import duckbot.cogs.tito
+import duckbot.cogs.weather
 import duckbot.health
 import duckbot.slash
 import duckbot.util.connection_test

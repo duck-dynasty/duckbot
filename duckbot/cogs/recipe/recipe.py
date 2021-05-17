@@ -1,10 +1,12 @@
-import re
 import json
 import random
+import re
 import urllib
+
 from bs4 import BeautifulSoup
 from discord.ext import commands
-from duckbot.slash import slash_command, Option
+
+from duckbot.slash import Option, slash_command
 
 
 class Recipe(commands.Cog):

@@ -1,7 +1,9 @@
-from discord.ext import commands
-from duckbot.slash import slash_command
-import urllib
 import json
+import urllib
+
+from discord.ext import commands
+
+from duckbot.slash import slash_command
 
 
 class DogPhotos(commands.Cog):

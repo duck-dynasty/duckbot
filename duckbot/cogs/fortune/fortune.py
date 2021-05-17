@@ -1,6 +1,8 @@
-from discord.ext import commands
-from duckbot.slash import slash_command
 import subprocess
+
+from discord.ext import commands
+
+from duckbot.slash import slash_command
 
 
 class Fortune(commands.Cog):

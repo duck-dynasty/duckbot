@@ -1,6 +1,8 @@
-import pytest
 from unittest import mock
+
 import d20
+import pytest
+
 from duckbot.cogs.games import Dice
 
 

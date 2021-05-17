@@ -1,5 +1,7 @@
-from discord.ext import commands
 import random
+
+from discord.ext import commands
+
 from duckbot.util.emojis import regional_indicator
 
 

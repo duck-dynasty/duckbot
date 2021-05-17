@@ -1,6 +1,7 @@
 from discord import Client
 from discord.ext.commands import Command
 from discord.ext.commands.view import StringView
+
 from duckbot.slash import Interaction
 
 from .route import Route8

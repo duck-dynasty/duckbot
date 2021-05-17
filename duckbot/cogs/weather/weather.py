@@ -1,12 +1,15 @@
 import os
 from math import ceil
+
 import pyowm
+from discord.ext import commands
 from pyowm.utils import config
 from pyowm.weatherapi25.location import Location
-from discord.ext import commands
-from duckbot.slash import slash_command, Option, OptionType
-from .saved_location import SavedLocation
+
 from duckbot.db import Database
+from duckbot.slash import Option, OptionType, slash_command
+
+from .saved_location import SavedLocation
 
 degrees = "\N{DEGREE SIGN}C"
 

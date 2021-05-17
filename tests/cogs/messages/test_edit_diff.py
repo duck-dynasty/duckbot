@@ -1,5 +1,7 @@
-import pytest
 from unittest import mock
+
+import pytest
+
 from duckbot.cogs.messages import EditDiff
 
 

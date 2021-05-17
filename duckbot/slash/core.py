@@ -2,6 +2,7 @@ import typing
 
 from discord.ext.commands import Bot, Cog, Command
 from discord.ext.commands.errors import BadArgument
+
 from duckbot.slash import Interaction, Option, OptionType
 
 from .context import InteractionContext

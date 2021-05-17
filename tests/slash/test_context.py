@@ -1,7 +1,9 @@
-import pytest
 from unittest import mock
+
+import pytest
 from discord import Embed
 from discord.http import HTTPClient
+
 from duckbot.slash import InteractionContext
 from duckbot.slash.route import Route8
 

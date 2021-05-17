@@ -1,6 +1,7 @@
-from discord.ext import commands
-from duckbot.slash import slash_command, Option
 import d20
+from discord.ext import commands
+
+from duckbot.slash import Option, slash_command
 
 
 class Dice(commands.Cog):

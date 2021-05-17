@@ -1,9 +1,11 @@
-import pytest
+from typing import Union
 from unittest import mock
+
 import discord
 import discord.ext.commands
+import pytest
+
 import duckbot.slash
-from typing import Union
 from duckbot import DuckBot
 
 

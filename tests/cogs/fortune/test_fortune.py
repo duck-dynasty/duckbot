@@ -1,5 +1,6 @@
-from unittest import mock
 from subprocess import CompletedProcess
+from unittest import mock
+
 from duckbot.cogs.fortune import Fortune
 
 

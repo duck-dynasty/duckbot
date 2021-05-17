@@ -1,6 +1,8 @@
 import pytest
+
+from duckbot.cogs.audio import WhoCanItBeNow
+from duckbot.cogs.audio import setup as extension_setup
 from tests.discord_test_ext import assert_cog_added_of_type
-from duckbot.cogs.audio import setup as extension_setup, WhoCanItBeNow
 
 
 @pytest.mark.asyncio
