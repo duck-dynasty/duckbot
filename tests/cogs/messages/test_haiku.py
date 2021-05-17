@@ -1,6 +1,8 @@
-import pytest
 from unittest import mock
-from discord import Embed, Colour
+
+import pytest
+from discord import Colour, Embed
+
 from duckbot.cogs.messages import Haiku
 
 EMBED_NAME = ":cherry_blossom: **Haiku Detected** :cherry_blossom:"

@@ -1,6 +1,8 @@
 import pytest
+
+from duckbot.cogs.messages import EditDiff, Haiku
+from duckbot.cogs.messages import setup as extension_setup
 from tests.discord_test_ext import assert_cog_added_of_type
-from duckbot.cogs.messages import setup as extension_setup, EditDiff, Haiku
 
 
 @pytest.mark.asyncio

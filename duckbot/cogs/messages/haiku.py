@@ -1,6 +1,6 @@
+from discord import Colour, Embed
 from discord.ext import commands
 from nltk.corpus import cmudict
-from discord import Embed, Colour
 
 
 class Haiku(commands.Cog):

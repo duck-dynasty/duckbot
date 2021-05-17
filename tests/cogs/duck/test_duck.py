@@ -1,7 +1,9 @@
-import pytest
 from unittest import mock
-from duckbot.util.emojis import regional_indicator
+
+import pytest
+
 from duckbot.cogs.duck import Duck
+from duckbot.util.emojis import regional_indicator
 
 
 @pytest.mark.asyncio

@@ -1,6 +1,8 @@
 import pytest
+
+from duckbot.cogs.fortune import EightBall, Fortune
+from duckbot.cogs.fortune import setup as extension_setup
 from tests.discord_test_ext import assert_cog_added_of_type
-from duckbot.cogs.fortune import setup as extension_setup, Fortune, EightBall
 
 
 @pytest.mark.asyncio

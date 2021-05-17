@@ -1,7 +1,8 @@
-import re
 import json
 import random
+import re
 import urllib
+
 from bs4 import BeautifulSoup
 from discord.ext import commands
 

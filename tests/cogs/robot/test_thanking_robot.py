@@ -1,4 +1,5 @@
 import pytest
+
 from duckbot.cogs.robot import ThankingRobot
 
 

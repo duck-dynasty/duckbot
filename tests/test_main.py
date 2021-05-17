@@ -1,4 +1,5 @@
 import pytest
+
 import duckbot
 from duckbot.__main__ import run_duckbot
 

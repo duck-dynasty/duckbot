@@ -1,4 +1,5 @@
 import pytest
+
 from duckbot.util.messages import try_delete
 
 

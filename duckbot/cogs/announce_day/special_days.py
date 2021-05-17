@@ -1,8 +1,10 @@
-import discord
-from datetime import date
-import holidays
 import math
-from dateutil.relativedelta import relativedelta as rd, SU
+from datetime import date
+
+import discord
+import holidays
+from dateutil.relativedelta import SU
+from dateutil.relativedelta import relativedelta as rd
 
 
 class SpecialDays(holidays.Canada):

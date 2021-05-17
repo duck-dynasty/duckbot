@@ -1,6 +1,7 @@
 import pytest
-from tests.duckmock.urllib import patch_urlopen
+
 from duckbot.cogs.dogs import DogPhotos
+from tests.duckmock.urllib import patch_urlopen
 
 
 def build_dog(img, success):

@@ -1,11 +1,13 @@
-import pytest
-from unittest import mock
 import datetime
-from discord import ChannelType
 from asyncio import CancelledError
-from tests.duckmock.discord import MockAsyncIterator
+from unittest import mock
+
+import pytest
+from discord import ChannelType
+
 from duckbot.cogs.insights import Insights
 from tests.duckmock.datetime import patch_utcnow
+from tests.duckmock.discord import MockAsyncIterator
 
 
 @pytest.fixture

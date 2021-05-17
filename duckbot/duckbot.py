@@ -1,4 +1,4 @@
-from discord import Intents, Game
+from discord import Game, Intents
 from discord.ext import commands
 
 

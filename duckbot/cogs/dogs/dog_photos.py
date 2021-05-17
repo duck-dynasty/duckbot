@@ -1,6 +1,7 @@
-from discord.ext import commands
-import urllib
 import json
+import urllib
+
+from discord.ext import commands
 
 
 class DogPhotos(commands.Cog):
