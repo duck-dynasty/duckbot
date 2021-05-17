@@ -1,15 +1,4 @@
-# collect pip dependencies into a virtualenv, which we'll copy into the prod stage
-FROM python:3.8 as pip-dependencies
-ENV VIRTUAL_ENV "/opt/venv"
-RUN python -m venv $VIRTUAL_ENV
-ENV PATH "$VIRTUAL_ENV/bin:$PATH"
-WORKDIR /pip-dependencies
-RUN pip install --upgrade pip setuptools wheel
-COPY pyproject.toml .
-COPY setup.py .
-RUN pip install .
-
-FROM python:3.8-slim as prod
+FROM python:3.8
 RUN apt-get update && apt-get -y install \
     ffmpeg \
     libpq-dev \
@@ -18,8 +7,12 @@ RUN apt-get update && apt-get -y install \
 ENV PATH "$PATH:/usr/games"
 ENV VIRTUAL_ENV "/opt/venv"
 ENV PATH "$VIRTUAL_ENV/bin:$PATH"
+RUN python -m venv $VIRTUAL_ENV
+RUN pip install --upgrade pip setuptools wheel
 WORKDIR /duckbot
-COPY --from=pip-dependencies "$VIRTUAL_ENV" "$VIRTUAL_ENV"
+COPY pyproject.toml .
+COPY setup.py .
+RUN pip install .
 COPY resources/ ./resources
 COPY duckbot/ ./duckbot
 ENV DUCKBOT_ARGS ""
