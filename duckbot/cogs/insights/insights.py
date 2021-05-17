@@ -1,8 +1,10 @@
-import random
 import datetime
+import random
+
 import discord
 from discord import ChannelType
 from discord.ext import commands, tasks
+
 from .phrases import responses
 
 

@@ -1,6 +1,8 @@
 import pytest
+
+from duckbot.cogs.games import AgeOfEmpires, Dice
+from duckbot.cogs.games import setup as extension_setup
 from tests.discord_test_ext import assert_cog_added_of_type
-from duckbot.cogs.games import setup as extension_setup, Dice, AgeOfEmpires
 
 
 @pytest.mark.asyncio

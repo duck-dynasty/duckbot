@@ -1,5 +1,6 @@
 import os
-from setuptools import setup, find_packages
+
+from setuptools import find_packages, setup
 from setuptools.command.develop import develop
 from setuptools.command.install import install
 
@@ -51,14 +52,16 @@ if __name__ == "__main__":
                 "pytest-asyncio",
                 "pytest-mock",
                 "pytest-xdist[psutil]",
+                "flake8",
                 "pytest-flake8",
+                "black",
                 "pytest-black",
+                "isort",
+                "pytest-isort",
                 "pytest-blockage",
                 "pytest-sugar",
                 "pytest-icdiff",
                 "pytest-cov",
-                "flake8",
-                "black",
             ]
         },
     )

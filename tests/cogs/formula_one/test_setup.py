@@ -1,6 +1,8 @@
 import pytest
+
+from duckbot.cogs.formula_one import FormulaOne
+from duckbot.cogs.formula_one import setup as extension_setup
 from tests.discord_test_ext import assert_cog_added_of_type
-from duckbot.cogs.formula_one import setup as extension_setup, FormulaOne
 
 
 @pytest.mark.asyncio

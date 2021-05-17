@@ -1,8 +1,10 @@
-import pytest
 from unittest import mock
+
+import pytest
 from pyowm.weatherapi25.location import Location
 from pyowm.weatherapi25.one_call import OneCall
 from pyowm.weatherapi25.weather import Weather as pyowmWeather
+
 from duckbot.cogs.weather import Weather
 from duckbot.cogs.weather.saved_location import SavedLocation
 

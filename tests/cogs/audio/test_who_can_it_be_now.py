@@ -1,8 +1,10 @@
-import pytest
 import asyncio
-from tests.async_mock_ext import async_value
+
+import pytest
 from discord.ext.commands import CommandError
+
 from duckbot.cogs.audio import WhoCanItBeNow
+from tests.async_mock_ext import async_value
 
 
 def play(*args, **kwargs):

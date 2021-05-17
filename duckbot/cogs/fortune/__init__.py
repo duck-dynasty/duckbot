@@ -1,5 +1,5 @@
-from .fortune import Fortune
 from .eightball import EightBall
+from .fortune import Fortune
 
 
 def setup(bot):

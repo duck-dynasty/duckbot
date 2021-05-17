@@ -1,5 +1,5 @@
-from .dice import Dice
 from .aoe import AgeOfEmpires
+from .dice import Dice
 
 
 def setup(bot):

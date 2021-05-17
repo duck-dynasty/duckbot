@@ -1,5 +1,5 @@
-from discord.ext import commands
 import d20
+from discord.ext import commands
 
 
 class Dice(commands.Cog):

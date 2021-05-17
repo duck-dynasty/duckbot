@@ -1,7 +1,9 @@
-import pytest
 from unittest import mock
+
 import discord
 import discord.ext.commands
+import pytest
+
 from duckbot import DuckBot
 
 
