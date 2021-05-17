@@ -23,7 +23,7 @@ class Kubernetes(commands.Cog):
         await self.correct(message, ["k8"], "Kubernetes", self.k8s, self.kubernetes)
 
     async def correct(self, message, wrongs, right, wrong_emoji, right_emoji):
-        if message.author == self.bot.author:
+        if message.author == self.bot.user:
             return
         if wrong_emoji and right_emoji and str(wrong_emoji) in message.content:
             await message.channel.send(f"I think {message.author.display_name} means {right_emoji}")
