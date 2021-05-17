@@ -18,16 +18,8 @@ import duckbot.cogs.recipe
 import duckbot.cogs.robot
 import duckbot.cogs.tito
 import duckbot.cogs.weather
-<<<<<<< HEAD
-import duckbot.cogs.messages
-import duckbot.cogs.insights
-import duckbot.cogs.corrections
-import duckbot.cogs.formula_one
-import duckbot.cogs.announce_day
-import duckbot.logging
-=======
->>>>>>> upstream/main
 import duckbot.health
+import duckbot.logging
 import duckbot.util.connection_test
 from duckbot import DuckBot
 

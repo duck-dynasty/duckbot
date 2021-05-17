@@ -1,4 +1,5 @@
 import pytest
+
 from duckbot.logging import GetLogs
 
 

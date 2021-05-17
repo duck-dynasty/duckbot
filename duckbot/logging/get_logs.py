@@ -1,7 +1,8 @@
-import discord
-from discord.ext import commands
 import os
 import tarfile
+
+import discord
+from discord.ext import commands
 
 
 class GetLogs(commands.Cog):
