@@ -29,9 +29,9 @@ async def test_eightball_only_question_marks(bot, context, question):
 
 
 @pytest.mark.asyncio
-@mock.patch("asyncio.sleep", return_value=None)
-@mock.patch("random.choice", return_value="8ball")
 @mock.patch("random.random", return_value=0.5)
+@mock.patch("random.choice", return_value="8ball")
+@mock.patch("asyncio.sleep", return_value=None)
 async def test_eightball_gives_response(sleep, choice, random, bot, context):
     clazz = EightBall(bot)
     await clazz.eightball(context, "will this test pass?")
@@ -40,9 +40,9 @@ async def test_eightball_gives_response(sleep, choice, random, bot, context):
 
 
 @pytest.mark.asyncio
-@mock.patch("asyncio.sleep", return_value=None)
-@mock.patch("random.choice", side_effect=["joke", "fortune"])
 @mock.patch("random.random", return_value=0.29)
+@mock.patch("random.choice", side_effect=["joke", "fortune"])
+@mock.patch("asyncio.sleep", return_value=None)
 async def test_eightball_gives_joke_response(sleep, choice, random, bot, context):
     clazz = EightBall(bot)
     await clazz.eightball(context, "will this test pass?")
