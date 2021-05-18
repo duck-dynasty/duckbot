@@ -27,8 +27,6 @@ jobs:
         path: ${{ env.pythonLocation }}
         key: ${{ env.pythonLocation }}-${{ hashFiles('setup.py') }}
         restore-keys: ${{ env.pythonLocation }}-
-    - name: Setup FFmpeg
-      uses: FedericoCarboni/setup-ffmpeg@v1
 
     - name: Install Packages
       run: |
