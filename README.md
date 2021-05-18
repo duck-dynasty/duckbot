@@ -27,7 +27,7 @@ The `dev` extras will also install development dependencies, like `pytest`. The 
 There are a few additional packages required to be able to run tests locally.
 
 ```sh
-sudo apt-get install -y --no-install-recommends ffmpeg libpq-dev
+sudo apt-get install -y --no-install-recommends ffmpeg
 ```
 
 Then, you can run tests.
