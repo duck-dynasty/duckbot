@@ -27,8 +27,8 @@ def test_ctor_ensures_singleton_instance():
     assert c1 is c2
 
 
-@mock.patch("duckbot.db.database.create_engine")
 @mock.patch("tests.db.test_database.Base")
+@mock.patch("duckbot.db.database.create_engine")
 def test_session_creates_tables(create, base):
     clazz = Database()
     session = clazz.session(base)
