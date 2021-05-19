@@ -5,10 +5,9 @@ import pytest
 from duckbot.health import HealthCheck
 
 
-@mock.patch("discord.ext.commands.Bot")
-@mock.patch("asyncio.StreamReader")
 @mock.patch("asyncio.StreamWriter")
-def test_healthcheck_bot_user_is_none(bot, reader, writer):
+@mock.patch("asyncio.StreamReader")
+def test_healthcheck_bot_user_is_none(reader, writer, bot):
     bot.user = None
     clazz = HealthCheck(bot)
     clazz.healthcheck(reader, writer)
@@ -16,10 +15,9 @@ def test_healthcheck_bot_user_is_none(bot, reader, writer):
     writer.close.assert_called()
 
 
-@mock.patch("discord.ext.commands.Bot")
-@mock.patch("asyncio.StreamReader")
 @mock.patch("asyncio.StreamWriter")
-def test_healthcheck_bot_is_not_ready(bot, reader, writer):
+@mock.patch("asyncio.StreamReader")
+def test_healthcheck_bot_is_not_ready(reader, writer, bot):
     bot.user = "user"
     bot.is_ready.return_value = False
     clazz = HealthCheck(bot)
@@ -28,10 +26,9 @@ def test_healthcheck_bot_is_not_ready(bot, reader, writer):
     writer.close.assert_called()
 
 
-@mock.patch("discord.ext.commands.Bot")
-@mock.patch("asyncio.StreamReader")
 @mock.patch("asyncio.StreamWriter")
-def test_healthcheck_bot_is_closed(bot, reader, writer):
+@mock.patch("asyncio.StreamReader")
+def test_healthcheck_bot_is_closed(reader, writer, bot):
     bot.user = "user"
     bot.is_ready.return_value = True
     bot.is_closed.return_value = True
@@ -41,10 +38,9 @@ def test_healthcheck_bot_is_closed(bot, reader, writer):
     writer.close.assert_called()
 
 
-@mock.patch("discord.ext.commands.Bot")
-@mock.patch("asyncio.StreamReader")
 @mock.patch("asyncio.StreamWriter")
-def test_healthcheck_bot_is_slow(bot, reader, writer):
+@mock.patch("asyncio.StreamReader")
+def test_healthcheck_bot_is_slow(reader, writer, bot):
     bot.user = "user"
     bot.is_ready.return_value = True
     bot.is_closed.return_value = False
@@ -55,10 +51,9 @@ def test_healthcheck_bot_is_slow(bot, reader, writer):
     writer.close.assert_called()
 
 
-@mock.patch("discord.ext.commands.Bot")
-@mock.patch("asyncio.StreamReader")
 @mock.patch("asyncio.StreamWriter")
-def test_healthcheck_healthy(bot, reader, writer):
+@mock.patch("asyncio.StreamReader")
+def test_healthcheck_healthy(reader, writer, bot):
     bot.user = "user"
     bot.is_ready.return_value = True
     bot.is_closed.return_value = False
@@ -70,8 +65,7 @@ def test_healthcheck_healthy(bot, reader, writer):
 
 
 @pytest.mark.asyncio
-@mock.patch("discord.ext.commands.Bot")
 @mock.patch("asyncio.start_server", return_value=None)
-async def test_start_health_check_tasks(bot, server):
+async def test_start_health_check_tasks(server, bot):
     clazz = HealthCheck(bot)
     await clazz.start_health_check_tasks()
