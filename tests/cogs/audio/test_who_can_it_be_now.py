@@ -65,7 +65,7 @@ async def test_connect_to_voice_no_voice(bot, command_context):
     delattr(command_context.author, "voice")
     clazz = WhoCanItBeNow(bot)
     await clazz.connect_to_voice(command_context)
-    command_context.send.assert_called_once_with("Music can only be played in a discord service, not a private channel.")
+    command_context.send.assert_called_once_with("Music can only be played in a discord server, not a private channel.")
 
 
 @pytest.mark.asyncio
