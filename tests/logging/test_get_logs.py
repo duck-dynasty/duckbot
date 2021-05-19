@@ -6,11 +6,11 @@ from duckbot.logging import GetLogs
 
 
 @pytest.mark.asyncio
-@mock.patch("discord.File", audospec=True)
-@mock.patch("tarfile.open", autospec=True)
-async def test_get_logs_sends_tarball_of_logs(mock_open, mock_dis_file, bot, context):
-    mock_open.add = mock.MagicMock()
-    mock_file_id = mock_dis_file.return_value
+@mock.patch("discord.File")
+@mock.patch("tarfile.open")
+async def test_get_logs_sends_tarball_of_logs(tar, discord_file, bot, context):
+    tar.add = mock.MagicMock()
+    mock_file_id = discord_file.return_value
 
     clazz = GetLogs(bot)
     await clazz._GetLogs__logs(context)
