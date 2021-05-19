@@ -27,7 +27,7 @@ The `dev` extras will also install development dependencies, like `pytest`. The 
 There are a few additional packages required to be able to run tests locally.
 
 ```sh
-sudo apt-get install -y --no-install-recommends ffmpeg libpq-dev
+sudo apt-get install -y --no-install-recommends libpq-dev
 ```
 
 Then, you can run tests.
@@ -59,4 +59,4 @@ Finally, there's two ways to run DuckBot. For a production-like environment, you
 docker-compose up --build
 ```
 
-If your work doesn't need a full setup, you can just run `python -m duckbot` for less wait time. Depending on what packages you have installed, some features may not work, see the [Dockerfile](https://github.com/Chippers255/duckbot/blob/main/Dockerfile) for what packages you'd need. For testing simple new commands though, this works fine enough.
+If your work doesn't need a full setup, you can just run `python -m duckbot` for less wait time. Depending on what apt packages you have installed, some features may not work, see the [Dockerfile](https://github.com/Chippers255/duckbot/blob/main/Dockerfile) for what packages you'd need. For testing simple new commands though, this works fine enough.
