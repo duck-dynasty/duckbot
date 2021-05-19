@@ -65,17 +65,17 @@ def test_guild_getter_guild(bot, guild_data, guild):
 
 
 @mock.patch("duckbot.slash.interaction.User")
-def test_author_getter_dm(user, bot, dm_data):
-    assert Interaction(bot=bot, data=dm_data).author == user.return_value
-    user.assert_called_once_with(data=dm_data["user"], state=bot._connection)
+def test_author_getter_dm(usr, bot, dm_data):
+    assert Interaction(bot=bot, data=dm_data).author == usr.return_value
+    usr.assert_called_once_with(data=dm_data["user"], state=bot._connection)
 
 
 @mock.patch("duckbot.slash.interaction.Member")
-def test_author_getter_guild(member, bot, guild_data, guild):
+def test_author_getter_guild(memb, bot, guild_data, guild):
     bot.get_guild.return_value = guild
-    assert Interaction(bot=bot, data=guild_data).author == member.return_value
+    assert Interaction(bot=bot, data=guild_data).author == memb.return_value
     bot.get_guild.assert_called_once_with(guild_data["guild_id"])
-    member.assert_called_once_with(data=guild_data["member"], state=bot._connection, guild=guild)
+    memb.assert_called_once_with(data=guild_data["member"], state=bot._connection, guild=guild)
 
 
 def test_data_getter(bot, data):
