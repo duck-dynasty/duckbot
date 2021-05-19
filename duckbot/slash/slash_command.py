@@ -3,22 +3,7 @@ import typing
 from discord.ext.commands import Command
 from discord.ext.commands.errors import BadArgument
 
-from duckbot.slash.option import Option, OptionType
-
-
-class SubCommand:
-    def __init__(self, *, name: str, description: str, type: OptionType, options):
-        self.name = name
-        self.description = description
-        self.type = type
-        self.options = options
-        self.__dict__ = {
-            "name": self.name,
-            "description": self.description,
-            "type": self.type,
-            "required": False,
-            "options": [x.__dict__ for x in self.options],
-        }
+from .option import Option, OptionType, SubCommand
 
 
 class SlashCommand:
@@ -30,15 +15,15 @@ class SlashCommand:
         self._options = options
 
     @property
-    def name(self):
+    def name(self) -> str:
         return self._root or self._name or self._command.name
 
     @property
-    def description(self):
+    def description(self) -> str:
         return self._root or self._description or self._command.description or self.name
 
     @property
-    def options(self):
+    def options(self) -> typing.List[Option]:
         if self._root and self._name:
             return [SubCommand(name=self._name, description=self._description, type=OptionType.SUB_COMMAND, options=self._options)]
         else:

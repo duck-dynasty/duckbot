@@ -33,7 +33,7 @@ class SlashCommandPatch(Cog):
                 json = {
                     "name": command.slash_ext.name,
                     "description": command.slash_ext.description,
-                    "options": [x.__dict__ for x in command.slash_ext.options],
+                    "options": [x.to_dict() for x in command.slash_ext.options],
                 }
                 group = [x for x in create_requests if x["name"] == json["name"]]
                 if group and group[0]:  # if a command with the same basename was already registered

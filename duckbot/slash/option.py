@@ -1,3 +1,6 @@
+import typing
+
+
 class OptionType:
     SUB_COMMAND = 1
     SUB_COMMAND_GROUP = 2
@@ -12,8 +15,40 @@ class OptionType:
 
 class Option:
     def __init__(self, *, name: str, description: str = None, type: OptionType = OptionType.STRING, required: bool = False):
-        self.name = name
-        self.description = description if description is not None else name
-        self.type = type
-        self.required = required
-        self.options = []
+        self._name = name
+        self._description = description
+        self._type = type
+        self._required = required
+
+    @property
+    def name(self) -> str:
+        return self._name
+
+    @property
+    def description(self) -> str:
+        return self._description or self.name
+
+    @property
+    def type(self) -> OptionType:
+        return self._type
+
+    @property
+    def required(self) -> bool:
+        return self._required
+
+    @property
+    def options(self) -> typing.List:
+        return []
+
+    def to_dict(self) -> dict:
+        return {"name": self.name, "description": self.description, "type": self.type, "required": self.required, "options": [x.to_dict() for x in self.options]}
+
+
+class SubCommand(Option):
+    def __init__(self, *, name: str, description: str, type: OptionType, options):
+        super().__init__(name=name, description=description, type=type, required=False)
+        self._options = options
+
+    @property
+    def options(self) -> typing.List:
+        return self._options
