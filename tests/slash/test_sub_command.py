@@ -21,7 +21,7 @@ def test_type_getter():
 
 
 def test_required_getter():
-    assert SubCommand(name="n", description="d", type=OptionType.SUB_COMMAND, options=[option]).required == False
+    assert not SubCommand(name="n", description="d", type=OptionType.SUB_COMMAND, options=[option]).required
 
 
 def test_options_getter():

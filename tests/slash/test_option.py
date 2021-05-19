@@ -18,7 +18,7 @@ def test_type_getter():
 
 
 def test_required_getter():
-    assert Option(name="n", description="d", type=OptionType.STRING, required=True).required == True
+    assert Option(name="n", description="d", type=OptionType.STRING, required=True).required
 
 
 def test_options_getter():
