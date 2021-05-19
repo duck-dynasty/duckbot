@@ -27,19 +27,7 @@ class SlashCommandPatch(Cog):
 
     @Cog.listener("on_ready")
     async def register_commands(self):
-        create_requests = []
-        for command in self.bot.walk_commands():
-            if not command.hidden and hasattr(command, "slash_ext") and command.slash_ext:
-                json = {
-                    "name": command.slash_ext.name,
-                    "description": command.slash_ext.description,
-                    "options": [x.to_dict() for x in command.slash_ext.options],
-                }
-                group = [x for x in create_requests if x["name"] == json["name"]]
-                if group and group[0]:  # if a command with the same basename was already registered
-                    group[0]["options"] += json["options"]  # append the options, for sub-command registration
-                else:
-                    create_requests.append(json)
+        create_requests = self.get_registered_slash_commands()
 
         raw_slash = await self.bot.http.request(Route8("GET", f"/applications/{self.bot.user.id}/commands"))
         existing = self.convert_response(raw_slash)
@@ -54,6 +42,22 @@ class SlashCommandPatch(Cog):
             id = next(y["id"] for y in raw_slash if y["name"] == x["name"])
             route = Route8("DELETE", f"/applications/{self.bot.user.id}/commands/{id}")
             await self.bot.http.request(route)
+
+    def get_registered_slash_commands(self):
+        create_requests = []
+        for command in self.bot.walk_commands():
+            if not command.hidden and hasattr(command, "slash_ext") and command.slash_ext:
+                json = {
+                    "name": command.slash_ext.name,
+                    "description": command.slash_ext.description,
+                    "options": [x.to_dict() for x in command.slash_ext.options],
+                }
+                group = [x for x in create_requests if x["name"] == json["name"]]
+                if group and group[0]:  # if a command with the same basename was already registered
+                    group[0]["options"] += json["options"]  # append the options, for sub-command registration
+                else:
+                    create_requests.append(json)
+        return create_requests
 
     def convert_response(self, raw_slash):
         return [

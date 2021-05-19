@@ -1,6 +1,13 @@
 from unittest import mock
 
 import pytest
+from discord.http import HTTPClient
+
+
+@pytest.fixture(autouse=True)
+def add_bot_connection(bot):
+    bot._connection = mock.Mock()
+    bot.http = mock.MagicMock(spec=HTTPClient)
 
 
 @pytest.fixture

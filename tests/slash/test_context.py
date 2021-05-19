@@ -2,16 +2,9 @@ from unittest import mock
 
 import pytest
 from discord import Embed
-from discord.http import HTTPClient
 
 from duckbot.slash import InteractionContext
 from duckbot.slash.route import Route8
-
-
-@pytest.fixture(autouse=True)
-def add_bot_connection(bot):
-    bot._connection = mock.Mock()
-    bot.http = mock.MagicMock(spec=HTTPClient)
 
 
 def test_ctor_no_interaction_options(bot, interaction, command):
