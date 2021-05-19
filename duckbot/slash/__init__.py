@@ -1,7 +1,8 @@
 from .context import InteractionContext
-from .core import SlashCommandPatch, slash_command
+from .core import SlashCommandPatch
 from .interaction import Interaction
 from .option import Option, OptionType
+from .slash_command import slash_command
 
 
 def setup(bot):
