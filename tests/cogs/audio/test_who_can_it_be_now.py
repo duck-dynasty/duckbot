@@ -1,4 +1,5 @@
 import asyncio
+from unittest import mock
 
 import pytest
 from discord.ext.commands import CommandError
@@ -12,7 +13,9 @@ def play(*args, **kwargs):
 
 
 @pytest.mark.asyncio
-async def test_task_loop_once(bot_spy, text_context, voice_client):
+@mock.patch("duckbot.cogs.audio.who_can_it_be_now.PCMVolumeTransformer", autospec=True)
+@mock.patch("duckbot.cogs.audio.who_can_it_be_now.FFmpegPCMAudio", autospec=True)
+async def test_task_loop_once(ffmpeg, vol, bot_spy, text_context, voice_client):
     text_context.voice_client = None
     text_context.author.voice.channel.connect.return_value = async_value(voice_client)
     voice_client.play = play
@@ -30,7 +33,9 @@ async def test_task_loop_once(bot_spy, text_context, voice_client):
 
 
 @pytest.mark.asyncio
-async def test_task_loop_repeats(bot_spy, text_context, voice_client):
+@mock.patch("duckbot.cogs.audio.who_can_it_be_now.PCMVolumeTransformer", autospec=True)
+@mock.patch("duckbot.cogs.audio.who_can_it_be_now.FFmpegPCMAudio", autospec=True)
+async def test_task_loop_repeats(ffmpeg, vol, bot_spy, text_context, voice_client):
     text_context.voice_client = None
     text_context.author.voice.channel.connect.return_value = async_value(voice_client)
 
@@ -99,7 +104,9 @@ async def test_start_already_started(bot, context):
 
 
 @pytest.mark.asyncio
-async def test_stop_disconnects(bot, context, voice_client):
+@mock.patch("duckbot.cogs.audio.who_can_it_be_now.PCMVolumeTransformer", autospec=True)
+@mock.patch("duckbot.cogs.audio.who_can_it_be_now.FFmpegPCMAudio", autospec=True)
+async def test_stop_disconnects(ffmpeg, vol, bot, context, voice_client):
     clazz = WhoCanItBeNow(bot)
     clazz.streaming = True
     clazz.audio_task = asyncio.create_task(clazz.stream_audio())
@@ -127,7 +134,9 @@ async def test_stop_null_context_not_streaming(bot):
 
 
 @pytest.mark.asyncio
-async def test_cog_unload_stops_streaming(bot, voice_client):
+@mock.patch("duckbot.cogs.audio.who_can_it_be_now.PCMVolumeTransformer", autospec=True)
+@mock.patch("duckbot.cogs.audio.who_can_it_be_now.FFmpegPCMAudio", autospec=True)
+async def test_cog_unload_stops_streaming(ffmpeg, vol, bot, voice_client):
     bot.loop = asyncio.get_event_loop()
     clazz = WhoCanItBeNow(bot)
     clazz.voice_client = voice_client

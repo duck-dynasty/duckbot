@@ -11,6 +11,7 @@ RUN pip install .
 
 FROM python:3.8-slim as prod
 RUN apt-get update && apt-get -y install \
+    git \
     ffmpeg \
     libpq-dev \
     fortune-mod fortunes fortunes-off cowsay cowsay-off \
