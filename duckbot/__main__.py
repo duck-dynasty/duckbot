@@ -17,8 +17,8 @@ import duckbot.cogs.robot
 import duckbot.cogs.tito
 import duckbot.cogs.weather
 import duckbot.health
-import duckbot.slash
 import duckbot.logging
+import duckbot.slash
 import duckbot.util.connection_test
 from duckbot import DuckBot
 
