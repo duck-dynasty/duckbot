@@ -3,7 +3,7 @@ import logging.handlers
 import os
 
 
-def define_logging():
+def define_logs():
     log_directory = "logs"
     os.makedirs(log_directory, exist_ok=True)
 

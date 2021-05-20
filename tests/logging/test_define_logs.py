@@ -4,7 +4,7 @@ from unittest import mock
 
 import pytest
 
-from duckbot.logging.define_logs import define_logging
+from duckbot.logging.define_logs import define_logs
 
 
 @pytest.mark.asyncio
@@ -16,7 +16,7 @@ async def test_define_logs_create_logger(make_dirs, get_logger, logger, handler)
     get_logger.return_value = logger
     mock_handler_id = handler.return_value
 
-    define_logging()
+    define_logs()
 
     make_dirs.assert_called_once_with("logs", exist_ok=True)
     get_logger.assert_called_once_with("discord")

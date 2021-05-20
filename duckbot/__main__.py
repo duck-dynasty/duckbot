@@ -18,7 +18,6 @@ import duckbot.cogs.tito
 import duckbot.cogs.weather
 import duckbot.health
 import duckbot.logging
-import duckbot.logging.define_logs
 import duckbot.util.connection_test
 from duckbot import DuckBot
 
@@ -49,6 +48,6 @@ def run_duckbot(bot: commands.Bot):
 
 
 if __name__ == "__main__":
-    duckbot.logging.define_logs.define_logging()
+    duckbot.logging.define_logs()
     bot = DuckBot()
     run_duckbot(bot)
