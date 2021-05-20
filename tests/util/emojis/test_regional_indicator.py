@@ -1,4 +1,5 @@
 import pytest
+
 from duckbot.util.emojis import regional_indicator
 
 

@@ -1,4 +1,5 @@
 import pytest
+
 from duckbot.util.connection_test import ConnectionTest
 
 

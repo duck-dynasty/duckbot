@@ -1,6 +1,8 @@
 import pytest
+
+from duckbot.cogs.corrections import Bitcoin, Kubernetes, Typos
+from duckbot.cogs.corrections import setup as extension_setup
 from tests.discord_test_ext import assert_cog_added_of_type
-from duckbot.cogs.corrections import setup as extension_setup, Typos, Bitcoin, Kubernetes
 
 
 @pytest.mark.asyncio

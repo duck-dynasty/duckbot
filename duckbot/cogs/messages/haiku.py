@@ -1,7 +1,6 @@
+from discord import Colour, Embed
 from discord.ext import commands
-import nltk
 from nltk.corpus import cmudict
-from discord import Embed, Colour
 
 
 class Haiku(commands.Cog):
@@ -11,7 +10,6 @@ class Haiku(commands.Cog):
 
     @commands.Cog.listener("on_ready")
     async def build_syllable_dictionary(self):
-        nltk.download("cmudict")
         self.syllables = {word: len([t for t in pronounce[0] if t[-1].isdigit()]) for word, pronounce in cmudict.dict().items()}
 
     @commands.Cog.listener("on_message")

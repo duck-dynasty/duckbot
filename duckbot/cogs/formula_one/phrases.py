@@ -1,5 +1,4 @@
-from duckbot.util.emojis import regional_indicator, red_a, red_b
-
+from duckbot.util.emojis import red_a, red_b, regional_indicator
 
 phrases = [
     [  # car go fast
@@ -26,4 +25,5 @@ phrases = [
     ],
     [regional_indicator("h"), regional_indicator("y"), regional_indicator("p"), regional_indicator("e")],
     [regional_indicator("p"), regional_indicator("o"), regional_indicator("g")],
+    [regional_indicator("d"), regional_indicator("a"), regional_indicator("n"), regional_indicator("k")],
 ]

@@ -1,5 +1,5 @@
-from unittest import mock
 import datetime
+from unittest import mock
 
 DATETIME = "datetime.datetime"
 
