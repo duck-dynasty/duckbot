@@ -43,6 +43,12 @@ class Option:
     def to_dict(self) -> dict:
         return {"name": self.name, "description": self.description, "type": self.type, "required": self.required, "options": [x.to_dict() for x in self.options]}
 
+    def __str__(self) -> str:
+        return str(self.to_dict())
+
+    def __repr__(self) -> str:
+        return str(self.to_dict())
+
 
 class SubCommand(Option):
     def __init__(self, *, name: str, description: str, type: OptionType, options):

@@ -1,7 +1,6 @@
 import typing
 
-from discord.ext.commands import Command
-from discord.ext.commands.errors import BadArgument
+from discord.ext.commands import BadArgument, Command
 
 from .option import Option, OptionType, SubCommand
 
