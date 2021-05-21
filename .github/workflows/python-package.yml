@@ -71,7 +71,7 @@ jobs:
         username: chippers255
         password: ${{ secrets.DOCKER_PASS }}
     - name: Build and Push Docker Image
-      run: docker buildx bake --set '*.platform=linux/amd64,linux/arm64,linux/386,linux/arm/v7,linux/arm/v6' --push
+      run: docker buildx bake --set '*.platform=linux/arm/v7' --push
 
     - name: Trigger Deployment
       run: |
