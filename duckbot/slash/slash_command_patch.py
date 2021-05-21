@@ -1,8 +1,7 @@
 from discord.ext.commands import Bot, Cog
 
-from duckbot.slash.interaction import Interaction
-
 from .context import InteractionContext
+from .interaction import Interaction
 from .route import Route8
 
 

@@ -7,6 +7,7 @@ from discord.http import HTTPClient
 @pytest.fixture(autouse=True)
 def add_bot_connection(bot):
     bot._connection = mock.Mock()
+    bot._connection.parsers = {}  # mock doesn't allow assignment, so make it a real object
     bot.http = mock.MagicMock(spec=HTTPClient)
 
 

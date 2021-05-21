@@ -41,3 +41,12 @@ class Interaction:
     @property
     def data(self):
         return self.raw_data["data"]
+
+    def __eq__(self, other):
+        return self.raw_data == other.raw_data if isinstance(other, Interaction) else False
+
+    def __str__(self):
+        return str(self.raw_data)
+
+    def __repr__(self):
+        return str(self.raw_data)

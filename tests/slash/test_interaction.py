@@ -80,3 +80,31 @@ def test_author_getter_guild(memb, bot, guild_data, guild):
 
 def test_data_getter(bot, data):
     assert Interaction(bot=bot, data=data).data == data["data"]
+
+
+def test_equals_equal(bot, data):
+    a = Interaction(bot=bot, data=data)
+    b = Interaction(bot=bot, data=data)
+    assert a == b
+
+
+def test_equals_fields_different(bot, dm_data, guild_data):
+    a = Interaction(bot=bot, data=dm_data)
+    b = Interaction(bot=bot, data=guild_data)
+    assert a != b
+
+
+def test_equals_different_class(bot, data):
+    a = Interaction(bot=bot, data=data)
+    b = "str"
+    assert a != b
+
+
+def test_str_is_raw_data_str(bot, data):
+    i = Interaction(bot=bot, data=data)
+    assert str(i) == str(i.raw_data)
+
+
+def test_repr_is_raw_data_str(bot, data):
+    i = Interaction(bot=bot, data=data)
+    assert repr(i) == str(i.raw_data)
