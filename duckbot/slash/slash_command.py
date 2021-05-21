@@ -40,10 +40,7 @@ def slash_command(*, root: str = None, name: str = None, description: str = None
 
         # patch the command instance with extra info so we can register it with discord
         command.slash_ext = SlashCommand(command, root=root, name=name, description=description, options=options)
-
-        if not hasattr(command, "_slash_discordpy_adapt_name"):
-            command._slash_discordpy_adapt_name = {}
-        command._slash_discordpy_adapt_name[name] = discordpy_adapt_name
+        command._slash_discordpy_adapt_name= {name: discordpy_adapt_name}
         if command.parent:
             if not hasattr(command.parent, "_slash_discordpy_adapt_name"):
                 command.parent._slash_discordpy_adapt_name = {}
