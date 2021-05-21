@@ -43,6 +43,9 @@ class Option:
     def to_dict(self) -> dict:
         return {"name": self.name, "description": self.description, "type": self.type, "required": self.required, "options": [x.to_dict() for x in self.options]}
 
+    def __eq__(self, other) -> bool:
+        return self.to_dict() == other.to_dict() if isinstance(other, Option) else False
+
     def __str__(self) -> str:
         return str(self.to_dict())
 

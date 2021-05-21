@@ -33,3 +33,31 @@ def test_to_dict():
         "required": True,
         "options": [],
     }
+
+
+def test_equals_equal():
+    a = Option(name="n", description="d", type=OptionType.STRING, required=True)
+    b = Option(name="n", description="d", type=OptionType.STRING, required=True)
+    assert a == b
+
+
+def test_equals_fields_different():
+    a = Option(name="n", description="d", type=OptionType.STRING, required=True)
+    b = Option(name="a", description="b", type=OptionType.STRING, required=True)
+    assert a != b
+
+
+def test_equals_different_class():
+    a = Option(name="n", description="d", type=OptionType.STRING, required=True)
+    b = "str"
+    assert a != b
+
+
+def test_str_is_dict_str():
+    opt = Option(name="n", description="d", type=OptionType.STRING, required=True)
+    assert str(opt) == str(opt.to_dict())
+
+
+def test_repr_is_dict_str():
+    opt = Option(name="n", description="d", type=OptionType.STRING, required=True)
+    assert repr(opt) == str(opt.to_dict())

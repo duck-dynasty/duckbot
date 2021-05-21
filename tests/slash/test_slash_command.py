@@ -1,11 +1,55 @@
 import pytest
 from discord.ext.commands import BadArgument, command
 
-from duckbot.slash import Option, slash_command
+from duckbot.slash import Option, OptionType, slash_command
+from duckbot.slash.option import SubCommand
 
 
 async def func(*args):
     pass
+
+
+def test_slash_command_patches_adapt_name():
+    cmd = command()(func)
+    slash_command(root="root", name="name")(cmd)
+    assert cmd._slash_discordpy_adapt_name == {"name": True}
+
+
+def test_slash_command_patches_adapt_name_as_given_value():
+    cmd = command()(func)
+    slash_command(root="root", name="name", discordpy_adapt_name=False)(cmd)
+    assert cmd._slash_discordpy_adapt_name == {"name": False}
+
+
+def test_slash_command_patches_adapt_name_to_parent():
+    parent = command()(func)
+    cmd = command(parent=parent)(func)
+    slash_command(root="root", name="name")(cmd)
+    assert parent._slash_discordpy_adapt_name == {"name": True}
+
+
+def test_slash_command_patches_adapt_name_to_parent_as_given_value():
+    parent = command()(func)
+    cmd = command(parent=parent)(func)
+    slash_command(root="root", name="name", discordpy_adapt_name=False)(cmd)
+    assert parent._slash_discordpy_adapt_name == {"name": False}
+
+
+def test_slash_command_patches_adapt_name_to_parent_multiple():
+    parent = command()(func)
+    cmd1 = command(parent=parent)(func)
+    cmd2 = command(parent=parent)(func)
+    slash_command(root="root", name="name1")(cmd1)
+    slash_command(root="root", name="name2")(cmd2)
+    assert parent._slash_discordpy_adapt_name == {"name1": True, "name2": True}
+
+
+def test_slash_command_patches_copy():
+    cmd = command()(func)
+    slash_command(root="root", name="name")(cmd)
+    copy = cmd.copy()
+    assert copy._slash_discordpy_adapt_name == cmd._slash_discordpy_adapt_name
+    assert copy.slash_ext == cmd.slash_ext
 
 
 def test_slash_command_creates_slash_ext():
@@ -57,7 +101,7 @@ def test_slash_command_slash_options_is_provided():
 def test_slash_command_slash_options_subcommand():
     options = [Option(name="opt")]
     slash = slash_command(root="root", name="name", options=options)(command()(func))
-    assert slash.slash_ext.options == options
+    assert slash.slash_ext.options == [SubCommand(name="name", description=None, type=OptionType.SUB_COMMAND, options=options)]
 
 
 def test_slash_command_not_decorating_command():

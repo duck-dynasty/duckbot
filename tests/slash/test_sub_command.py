@@ -36,3 +36,31 @@ def test_to_dict():
         "required": False,
         "options": [option.to_dict()],
     }
+
+
+def test_equals_equal():
+    a = SubCommand(name="n", description="d", type=OptionType.SUB_COMMAND, options=[option])
+    b = SubCommand(name="n", description="d", type=OptionType.SUB_COMMAND, options=[option])
+    assert a == b
+
+
+def test_equals_fields_different():
+    a = SubCommand(name="n", description="d", type=OptionType.SUB_COMMAND, options=[option])
+    b = SubCommand(name="a", description="b", type=OptionType.SUB_COMMAND, options=[option])
+    assert a != b
+
+
+def test_equals_different_class():
+    a = SubCommand(name="n", description="d", type=OptionType.SUB_COMMAND, options=[option])
+    b = "str"
+    assert a != b
+
+
+def test_str_is_dict_str():
+    sub = SubCommand(name="n", description="d", type=OptionType.SUB_COMMAND, options=[option])
+    assert str(sub) == str(sub.to_dict())
+
+
+def test_repr_is_dict_str():
+    sub = SubCommand(name="n", description="d", type=OptionType.SUB_COMMAND, options=[option])
+    assert repr(sub) == str(sub.to_dict())
