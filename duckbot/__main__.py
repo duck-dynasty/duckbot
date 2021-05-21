@@ -1,5 +1,3 @@
-import logging
-import logging.handlers
 import os
 
 from discord.ext import commands
@@ -19,6 +17,7 @@ import duckbot.cogs.robot
 import duckbot.cogs.tito
 import duckbot.cogs.weather
 import duckbot.health
+import duckbot.logging
 import duckbot.util.connection_test
 from duckbot import DuckBot
 
@@ -28,6 +27,7 @@ def run_duckbot(bot: commands.Bot):
         bot.load_extension(duckbot.util.connection_test.__name__)
 
     bot.load_extension(duckbot.health.__name__)
+    bot.load_extension(duckbot.logging.__name__)
 
     bot.load_extension(duckbot.cogs.duck.__name__)
     bot.load_extension(duckbot.cogs.dogs.__name__)
@@ -47,19 +47,7 @@ def run_duckbot(bot: commands.Bot):
     bot.run(os.getenv("DISCORD_TOKEN"))
 
 
-def logger_setup():
-    log_directory = "logs"
-    os.makedirs(log_directory, exist_ok=True)
-
-    logger = logging.getLogger("discord")
-    logger.setLevel(logging.INFO)
-
-    handler = logging.handlers.RotatingFileHandler(filename=os.path.join(log_directory, "duck.log"), mode="a", maxBytes=256000, backupCount=10)
-    handler.setFormatter(logging.Formatter("%(asctime)s:%(levelname)s:%(name)s: %(message)s"))
-    logger.addHandler(handler)
-
-
 if __name__ == "__main__":
-    logger_setup()
+    duckbot.logging.define_logs()
     bot = DuckBot()
     run_duckbot(bot)
