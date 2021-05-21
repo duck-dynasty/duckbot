@@ -1,3 +1,4 @@
+from .define_logs import define_logs
 from .get_logs import GetLogs
 
 
