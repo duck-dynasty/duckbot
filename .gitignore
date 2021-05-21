@@ -130,3 +130,5 @@ dmypy.json
 
 # log files
 logs
+logs.tar.gz
+
