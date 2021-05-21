@@ -87,6 +87,6 @@ class Recipe(commands.Cog):
         ]
     )
     @commands.command(name="recipe")
-    async def recipe(self, context, *, search_term: str = None):
+    async def recipe(self, context, *, search_term: str = ""):
         async with context.typing():
             await self.__recipe(context, search_term)
