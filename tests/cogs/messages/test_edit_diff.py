@@ -14,7 +14,7 @@ async def test_show_edit_diff_typical_case(before, after, bot):
     after.clean_content = "abd"
     clazz = EditDiff(bot)
     await clazz.show_edit_diff(before, after)
-    after.channel.send.assert_called_once_with(f":eyes: {after.author.mention}.\nab[-c-]{{+d+}}\n", delete_after=300)
+    after.channel.send.assert_called_once_with(f":eyes: {after.author.mention}.\nab[-c-]{{+d+}}", delete_after=300)
 
 
 @pytest.mark.asyncio

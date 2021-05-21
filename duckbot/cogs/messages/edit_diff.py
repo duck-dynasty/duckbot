@@ -1,4 +1,4 @@
-import subprocess
+from difflib import ndiff
 
 from discord.ext import commands
 
@@ -12,11 +12,16 @@ class EditDiff(commands.Cog):
         if before.author == self.bot.user or after.author == self.bot.user or before.content == after.content:
             return
 
-        before_file = f'echo "$BEFORE" > {before.id}.before'
-        after_file = f'echo "$AFTER" > {after.id}.after'
-        diff_cmd = f"git diff --no-index -U10000 --word-diff=plain --word-diff-regex=. {before.id}.before {after.id}.after | tail -n +6"
-        cleanup = f"rm -rf {before.id}.before {after.id}.after"
-        env = {"BEFORE": before.clean_content, "AFTER": after.clean_content}
-
-        process = subprocess.run(f"{before_file} && {after_file} && {diff_cmd} ; {cleanup}", shell=True, capture_output=True, env=env)
-        await after.channel.send(f":eyes: {after.author.mention}.\n{process.stdout.decode()}", delete_after=300)
+        msg = ""
+        prev = " "  # start out as no change
+        for d in ndiff(before.clean_content, after.clean_content):
+            change = d[0]
+            if change != prev and prev != " ":  # leaving a diff chunk
+                msg += prev + ("}" if prev == "+" else "]")
+            if change != prev and change != " ":  # entering a diff chunk
+                msg += ("{" if change == "+" else "[") + change
+            msg += d[-1]  # append the letter
+            prev = change
+        if prev != " ":  # close final diff chunk
+            msg += prev + ("}" if prev == "+" else "]")
+        await after.channel.send(f":eyes: {after.author.mention}.\n{msg}", delete_after=300)
