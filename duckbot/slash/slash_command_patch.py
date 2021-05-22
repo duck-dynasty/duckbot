@@ -52,7 +52,7 @@ class SlashCommandPatch(Cog):
     def get_registered_slash_commands(self):
         create_requests = []
         for command in self.bot.walk_commands():
-            if not command.hidden and hasattr(command, "slash_ext") and command.slash_ext:
+            if hasattr(command, "slash_ext") and command.slash_ext:
                 json = {
                     "name": command.slash_ext.name,
                     "description": command.slash_ext.description,
