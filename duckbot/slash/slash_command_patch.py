@@ -24,6 +24,7 @@ class SlashCommandPatch(Cog):
         for command in self.bot.commands:
             # slash_ext is patched in @slash_command
             if hasattr(command, "slash_ext") and command.slash_ext and command.name == interaction.data["name"]:
+                log.info("delegating /%s to command %s", command.name, command)
                 context = InteractionContext(bot=self.bot, interaction=interaction, command=command)
                 await command.invoke(context)
                 return
