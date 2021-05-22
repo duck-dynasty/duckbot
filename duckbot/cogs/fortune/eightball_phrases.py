@@ -34,4 +34,10 @@ phrases = [
     "Forget about it.",
 ]
 
-joke_phrases = ["...Hang on, it got stuck.", "YEET... shook too hard.", "Crap, I dropped it.", "Uh...................", "That's what you want to ask about? But... why?"]
+joke_phrases = [
+    "...Hang on, it got stuck.",
+    "YEET... shook too hard.",
+    "Crap, I dropped it.",
+    "Uh...................",
+    "That's what you want to ask about? But... why?",
+]
