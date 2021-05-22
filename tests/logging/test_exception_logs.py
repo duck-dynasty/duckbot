@@ -1,7 +1,6 @@
 from unittest import mock
 
 import pytest
-from discord.ext import commands
 
 from duckbot.logging import ExceptionLogs
 
@@ -13,11 +12,8 @@ from duckbot.logging import ExceptionLogs
 @mock.patch("logging.getLogger")
 async def test_exception_logs_log_exception(get_logger, logger, format_exc, print_exc, bot, context):
     exception = mock.Mock(Exception)
-    cog = mock.Mock(commands.Cog)
     get_logger.return_value = logger
     context.command = ""
-    context.cog = cog
-    context.cog._get_overridden_method.return_value = None
 
     clazz = ExceptionLogs(bot)
     await clazz.log_exceptions(context, exception)

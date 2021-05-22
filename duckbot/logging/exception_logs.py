@@ -14,5 +14,5 @@ class ExceptionLogs(commands.Cog):
         logger = logging.getLogger("discord")
         exception_string = "".join(traceback.format_exception(etype=type(exception), value=exception, tb=exception.__traceback__))
         logger.error(exception_string)
-        print("Brother, ignoring exception in command {}:".format(context.command), file=sys.stderr)
+        print(f"Brother, ignoring exception in command {context.command}:", file=sys.stderr)
         traceback.print_exception(type(exception), exception, exception.__traceback__, file=sys.stderr)
