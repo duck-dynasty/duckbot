@@ -20,7 +20,7 @@ async def test_exception_logs_log_exception(get_logger, logger, format_exc, prin
     context.cog._get_overridden_method.return_value = None
 
     clazz = ExceptionLogs(bot)
-    await clazz.on_command_error(context, exception)
+    await clazz.log_exceptions(context, exception)
 
     get_logger.assert_called_once_with("discord")
     format_exc.assert_called_once()
