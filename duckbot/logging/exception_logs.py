@@ -8,8 +8,8 @@ from discord.ext import commands
 class ExceptionLogs(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.bot.add_listener(self.log_exceptions, name="on_command_error")
 
+    @commands.Cog.listener("on_command_error")
     async def log_exceptions(self, context, exception):
         logger = logging.getLogger("discord")
         exception_string = "".join(traceback.format_exception(etype=type(exception), value=exception, tb=exception.__traceback__))
