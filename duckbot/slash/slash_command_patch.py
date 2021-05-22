@@ -1,8 +1,12 @@
+import logging
+
 from discord.ext.commands import Bot, Cog
 
 from .context import InteractionContext
 from .interaction import Interaction
 from .route import Route8
+
+log = logging.getLogger(__name__)
 
 
 class SlashCommandPatch(Cog):
@@ -35,9 +39,11 @@ class SlashCommandPatch(Cog):
         needs_delete = [x for x in existing if x["name"] not in expected_names]
 
         for x in needs_update:
+            log.info("updating slash command %s ; data=%s", x["name"], x)
             route = Route8("POST", f"/applications/{self.bot.user.id}/commands")
             await self.bot.http.request(route, json=x)
         for x in needs_delete:
+            log.info("deleting slash command %s ; data=%s", x["name"], x)
             id = next(y["id"] for y in raw_slash if y["name"] == x["name"])
             route = Route8("DELETE", f"/applications/{self.bot.user.id}/commands/{id}")
             await self.bot.http.request(route)
