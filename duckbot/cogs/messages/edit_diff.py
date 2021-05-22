@@ -16,12 +16,21 @@ class EditDiff(commands.Cog):
         prev = " "  # start out as no change
         for d in ndiff(before.clean_content, after.clean_content):
             change = d[0]
-            if change != prev and prev != " ":  # leaving a diff chunk
-                msg += prev + ("}" if prev == "+" else "]")
-            if change != prev and change != " ":  # entering a diff chunk
-                msg += ("{" if change == "+" else "[") + change
+            msg += self.try_enter_diff_chunk(change, prev)
+            msg += self.try_leave_diff_chunk(change, prev)
             msg += d[-1]  # append the letter
             prev = change
-        if prev != " ":  # close final diff chunk
-            msg += prev + ("}" if prev == "+" else "]")
+        msg += self.try_enter_diff_chunk(" ", prev)  # close the final diff chunk if necessary
         await after.channel.send(f":eyes: {after.author.mention}.\n{msg}", delete_after=300)
+
+    def try_enter_diff_chunk(self, change, prev):
+        if change != prev and prev != " ":
+            return prev + ("}" if prev == "+" else "]")
+        else:
+            return ""
+
+    def try_leave_diff_chunk(self, change, prev):
+        if change != prev and change != " ":
+            return ("{" if change == "+" else "[") + change
+        else:
+            return ""
