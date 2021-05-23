@@ -71,7 +71,7 @@ jobs:
         username: twentylemon
         password: ${{ secrets.DOCKER_PASS }}
     - name: Build and Push Docker Image
-      run: docker buildx bake --set '*.platform=linux/amd64' --push --set '*.cache-from=type=local,src=/tmp/.buildx-cache' --set '*.cache-to=type=local,src=/tmp/.buildx-cache'
+      run: docker buildx bake --set '*.platform=linux/amd64' --push --set '*.cache-from=type=local,src=/tmp/.buildx-cache' --set '*.cache-to=type=local,dest=/tmp/.buildx-cache'
 
 #     - name: Trigger Deployment
 #       run: |
