@@ -11,12 +11,15 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.8]
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python 3.8
+    - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.8'
+        python-version: ${{ matrix.python-version }}
 
     - name: Setup Pip Cache
       uses: actions/cache@v2
@@ -31,6 +34,12 @@ jobs:
         pip install --editable .[dev]
     - name: Run Tests
       run: pytest
+    - name: Upload Test Results
+      uses: actions/upload-artifact@v2
+      with:
+        name: code-coverage-report-python${{ matrix.python-version }}
+        path: htmlcov
+        retention-days: 7
 
   sanity:
     runs-on: ubuntu-latest
