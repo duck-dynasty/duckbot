@@ -15,7 +15,9 @@ def download_nltk_data():
     original_download = nltk.download
     nltk.download = lambda x: original_download(x, download_dir=download_dir)
     nltk.download("cmudict")
+    sys.argv.append("lite")
     textblob.download_corpora.main()
+    sys.argv.pop()
 
 
 class PostDevelop(develop):
