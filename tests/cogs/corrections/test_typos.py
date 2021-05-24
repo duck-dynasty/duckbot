@@ -12,7 +12,7 @@ async def test_correct_typos_bot_user(bot, message):
     bot.user = message.author
     clazz = Typos(bot)
     await clazz.correct_typos(message)
-    message.channel.send.assert_not_called()
+    message.channel.history.assert_not_called()
 
 
 @pytest.mark.asyncio
@@ -20,7 +20,7 @@ async def test_correct_typos_message_is_not_fuck(bot, message):
     message.content = "poopy"
     clazz = Typos(bot)
     await clazz.correct_typos(message)
-    message.channel.send.assert_not_called()
+    message.channel.history.assert_not_called()
 
 
 @pytest.mark.asyncio
@@ -29,7 +29,7 @@ async def test_correct_typos_no_previous_message(bot, message):
     message.channel.history.return_value = MockAsyncIterator(None)
     clazz = Typos(bot)
     await clazz.correct_typos(message)
-    message.channel.send.assert_not_called()
+    message.reply.assert_not_called()
 
 
 @pytest.mark.asyncio
@@ -44,7 +44,7 @@ async def test_correct_typos_no_typos_in_previous(textblob, prev_message, bot, m
     textblob.return_value.correct.return_value = TextBlob(prev_message.content)
     clazz = Typos(bot)
     await clazz.correct_typos(message)
-    message.channel.send.assert_called_once_with(f"There's no need for harsh words, {message.author.mention}.")
+    message.reply.assert_called_once_with(f"There's no need for harsh words, {message.author.display_name}.")
 
 
 @pytest.mark.asyncio
@@ -59,4 +59,4 @@ async def test_correct_typos_sends_correction(textblob, prev_message, bot, messa
     textblob.return_value.correct.return_value = TextBlob("hello")
     clazz = Typos(bot)
     await clazz.correct_typos(message)
-    message.channel.send.assert_called_once_with(f"> hello\nThink I fixed it, {message.author.mention}!")
+    prev_message.reply.assert_called_once_with(f"> hello\nThink I fixed it, {message.author.display_name}!")

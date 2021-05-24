@@ -15,9 +15,9 @@ class Typos(commands.Cog):
                 c = self.correct(prev.content)
                 if c != prev.content:
                     msg = f"> {c}\nThink I fixed it, {message.author.mention}!"
-                    await message.channel.send(msg)
+                    await prev.reply(f"> {c}\nThink I fixed it, {message.author.display_name}!")
                 else:
-                    await message.channel.send(f"There's no need for harsh words, {message.author.mention}.")
+                    await message.reply(f"There's no need for harsh words, {message.author.display_name}.")
 
     def correct(self, sentence):
         return str(TextBlob(sentence).correct())
