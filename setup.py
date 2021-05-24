@@ -7,11 +7,15 @@ from setuptools.command.install import install
 
 def download_nltk_data():
     import nltk
+    import textblob.download_corpora
 
     venv = os.getenv("VIRTUAL_ENV")
     base = venv if venv else os.getenv("HOME")
     download_dir = os.path.join(base, "nltk_data")
-    nltk.download("cmudict", download_dir=download_dir)
+    original_download = nltk.download
+    nltk.download = lambda x: original_download(x, download_dir=download_dir)
+    nltk.download("cmudict")
+    textblob.download_corpora.main()
 
 
 class PostDevelop(develop):
@@ -34,7 +38,10 @@ if __name__ == "__main__":
         python_requires=">=3.8",
         packages=find_packages(),
         cmdclass={"develop": PostDevelop, "install": PostInstall},
-        setup_requires=["nltk>=3.6,<4"],
+        setup_requires=[
+            "nltk>=3.6,<4",
+            "textblob<1",
+        ],
         install_requires=[
             "discord.py[voice]>=1.7,<2",
             "beautifulsoup4",
@@ -45,6 +52,7 @@ if __name__ == "__main__":
             "sqlalchemy>=1.4,<2",
             "d20>=1.1.0,<2",
             "nltk>=3.6,<4",
+            "textblob<1",
         ],
         extras_require={
             "dev": [
