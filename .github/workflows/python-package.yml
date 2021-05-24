@@ -29,8 +29,6 @@ jobs:
       run: |
         pip install --upgrade pip setuptools wheel
         pip install --editable .[dev]
-      env:
-        VIRTUAL_ENV: ${{ env.pythonLocation }}
     - name: Run Tests
       run: pytest
 
