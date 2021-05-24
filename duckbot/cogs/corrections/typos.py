@@ -14,7 +14,6 @@ class Typos(commands.Cog):
             if prev is not None:
                 c = self.correct(prev.content)
                 if c != prev.content:
-                    msg = f"> {c}\nThink I fixed it, {message.author.mention}!"
                     await prev.reply(f"> {c}\nThink I fixed it, {message.author.display_name}!")
                 else:
                     await message.reply(f"There's no need for harsh words, {message.author.display_name}.")
