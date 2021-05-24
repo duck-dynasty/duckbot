@@ -33,14 +33,25 @@ jobs:
         pip install --upgrade pip setuptools wheel
         pip install --editable .[dev]
     - name: Run Tests
-      run: pytest
+      run: pytest --junitxml=coverage.xml
     - name: Upload Test Results
       if: ${{ always() }}
       uses: actions/upload-artifact@v2
       with:
         name: code-coverage-report-python${{ matrix.python-version }}
-        path: htmlcov
+        path: pytest-report.xml
         retention-days: 7
+    - name: SonarCloud Analysis
+#       if: github.event_name == 'push' && github.repository == 'Chippers255/duckbot'
+      uses: sonarsource/sonarcloud-github-action@master
+      with:
+        args: |
+          -Dsonar.organization=twentylemon
+          -Dsonar.projectKey=duckbot
+          -Dsonar.python.coverage.reportPaths=coverage.xml
+          -Dsonar.sources=duckbot/
+          -Dsonar.tests=tests/
+          -Dsonar.version=true
 
   sanity:
     runs-on: ubuntu-latest
