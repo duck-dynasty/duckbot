@@ -30,28 +30,9 @@ jobs:
         pip install --upgrade pip setuptools wheel
         pip install --editable .[dev]
     - name: Run Tests
-      run: pytest --junitxml=coverage.xml
-    - name: Upload Coverage File
-      uses: actions/upload-artifact@v2
-      with:
-        name: coverage.xml
-        path: coverage.xml
-        retention-days: 7
-
-  coverage:
-    needs:
-    - release
-    runs-on: ubuntu-latest
-#     if: github.event_name == 'push' && github.repository == 'Chippers255/duckbot'
-    steps:
-    - name: Download Coverage
-      uses: actions/download-artifact@v2
-      with:
-        name: coverage.xml
-    - name: Upload Coverage to Coveralls
-      uses: coverallsapp/github-action@master
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+      run: pytest
+    - name: Report Code Coverage
+      uses: codecov/codecov-action@v1
 
   sanity:
     runs-on: ubuntu-latest
