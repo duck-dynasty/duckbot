@@ -1,7 +1,7 @@
 import pytest
 
-from duckbot.logging import ExceptionLogs, GetLogs
-from duckbot.logging import setup as extension_setup
+from duckbot.logs import ExceptionLogs, GetLogs
+from duckbot.logs import setup as extension_setup
 from tests.discord_test_ext import assert_cog_added_of_type
 
 

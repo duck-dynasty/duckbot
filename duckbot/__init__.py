@@ -1,1 +1,1 @@
-from .duckbot import DuckBot
+from .bot import DuckBot
