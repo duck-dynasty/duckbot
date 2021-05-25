@@ -22,7 +22,7 @@ jobs:
       id: venv
       uses: actions/cache@v2
       with:
-        path: ./venv
+        path: venv
         key: ${{ env.pythonLocation }}-venv-${{ hashFiles('setup.py') }}
 
     - name: Install Packages
