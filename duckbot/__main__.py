@@ -27,7 +27,7 @@ def run_duckbot(bot: commands.Bot):
         bot.load_extension(duckbot.util.connection_test.__name__)
 
     bot.load_extension(duckbot.health.__name__)
-    bot.load_extension(duckbot.logging.__name__)
+    bot.load_extension(duckbot.logs.__name__)
 
     bot.load_extension(duckbot.cogs.duck.__name__)
     bot.load_extension(duckbot.cogs.dogs.__name__)
