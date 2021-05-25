@@ -31,6 +31,8 @@ jobs:
         pip install --editable .[dev]
     - name: Run Tests
       run: pytest
+    - name: Report Code Coverage
+      uses: codecov/codecov-action@v1
 
   sanity:
     runs-on: ubuntu-latest
