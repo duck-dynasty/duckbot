@@ -48,6 +48,6 @@ def run_duckbot(bot: commands.Bot):
 
 
 if __name__ == "__main__":
-    duckbot.logging.define_logs()
+    duckbot.logs.define_logs()
     bot = DuckBot()
     run_duckbot(bot)
