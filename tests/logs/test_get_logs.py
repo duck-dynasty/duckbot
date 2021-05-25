@@ -2,7 +2,7 @@ from unittest import mock
 
 import pytest
 
-from duckbot.logging import GetLogs
+from duckbot.logs import GetLogs
 
 
 @pytest.mark.asyncio
@@ -14,7 +14,7 @@ async def test_get_logs_sends_tarball_of_logs(tar, open, file, bot, command_cont
     mock_file_id = file.return_value
 
     clazz = GetLogs(bot)
-    await clazz._GetLogs__logs(command_context)
+    await clazz.logs(context)
 
     open.assert_called_once_with("logs.tar.gz", "w:gz")
     tar.add.assert_called_once_with("logs")

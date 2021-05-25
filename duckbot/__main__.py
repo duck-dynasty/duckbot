@@ -17,7 +17,7 @@ import duckbot.cogs.robot
 import duckbot.cogs.tito
 import duckbot.cogs.weather
 import duckbot.health
-import duckbot.logging
+import duckbot.logs
 import duckbot.slash
 import duckbot.util.connection_test
 from duckbot import DuckBot
@@ -28,7 +28,7 @@ def run_duckbot(bot: commands.Bot):
         bot.load_extension(duckbot.util.connection_test.__name__)
 
     bot.load_extension(duckbot.health.__name__)
-    bot.load_extension(duckbot.logging.__name__)
+    bot.load_extension(duckbot.logs.__name__)
 
     bot.load_extension(duckbot.slash.__name__)
 
@@ -51,6 +51,6 @@ def run_duckbot(bot: commands.Bot):
 
 
 if __name__ == "__main__":
-    duckbot.logging.define_logs()
+    duckbot.logs.define_logs()
     bot = DuckBot()
     run_duckbot(bot)

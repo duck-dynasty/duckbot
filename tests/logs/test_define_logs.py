@@ -4,7 +4,7 @@ from unittest import mock
 
 import pytest
 
-from duckbot.logging.define_logs import define_logs
+from duckbot.logs import define_logs
 
 
 @pytest.mark.asyncio
