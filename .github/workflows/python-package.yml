@@ -18,19 +18,24 @@ jobs:
       with:
         python-version: '3.8'
 
-    - name: Setup Pip Cache
+    - name: Setup Virtual Environment Cache
+      id: venv
       uses: actions/cache@v2
       with:
-        path: ${{ env.pythonLocation }}
-        key: ${{ env.pythonLocation }}-${{ hashFiles('setup.py') }}
-        restore-keys: ${{ env.pythonLocation }}-
+        path: ./venv
+        key: ${{ env.pythonLocation }}-venv-${{ hashFiles('setup.py') }}
 
     - name: Install Packages
+      if: steps.venv.outputs.cache-hit != 'true'
       run: |
+        python -m venv --clear venv
+        . ./venv/bin/activate
         pip install --upgrade pip setuptools wheel
         pip install --editable .[dev]
     - name: Run Tests
-      run: pytest
+      run: |
+        . venv/bin/activate
+        pytest
 
   sanity:
     runs-on: ubuntu-latest
