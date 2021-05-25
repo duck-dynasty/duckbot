@@ -23,7 +23,6 @@ jobs:
       with:
         path: ${{ env.pythonLocation }}
         key: ${{ env.pythonLocation }}-${{ hashFiles('setup.py') }}
-        restore-keys: ${{ env.pythonLocation }}-${{ hashFiles('setup.py') }}
 
     - name: Install Packages
       run: |
