@@ -2,7 +2,7 @@ from unittest import mock
 
 import pytest
 
-from duckbot.logging import ExceptionLogs
+from duckbot.logs import ExceptionLogs
 
 
 @pytest.mark.asyncio
