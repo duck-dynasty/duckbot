@@ -1,3 +1,4 @@
+import logging
 from unittest import mock
 
 import discord
@@ -5,6 +6,11 @@ import discord.ext.commands
 import pytest
 
 from duckbot import DuckBot
+
+
+def pytest_configure(config):
+    # flake8 logs a ton, suppress it
+    logging.getLogger("flake8").setLevel(logging.ERROR)
 
 
 @pytest.fixture(scope="session", autouse=True)
