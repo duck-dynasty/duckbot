@@ -37,6 +37,7 @@ jobs:
         . venv/bin/activate
         pytest
     - name: Report Code Coverage
+      if: ${{ always() }}
       uses: codecov/codecov-action@v1
 
   sanity:
