@@ -4,6 +4,7 @@ logs.tar.gz
 
 # ignore all the jetbrains project files
 .idea
+*.iml
 
 ##### https://github.com/github/gitignore/blob/master/Python.gitignore
 # Byte-compiled / optimized / DLL files
