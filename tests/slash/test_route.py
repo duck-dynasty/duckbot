@@ -20,7 +20,7 @@ def test_eq_different_method():
 
 
 def test_eq_different_path():
-    assert Route8("PUT", "/application") != Route8("PUT", "/app")
+    assert Route8("PUT", "/ppa") != Route8("PUT", "/app")
 
 
 def test_str_returns_method_and_url():
