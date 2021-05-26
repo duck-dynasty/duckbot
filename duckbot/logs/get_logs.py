@@ -12,9 +12,9 @@ class GetLogs(commands.Cog):
 
     @commands.command(name="logs")
     async def logs_command(self, context):
-        await self.__logs(context)
+        await self.logs(context)
 
-    async def __logs(self, context):
+    async def logs(self, context):
         archive = tarfile.open(self.log_archive_name, "w:gz")
         archive.add(self.log_directory)
         archive.close()

@@ -2,6 +2,7 @@
 [![GitHub License](https://img.shields.io/github/license/chippers255/duckbot)](https://github.com/Chippers255/duckbot/blob/main/LICENSE)
 [![GitHub Issues](https://img.shields.io/github/issues/chippers255/duckbot)](https://github.com/Chippers255/duckbot/issues)
 [![Build Status](https://img.shields.io/github/workflow/status/Chippers255/duckbot/DuckBot%20CI)](https://github.com/Chippers255/duckbot/actions/workflows/python-package.yml)
+[![codecov](https://codecov.io/gh/Chippers255/duckbot/branch/main/graph/badge.svg?token=FX4DT5MWBW)](https://codecov.io/gh/Chippers255/duckbot)
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=Chippers255_duckbot&metric=code_smells)](https://sonarcloud.io/dashboard?id=Chippers255_duckbot)
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Chippers255_duckbot&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=Chippers255_duckbot)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -24,14 +25,6 @@ pip install --editable .[dev]
 The `dev` extras will also install development dependencies, like `pytest`. The installation commands should be run whenever you merge from upstream.
 
 ### Run Tests & Formatter
-There are a few additional packages required to be able to run tests locally.
-
-```sh
-sudo apt-get install -y --no-install-recommends libpq-dev
-```
-
-Then, you can run tests.
-
 ```sh
 pytest              # runs tests, lint and format checks
 isort . && black .  # reformats the entire code base

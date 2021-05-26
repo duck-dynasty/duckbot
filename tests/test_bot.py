@@ -1,7 +1,8 @@
 import pytest
 from discord import Game, Intents
 
-from duckbot.duckbot import DuckBot, intents
+from duckbot import DuckBot
+from duckbot.bot import intents
 
 
 def test_intents_has_required_permissions():
