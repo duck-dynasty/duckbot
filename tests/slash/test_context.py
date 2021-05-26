@@ -108,7 +108,7 @@ async def test_typing_throws_error_if_called_twice(bot, interaction, command):
     async with clazz.typing():
         with pytest.raises(AssertionError):
             async with clazz.typing():
-                raise Exception()
+                raise NotImplementedError()
 
 
 def assert_class_setup(clazz, bot):
