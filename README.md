@@ -2,6 +2,7 @@
 [![GitHub License](https://img.shields.io/github/license/chippers255/duckbot)](https://github.com/Chippers255/duckbot/blob/main/LICENSE)
 [![GitHub Issues](https://img.shields.io/github/issues/chippers255/duckbot)](https://github.com/Chippers255/duckbot/issues)
 [![Build Status](https://img.shields.io/github/workflow/status/Chippers255/duckbot/DuckBot%20CI)](https://github.com/Chippers255/duckbot/actions/workflows/python-package.yml)
+[![codecov](https://codecov.io/gh/Chippers255/duckbot/branch/main/graph/badge.svg?token=FX4DT5MWBW)](https://codecov.io/gh/Chippers255/duckbot)
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=Chippers255_duckbot&metric=code_smells)](https://sonarcloud.io/dashboard?id=Chippers255_duckbot)
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=Chippers255_duckbot&metric=vulnerabilities)](https://sonarcloud.io/dashboard?id=Chippers255_duckbot)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
@@ -21,17 +22,9 @@ pip install --upgrade pip setuptools wheel
 pip install --editable .[dev]
 ```
 
-The `dev` extras will also install development dependencies, like `pytest`. The install commands should be run whenever you merge from upstream.
+The `dev` extras will also install development dependencies, like `pytest`. The installation commands should be run whenever you merge from upstream.
 
 ### Run Tests & Formatter
-There are a few additional packages required to be able to run tests locally.
-
-```sh
-sudo apt-get install -y --no-install-recommends libpq-dev
-```
-
-Then, you can run tests.
-
 ```sh
 pytest              # runs tests, lint and format checks
 isort . && black .  # reformats the entire code base
@@ -49,12 +42,12 @@ DISCORD_TOKEN=thesecrettoken
 OPENWEATHER_TOKEN=thesecrettoken
 ```
 
-With your tokens available, you can jam them into your environment so you can run DuckBot. You may want to put this into your bashrc for convenience.
+With your tokens available, you can jam them into your shell environment, so you can run DuckBot. You may want to put this into your bashrc for convenience.
 ```sh
 export $(cat duckbot/.env | xargs)
 ```
 
-Finally, there's two ways to run DuckBot. For a production-like environment, you should run using [docker-compose](https://docs.docker.com/compose/).
+Finally, there are two ways to run DuckBot. For a production-like environment, you should run using [docker-compose](https://docs.docker.com/compose/).
 ```sh
 docker-compose up --build
 ```

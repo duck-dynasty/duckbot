@@ -13,9 +13,7 @@ multi_line_output = 3
 [tool.pytest.ini_options]
 addopts = """\
     -ra \
-    --black \
     --flake8 \
-    --isort \
     --cov=duckbot \
     --cov-branch \
     --cov-fail-under=85 \
