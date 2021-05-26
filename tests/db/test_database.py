@@ -7,9 +7,18 @@ from duckbot.db import Database
 Base = declarative_base()
 
 
-def test_ctor_creates_engine():
+@mock.patch("duckbot.db.database.create_engine")
+def test_db_creates_engine_if_not_exists(create):
     clazz = Database()
     assert clazz.db is not None
+
+
+@mock.patch("duckbot.db.database.create_engine")
+def test_db_creates_engine_reuses_existing(create):
+    clazz = Database()
+    first = clazz.db
+    second = clazz.db
+    assert first == second
 
 
 def test_ctor_ensures_singleton_instance():
@@ -19,7 +28,8 @@ def test_ctor_ensures_singleton_instance():
 
 
 @mock.patch("tests.db.test_database.Base")
-def test_session_creates_tables(base):
+@mock.patch("duckbot.db.database.create_engine")
+def test_session_creates_tables(create, base):
     clazz = Database()
     session = clazz.session(base)
     base.metadata.create_all.assert_called_once_with(clazz.db)
