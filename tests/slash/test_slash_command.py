@@ -6,7 +6,7 @@ from duckbot.slash.option import SubCommand
 
 
 async def func(*args):
-    pass
+    """A nothing function for @command to wrap."""
 
 
 def test_slash_command_patches_adapt_name():

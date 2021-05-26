@@ -45,8 +45,8 @@ class SlashCommandPatch(Cog):
             await self.bot.http.request(route, json=x)
         for x in needs_delete:
             log.info("deleting slash command %s ; data=%s", x["name"], x)
-            id = next(y["id"] for y in raw_slash if y["name"] == x["name"])
-            route = Route8("DELETE", f"/applications/{self.bot.user.id}/commands/{id}")
+            slash_id = next(y["id"] for y in raw_slash if y["name"] == x["name"])
+            route = Route8("DELETE", f"/applications/{self.bot.user.id}/commands/{slash_id}")
             await self.bot.http.request(route)
 
     def get_registered_slash_commands(self):
