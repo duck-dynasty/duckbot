@@ -25,14 +25,6 @@ pip install --editable .[dev]
 The `dev` extras will also install development dependencies, like `pytest`. The install commands should be run whenever you merge from upstream.
 
 ### Run Tests & Formatter
-There are a few additional packages required to be able to run tests locally.
-
-```sh
-sudo apt-get install -y --no-install-recommends libpq-dev
-```
-
-Then, you can run tests.
-
 ```sh
 pytest              # runs tests, lint and format checks
 isort . && black .  # reformats the entire code base
