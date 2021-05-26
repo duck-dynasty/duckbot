@@ -32,12 +32,12 @@ class SlashCommand:
 def slash_command(*, root: str = None, name: str = None, description: str = None, options: typing.List[Option] = [], discordpy_adapt_name: bool = True):
     """A decorator to mark a discordpy command as a discord slash command (aka interaction).
 
-        :param root: the command basename, for use with sub-commands; if provided, `name` must also be provided
-        :param name: the name to create the command with; if provided, `name` must also be provided
-        :param description: the command description; a short blurb about what the command does; defaults to the command description.
-        :param options: the slash command options
-        :param discordpy_adapt_name: True to include subcommand names in the discordpy delegate, False to exclude the subcommand name
-        :return: the decorated Command, with new fields for slash command specifics added
+    :param root: the command basename, for use with sub-commands; if provided, `name` must also be provided
+    :param name: the name to create the command with; if provided, `name` must also be provided
+    :param description: the command description; a short blurb about what the command does; defaults to the command description.
+    :param options: the slash command options
+    :param discordpy_adapt_name: True to include subcommand names in the discordpy delegate, False to exclude the subcommand name
+    :return: the decorated Command, with new fields for slash command specifics added
     """
 
     def decorator(command):
