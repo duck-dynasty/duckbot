@@ -10,7 +10,6 @@ class DogPhotos(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    # TODO add breed option https://dog.ceo/dog-api/documentation/
     @slash_command()
     @commands.command(name="dog", description=":dog:")
     async def dog_command(self, context):
