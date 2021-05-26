@@ -3,7 +3,7 @@ responses = [
     "That was both educational and intelligent.",
     "Wow!",
     "Thanks for sharing!",
-    "You sparked my curiousity.",
+    "You sparked my curiosity.",
     "I have been enlightened.",
     "A-Ok.",
     "I appreciate the information!",

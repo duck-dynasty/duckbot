@@ -58,9 +58,8 @@ class Recipe(commands.Cog):
 
         return html_content
 
-    async def __recipe(self, context, *args):
+    async def __recipe(self, context, search_term):
         # clean up the arguments to make a valid recipe search
-        search_term = " ".join(args)
         search_term = re.sub(r"[^\w\s]", "", search_term)
 
         try:
@@ -81,6 +80,6 @@ class Recipe(commands.Cog):
         await context.send(response)
 
     @commands.command(name="recipe")
-    async def recipe(self, context, *args):
+    async def recipe(self, context, *, search_term: str = ""):
         async with context.typing():
-            await self.__recipe(context, *args)
+            await self.__recipe(context, search_term)
