@@ -128,3 +128,23 @@ class Weather(commands.Cog):
 
     def __is_snowy(self, weather):
         return (weather.status and "snow" in weather.status.lower()) or (weather.detailed_status and "snow" in weather.detailed_status.lower())
+
+# https://matplotlib.org/stable/tutorials/introductory/usage.html#sphx-glr-tutorials-introductory-usage-py
+# with plt.xkcd():
+#     fig, ax1 = plt.subplots()
+#
+#     color = 'tab:red'
+#     ax1.set_xlabel('time (h)')
+#     ax1.set_ylabel('temp', color=color)
+#     ax1.plot(x, y1, color=color)
+#     ax1.tick_params(axis='y', labelcolor=color)
+#
+#     ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
+#
+#     color = 'tab:blue'
+#     ax2.set_ylabel('rain', color=color)  # we already handled the x-label with ax1
+#     ax2.bar(x, y2, color=color)
+#     ax2.tick_params(axis='y', labelcolor=color)
+#
+#     fig.tight_layout()  # otherwise the right y-label is slightly clipped
+#     plt.show()
