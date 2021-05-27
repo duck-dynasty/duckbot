@@ -38,6 +38,7 @@ class SlashCommandPatch(Cog):
         expected_names = [x["name"] for x in create_requests]
         needs_update = [x for x in create_requests if x not in existing]
         needs_delete = [x for x in existing if x["name"] not in expected_names]
+        log.debug("slash commands existing = %s  ;  expected = %s", raw_slash, create_requests)
 
         for x in needs_update:
             log.info("updating slash command %s ; data=%s", x["name"], x)
