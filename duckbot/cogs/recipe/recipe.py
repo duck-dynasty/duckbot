@@ -86,7 +86,7 @@ class Recipe(commands.Cog):
             Option(name="search-term", description="The recipe search terms."),
         ]
     )
-    @commands.command(name="recipe")
+    @commands.command(name="recipe", description="Get a random recipe for something.")
     async def recipe(self, context, *, search_term: str = ""):
         async with context.typing():
             await self.__recipe(context, search_term)
