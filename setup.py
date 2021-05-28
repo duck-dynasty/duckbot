@@ -69,6 +69,7 @@ if __name__ == "__main__":
                 "pytest-sugar",
                 "pytest-icdiff",
                 "pytest-cov",
+                "coverage",  # for codecov.io
             ]
         },
     )
