@@ -35,7 +35,7 @@ jobs:
     - name: Run Tests
       run: |
         . venv/bin/activate
-        pytest
+        pytest --cov-report=xml
     - name: Report Code Coverage
       if: ${{ always() }}
       uses: codecov/codecov-action@v1
