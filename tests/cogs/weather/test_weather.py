@@ -133,28 +133,28 @@ async def test_set_default_location_location_not_saved(clazz, session, context):
 
 
 @pytest.mark.asyncio
-async def test_get_weather_no_default_no_args(clazz, session, context):
+async def test_send_weather_no_default_no_args(clazz, session, context):
     session.get.return_value = None
-    await clazz.get_weather(context, None, None, None)
+    await clazz.send_weather(context, None, None, None)
     context.send.assert_called_once_with("Set a default location using `!weather set city country-code`")
 
 
 @pytest.mark.asyncio
-async def test_get_weather_default_location(clazz, session, context):
+async def test_send_weather_default_location(clazz, session, context):
     session.get.return_value = SavedLocation(id=1, name="city", country="country", city_id=123, latitude=1, longitude=2)
     clazz.weather_message = stub_weather_msg
-    await clazz.get_weather(context, None, None, None)
+    await clazz.send_weather(context, None, None, None)
     context.send.assert_called_once_with("weather")
 
 
 @pytest.mark.asyncio
-async def test_get_weather_provided_location(clazz, context):
+async def test_send_weather_provided_location(clazz, context):
     async def mock_search_location(context, *args):
         return make_city("city")
 
     clazz.search_location = mock_search_location
     clazz.weather_message = stub_weather_msg
-    await clazz.get_weather(context, "city", None, None)
+    await clazz.send_weather(context, "city", None, None)
     context.send.assert_called_once_with("weather")
 
 
