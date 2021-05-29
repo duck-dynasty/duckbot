@@ -136,6 +136,7 @@ class Weather(commands.Cog):
 
     def weather_graph(self, weather: OneCall):
         # TODO 24h is better data, but labels overlap like crazy
+        # plt.setp(ax.get_xticklabels(), rotation=30, horizontalalignment='right')
         hourly = [weather.forecast_hourly[i] for i in range(24)]
         # TODO convert to local time, instead of UTC
         hours = [w.reference_time("date").strftime("%-I%p") for w in hourly]
