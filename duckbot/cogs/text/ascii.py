@@ -1,3 +1,4 @@
+import pyfiglet
 from discord.ext import commands
 
 
@@ -10,4 +11,9 @@ class Ascii(commands.Cog):
         await self.ascii(context, text)
 
     async def ascii(self, context, text: str):
-        pass
+        art = str(pyfiglet.figlet_format(text.strip()))
+        if len(art) < 1990:
+            await context.send(f"```{art}```")
+        else:
+            art = str(pyfiglet.figlet_format("Happy Birthday!"))
+            await context.send(f"Discord won't let me send art with that much GUSTO, so here's a happy birthday.\n```{art}```")
