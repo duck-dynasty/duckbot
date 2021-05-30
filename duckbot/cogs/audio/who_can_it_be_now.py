@@ -4,6 +4,8 @@ from importlib.resources import path
 from discord import FFmpegPCMAudio, PCMVolumeTransformer, VoiceClient
 from discord.ext import commands
 
+from duckbot.util.messages import try_delete
+
 
 class WhoCanItBeNow(commands.Cog):
     def __init__(self, bot):
@@ -73,3 +75,8 @@ class WhoCanItBeNow(commands.Cog):
             self.streaming = False
         elif context is not None:
             await context.send("Brother, no :musical_note: :saxophone: is active.")
+
+    @start.after_invoke
+    @stop.after_invoke
+    async def delete_command_message(self, context):
+        await try_delete(context.message)
