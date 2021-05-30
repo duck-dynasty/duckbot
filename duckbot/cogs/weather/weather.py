@@ -139,6 +139,7 @@ class Weather(commands.Cog):
         # plt.setp(ax.get_xticklabels(), rotation=30, horizontalalignment='right')
         hourly = [weather.forecast_hourly[i] for i in range(24)]
         # TODO convert to local time, instead of UTC
+        # https://github.com/pegler/pytzwhere
         hours = [w.reference_time("date").strftime("%-I%p") for w in hourly]
         figure, left_axis = plt.subplots()
         left_axis.set_xlabel("Time")
