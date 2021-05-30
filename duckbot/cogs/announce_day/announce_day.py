@@ -50,10 +50,11 @@ class AnnounceDay(commands.Cog):
             if channel:
                 message = self.get_message()
                 await channel.send(message)
-                if random.random() < 1.0 / 10.0:
-                    await self.send_dog(channel)
-                elif random.random() < 1.0 / 10.0:
-                    await self.send_gif(channel)
+
+                should_send_dog = random.random() < 1.0 / 10.0
+                should_send_gif = not should_send_dog and random.random() < 1.0 / 10.0
+                await self.send_dog(channel) if should_send_dog else None
+                await self.send_gif(channel) if should_send_gif else None
 
     async def send_dog(self, channel):
         try:
