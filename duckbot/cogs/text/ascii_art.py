@@ -2,12 +2,12 @@ import pyfiglet
 from discord.ext import commands
 
 
-class Ascii(commands.Cog):
+class AsciiArt(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
     @commands.command(name="ascii")
-    async def ascii_command(self, context, *, text: str = None):
+    async def ascii_command(self, context, *, text: str = "I need text, brother."):
         await self.ascii(context, text)
 
     async def ascii(self, context, text: str):
