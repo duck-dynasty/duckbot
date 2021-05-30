@@ -1,6 +1,5 @@
 from unittest import mock
 
-import discord
 import pytest
 from pyowm.weatherapi25.location import Location
 from pyowm.weatherapi25.one_call import OneCall
