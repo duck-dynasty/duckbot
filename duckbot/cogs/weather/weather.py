@@ -1,14 +1,18 @@
+import datetime
 import os
 from math import ceil
 from typing import Optional
 
 import discord
+import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import pyowm
+import pytz
 from discord.ext import commands
 from pyowm.utils import config
 from pyowm.weatherapi25.location import Location
 from pyowm.weatherapi25.one_call import OneCall
+from tzwhere import tzwhere
 
 from duckbot.db import Database
 
@@ -34,11 +38,12 @@ class Weather(commands.Cog):
         await self.weather(context, city, country, index)
 
     async def weather(self, context, city: str, country: str, index: int):
-        try:
-            return await self.send_weather(context, city, country, index)
-        except Exception as e:
-            await context.send(f"Iunno. Figure it out.\n{e}")
-            raise e
+        with context.typing():
+            try:
+                return await self.send_weather(context, city, country, index)
+            except Exception as e:
+                await context.send(f"Iunno. Figure it out.\n{e}")
+                raise e
 
     @weather_command.command(name="set", invoke_without_command=True)
     async def weather_set_command(self, context, city: str = None, country: str = None, index: int = None):
@@ -93,7 +98,7 @@ class Weather(commands.Cog):
             location = await self.search_location(context, city, country, index)
         if location is not None:
             weather = self.owm().weather_manager().one_call(lat=location.lat, lon=location.lon, exclude="minutely", units="metric")
-            await context.send(self.weather_message(location, weather), file=discord.File(self.weather_graph(weather)))
+            await context.send(self.weather_message(location, weather), file=discord.File(self.weather_graph(location, weather)))
 
     def weather_message(self, city: Location, weather: OneCall) -> str:
         messages = []
@@ -134,16 +139,13 @@ class Weather(commands.Cog):
     def __is_snowy(self, weather) -> str:
         return (weather.status and "snow" in weather.status.lower()) or (weather.detailed_status and "snow" in weather.detailed_status.lower())
 
-    def weather_graph(self, weather: OneCall):
-        # TODO 24h is better data, but labels overlap like crazy
-        # plt.setp(ax.get_xticklabels(), rotation=30, horizontalalignment='right')
+    def weather_graph(self, city: Location, weather: OneCall):
         hourly = [weather.forecast_hourly[i] for i in range(24)]
-        # TODO convert to local time, instead of UTC
-        # https://github.com/pegler/pytzwhere
-        hours = [w.reference_time("date").strftime("%-I%p") for w in hourly]
+        tz = pytz.timezone(tzwhere.tzwhere(forceTZ=True).tzNameAt(city.lat, city.lon, forceTZ=True))
+        hours = [w.reference_time("date").astimezone(tz=tz) for w in hourly]
         figure, left_axis = plt.subplots()
         left_axis.set_xlabel("Time")
-        left_axis.set_ylabel("Temperature")
+        left_axis.set_ylabel(f"Temperature ({degrees})")
         left_axis.plot(hours, [w.temperature()["temp"] for w in hourly], label="Temperature", color="orangered")
         left_axis.plot(hours, [w.temperature()["feels_like"] for w in hourly], label="Feels Like", color="forestgreen")
         left_axis.legend(loc="upper left")
@@ -153,19 +155,23 @@ class Weather(commands.Cog):
         right_axis.set_ylabel("Precipitation")
         rain = [w.rain["1h"] if "1h" in w.rain else 0 for w in hourly]
         snow = [w.snow["1h"] if "1h" in w.snow else 0 for w in hourly]
-        rects_rain = right_axis.bar(hours, rain, label="Rain", color="blue", alpha=0.3)
-        rects_snow = right_axis.bar(hours, snow, bottom=rain, label="Snow", color="powderblue", alpha=0.3)
+        rects_rain = right_axis.bar(hours, rain, label="Rain (mm)", color="blue", alpha=0.3, width=1.0 / 24)
+        rects_snow = right_axis.bar(hours, snow, bottom=rain, label="Snow (cm)", color="powderblue", alpha=0.3, width=1.0 / 24)
         right_axis.legend(loc="upper right")
 
-        y_max = max([r.get_height() + s.get_height() for r, s in zip(rects_rain, rects_snow)])
-        if y_max < 1:
-            right_axis.set_ylim([0, 1])
-            y_max = 1
+        y_max = max(1, max([r.get_height() + s.get_height() for r, s in zip(rects_rain, rects_snow)]))
+        right_axis.set_ylim([0, y_max])
 
         for i, w in enumerate(hourly):
             probability = round(w.precipitation_probability * 100)
-            plt.text(hours[i], 0.2 * y_max, f"{probability}%", ha="center", va="center", color="darkblue", alpha=0.5)
+            plt.text(hours[i], 0.2 * y_max, f"{probability}%", ha="center", va="center", rotation=90, color="darkblue", alpha=0.5)
+            plt.text(hours[i], 0.75 * y_max, w.detailed_status, ha="center", va="center", rotation=90, color="black", alpha=0.5)
 
+        one_hour = datetime.timedelta(hours=1)
+        left_axis.xaxis.set_major_locator(mdates.HourLocator(interval=4, tz=tz))
+        left_axis.xaxis.set_major_formatter(mdates.DateFormatter("%-I%p", tz=tz))
+        left_axis.set_xlim(min(hours) - one_hour, max(hours) + one_hour)
+        plt.setp(left_axis.get_xticklabels(), rotation=30, horizontalalignment="right")
         figure.tight_layout()
         plt.savefig("weather.png", facecolor="ghostwhite")
         return "weather.png"
