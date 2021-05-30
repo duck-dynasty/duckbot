@@ -53,6 +53,7 @@ if __name__ == "__main__":
             "d20>=1.1.0,<2",
             "nltk>=3.6,<4",
             "textblob<1",
+            "pyfiglet<1",
         ],
         extras_require={
             "dev": [
