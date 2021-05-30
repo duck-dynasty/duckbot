@@ -147,3 +147,10 @@ async def test_cog_unload_stops_streaming(ffmpeg, vol, bot, voice_client):
     assert clazz.streaming is False
     assert clazz.voice_client is None
     assert clazz.audio_task is None
+
+
+@pytest.mark.asyncio
+async def test_delete_command_message(bot, context):
+    clazz = WhoCanItBeNow(bot)
+    await clazz.delete_command_message(context)
+    context.message.delete.assert_called()
