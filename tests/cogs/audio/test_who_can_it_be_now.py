@@ -150,7 +150,7 @@ async def test_cog_unload_stops_streaming(ffmpeg, vol, bot, voice_client):
 
 
 @pytest.mark.asyncio
-async def test_delete_command_message(bot, context):
+async def test_delete_command_message(bot, command_context):
     clazz = WhoCanItBeNow(bot)
-    await clazz.delete_command_message(context)
-    context.message.delete.assert_called()
+    await clazz.delete_command_message(command_context)
+    command_context.message.delete.assert_called()
