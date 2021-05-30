@@ -10,5 +10,5 @@ async def test_try_delete_deletes_message(message):
 
 
 @pytest.mark.asyncio
-async def test_try_delete_message_is_none(message):
+async def test_try_delete_message_is_none():
     await try_delete(None)
