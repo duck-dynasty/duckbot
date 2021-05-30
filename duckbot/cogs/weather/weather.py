@@ -8,11 +8,11 @@ import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import pyowm
 import pytz
+import tzwhere.tzwhere
 from discord.ext import commands
 from pyowm.utils import config
 from pyowm.weatherapi25.location import Location
 from pyowm.weatherapi25.one_call import OneCall
-from tzwhere import tzwhere
 
 from duckbot.db import Database
 
@@ -141,7 +141,7 @@ class Weather(commands.Cog):
 
     def weather_graph(self, city: Location, weather: OneCall):
         hourly = [weather.forecast_hourly[i] for i in range(24)]
-        tz = pytz.timezone(tzwhere.tzwhere(forceTZ=True).tzNameAt(city.lat, city.lon, forceTZ=True))
+        tz = pytz.timezone(tzwhere.tzwhere.tzwhere(forceTZ=True).tzNameAt(city.lat, city.lon, forceTZ=True))
         hours = [w.reference_time("date").astimezone(tz=tz) for w in hourly]
         figure, left_axis = plt.subplots()
         left_axis.set_xlabel("Time")
@@ -169,7 +169,7 @@ class Weather(commands.Cog):
 
         one_hour = datetime.timedelta(hours=1)
         left_axis.xaxis.set_major_locator(mdates.HourLocator(interval=4, tz=tz))
-        left_axis.xaxis.set_major_formatter(mdates.DateFormatter("%-I%p", tz=tz))
+        left_axis.xaxis.set_major_formatter(mdates.DateFormatter("%I%p" if os.name == "nt" else "%-I%p", tz=tz))
         left_axis.set_xlim(min(hours) - one_hour, max(hours) + one_hour)
         plt.setp(left_axis.get_xticklabels(), rotation=30, horizontalalignment="right")
         figure.tight_layout()
