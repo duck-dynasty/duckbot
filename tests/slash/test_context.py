@@ -1,5 +1,7 @@
+import json
 from unittest import mock
 
+import aiohttp
 import pytest
 from discord import Embed
 
@@ -76,9 +78,28 @@ async def test_send_response(bot, interaction, command):
     clazz = InteractionContext(bot=bot, interaction=interaction, command=command)
     embed = Embed().add_field(name="name", value="value")
     await clazz.send(content="hi", embed=embed)
-    json = {"type": 4, "data": {"content": "hi", "embeds": [embed.to_dict()], "tts": False}}
+    json_payload = {"type": 4, "data": {"content": "hi", "embeds": [embed.to_dict()], "tts": False}}
     route = Route8("POST", f"/interactions/{interaction.id}/{interaction.token}/callback")
-    bot.http.request.assert_called_once_with(route, json=json)
+    bot.http.request.assert_called_once_with(route, json=json_payload)
+
+
+@pytest.mark.asyncio
+@mock.patch("discord.File")
+async def test_send_response_file(file, bot, interaction, command):
+    file.fp = "file-path"
+    file.filename = "name"
+    clazz = InteractionContext(bot=bot, interaction=interaction, command=command)
+    embed = Embed().add_field(name="name", value="value")
+    await clazz.send(content="hi", embed=embed, file=file)
+    json_payload = {"type": 4, "data": {"content": "hi", "embeds": [embed.to_dict()], "tts": False}}
+    route = Route8("POST", f"/interactions/{interaction.id}/{interaction.token}/callback")
+    form = aiohttp.FormData()
+    form.add_field("payload_json", json.dumps(json_payload))
+    form.add_field("file", file.fp, filename=file.filename, content_type="application/octet-stream")
+    bot.http.request.assert_called_once()
+    assert bot.http.request.call_args.args == (route,)
+    assert bot.http.request.call_args.kwargs["files"] == [file]
+    assert bot.http.request.call_args.kwargs["data"]._fields == form._fields
 
 
 @pytest.mark.asyncio
@@ -87,9 +108,29 @@ async def test_send_follow_up(bot, interaction, command):
     embed = Embed().add_field(name="name", value="value")
     clazz.follow_up = True
     await clazz.send(content="hi", embed=embed)
-    json = {"content": "hi", "embeds": [embed.to_dict()], "tts": False}
+    json_payload = {"content": "hi", "embeds": [embed.to_dict()], "tts": False}
     route = Route8("POST", f"/webhooks/{interaction.application_id}/{interaction.token}")
-    bot.http.request.assert_called_once_with(route, json=json)
+    bot.http.request.assert_called_once_with(route, json=json_payload)
+
+
+@pytest.mark.asyncio
+@mock.patch("discord.File")
+async def test_send_follow_up_file(file, bot, interaction, command):
+    file.fp = "file-path"
+    file.filename = "name"
+    clazz = InteractionContext(bot=bot, interaction=interaction, command=command)
+    embed = Embed().add_field(name="name", value="value")
+    clazz.follow_up = True
+    await clazz.send(content="hi", embed=embed, file=file)
+    json_payload = {"content": "hi", "embeds": [embed.to_dict()], "tts": False}
+    route = Route8("POST", f"/webhooks/{interaction.application_id}/{interaction.token}")
+    form = aiohttp.FormData()
+    form.add_field("payload_json", json.dumps(json_payload))
+    form.add_field("file", file.fp, filename=file.filename, content_type="application/octet-stream")
+    bot.http.request.assert_called_once()
+    assert bot.http.request.call_args.args == (route,)
+    assert bot.http.request.call_args.kwargs["files"] == [file]
+    assert bot.http.request.call_args.kwargs["data"]._fields == form._fields
 
 
 @pytest.mark.asyncio
@@ -97,9 +138,9 @@ async def test_typing_starts_follow_up(bot, interaction, command):
     clazz = InteractionContext(bot=bot, interaction=interaction, command=command)
     async with clazz.typing():
         assert clazz.follow_up
-        json = {"type": 5, "data": {"content": ":thinking:"}}
+        json_payload = {"type": 5, "data": {"content": ":thinking:"}}
         route = Route8("POST", f"/interactions/{interaction.id}/{interaction.token}/callback")
-        bot.http.request.assert_called_once_with(route, json=json)
+        bot.http.request.assert_called_once_with(route, json=json_payload)
 
 
 @pytest.mark.asyncio

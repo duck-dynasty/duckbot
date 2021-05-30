@@ -1,3 +1,8 @@
+import json
+from typing import Optional
+
+import aiohttp
+import discord
 from discord import Client
 from discord.ext.commands import Command
 from discord.ext.commands.view import StringView
@@ -64,16 +69,22 @@ class InteractionContext:
     def command(self, value):
         self._command = value
 
-    async def send(self, content="", *, embed=None, file=None):
+    async def send(self, content="", *, embed: Optional[discord.Embed] = None, file: Optional[discord.File] = None):
         """Send a message as a response to an interaction.
         If you want to send multiple responses, you have to use `typing()` first."""
         if self.follow_up:
-            json = {"content": content, "embeds": [embed.to_dict()] if embed else [], "tts": False}
+            json_payload = {"content": content, "embeds": [embed.to_dict()] if embed else [], "tts": False}
             route = Route8("POST", f"/webhooks/{self.interaction.application_id}/{self.interaction.token}")
         else:
-            json = {"type": 4, "data": {"content": content, "embeds": [embed.to_dict()] if embed else [], "tts": False}}
+            json_payload = {"type": 4, "data": {"content": content, "embeds": [embed.to_dict()] if embed else [], "tts": False}}
             route = Route8("POST", f"/interactions/{self.interaction.id}/{self.interaction.token}/callback")
-        await self.bot.http.request(route, json=json)
+        if file:
+            form = aiohttp.FormData()
+            form.add_field("payload_json", json.dumps(json_payload))
+            form.add_field("file", file.fp, filename=file.filename, content_type="application/octet-stream")
+            await self.bot.http.request(route, data=form, files=[file])
+        else:
+            await self.bot.http.request(route, json=json_payload)
 
     def typing(self):
         """Triggers a "Bot is thinking..." response to the interaction.
