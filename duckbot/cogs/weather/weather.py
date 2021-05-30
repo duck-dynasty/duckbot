@@ -38,7 +38,7 @@ class Weather(commands.Cog):
         await self.weather(context, city, country, index)
 
     async def weather(self, context, city: str, country: str, index: int):
-        with context.typing():
+        async with context.typing():
             try:
                 return await self.send_weather(context, city, country, index)
             except Exception as e:
