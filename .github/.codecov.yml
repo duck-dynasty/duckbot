@@ -3,4 +3,4 @@ coverage:
     project:
       default:
         target: 85
-        threshold: 10  # allow coverage drops by up to 10%
+        threshold: 10%  # allow coverage drops by up to 10%
