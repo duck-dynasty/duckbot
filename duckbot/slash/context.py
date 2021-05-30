@@ -64,7 +64,7 @@ class InteractionContext:
     def command(self, value):
         self._command = value
 
-    async def send(self, content="", *, embed=None):
+    async def send(self, content="", *, embed=None, file=None):
         """Send a message as a response to an interaction.
         If you want to send multiple responses, you have to use `typing()` first."""
         if self.follow_up:
