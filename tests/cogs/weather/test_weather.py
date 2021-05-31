@@ -147,9 +147,7 @@ async def test_send_weather_default_location(file, clazz, session, context):
     clazz.weather_message = stub_weather_msg
     clazz.weather_graph = stub_weather_gph
     await clazz.send_weather(context, None, None, None)
-    context.send.assert_called_once()
-    assert context.send.call_args.args == ("weather",)
-    assert context.send.call_args.kwargs == {"file": file.return_value}
+    context.send.assert_called_once_with("weather", file=file.return_value)
 
 
 @pytest.mark.asyncio
@@ -162,8 +160,7 @@ async def test_send_weather_provided_location(file, clazz, context):
     clazz.weather_message = stub_weather_msg
     clazz.weather_graph = stub_weather_gph
     await clazz.send_weather(context, "city", None, None)
-    assert context.send.call_args.args == ("weather",)
-    assert context.send.call_args.kwargs == {"file": file.return_value}
+    context.send.assert_called_once_with("weather", file=file.return_value)
 
 
 def test_weather_message_no_precipitation(clazz):
