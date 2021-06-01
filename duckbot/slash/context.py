@@ -69,9 +69,17 @@ class InteractionContext:
     def command(self, value):
         self._command = value
 
-    async def send(self, content="", *, embed: Optional[discord.Embed] = None, file: Optional[discord.File] = None):
-        """Send a message as a response to an interaction.
-        If you want to send multiple responses, you have to use `typing()` first."""
+    async def send(self, content="", *, embed: Optional[discord.Embed] = None, file: Optional[discord.File] = None, delete_after: Optional[float] = None) -> None:
+        """
+        Send a message as a response to an interaction.
+        If you want to send multiple responses, you have to use `typing()` first.
+
+        :param content: the message content to send
+        :param embed: embed message content to send
+        :param file: a file to upload and sent
+        :param delete_after: does nothing, exists for interface parity with discordpy
+        :return: None
+        """
         if self.follow_up:
             json_payload = {"content": content, "embeds": [embed.to_dict()] if embed else [], "tts": False}
             route = Route8("POST", f"/webhooks/{self.interaction.application_id}/{self.interaction.token}")
