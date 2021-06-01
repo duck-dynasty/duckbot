@@ -33,6 +33,7 @@ class SpecialDays(holidays.Canada):
         self[date(year, 4, 12)] = "National Grilled Cheese Day"
         self[date(year, 5, 1) + rd(weekday=SU(+2))] = "Mother's Day"
         self[date(year, 5, 7)] = f"Bro Tito Day {tito}"
+        self[date(year, 5, 25)] = "Towel Day! DON'T PANIC :thumbsup:"
         self[date(year, 6, 1) + rd(weekday=SU(+3))] = "Father's Day"
         self[date(year, 6, 21)] = f"Erin's Birthday. She's {year-1991} years old"
         self[date(year, 9, 8)] = f"Dan's Birthday. He {year-1989} old"
