@@ -1,13 +1,13 @@
 from typing import Optional, Union
 
-from discord import Client, Guild, Member, User
+import discord
 from discord.abc import GuildChannel, PrivateChannel
 
 
 class Interaction:
     """https://discord.com/developers/docs/interactions/slash-commands#interaction"""
 
-    def __init__(self, *, bot: Client, data):
+    def __init__(self, *, bot: discord.Client, data):
         self.bot = bot
         self.raw_data = data
 
@@ -28,15 +28,15 @@ class Interaction:
         return self.bot.get_channel(self.raw_data["channel_id"])
 
     @property
-    def guild(self) -> Optional[Guild]:
+    def guild(self) -> Optional[discord.Guild]:
         return self.bot.get_guild(self.raw_data["guild_id"]) if "guild_id" in self.raw_data else None
 
     @property
-    def author(self) -> Union[Member, User]:
+    def author(self) -> Union[discord.Member, discord.User]:
         if "guild_id" in self.raw_data:
-            return Member(data=self.raw_data["member"], guild=self.guild, state=self.bot._connection)
+            return discord.Member(data=self.raw_data["member"], guild=self.guild, state=self.bot._connection)
         else:
-            return User(data=self.raw_data["user"], state=self.bot._connection)
+            return discord.User(data=self.raw_data["user"], state=self.bot._connection)
 
     @property
     def data(self):
