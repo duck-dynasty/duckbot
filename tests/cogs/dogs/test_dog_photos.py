@@ -5,6 +5,9 @@ import pytest
 from duckbot.cogs.dogs import DogPhotos
 from tests.duckmock.urllib import patch_urlopen
 
+RANDOM_IMAGE_URI = "https://dog.ceo/api/breeds/image/random"
+LIST_BREEDS_URI = "https://dog.ceo/api/breeds/list/all"
+
 
 def build_dog(img, success):
     return '{"message": "' + img + '", "status": "' + ("success" if success else "failure") + '"}'
@@ -20,7 +23,7 @@ def test_get_dog_image_any_breed_success(req, bot):
         clazz = DogPhotos(bot)
         response = clazz.get_dog_image()
         assert response == "dog"
-        req.assert_called_once_with("https://dog.ceo/api/breeds/image/random")
+        req.assert_called_once_with(RANDOM_IMAGE_URI)
 
 
 @pytest.mark.parametrize("breed,path", [("collie", "collie"), ("border collie", "collie/border"), ("dog", "dog")])
@@ -40,7 +43,7 @@ def test_get_dog_image_failure(req, bot):
         clazz = DogPhotos(bot)
         with pytest.raises(RuntimeError):
             clazz.get_dog_image()
-        req.assert_called_once_with("https://dog.ceo/api/breeds/image/random")
+        req.assert_called_once_with(RANDOM_IMAGE_URI)
 
 
 @mock.patch("urllib.request.Request")
@@ -50,7 +53,7 @@ def test_get_dog_image_no_message(req, bot):
         clazz = DogPhotos(bot)
         with pytest.raises(RuntimeError):
             clazz.get_dog_image()
-        req.assert_called_once_with("https://dog.ceo/api/breeds/image/random")
+        req.assert_called_once_with(RANDOM_IMAGE_URI)
 
 
 @mock.patch("urllib.request.Request")
@@ -59,7 +62,7 @@ def test_get_breeds_success(req, bot):
         clazz = DogPhotos(bot)
         response = clazz.get_breeds()
         assert response == ["collie", "border collie", "dog"]
-        req.assert_any_call("https://dog.ceo/api/breeds/list/all")
+        req.assert_any_call(LIST_BREEDS_URI)
 
 
 @mock.patch("urllib.request.Request")
@@ -68,7 +71,7 @@ def test_get_breeds_failure(req, bot):
         clazz = DogPhotos(bot)
         with pytest.raises(RuntimeError):
             clazz.get_breeds()
-        req.assert_any_call("https://dog.ceo/api/breeds/list/all")
+        req.assert_any_call(LIST_BREEDS_URI)
 
 
 @pytest.mark.asyncio
@@ -78,7 +81,7 @@ async def test_dog_no_breed(req, bot, context):
         clazz = DogPhotos(bot)
         await clazz.dog(context, None)
         context.send.assert_called_once_with("result")
-        req.assert_called_once_with("https://dog.ceo/api/breeds/image/random")
+        req.assert_called_once_with(RANDOM_IMAGE_URI)
 
 
 @pytest.mark.asyncio
@@ -88,7 +91,7 @@ async def test_dog_known_breed(req, bot, context):
         clazz = DogPhotos(bot)
         await clazz.dog(context, "collie")
         context.send.assert_called_once_with("pup")
-        req.assert_any_call("https://dog.ceo/api/breeds/list/all")
+        req.assert_any_call(LIST_BREEDS_URI)
         req.assert_any_call("https://dog.ceo/api/breed/collie/images/random")
 
 
@@ -99,5 +102,5 @@ async def test_dog_unknown_breed(req, bot, context):
         clazz = DogPhotos(bot)
         await clazz.dog(context, "who?")
         context.send.assert_called_once_with("flup")
-        req.assert_any_call("https://dog.ceo/api/breeds/list/all")
-        req.assert_any_call("https://dog.ceo/api/breeds/image/random")
+        req.assert_any_call(LIST_BREEDS_URI)
+        req.assert_any_call(RANDOM_IMAGE_URI)
