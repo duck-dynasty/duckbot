@@ -63,12 +63,19 @@ async def test_react_with_duckbot_random_passes(random, bot, message):
 @pytest.mark.asyncio
 async def test_github(bot, context):
     clazz = Duck(bot)
-    await clazz._Duck__github(context)
+    await clazz.github(context)
     context.send.assert_called_once_with("https://github.com/Chippers255/duckbot")
 
 
 @pytest.mark.asyncio
 async def test_wiki(bot, context):
     clazz = Duck(bot)
-    await clazz._Duck__wiki(context)
+    await clazz.wiki(context)
     context.send.assert_called_once_with("https://github.com/Chippers255/duckbot/wiki")
+
+
+@pytest.mark.asyncio
+async def test_delete_command_message(bot, context):
+    clazz = Duck(bot)
+    await clazz.delete_command_message(context)
+    context.message.delete.assert_called()
