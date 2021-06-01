@@ -65,7 +65,7 @@ async def test_connect_to_voice_no_voice(bot, command_context):
     delattr(command_context.author, "voice")
     clazz = WhoCanItBeNow(bot)
     await clazz.connect_to_voice(command_context)
-    command_context.send.assert_called_once_with("Music can only be played in a discord server, not a private channel.")
+    command_context.send.assert_called_once_with("Music can only be played in a discord server, not a private channel.", delete_after=30)
 
 
 @pytest.mark.asyncio
@@ -84,7 +84,7 @@ async def test_connect_to_voice_author_not_in_channel(bot, command_context):
     clazz = WhoCanItBeNow(bot)
     with pytest.raises(CommandError):
         await clazz.connect_to_voice(command_context)
-    command_context.send.assert_called_once_with("Connect to a voice channel so I know where to `!start`.")
+    command_context.send.assert_called_once_with("Connect to a voice channel so I know where to `!start`.", delete_after=30)
 
 
 @pytest.mark.asyncio
@@ -123,7 +123,7 @@ async def test_stop_not_streaming(bot, command_context):
     clazz = WhoCanItBeNow(bot)
     clazz.streaming = False
     await clazz._WhoCanItBeNow__stop(command_context)
-    command_context.send.assert_called_once_with("Brother, no :musical_note: :saxophone: is active.")
+    command_context.send.assert_called_once_with("Brother, no :musical_note: :saxophone: is active.", delete_after=30)
 
 
 @pytest.mark.asyncio
