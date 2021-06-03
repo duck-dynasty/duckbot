@@ -27,11 +27,11 @@ class WhoCanItBeNow(commands.Cog):
     async def connect_to_voice(self, context):
         if context.voice_client is None:
             if not hasattr(context.author, "voice"):
-                await context.send("Music can only be played in a discord server, not a private channel.")
+                await context.send("Music can only be played in a discord server, not a private channel.", delete_after=30)
             elif context.author.voice:
                 self.voice_client = await context.author.voice.channel.connect()
             else:
-                await context.send("Connect to a voice channel so I know where to `!start`.")
+                await context.send("Connect to a voice channel so I know where to `!start`.", delete_after=30)
                 raise commands.CommandError("`start` invoked when author not in voice channel")
         else:
             context.voice_client.stop()
@@ -74,7 +74,7 @@ class WhoCanItBeNow(commands.Cog):
             self.voice_client = None
             self.streaming = False
         elif context is not None:
-            await context.send("Brother, no :musical_note: :saxophone: is active.")
+            await context.send("Brother, no :musical_note: :saxophone: is active.", delete_after=30)
 
     @start.after_invoke
     @stop.after_invoke

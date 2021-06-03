@@ -46,6 +46,7 @@ if __name__ == "__main__":
             "discord.py[voice]>=1.7,<2",
             "beautifulsoup4",
             "pytz",
+            "tzwhere>=3.0,<4",
             "holidays>=0.11,<0.12",
             "pyowm>=3.2,<4",  # openweather
             "psycopg2",
@@ -53,6 +54,7 @@ if __name__ == "__main__":
             "d20>=1.1.0,<2",
             "nltk>=3.6,<4",
             "textblob<1",
+            "matplotlib>=3.4,<4",
         ],
         extras_require={
             "dev": [
