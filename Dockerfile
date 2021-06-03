@@ -13,7 +13,6 @@ FROM python:3.8-slim as prod
 RUN apt-get update && apt-get -y install \
     ffmpeg \
     libpq-dev \
-    libpulse-dev \
     fortune-mod fortunes fortunes-off cowsay cowsay-off \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 ENV PATH "$PATH:/usr/games"
