@@ -7,7 +7,7 @@ WORKDIR /pip-dependencies
 RUN pip install --upgrade pip setuptools wheel
 COPY pyproject.toml .
 COPY setup.py .
-RUN pip install --extra-index-url https://www.piwheels.org/simple .
+RUN pip install .
 
 FROM python:3.8-slim as prod
 RUN apt-get update && apt-get -y install \
