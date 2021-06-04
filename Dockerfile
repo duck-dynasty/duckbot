@@ -5,14 +5,24 @@ RUN python -m venv $VIRTUAL_ENV
 ENV PATH "$VIRTUAL_ENV/bin:$PATH"
 WORKDIR /pip-dependencies
 RUN pip install --upgrade pip setuptools wheel
+# install atlas and geos for matplotlib
+RUN apt-get update && apt-get -y install \
+    libatlas-base-dev libgeos-dev \
+  && apt-get clean && rm -rf /var/lib/apt/lists/*
 COPY pyproject.toml .
 COPY setup.py .
-RUN pip install .
+RUN pip install --no-cache-dir --extra-index-url https://www.piwheels.org/simple .
 
 FROM python:3.8-slim as prod
+# ffmpeg: for discord audio
+# libpq-dev: postgres client libraries
+# libatlas-base-dev & libgeos-dev: matplotlib dependencies
+# fortune/cowsay: for !fortune command
 RUN apt-get update && apt-get -y install \
     ffmpeg \
     libpq-dev \
+    libpulse-dev \
+    libatlas-base-dev libgeos-dev \
     fortune-mod fortunes fortunes-off cowsay cowsay-off \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 ENV PATH "$PATH:/usr/games"
