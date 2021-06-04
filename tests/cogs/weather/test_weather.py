@@ -212,9 +212,9 @@ def plt(plot):
     return plot
 
 
-@mock.patch("tzwhere.tzwhere.tzwhere")
-def test_weather_graph_for_code_coverage(tzwhere, clazz, plt):
-    tzwhere.return_value.tzNameAt.return_value = "US/Eastern"
+@mock.patch("timezonefinder.TimezoneFinder")
+def test_weather_graph_for_code_coverage(tzfinder, clazz, plt):
+    tzfinder.return_value.timezone_at.return_value = "US/Eastern"
     img = clazz.weather_graph(make_city("city"), one_call())
     assert img == "weather.png"
 

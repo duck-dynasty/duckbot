@@ -8,7 +8,7 @@ import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import pyowm
 import pytz
-import tzwhere.tzwhere
+import timezonefinder
 from discord.ext import commands
 from pyowm.utils import config
 from pyowm.weatherapi25.location import Location
@@ -141,7 +141,7 @@ class Weather(commands.Cog):
 
     def weather_graph(self, city: Location, weather: OneCall):
         hourly = [weather.forecast_hourly[i] for i in range(24)]
-        tz = pytz.timezone(tzwhere.tzwhere.tzwhere(forceTZ=True).tzNameAt(city.lat, city.lon, forceTZ=True))
+        tz = pytz.timezone(timezonefinder.TimezoneFinder().timezone_at(lat=city.lat, lng=city.lon))
         hours = [w.reference_time("date").astimezone(tz=tz) for w in hourly]
         figure, left_axis = plt.subplots()
         left_axis.set_xlabel("Time")
