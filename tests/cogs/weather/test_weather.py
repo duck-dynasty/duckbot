@@ -54,14 +54,15 @@ def test_owm_returns_cached_instance(clazz, owm):
 @pytest.mark.asyncio
 async def test_weather_get_failure(clazz, owm, context):
     owm.weather_manager.side_effect = Exception("ded")
-    await clazz.weather(context, "city", None, None)
+    with pytest.raises(Exception):
+        await clazz.weather(context, "city", None, None)
     context.send.assert_called_once_with("Iunno. Figure it out.\nded")
 
 
 @pytest.mark.asyncio
 async def test_search_location_no_args(clazz, context):
     assert await clazz.search_location(context, None, None, None) is None
-    context.send.assert_called_once_with("Not enough arguments to determine weather location, see https://github.com/Chippers255/duckbot/wiki#weather")
+    context.send.assert_called_once_with("Not enough arguments to determine weather location, see https://github.com/Chippers255/duckbot/wiki/Commands#weather")
 
 
 @pytest.mark.asyncio
@@ -133,29 +134,33 @@ async def test_set_default_location_location_not_saved(clazz, session, context):
 
 
 @pytest.mark.asyncio
-async def test_get_weather_no_default_no_args(clazz, session, context):
+async def test_send_weather_no_default_no_args(clazz, session, context):
     session.get.return_value = None
-    await clazz.get_weather(context, None, None, None)
+    await clazz.send_weather(context, None, None, None)
     context.send.assert_called_once_with("Set a default location using `!weather set city country-code`")
 
 
 @pytest.mark.asyncio
-async def test_get_weather_default_location(clazz, session, context):
+@mock.patch("discord.File")
+async def test_send_weather_default_location(file, clazz, session, context):
     session.get.return_value = SavedLocation(id=1, name="city", country="country", city_id=123, latitude=1, longitude=2)
     clazz.weather_message = stub_weather_msg
-    await clazz.get_weather(context, None, None, None)
-    context.send.assert_called_once_with("weather")
+    clazz.weather_graph = stub_weather_gph
+    await clazz.send_weather(context, None, None, None)
+    context.send.assert_called_once_with("weather", file=file.return_value)
 
 
 @pytest.mark.asyncio
-async def test_get_weather_provided_location(clazz, context):
+@mock.patch("discord.File")
+async def test_send_weather_provided_location(file, clazz, context):
     async def mock_search_location(context, *args):
         return make_city("city")
 
     clazz.search_location = mock_search_location
     clazz.weather_message = stub_weather_msg
-    await clazz.get_weather(context, "city", None, None)
-    context.send.assert_called_once_with("weather")
+    clazz.weather_graph = stub_weather_gph
+    await clazz.send_weather(context, "city", None, None)
+    context.send.assert_called_once_with("weather", file=file.return_value)
 
 
 def test_weather_message_no_precipitation(clazz):
@@ -196,13 +201,35 @@ def test_weather_message_hot(clazz):
     assert "I might need to take a break today, it hot." in message
 
 
+@pytest.fixture
+@mock.patch("duckbot.cogs.weather.weather.plt")
+def plt(plot):
+    fig = mock.MagicMock()
+    axis = mock.MagicMock()
+    plot.subplots.return_value = (fig, axis)
+    axis.twinx.return_value = axis
+    axis.bar.return_value = []
+    return plot
+
+
+@mock.patch("timezonefinder.TimezoneFinder")
+def test_weather_graph_for_code_coverage(tzfinder, clazz, plt):
+    tzfinder.return_value.timezone_at.return_value = "US/Eastern"
+    img = clazz.weather_graph(make_city("city"), one_call())
+    assert img == "weather.png"
+
+
 def stub_weather_msg(city, weather):
     return "weather"
 
 
+def stub_weather_gph(city, weather):
+    return "weather.png"
+
+
 def one_call(status=None, prec_chance=49.9, max_temp=10):
     wea = weather(status, prec_chance, max_temp)
-    return OneCall(lat=1, lon=1, timezone="UTC", current=wea, forecast_daily=[wea])
+    return OneCall(lat=1, lon=1, timezone="UTC", current=wea, forecast_daily=[wea], forecast_hourly=[wea] * 24)
 
 
 def weather(status, prec_chance, max_temp):
@@ -211,8 +238,8 @@ def weather(status, prec_chance, max_temp):
         sunset_time=0,
         sunrise_time=0,
         clouds=0,
-        rain={"all": 1.9},
-        snow={"all": 2.9},
+        rain={"all": 1.9, "1h": 0.5},
+        snow={"all": 2.9, "1h": 1.5},
         wind=None,
         humidity=0,
         pressure=None,
