@@ -80,7 +80,7 @@ jobs:
     - name: Build and Push Docker Image
       run: |
         docker buildx bake \
-          --set '*.platform=linux/arm/v7' \
+          --set '*.platform=linux/arm/v7,linux/amd64' \
           --push \
           --set '*.cache-from=type=local,src=/tmp/.buildx-cache' \
           --set '*.cache-to=type=local,dest=/tmp/.buildx-cache'
