@@ -3,6 +3,7 @@ import random
 from discord.ext import commands
 
 from duckbot.util.emojis import regional_indicator
+from duckbot.util.messages import try_delete
 
 
 class Duck(commands.Cog):
@@ -23,15 +24,20 @@ class Duck(commands.Cog):
                 await message.add_reaction(regional_indicator(c))
 
     @commands.command(name="duck")
-    async def github(self, context):
-        await self.__github(context)
+    async def duck_command(self, context):
+        await self.github(context)
 
-    async def __github(self, context):
+    async def github(self, context):
         await context.send("https://github.com/Chippers255/duckbot")
 
     @commands.command(name="help")
-    async def wiki(self, context):
-        await self.__wiki(context)
+    async def wiki_command(self, context):
+        await self.wiki(context)
 
-    async def __wiki(self, context):
+    async def wiki(self, context):
         await context.send("https://github.com/Chippers255/duckbot/wiki")
+
+    @duck_command.after_invoke
+    @wiki_command.after_invoke
+    async def delete_command_message(self, context):
+        await try_delete(context.message)
