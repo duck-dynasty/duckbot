@@ -143,35 +143,36 @@ class Weather(commands.Cog):
         hourly = [weather.forecast_hourly[i] for i in range(24)]
         tz = pytz.timezone(timezonefinder.TimezoneFinder().timezone_at(lat=city.lat, lng=city.lon))
         hours = [w.reference_time("date").astimezone(tz=tz) for w in hourly]
-        figure, left_axis = plt.subplots()
-        left_axis.set_xlabel("Time")
-        left_axis.set_ylabel(f"Temperature ({degrees})")
-        left_axis.plot(hours, [w.temperature()["temp"] for w in hourly], label="Temperature", color="orangered")
-        left_axis.plot(hours, [w.temperature()["feels_like"] for w in hourly], label="Feels Like", color="forestgreen")
-        left_axis.legend(loc="upper left")
-        left_axis.set_facecolor("ghostwhite")
+        with plt.xkcd():
+            figure, left_axis = plt.subplots()
+            left_axis.set_xlabel("Time")
+            left_axis.set_ylabel(f"Temperature ({degrees})")
+            left_axis.plot(hours, [w.temperature()["temp"] for w in hourly], label="Temperature", color="orangered")
+            left_axis.plot(hours, [w.temperature()["feels_like"] for w in hourly], label="Feels Like", color="forestgreen")
+            left_axis.legend(loc="upper left")
+            left_axis.set_facecolor("ghostwhite")
 
-        right_axis = left_axis.twinx()
-        right_axis.set_ylabel("Precipitation")
-        rain = [w.rain["1h"] if "1h" in w.rain else 0 for w in hourly]
-        snow = [w.snow["1h"] if "1h" in w.snow else 0 for w in hourly]
-        rects_rain = right_axis.bar(hours, rain, label="Rain (mm)", color="blue", alpha=0.3, width=1.0 / 24)
-        rects_snow = right_axis.bar(hours, snow, bottom=rain, label="Snow (cm)", color="powderblue", alpha=0.3, width=1.0 / 24)
-        right_axis.legend(loc="upper right")
+            right_axis = left_axis.twinx()
+            right_axis.set_ylabel("Precipitation")
+            rain = [w.rain["1h"] if "1h" in w.rain else 0 for w in hourly]
+            snow = [w.snow["1h"] if "1h" in w.snow else 0 for w in hourly]
+            rects_rain = right_axis.bar(hours, rain, label="Rain (mm)", color="blue", alpha=0.3, width=1.0 / 24)
+            rects_snow = right_axis.bar(hours, snow, bottom=rain, label="Snow (cm)", color="powderblue", alpha=0.3, width=1.0 / 24)
+            right_axis.legend(loc="upper right")
 
-        y_max = max(1, max([r.get_height() + s.get_height() for r, s in zip(rects_rain, rects_snow)]))
-        right_axis.set_ylim([0, y_max])
+            y_max = max(1, max([r.get_height() + s.get_height() for r, s in zip(rects_rain, rects_snow)]))
+            right_axis.set_ylim([0, y_max])
 
-        for i, w in enumerate(hourly):
-            probability = round(w.precipitation_probability * 100)
-            plt.text(hours[i], 0.2 * y_max, f"{probability}%", ha="center", va="center", rotation=90, color="darkblue", alpha=0.5)
-            plt.text(hours[i], 0.75 * y_max, w.detailed_status, ha="center", va="center", rotation=90, color="black", alpha=0.5)
+            for i, w in enumerate(hourly):
+                probability = round(w.precipitation_probability * 100)
+                plt.text(hours[i], 0.2 * y_max, f"{probability}%", ha="center", va="center", rotation=90, color="darkblue", alpha=0.5)
+                plt.text(hours[i], 0.75 * y_max, w.detailed_status, ha="center", va="center", rotation=90, color="black", alpha=0.5)
 
-        one_hour = datetime.timedelta(hours=1)
-        left_axis.xaxis.set_major_locator(mdates.HourLocator(interval=4, tz=tz))
-        left_axis.xaxis.set_major_formatter(mdates.DateFormatter("%I%p" if os.name == "nt" else "%-I%p", tz=tz))
-        left_axis.set_xlim(min(hours) - one_hour, max(hours) + one_hour)
-        plt.setp(left_axis.get_xticklabels(), rotation=30, horizontalalignment="right")
-        figure.tight_layout()
-        plt.savefig("weather.png", facecolor="ghostwhite")
-        return "weather.png"
+            one_hour = datetime.timedelta(hours=1)
+            left_axis.xaxis.set_major_locator(mdates.HourLocator(interval=4, tz=tz))
+            left_axis.xaxis.set_major_formatter(mdates.DateFormatter("%I%p" if os.name == "nt" else "%-I%p", tz=tz))
+            left_axis.set_xlim(min(hours) - one_hour, max(hours) + one_hour)
+            plt.setp(left_axis.get_xticklabels(), rotation=30, horizontalalignment="right")
+            figure.tight_layout()
+            plt.savefig("weather.png", facecolor="ghostwhite")
+            return "weather.png"
