@@ -31,6 +31,7 @@ class PostInstall(install):
 
 
 if __name__ == "__main__":
+
     setup(
         name="duckbot",
         version="1.0",
