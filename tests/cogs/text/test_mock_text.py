@@ -18,11 +18,3 @@ async def test_mock_text_no_message(bot, context):
     await clazz.mock_text(context, "")
     context.send.assert_called_once_with("BoB, bAsEd On ThIs, I sHoUlD mOcK yOu... I nEeD tExT dUdE.")
     context.message.delete.assert_called()
-
-
-@pytest.mark.asyncio
-async def test_mock_text_message_too_long(bot, context):
-    clazz = MockText(bot)
-    await clazz.mock_text(context, "a " * 999)
-    context.send.assert_called_once_with("ThAt'S tOo MuCh LeTtErS aNd StUfF gUy.")
-    context.message.delete.assert_called()
