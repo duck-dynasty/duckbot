@@ -13,14 +13,12 @@ class MockText(commands.Cog):
 
     async def mock_text(self, context, text: str):
         if text == "":
-            mocked_text = await self.mockify("based on this, I should mock you... I need text dude.")
-            await context.send(f"{context.message.author.display_name}, {mocked_text}")
+            mocked_text = await self.mockify(f"{context.message.author.display_name}, based on this, I should mock you... I need text dude.")
         elif len(text) > 1990:
-            mocked_text = await self.mockify("that's too much letters and stuff dude.")
-            await context.send(f"{mocked_text}")
+            mocked_text = await self.mockify("that's too much letters and stuff guy.")
         else:
             mocked_text = await self.mockify(text.strip())
-            await context.send(f"{mocked_text}")
+        await context.send(f"{mocked_text}")
         await try_delete(context.message)
 
     async def mockify(self, text: str):
