@@ -1,7 +1,6 @@
 import pytest
 
-from duckbot.cogs.text import AsciiArt
-from duckbot.cogs.text import MockText
+from duckbot.cogs.text import AsciiArt, MockText
 from duckbot.cogs.text import setup as extension_setup
 from tests.discord_test_ext import assert_cog_added_of_type
 
