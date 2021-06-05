@@ -4,6 +4,7 @@ import d20
 import pytest
 
 from duckbot.cogs.games import Dice
+from duckbot.util.messages import MAX_MESSAGE_LENGTH
 
 
 @pytest.mark.asyncio
@@ -24,11 +25,11 @@ async def test_roll_dice_too_many_dice(bot, context):
 @pytest.mark.asyncio
 @mock.patch("d20.Roller")
 async def test_roll_result_too_long_for_message(roller, bot, context):
-    roller.return_value.roll.return_value.result = "x" * 1951
+    roller.return_value.roll.return_value.result = "x" * MAX_MESSAGE_LENGTH
     roller.return_value.roll.return_value.total = 100
     clazz = Dice(bot)
     await clazz.roll(context, "1d20")
-    context.send.assert_called_once_with(f"**Rolls**: {'x' * 1950}...\n**Total**: 100")
+    context.send.assert_called_once_with(f"**Rolls**: {'x' * (MAX_MESSAGE_LENGTH - 50)}...\n**Total**: 100")
 
 
 @pytest.mark.asyncio

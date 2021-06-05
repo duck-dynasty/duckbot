@@ -1,6 +1,8 @@
 import d20
 from discord.ext import commands
 
+from duckbot.util.messages import MAX_MESSAGE_LENGTH
+
 
 class Dice(commands.Cog):
     def __init__(self, bot):
@@ -11,10 +13,11 @@ class Dice(commands.Cog):
         await self.roll(context, expression)
 
     async def roll(self, context, expression: str):
+        max_length = MAX_MESSAGE_LENGTH - 50  # max-50 as a buffer for the added text
         try:
             roller = self.make_roller(100_000)
             result = roller.roll(expression, allow_comments=True, stringifier=DiceStringifier())
-            text = f"{result.result[:1950]}..." if len(result.result) > 1950 else result.result
+            text = f"{result.result[:max_length]}..." if len(result.result) > max_length else result.result
             await context.send(f"**Rolls**: {text}\n**Total**: {result.total}")
         except d20.errors.TooManyRolls:
             await context.send(f"I can only roll up to {roller.context.max_rolls} dice.", delete_after=30)
