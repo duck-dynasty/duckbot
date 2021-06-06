@@ -13,7 +13,7 @@ async def test_mock_text_mocks_message(bot, command_context):
 
 @pytest.mark.asyncio
 async def test_mock_text_no_message(bot, command_context):
-    context.message.author.display_name = "bob"
+    command_context.message.author.display_name = "bob"
     clazz = MockText(bot)
     await clazz.mock_text(command_context, "")
     command_context.send.assert_called_once_with("BoB, bAsEd On ThIs, I sHoUlD mOcK yOu... I nEeD tExT dUdE.")
