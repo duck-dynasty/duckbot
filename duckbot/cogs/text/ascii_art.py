@@ -1,6 +1,8 @@
 import pyfiglet
 from discord.ext import commands
 
+from duckbot.util.messages import MAX_MESSAGE_LENGTH
+
 
 class AsciiArt(commands.Cog):
     def __init__(self, bot):
@@ -12,7 +14,7 @@ class AsciiArt(commands.Cog):
 
     async def ascii(self, context, text: str):
         art = str(pyfiglet.figlet_format(text.strip()))
-        if len(art) < 1990:
+        if len(art) < MAX_MESSAGE_LENGTH - 6:  # max-6 for the ``` characters
             await context.send(f"```{art}```")
         else:
             art = str(pyfiglet.figlet_format("Happy Birthday!"))
