@@ -2,6 +2,8 @@ import subprocess
 
 from discord.ext import commands
 
+from duckbot.util.messages import MAX_MESSAGE_LENGTH
+
 
 class Fortune(commands.Cog):
     def __init__(self, bot):
@@ -13,7 +15,7 @@ class Fortune(commands.Cog):
 
     def get_fortune(self):
         message = self.__get_fortune_output()
-        while len(message) > 1950:  # discord has a 2000 character limit, just leaving a buffer
+        while len(message) > MAX_MESSAGE_LENGTH - 6:  # max-6 for the ``` characters
             message = self.__get_fortune_output()
         return f"```{message}```"
 

@@ -11,7 +11,7 @@ RUN apt-get update && apt-get -y install \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 COPY pyproject.toml .
 COPY setup.py .
-RUN pip install --no-cache-dir --extra-index-url https://www.piwheels.org/simple .
+RUN pip install --extra-index-url https://www.piwheels.org/simple .
 
 FROM python:3.8-slim as prod
 # ffmpeg: for discord audio
