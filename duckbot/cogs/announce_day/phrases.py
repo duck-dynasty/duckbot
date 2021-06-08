@@ -4,6 +4,7 @@ days = {
             "the day of the moon",
             "Moonday",
             "Monday",
+            "the first day of the week according to the ISO 8601 standard",
         ],
         "templates": [
             "Screw this, it is {0}.",
@@ -72,6 +73,7 @@ days = {
             "the day of the sun",
             "Sunday",
             "Sunday, Sunday, Sunday",
+            "the first day of the week",
         ],
         "templates": [
             "WEEKEND ALERT: {0}!",
