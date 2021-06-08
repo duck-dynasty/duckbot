@@ -91,6 +91,7 @@ jobs:
         path: wiki
       env:
         GH_PERSONAL_ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        WIKI_COMMIT_MESSAGE: ${{ github.event.commits[0].message }}
 
     - name: Trigger Deployment
       run: |
