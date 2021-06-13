@@ -45,6 +45,7 @@ If `location` is omitted, DuckBot will try to use the default location you have 
 The `location` is a little finicky. It takes the form of `city country-code index`.  
 If the city name includes spaces, you have to put it `"in quotes"`.  
 The country code is the two character country code (like CA for Canada), or the two character state code for cities in the USA.  
+Commas will be removed from city and country names.  
 If there's ever ambiguity, DuckBot will respond with all of the cities found for the search, and will number them all. After specifying the city and country code, you can specify the index to select a single city from the list.
 
 Here's an example usage:
