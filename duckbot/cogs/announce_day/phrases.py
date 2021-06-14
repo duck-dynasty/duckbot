@@ -4,10 +4,12 @@ days = {
             "the day of the moon",
             "Moonday",
             "Monday",
+            "the first day of the week according to the ISO 8601 standard",
         ],
         "templates": [
             "Screw this, it is {0}.",
         ],
+        "gifs": [],
     },
     1: {
         "names": [
@@ -19,6 +21,7 @@ days = {
         "templates": [
             "Yo, one of my favourite days ever: {0}.",
         ],
+        "gifs": [],
     },
     2: {
         "names": [
@@ -30,6 +33,7 @@ days = {
             "https://www.youtube.com/watch?v=du-TY1GUFGk",
         ],
         "templates": [],
+        "gifs": [],
     },
     3: {
         "names": [
@@ -39,6 +43,7 @@ days = {
             "Thursday",
         ],
         "templates": [],
+        "gifs": [],
     },
     4: {
         "names": [
@@ -48,6 +53,9 @@ days = {
             "Friday",
         ],
         "templates": [],
+        "gifs": [
+            "https://tenor.com/view/nicolas-cage-friday-feel-that-friday-feeling-feel-that-thats-friday-gif-12235300",
+        ],
     },
     5: {
         "names": [
@@ -58,19 +66,23 @@ days = {
         "templates": [
             "WEEKEND ALERT: {0}!",
         ],
+        "gifs": [],
     },
     6: {
         "names": [
             "the day of the sun",
             "Sunday",
             "Sunday, Sunday, Sunday",
+            "the first day of the week",
         ],
         "templates": [
             "WEEKEND ALERT: {0}!",
         ],
+        "gifs": [],
     },
 }
 
+# {0} is today, {1} is tomorrow
 templates = [
     "Today is {0}.",
     "Today: {0}. Tomorrow: {1}.",

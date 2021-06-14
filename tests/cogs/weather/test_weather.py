@@ -76,6 +76,15 @@ async def test_search_location_no_matches(clazz, context, city_id):
 async def test_search_location_single_return_city_only(clazz, context, city_id):
     city_id.locations_for.return_value = [make_city("city")]
     city = await clazz.search_location(context, "city", None, None)
+    city_id.locations_for.assert_called_once_with("city", country=None)
+    assert city.to_dict() == make_city("city").to_dict()
+
+
+@pytest.mark.asyncio
+async def test_search_location_city_name_with_comma_removed(clazz, context, city_id):
+    city_id.locations_for.return_value = [make_city("city")]
+    city = await clazz.search_location(context, "city,", None, None)
+    city_id.locations_for.assert_called_once_with("city", country=None)
     assert city.to_dict() == make_city("city").to_dict()
 
 
@@ -83,6 +92,7 @@ async def test_search_location_single_return_city_only(clazz, context, city_id):
 async def test_search_location_single_return_country_arg(clazz, context, city_id):
     city_id.locations_for.return_value = [make_city("city")]
     city = await clazz.search_location(context, "city", "US", None)
+    city_id.locations_for.assert_called_once_with("city", country="US")
     assert city.to_dict() == make_city("city").to_dict()
 
 
