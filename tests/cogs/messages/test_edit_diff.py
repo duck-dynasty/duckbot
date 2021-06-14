@@ -11,14 +11,15 @@ from duckbot.cogs.messages import EditDiff
 @pytest.mark.parametrize(
     "before_text,after_text,diff",
     [
-        ("a", "ba", "{+b+}a"),
-        ("a", "ab", "a{+b+}"),
-        ("ab", "a", "a[-b-]"),
-        ("ba", "a", "[-b-]a"),
-        ("abc", "dbc", "[-a-]{+d+}bc"),
-        ("abc", "abd", "ab[-c-]{+d+}"),
-        ("abc", "bcd", "[-a-]bc{+d+}"),
-        ("abc", "def", "[-abc-]{+def+}"),
+        ("replace", "word", "[-replace-]{+word+}"),
+        ("add space", "add   space", "add[- -]{+   +}space"),
+        ("add word", "add middle word", "add {+middle +}word"),
+        ("add", "add word", "add{+ word+}"),
+        ("word", "add word", "{+add +}word"),
+        ("remove word", "remove", "remove[- word-]"),
+        ("remove word", "word", "[-remove -]word"),
+        ("two words", "two things", "two [-words-]{+things+}"),
+        ("two words", "full change", "[-two-]{+full+} [-words-]{+change+}"),
     ],
 )
 async def test_show_edit_diff_typical_case(before, after, before_text, after_text, diff, bot):
