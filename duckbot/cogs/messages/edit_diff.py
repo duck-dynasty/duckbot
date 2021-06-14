@@ -1,3 +1,4 @@
+import re
 from difflib import ndiff
 
 from discord.ext import commands
@@ -14,14 +15,18 @@ class EditDiff(commands.Cog):
 
         msg = ""
         prev = " "  # start out as no change
-        for d in ndiff(before.clean_content, after.clean_content):
+        for d in ndiff(self.split_words(before.clean_content), self.split_words(after.clean_content)):
             change = d[0]
-            msg += self.try_leave_diff_chunk(change, prev)
-            msg += self.try_enter_diff_chunk(change, prev)
-            msg += d[-1]  # append the letter
-            prev = change
+            if change != "?":  # ignore stuff not in either message
+                msg += self.try_leave_diff_chunk(change, prev)
+                msg += self.try_enter_diff_chunk(change, prev)
+                msg += d[2:]  # append the letter
+                prev = change
         msg += self.try_leave_diff_chunk(" ", prev)  # close the final diff chunk if necessary
         await after.channel.send(f":eyes: {after.author.mention}.\n{msg}", delete_after=300)
+
+    def split_words(self, content):
+        return re.split(r"(\s+)", content)
 
     def try_leave_diff_chunk(self, change, prev):
         if change != prev and prev != " ":
