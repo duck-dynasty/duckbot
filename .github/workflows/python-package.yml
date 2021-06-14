@@ -85,9 +85,18 @@ jobs:
           --set '*.cache-from=type=local,src=/tmp/.buildx-cache' \
           --set '*.cache-to=type=local,dest=/tmp/.buildx-cache'
 
+    - name: Publish Wiki Documentation
+      uses: SwiftDocOrg/github-wiki-publish-action@v1
+      with:
+        path: wiki
+      env:
+        GH_PERSONAL_ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        WIKI_COMMIT_MESSAGE: ${{ github.event.commits[0].message }}
+        GITHUB_ACTOR: ${{ github.event.commits[0].author.name }}
+
     - name: Trigger Deployment
       run: |
-        curl -X POST https://api.github.com/repos/${{ secrets.DEPLOY_REPO }}/dispatches \
+        curl -X POST $GITHUB_API_URL/repos/${{ secrets.DEPLOY_REPO }}/dispatches \
           -u "${{ secrets.ACCESS_TOKEN }}" \
           -H "Accept: application/vnd.github.everest-preview+json" \
           -H "Content-Type: application/json" \

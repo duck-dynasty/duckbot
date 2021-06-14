@@ -1,4 +1,5 @@
 import datetime
+import logging
 import random
 
 import discord
@@ -9,6 +10,8 @@ from discord.ext import commands, tasks
 from .phrases import days, templates
 from .special_days import SpecialDays
 
+log = logging.getLogger(__name__)
+
 
 class AnnounceDay(commands.Cog):
     def __init__(self, bot, dog_photos):
@@ -16,10 +19,10 @@ class AnnounceDay(commands.Cog):
         self.dog_photos = dog_photos
         self.tz = pytz.timezone("US/Eastern")
         self.holidays = SpecialDays(bot)
-        self.on_hour.start()
+        self.on_hour_loop.start()
 
     def cog_unload(self):
-        self.on_hour.cancel()
+        self.on_hour_loop.cancel()
 
     def should_announce_day(self):
         now = datetime.datetime.now(self.tz)
@@ -38,23 +41,35 @@ class AnnounceDay(commands.Cog):
             return message
 
     @tasks.loop(hours=1.0)
-    async def on_hour(self):
-        await self.__on_hour()
+    async def on_hour_loop(self):
+        await self.on_hour()
 
-    async def __on_hour(self):
+    async def on_hour(self):
         if self.should_announce_day():
             channel = discord.utils.get(self.bot.get_all_channels(), guild__name="Friends Chat", name="general", type=ChannelType.text)
             if channel:
                 message = self.get_message()
                 await channel.send(message)
-                if random.random() < 1.0 / 10.0:
-                    try:
-                        dogs = [":dog:", ":dog2:", ":guide_dog:", ":service_dog:"]
-                        await channel.send(f"Also, here's a dog! {random.choice(dogs)}\n{self.dog_photos.get_dog_image()}")
-                    except Exception:
-                        pass  # ignore failures for sending dog photo
 
-    @on_hour.before_loop
+                should_send_dog = random.random() < 1.0 / 10.0
+                should_send_gif = not should_send_dog and random.random() < 1.0 / 10.0
+                await self.send_dog(channel) if should_send_dog else None
+                await self.send_gif(channel) if should_send_gif else None
+
+    async def send_dog(self, channel):
+        try:
+            dogs = [":dog:", ":dog2:", ":guide_dog:", ":service_dog:"]
+            await channel.send(f"Also, here's a dog! {random.choice(dogs)}\n{self.dog_photos.get_dog_image()}")
+        except Exception as e:
+            log.warning(e, exc_info=True)  # ignore failures for sending dog photo
+
+    async def send_gif(self, channel):
+        now = datetime.datetime.now(self.tz)
+        day = now.weekday()
+        if days[day]["gifs"]:
+            await channel.send(random.choice(days[day]["gifs"]))
+
+    @on_hour_loop.before_loop
     async def before_loop(self):
         await self.bot.wait_until_ready()
 

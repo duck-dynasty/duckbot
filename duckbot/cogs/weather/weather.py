@@ -60,11 +60,11 @@ class Weather(commands.Cog):
 
     async def search_location(self, context, city: str, country: str, index: int) -> Optional[Location]:
         if city is not None:
-            country = country.upper() if country is not None else None
+            country = country.upper().replace(",", "") if country is not None else None
             if country is not None and len(country) != 2:
                 await context.send("Country must be an ISO country code, such as CA for Canada.")
                 return None
-            locations = self.owm().city_id_registry().locations_for(city, country=country)
+            locations = self.owm().city_id_registry().locations_for(city.replace(",", ""), country=country)
             if not locations:
                 await context.send("No cities found matching search.")
                 return None
@@ -73,7 +73,7 @@ class Weather(commands.Cog):
                     return locations[int(index) - 1]
                 else:
                     message = "Multiple cities found matching search.\nNarrow your search or specify an index to pick one of the following:\n"
-                    options = [f"{i+1}: {self.__location_string(city)}" for i, city in enumerate(locations)]
+                    options = [f"{i+1}: {self.__location_string(c)}" for i, c in enumerate(locations)]
                     await context.send(message + "\n".join(options))
                     return None
             else:
