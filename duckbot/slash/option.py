@@ -61,3 +61,6 @@ class SubCommand(Option):
     @property
     def options(self) -> typing.List:
         return self._options
+
+    def __eq__(self, other) -> bool:
+        return super().__eq__(other)  # just to make LGTM happy, no real need to override since it uses to_dict()
