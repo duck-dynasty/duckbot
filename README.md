@@ -3,7 +3,7 @@
 [![GitHub Issues](https://img.shields.io/github/issues/chippers255/duckbot)](https://github.com/Chippers255/duckbot/issues)
 [![Build Status](https://img.shields.io/github/workflow/status/Chippers255/duckbot/DuckBot%20CI)](https://github.com/Chippers255/duckbot/actions/workflows/python-package.yml)
 [![codecov](https://codecov.io/gh/Chippers255/duckbot/branch/main/graph/badge.svg?token=FX4DT5MWBW)](https://codecov.io/gh/Chippers255/duckbot)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Chippers255_duckbot&metric=alert_status)](https://sonarcloud.io/dashboard?id=Chippers255_duckbot)
+[![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/Chippers255/duckbot.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Chippers255/duckbot/context:python)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
 
