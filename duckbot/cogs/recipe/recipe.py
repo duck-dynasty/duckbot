@@ -29,7 +29,7 @@ class Recipe(commands.Cog):
             try:
                 data["name"] = article.find("h3", {"class": "card__title"}).get_text().strip(" \t\n\r")
                 data["description"] = article.find("div", {"class": "card__summary"}).get_text().strip(" \t\n\r")
-                data["url"] = article.find("a", href=re.compile("^https://www.allrecipes.com/recipe/"))["href"]
+                data["url"] = article.find("a", href=re.compile(r"^https://www\.allrecipes\.com/recipe/"))["href"]
                 data["rating"] = len(article.findAll("span", {"class": "rating-star active"}))
 
                 recipe_list.append(data)
