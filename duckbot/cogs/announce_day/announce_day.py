@@ -52,7 +52,7 @@ class AnnounceDay(commands.Cog):
                 await channel.send(message)
 
                 should_send_dog = random.random() < 1.0 / 10.0
-                should_send_gif = not should_send_dog and random.random() < 1.0 / 9.0  # 10%, since relies on not sending dog gif
+                should_send_gif = not should_send_dog and random.random() < 1.0 / 9.0  # 10%, since relies on not sending dog photo
                 await self.send_dog(channel) if should_send_dog else None
                 await self.send_gif(channel) if should_send_gif else None
 
