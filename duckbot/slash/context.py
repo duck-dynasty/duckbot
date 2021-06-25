@@ -2,8 +2,7 @@ import json
 from typing import Optional
 
 import aiohttp
-import discord
-from discord import Client
+from discord import Client, Embed, File
 from discord.ext.commands import Command
 from discord.ext.commands.view import StringView
 
@@ -69,7 +68,7 @@ class InteractionContext:
     def command(self, value):
         self._command = value
 
-    async def send(self, content="", *, embed: Optional[discord.Embed] = None, file: Optional[discord.File] = None, delete_after: Optional[float] = None) -> None:
+    async def send(self, content="", *, embed: Optional[Embed] = None, file: Optional[File] = None, delete_after: Optional[float] = None) -> None:
         """
         Send a message as a response to an interaction.
         If you want to send multiple responses, you have to use `typing()` first.
