@@ -32,7 +32,9 @@ days = {
             "Ness' wedding day",
             "https://www.youtube.com/watch?v=du-TY1GUFGk",
         ],
-        "templates": [],
+        "templates": [
+            "It is {0}, my dudes.",
+        ],
         "gifs": [],
     },
     3: {
