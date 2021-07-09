@@ -55,7 +55,10 @@ days = {
             "Friday",
         ],
         "templates": [],
-        "gifs": ["https://tenor.com/view/nicolas-cage-friday-feel-that-friday-feeling-feel-that-thats-friday-gif-12235300", "https://i.redd.it/sp2b24o1e4a71.jpg"],
+        "gifs": [
+            "https://tenor.com/view/nicolas-cage-friday-feel-that-friday-feeling-feel-that-thats-friday-gif-12235300",
+            "https://i.redd.it/sp2b24o1e4a71.jpg",
+        ],
     },
     5: {
         "names": [
@@ -75,7 +78,10 @@ days = {
             "Sunday, Sunday, Sunday",
             "the first day of the week",
         ],
-        "templates": ["WEEKEND ALERT: {0}!", "It's {0}, but is it RACE DAY?"],
+        "templates": [
+            "WEEKEND ALERT: {0}!",
+            "It's {0}, but is it RACE DAY?",
+        ],
         "gifs": [],
     },
 }
