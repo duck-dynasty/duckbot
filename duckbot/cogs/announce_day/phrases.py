@@ -58,6 +58,7 @@ days = {
         "gifs": [
             "https://tenor.com/view/nicolas-cage-friday-feel-that-friday-feeling-feel-that-thats-friday-gif-12235300",
             "https://i.redd.it/sp2b24o1e4a71.jpg",
+            "https://i.redd.it/sp2b24o1e4a71.jpg",
         ],
     },
     5: {
