@@ -86,7 +86,7 @@ days = {
     },
 }
 
-# {0} is today, {1} is tomorrow
+# {0} is today, {1} is tomorrow, {2} is yesterday
 templates = [
     "Today is {0}.",
     "Today: {0}. Tomorrow: {1}.",
@@ -106,5 +106,6 @@ templates = [
     "Beep boop: {0}.",
     "I take no pleasure in announcing that today is {0}, for I am a robot.",
     "I take no displeasure in announcing that today is {0}, for I am a robot.",
+    "Today was {2}. But, that's over.",
     "Fek, figure it out.",
 ]
