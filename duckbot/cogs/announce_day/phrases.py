@@ -52,6 +52,7 @@ days = {
             "Frigga's day",
             "Friday, Friday, gotta get down on Friday",
             "Stir Fry day",
+            "Friyay",
             "Friday",
         ],
         "templates": [],
