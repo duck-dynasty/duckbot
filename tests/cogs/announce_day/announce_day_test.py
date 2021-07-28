@@ -41,24 +41,26 @@ async def test_cog_unload_cancels_task(bot, dog_photos):
 
 @pytest.mark.asyncio
 @mock.patch("random.random", return_value=0.5)
-async def test_on_hour_7am_eastern_special_day(random, bot, dog_photos, guild_channel, setup_general_channel):
+@mock.patch("random.choice", side_effect=["today", "tomorrow", "yesterday", "{0} {1} {2}"])
+async def test_on_hour_7am_eastern_special_day(random, choice, bot, dog_photos, guild_channel, setup_general_channel):
     with patch_now(datetime.datetime(2002, 1, 1, hour=7)):
         clazz = AnnounceDay(bot, dog_photos)
         await clazz.on_hour()
         if guild_channel.type == ChannelType.text:
-            guild_channel.send.assert_called()
+            guild_channel.send.assert_called_once_with("today tomorrow yesterday\nIt is also New Year's Day.")
         else:
             assert not guild_channel.method_calls
 
 
 @pytest.mark.asyncio
 @mock.patch("random.random", return_value=0.5)
-async def test_on_hour_7am_eastern_not_special_day(random, bot, dog_photos, guild_channel, setup_general_channel):
+@mock.patch("random.choice", side_effect=["today", "tomorrow", "yesterday", "{0} {1} {2}"])
+async def test_on_hour_7am_eastern_not_special_day(random, choice, bot, dog_photos, guild_channel, setup_general_channel):
     with patch_now(datetime.datetime(2002, 1, 21, hour=7)):
         clazz = AnnounceDay(bot, dog_photos)
         await clazz.on_hour()
         if guild_channel.type == ChannelType.text:
-            guild_channel.send.assert_called()
+            guild_channel.send.assert_called_once_with("today tomorrow yesterday")
         else:
             assert not guild_channel.method_calls
 

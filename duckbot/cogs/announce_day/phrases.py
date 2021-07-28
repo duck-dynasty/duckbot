@@ -15,7 +15,6 @@ days = {
         "names": [
             "Tyr's day",
             "Tuesday",
-            "Dndndndndndndnd",
             "Taco Tuesday",
         ],
         "templates": [
@@ -30,6 +29,7 @@ days = {
             "Wednesday, my dudes",
             "hump day",
             "Ness' wedding day",
+            "Dndndndndndndnd",
             "https://www.youtube.com/watch?v=du-TY1GUFGk",
         ],
         "templates": [
@@ -52,11 +52,13 @@ days = {
             "Frigga's day",
             "Friday, Friday, gotta get down on Friday",
             "Stir Fry day",
+            "Friyay",
             "Friday",
         ],
         "templates": [],
         "gifs": [
             "https://tenor.com/view/nicolas-cage-friday-feel-that-friday-feeling-feel-that-thats-friday-gif-12235300",
+            "https://i.redd.it/sp2b24o1e4a71.jpg",
         ],
     },
     5: {
@@ -79,12 +81,13 @@ days = {
         ],
         "templates": [
             "WEEKEND ALERT: {0}!",
+            "It's {0}, but is it RACE DAY?",
         ],
         "gifs": [],
     },
 }
 
-# {0} is today, {1} is tomorrow
+# {0} is today, {1} is tomorrow, {2} is yesterday
 templates = [
     "Today is {0}.",
     "Today: {0}. Tomorrow: {1}.",
@@ -104,5 +107,6 @@ templates = [
     "Beep boop: {0}.",
     "I take no pleasure in announcing that today is {0}, for I am a robot.",
     "I take no displeasure in announcing that today is {0}, for I am a robot.",
+    "Today was {2}. But, that's over.",
     "Fek, figure it out.",
 ]
