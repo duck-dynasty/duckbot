@@ -35,7 +35,9 @@ days = {
         "templates": [
             "It is {0}, my dudes.",
         ],
-        "gifs": [],
+        "gifs": [
+            "https://giphy.com/gifs/yazagames-frog-wednesday-inkulinati-d7HbZN8aQh1Mh3ZnKw",
+        ],
     },
     3: {
         "names": [
