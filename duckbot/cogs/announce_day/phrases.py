@@ -44,7 +44,9 @@ days = {
             "civ day",
             "Thursday",
         ],
-        "templates": [],
+        "templates": [
+            "14",
+        ],
         "gifs": [],
     },
     4: {
