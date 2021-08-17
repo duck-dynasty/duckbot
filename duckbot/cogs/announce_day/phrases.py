@@ -46,7 +46,9 @@ days = {
             "civ day",
             "Thursday",
         ],
-        "templates": [],
+        "templates": [
+            "14",
+        ],
         "gifs": [],
     },
     4: {
@@ -94,6 +96,7 @@ templates = [
     "Today is {0}.",
     "Today: {0}. Tomorrow: {1}.",
     "Brothers, the day is {0}.",
+    "yo it's {0}",
     "Yoooooo, today is {0}! Brother.",
     "The day is {0}. Prepare yourself.",
     "What if I said to you that in fact, today is not {0}? I'd be lying.",
