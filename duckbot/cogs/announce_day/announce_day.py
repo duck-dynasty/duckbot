@@ -61,7 +61,7 @@ class AnnounceDay(commands.Cog):
 
     async def send_dog(self, channel):
         try:
-            dogs = [":dog:", ":dog2:", ":guide_dog:", ":service_dog:"]
+            dogs = [":dog:", ":dog2:", ":guide_dog:", ":service_dog:", ":hotdog:", ":feet:", ":bone:"]
             await channel.send(f"Also, here's a dog! {random.choice(dogs)}\n{self.dog_photos.get_dog_image()}")
         except Exception as e:
             log.warning(e, exc_info=True)  # ignore failures for sending dog photo
