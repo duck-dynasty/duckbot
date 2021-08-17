@@ -9,7 +9,7 @@ class DogPhotos(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="dog")
+    @commands.command(name="dog", aliases=["doge"])
     async def dog_command(self, context, *, breed: Optional[str] = None):
         await self.dog(context, breed)
 

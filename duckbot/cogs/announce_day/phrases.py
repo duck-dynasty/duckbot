@@ -9,7 +9,9 @@ days = {
         "templates": [
             "Screw this, it is {0}.",
         ],
-        "gifs": [],
+        "gifs": [
+            "https://tenor.com/view/monday-hate-mondays-gif-14157166",
+        ],
     },
     1: {
         "names": [
@@ -35,7 +37,9 @@ days = {
         "templates": [
             "It is {0}, my dudes.",
         ],
-        "gifs": [],
+        "gifs": [
+            "https://giphy.com/gifs/yazagames-frog-wednesday-inkulinati-d7HbZN8aQh1Mh3ZnKw",
+        ],
     },
     3: {
         "names": [
@@ -44,7 +48,9 @@ days = {
             "civ day",
             "Thursday",
         ],
-        "templates": [],
+        "templates": [
+            "14",
+        ],
         "gifs": [],
     },
     4: {
@@ -92,6 +98,7 @@ templates = [
     "Today is {0}.",
     "Today: {0}. Tomorrow: {1}.",
     "Brothers, the day is {0}.",
+    "yo it's {0}",
     "Yoooooo, today is {0}! Brother.",
     "The day is {0}. Prepare yourself.",
     "What if I said to you that in fact, today is not {0}? I'd be lying.",
