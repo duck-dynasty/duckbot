@@ -9,7 +9,9 @@ days = {
         "templates": [
             "Screw this, it is {0}.",
         ],
-        "gifs": [],
+        "gifs": [
+            "https://tenor.com/view/monday-hate-mondays-gif-14157166",
+        ],
     },
     1: {
         "names": [
