@@ -26,4 +26,5 @@ phrases = [
     [regional_indicator("h"), regional_indicator("y"), regional_indicator("p"), regional_indicator("e")],
     [regional_indicator("p"), regional_indicator("o"), regional_indicator("g")],
     [regional_indicator("d"), regional_indicator("a"), regional_indicator("n"), regional_indicator("k")],
+    [regional_indicator("b"), red_a(), regional_indicator("n"), regional_indicator("g")],
 ]
