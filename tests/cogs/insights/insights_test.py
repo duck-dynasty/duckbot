@@ -6,7 +6,6 @@ import pytest
 from discord import ChannelType
 
 from duckbot.cogs.insights import Insights
-from tests.duckmock.datetime import patch_utcnow
 from tests.duckmock.discord import MockAsyncIterator
 
 
@@ -51,39 +50,39 @@ async def test_check_should_respond_no_history(bot, guild, guild_channel):
 
 
 @pytest.mark.asyncio
+@mock.patch("duckbot.cogs.insights.insights.utcnow", return_value=datetime.datetime(2000, 1, 1, hour=12, minute=00, tzinfo=datetime.timezone.utc))
 @mock.patch("discord.Message", autospec=True)
-async def test_check_should_respond_new_message(message, bot, text_channel, setup_general_channel):
-    with patch_utcnow(datetime.datetime(2000, 1, 1, hour=12, minute=00)):
-        message.created_at = datetime.datetime(2000, 1, 1, hour=11, minute=38)
-        message.author.id = 244629273191645184
-        text_channel.history.return_value = MockAsyncIterator(message)
-        clazz = Insights(bot)
-        await clazz._Insights__check_should_respond()
-        text_channel.send.assert_not_called()
+async def test_check_should_respond_new_message(message, utcnow, bot, text_channel, setup_general_channel):
+    message.created_at = datetime.datetime(2000, 1, 1, hour=11, minute=38, tzinfo=datetime.timezone.utc)
+    message.author.id = 244629273191645184
+    text_channel.history.return_value = MockAsyncIterator(message)
+    clazz = Insights(bot)
+    await clazz._Insights__check_should_respond()
+    text_channel.send.assert_not_called()
 
 
 @pytest.mark.asyncio
+@mock.patch("duckbot.cogs.insights.insights.utcnow", return_value=datetime.datetime(2000, 1, 1, hour=12, minute=00, tzinfo=datetime.timezone.utc))
 @mock.patch("discord.Message", autospec=True)
-async def test_check_should_respond_not_special_user(message, bot, text_channel, setup_general_channel):
-    with patch_utcnow(datetime.datetime(2000, 1, 1, hour=12, minute=00)):
-        message.created_at = datetime.datetime(2000, 1, 1, hour=11, minute=00)
-        message.author.id = 0
-        text_channel.history.return_value = MockAsyncIterator(message)
-        clazz = Insights(bot)
-        await clazz._Insights__check_should_respond()
-        text_channel.send.assert_not_called()
+async def test_check_should_respond_not_special_user(message, utcnow, bot, text_channel, setup_general_channel):
+    message.created_at = datetime.datetime(2000, 1, 1, hour=11, minute=00, tzinfo=datetime.timezone.utc)
+    message.author.id = 0
+    text_channel.history.return_value = MockAsyncIterator(message)
+    clazz = Insights(bot)
+    await clazz._Insights__check_should_respond()
+    text_channel.send.assert_not_called()
 
 
 @pytest.mark.asyncio
+@mock.patch("duckbot.cogs.insights.insights.utcnow", return_value=datetime.datetime(2000, 1, 1, hour=12, minute=00, tzinfo=datetime.timezone.utc))
 @mock.patch("discord.Message", autospec=True)
-async def test_check_should_respond_old_message_sent_by_special_user(message, bot, text_channel, setup_general_channel):
-    with patch_utcnow(datetime.datetime(2000, 1, 1, hour=12, minute=00)):
-        message.created_at = datetime.datetime(2000, 1, 1, hour=11, minute=00)
-        message.author.id = 244629273191645184
-        text_channel.history.return_value = MockAsyncIterator(message)
-        clazz = Insights(bot)
-        await clazz._Insights__check_should_respond()
-        text_channel.send.assert_called()
+async def test_check_should_respond_old_message_sent_by_special_user(message, utcnow, bot, text_channel, setup_general_channel):
+    message.created_at = datetime.datetime(2000, 1, 1, hour=11, minute=00, tzinfo=datetime.timezone.utc)
+    message.author.id = 244629273191645184
+    text_channel.history.return_value = MockAsyncIterator(message)
+    clazz = Insights(bot)
+    await clazz._Insights__check_should_respond()
+    text_channel.send.assert_called()
 
 
 @pytest.mark.asyncio
