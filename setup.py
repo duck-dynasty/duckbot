@@ -42,11 +42,11 @@ if __name__ == "__main__":
             "nltk>=3.6,<4",
             "textblob<1",
         ],
-        dependency_links=[
-            "git+https://github.com/Rapptz/discord.py#egg=discord.py[voice]",
-        ],
+#        dependency_links=[
+#            "git+https://github.com/Rapptz/discord.py#egg=discord.py-2.0.0a",
+#        ],
         install_requires=[
-            "discord.py[voice]==2.0.0a",
+            "discord.py[voice] @ git+https://github.com/Rapptz/discord.py",
             "beautifulsoup4",
             "pytz",
             "timezonefinder>=5.2,<6",
