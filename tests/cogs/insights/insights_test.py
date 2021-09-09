@@ -10,7 +10,7 @@ from tests.duckmock.discord import MockAsyncIterator
 
 
 @pytest.fixture
-def setup_general_channel(bot, guild, text_channel):
+def setup_expected_general_channel(bot, guild, text_channel):
     bot.get_all_channels.return_value = [text_channel]
     guild.name = "Friends Chat"
     text_channel.guild = guild
@@ -52,7 +52,7 @@ async def test_check_should_respond_no_history(bot, guild, guild_channel):
 @pytest.mark.asyncio
 @mock.patch("duckbot.cogs.insights.insights.utcnow", return_value=datetime.datetime(2000, 1, 1, hour=12, minute=00, tzinfo=datetime.timezone.utc))
 @mock.patch("discord.Message", autospec=True)
-async def test_check_should_respond_new_message(message, utcnow, bot, text_channel, setup_general_channel):
+async def test_check_should_respond_new_message(message, utcnow, bot, text_channel, setup_expected_general_channel):
     message.created_at = datetime.datetime(2000, 1, 1, hour=11, minute=38, tzinfo=datetime.timezone.utc)
     message.author.id = 244629273191645184
     text_channel.history.return_value = MockAsyncIterator(message)
@@ -64,7 +64,7 @@ async def test_check_should_respond_new_message(message, utcnow, bot, text_chann
 @pytest.mark.asyncio
 @mock.patch("duckbot.cogs.insights.insights.utcnow", return_value=datetime.datetime(2000, 1, 1, hour=12, minute=00, tzinfo=datetime.timezone.utc))
 @mock.patch("discord.Message", autospec=True)
-async def test_check_should_respond_not_special_user(message, utcnow, bot, text_channel, setup_general_channel):
+async def test_check_should_respond_not_special_user(message, utcnow, bot, text_channel, setup_expected_general_channel):
     message.created_at = datetime.datetime(2000, 1, 1, hour=11, minute=00, tzinfo=datetime.timezone.utc)
     message.author.id = 0
     text_channel.history.return_value = MockAsyncIterator(message)
@@ -76,7 +76,7 @@ async def test_check_should_respond_not_special_user(message, utcnow, bot, text_
 @pytest.mark.asyncio
 @mock.patch("duckbot.cogs.insights.insights.utcnow", return_value=datetime.datetime(2000, 1, 1, hour=12, minute=00, tzinfo=datetime.timezone.utc))
 @mock.patch("discord.Message", autospec=True)
-async def test_check_should_respond_old_message_sent_by_special_user(message, utcnow, bot, text_channel, setup_general_channel):
+async def test_check_should_respond_old_message_sent_by_special_user(message, utcnow, bot, text_channel, setup_expected_general_channel):
     message.created_at = datetime.datetime(2000, 1, 1, hour=11, minute=00, tzinfo=datetime.timezone.utc)
     message.author.id = 244629273191645184
     text_channel.history.return_value = MockAsyncIterator(message)

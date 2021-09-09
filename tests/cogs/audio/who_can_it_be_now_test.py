@@ -15,18 +15,18 @@ def play(*args, **kwargs):
 @pytest.mark.asyncio
 @mock.patch("duckbot.cogs.audio.who_can_it_be_now.PCMVolumeTransformer", autospec=True)
 @mock.patch("duckbot.cogs.audio.who_can_it_be_now.FFmpegPCMAudio", autospec=True)
-async def test_task_loop_once(ffmpeg, vol, bot_spy, text_context, voice_client):
-    text_context.voice_client = None
-    text_context.author.voice.channel.connect.return_value = async_value(voice_client)
+async def test_task_loop_once(ffmpeg, vol, bot_spy, guild_context, voice_client):
+    guild_context.voice_client = None
+    guild_context.author.voice.channel.connect.return_value = async_value(voice_client)
     voice_client.play = play
     clazz = WhoCanItBeNow(bot_spy)
-    await clazz.connect_to_voice(text_context)
+    await clazz.connect_to_voice(guild_context)
     assert clazz.voice_client is not None
-    await clazz._WhoCanItBeNow__start(text_context)
+    await clazz._WhoCanItBeNow__start(guild_context)
     assert clazz.audio_task is not None
     assert clazz.streaming is True
     await clazz.stream.wait()
-    await clazz._WhoCanItBeNow__stop(text_context)
+    await clazz._WhoCanItBeNow__stop(guild_context)
     assert clazz.streaming is False
     assert clazz.audio_task is None
     assert clazz.voice_client is None
@@ -35,9 +35,9 @@ async def test_task_loop_once(ffmpeg, vol, bot_spy, text_context, voice_client):
 @pytest.mark.asyncio
 @mock.patch("duckbot.cogs.audio.who_can_it_be_now.PCMVolumeTransformer", autospec=True)
 @mock.patch("duckbot.cogs.audio.who_can_it_be_now.FFmpegPCMAudio", autospec=True)
-async def test_task_loop_repeats(ffmpeg, vol, bot_spy, text_context, voice_client):
-    text_context.voice_client = None
-    text_context.author.voice.channel.connect.return_value = async_value(voice_client)
+async def test_task_loop_repeats(ffmpeg, vol, bot_spy, guild_context, voice_client):
+    guild_context.voice_client = None
+    guild_context.author.voice.channel.connect.return_value = async_value(voice_client)
 
     def loop_first(*args, **kwargs):
         voice_client.play = play
@@ -45,15 +45,15 @@ async def test_task_loop_repeats(ffmpeg, vol, bot_spy, text_context, voice_clien
 
     voice_client.play = loop_first
     clazz = WhoCanItBeNow(bot_spy)
-    await clazz.connect_to_voice(text_context)
+    await clazz.connect_to_voice(guild_context)
     assert clazz.voice_client is not None
-    await clazz._WhoCanItBeNow__start(text_context)
+    await clazz._WhoCanItBeNow__start(guild_context)
     assert clazz.audio_task is not None
     assert clazz.streaming is True
     await clazz.stream.wait()
     await asyncio.sleep(0)
     await clazz.stream.wait()
-    await clazz._WhoCanItBeNow__stop(text_context)
+    await clazz._WhoCanItBeNow__stop(guild_context)
     assert clazz.streaming is False
     assert clazz.audio_task is None
     assert clazz.voice_client is None
@@ -69,11 +69,11 @@ async def test_connect_to_voice_no_voice(bot, context):
 
 
 @pytest.mark.asyncio
-async def test_connect_to_voice_author_in_channel(bot, text_context, voice_client):
-    text_context.voice_client = None
-    text_context.author.voice.channel.connect.return_value = async_value(voice_client)
+async def test_connect_to_voice_author_in_channel(bot, guild_context, voice_client):
+    guild_context.voice_client = None
+    guild_context.author.voice.channel.connect.return_value = async_value(voice_client)
     clazz = WhoCanItBeNow(bot)
-    await clazz.connect_to_voice(text_context)
+    await clazz.connect_to_voice(guild_context)
     assert clazz.voice_client == voice_client
 
 
