@@ -1,5 +1,4 @@
 import datetime
-from asyncio import CancelledError
 from unittest import mock
 
 import pytest
