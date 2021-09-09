@@ -28,9 +28,7 @@ async def test_before_loop_waits_for_bot(bot):
 async def test_cog_unload_cancels_task(bot):
     clazz = Insights(bot)
     clazz.cog_unload()
-    with pytest.raises(CancelledError):
-        await clazz.check_should_respond.get_task()
-    assert not clazz.check_should_respond.is_running()
+    clazz.check_should_respond.cancel.assert_called()
 
 
 @pytest.mark.asyncio
