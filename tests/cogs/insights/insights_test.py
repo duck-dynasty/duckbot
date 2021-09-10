@@ -27,23 +27,23 @@ async def test_before_loop_waits_for_bot(bot):
 async def test_cog_unload_cancels_task(bot):
     clazz = Insights(bot)
     clazz.cog_unload()
-    clazz.check_should_respond.cancel.assert_called()
+    clazz.check_should_respond_loop.cancel.assert_called()
 
 
 @pytest.mark.asyncio
-async def test_check_should_respond_no_history(bot, guild, guild_channel):
-    bot.get_all_channels.return_value = [guild_channel]
+async def test_check_should_respond_no_history(bot, guild, channel):
+    bot.get_all_channels.return_value = [channel]
     guild.name = "Friends Chat"
-    guild_channel.guild = guild
-    guild_channel.name = "general"
-    if guild_channel.type == ChannelType.text:
-        guild_channel.history.return_value = MockAsyncIterator(None)
+    channel.guild = guild
+    channel.name = "general"
+    if channel.type == ChannelType.text:
+        channel.history.return_value = MockAsyncIterator(None)
     clazz = Insights(bot)
-    await clazz._Insights__check_should_respond()
-    if guild_channel.type == ChannelType.text:
-        guild_channel.send.assert_not_called()
+    await clazz.check_should_respond()
+    if channel.type == ChannelType.text:
+        channel.send.assert_not_called()
     else:
-        assert not guild_channel.method_calls
+        assert not channel.method_calls
 
 
 @pytest.mark.asyncio
@@ -54,7 +54,7 @@ async def test_check_should_respond_new_message(message, utcnow, bot, text_chann
     message.author.id = 244629273191645184
     text_channel.history.return_value = MockAsyncIterator(message)
     clazz = Insights(bot)
-    await clazz._Insights__check_should_respond()
+    await clazz.check_should_respond()
     text_channel.send.assert_not_called()
 
 
@@ -66,7 +66,7 @@ async def test_check_should_respond_not_special_user(message, utcnow, bot, text_
     message.author.id = 0
     text_channel.history.return_value = MockAsyncIterator(message)
     clazz = Insights(bot)
-    await clazz._Insights__check_should_respond()
+    await clazz.check_should_respond()
     text_channel.send.assert_not_called()
 
 
@@ -78,12 +78,12 @@ async def test_check_should_respond_old_message_sent_by_special_user(message, ut
     message.author.id = 244629273191645184
     text_channel.history.return_value = MockAsyncIterator(message)
     clazz = Insights(bot)
-    await clazz._Insights__check_should_respond()
+    await clazz.check_should_respond()
     text_channel.send.assert_called()
 
 
 @pytest.mark.asyncio
 async def test_insight_command_sends_message(bot, context):
     clazz = Insights(bot)
-    await clazz._Insights__insight(context)
+    await clazz.insight(context)
     context.send.assert_called()

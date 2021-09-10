@@ -3,6 +3,7 @@ from unittest import mock
 
 import discord
 import discord.ext.commands
+import discord.ext.tasks
 import pytest
 
 from duckbot import DuckBot
@@ -53,6 +54,7 @@ async def bot_spy() -> DuckBot:
 @pytest.fixture
 @mock.patch("duckbot.DuckBot", autospec=True)
 def bot(b, monkeypatch) -> DuckBot:
+    """Returns a mock DuckBot instance. The default event loops are replaced by mocks."""
     b.loop = mock.Mock()
     monkeypatch.setattr(discord.ext.tasks, "Loop", mock.Mock())  # mock out loop, it uses `asyncio.get_event_loop()` by default
     return b
@@ -61,12 +63,14 @@ def bot(b, monkeypatch) -> DuckBot:
 @pytest.fixture
 @mock.patch("discord.User", autospec=True)
 def user(u) -> discord.User:
+    """Returns a mock discord User, someone in a private channel (eg DM)."""
     return u
 
 
 @pytest.fixture
 @mock.patch("discord.Member", autospec=True)
 def member(m) -> discord.Member:
+    """Returns a mock discord Member, someone in a discord server."""
     return m
 
 
@@ -76,15 +80,6 @@ def message(m, channel, user, member) -> discord.Message:
     """Returns a message with nested properties set, for each channel type a message can be sent to."""
     m.channel = channel
     m.author = user if channel.type in [discord.ChannelType.private, discord.ChannelType.group] else member
-    return m
-
-
-@pytest.fixture(params=["discord.TextChannel", "discord.Thread"])
-@mock.patch("discord.Message", autospec=True)
-def guild_message(m, request, text_channel, thread, member) -> discord.Message:
-    """Returns a guild TextChannel or Thread message with the channel property set."""
-    m.channel = text_channel if request.param == "discord.TextChannel" else thread
-    m.author = member
     return m
 
 
@@ -99,37 +94,17 @@ def context(c, message) -> discord.ext.commands.Context:
 
 
 @pytest.fixture
-@mock.patch("discord.ext.commands.Context", autospec=True)
-def guild_context(c, guild_message) -> discord.ext.commands.Context:
-    """Returns a guild context with nested properties set."""
-    c.message = guild_message
-    c.channel = guild_message.channel
-    c.author = guild_message.author
-    return c
-
-
-@pytest.fixture
 @mock.patch("discord.Emoji", autospec=True)
 def emoji(e) -> discord.Emoji:
+    """Returns a mock Emoji."""
     return e
 
 
 @pytest.fixture
 @mock.patch("discord.Guild", autospec=True)
 def guild(g) -> discord.Guild:
+    """Returns a mock Guild, ie a discord server."""
     return g
-
-
-@pytest.fixture(params=["discord.TextChannel", "discord.VoiceChannel", "discord.Thread"])
-def guild_channel(request, text_channel, voice_channel, thread):
-    """Returns a guild TextChannel and a VoiceChannel."""
-    if request.param == "discord.TextChannel":
-        return text_channel
-    elif request.param == "discord.VoiceChannel":
-        return voice_channel
-    elif request.param == "discord.Thread":
-        return thread
-    raise AssertionError
 
 
 @pytest.fixture(params=["discord.TextChannel", "discord.DMChannel", "discord.GroupChannel", "discord.Thread"])
@@ -147,8 +122,15 @@ def channel(request, text_channel, dm_channel, group_channel, thread):
 
 
 @pytest.fixture
+def skip_if_private_channel(channel, dm_channel, group_channel):
+    if channel is dm_channel or channel is group_channel:
+        pytest.skip("test requires a non-private discord channel")
+
+
+@pytest.fixture
 @mock.patch("discord.TextChannel", autospec=True)
 def text_channel(tc) -> discord.TextChannel:
+    """Returns a text channel, a typical channel in a discord server."""
     tc.type = discord.ChannelType.text
     return tc
 
@@ -156,6 +138,7 @@ def text_channel(tc) -> discord.TextChannel:
 @pytest.fixture
 @mock.patch("discord.DMChannel", autospec=True)
 def dm_channel(dm) -> discord.DMChannel:
+    """Returns a dm channel, a direct message between two users."""
     dm.type = discord.ChannelType.private
     return dm
 
@@ -163,6 +146,7 @@ def dm_channel(dm) -> discord.DMChannel:
 @pytest.fixture
 @mock.patch("discord.GroupChannel", autospec=True)
 def group_channel(g) -> discord.GroupChannel:
+    """Returns a group channel, a private channel between two or more users, outside of a server."""
     g.type = discord.ChannelType.group
     return g
 
@@ -170,6 +154,7 @@ def group_channel(g) -> discord.GroupChannel:
 @pytest.fixture
 @mock.patch("discord.Thread", autospec=True)
 def thread(thrd) -> discord.Thread:
+    """Returns a thread channel, an ephemeral channel inside of a discord server."""
     thrd.type = discord.ChannelType.public_thread
     return thrd
 
@@ -177,6 +162,7 @@ def thread(thrd) -> discord.Thread:
 @pytest.fixture
 @mock.patch("discord.VoiceChannel", autospec=True)
 def voice_channel(vc) -> discord.VoiceChannel:
+    """Returns a voice channel, an audio only channel in a discord server."""
     vc.type = discord.ChannelType.voice
     return vc
 
@@ -184,6 +170,7 @@ def voice_channel(vc) -> discord.VoiceChannel:
 @pytest.fixture
 @mock.patch("discord.VoiceClient", autospec=True)
 def voice_client(vc) -> discord.VoiceClient:
+    """Returns a mock voice client."""
     return vc
 
 
