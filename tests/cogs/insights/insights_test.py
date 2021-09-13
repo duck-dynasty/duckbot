@@ -47,8 +47,8 @@ async def test_check_should_respond_no_history(bot, guild, channel):
 
 
 @pytest.mark.asyncio
-@mock.patch("duckbot.cogs.insights.insights.utcnow", return_value=datetime.datetime(2000, 1, 1, hour=12, minute=00, tzinfo=datetime.timezone.utc))
 @mock.patch("discord.Message", autospec=True)
+@mock.patch("duckbot.cogs.insights.insights.utcnow", return_value=datetime.datetime(2000, 1, 1, hour=12, minute=00, tzinfo=datetime.timezone.utc))
 async def test_check_should_respond_new_message(message, utcnow, bot, text_channel, setup_expected_general_channel):
     message.created_at = datetime.datetime(2000, 1, 1, hour=11, minute=38, tzinfo=datetime.timezone.utc)
     message.author.id = 244629273191645184
@@ -59,8 +59,8 @@ async def test_check_should_respond_new_message(message, utcnow, bot, text_chann
 
 
 @pytest.mark.asyncio
-@mock.patch("duckbot.cogs.insights.insights.utcnow", return_value=datetime.datetime(2000, 1, 1, hour=12, minute=00, tzinfo=datetime.timezone.utc))
 @mock.patch("discord.Message", autospec=True)
+@mock.patch("duckbot.cogs.insights.insights.utcnow", return_value=datetime.datetime(2000, 1, 1, hour=12, minute=00, tzinfo=datetime.timezone.utc))
 async def test_check_should_respond_not_special_user(message, utcnow, bot, text_channel, setup_expected_general_channel):
     message.created_at = datetime.datetime(2000, 1, 1, hour=11, minute=00, tzinfo=datetime.timezone.utc)
     message.author.id = 0
@@ -71,8 +71,8 @@ async def test_check_should_respond_not_special_user(message, utcnow, bot, text_
 
 
 @pytest.mark.asyncio
-@mock.patch("duckbot.cogs.insights.insights.utcnow", return_value=datetime.datetime(2000, 1, 1, hour=12, minute=00, tzinfo=datetime.timezone.utc))
 @mock.patch("discord.Message", autospec=True)
+@mock.patch("duckbot.cogs.insights.insights.utcnow", return_value=datetime.datetime(2000, 1, 1, hour=12, minute=00, tzinfo=datetime.timezone.utc))
 async def test_check_should_respond_old_message_sent_by_special_user(message, utcnow, bot, text_channel, setup_expected_general_channel):
     message.created_at = datetime.datetime(2000, 1, 1, hour=11, minute=00, tzinfo=datetime.timezone.utc)
     message.author.id = 244629273191645184
