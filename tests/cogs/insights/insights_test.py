@@ -8,14 +8,6 @@ from duckbot.cogs.insights import Insights
 from tests.duckmock.discord import MockAsyncIterator
 
 
-@pytest.fixture
-def setup_expected_general_channel(bot, guild, text_channel):
-    bot.get_all_channels.return_value = [text_channel]
-    guild.name = "Friends Chat"
-    text_channel.guild = guild
-    text_channel.name = "general"
-
-
 @pytest.mark.asyncio
 async def test_before_loop_waits_for_bot(bot):
     clazz = Insights(bot)
