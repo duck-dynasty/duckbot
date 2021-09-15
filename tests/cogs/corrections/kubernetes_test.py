@@ -1,14 +1,12 @@
-from unittest import mock
-
 import pytest
 
 from duckbot.cogs.corrections import Kubernetes
 
 
 @pytest.fixture
-@mock.patch("discord.Emoji", autospec=True)
-def k8s_emoji(e, guild):
+def k8s_emoji(autospec, guild):
     guild.name = "Friends Chat"
+    e = autospec.of("discord.Emoji")
     e.guild = guild
     e.id = 1
     e.name = "k8s"
@@ -17,9 +15,9 @@ def k8s_emoji(e, guild):
 
 
 @pytest.fixture
-@mock.patch("discord.Emoji", autospec=True)
-def kubernetes_emoji(e, guild):
+def kubernetes_emoji(autospec, guild):
     guild.name = "Friends Chat"
+    e = autospec.of("discord.Emoji")
     e.guild = guild
     e.id = 2
     e.name = "kubernetes"
