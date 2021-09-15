@@ -52,5 +52,5 @@ def thread(autospec) -> discord.Thread:
     ]
 )
 def channel(request):
-    """Returns a text based channel."""
+    """Returns one of every text based channel."""
     return request.param
