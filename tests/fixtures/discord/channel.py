@@ -1,19 +1,6 @@
 import discord
 import pytest
-
-
-@pytest.fixture(params=["discord.TextChannel", "discord.DMChannel", "discord.GroupChannel", "discord.Thread"])
-def channel(request, text_channel, dm_channel, group_channel, thread):
-    """Returns a text based channel."""
-    if request.param == "discord.TextChannel":
-        return text_channel
-    elif request.param == "discord.DMChannel":
-        return dm_channel
-    elif request.param == "discord.GroupChannel":
-        return group_channel
-    elif request.param == "discord.Thread":
-        return thread
-    raise AssertionError
+from pytest_lazyfixture import lazy_fixture
 
 
 @pytest.fixture
@@ -54,3 +41,16 @@ def thread(autospec) -> discord.Thread:
     thrd = autospec.of("discord.Thread")
     thrd.type = discord.ChannelType.public_thread
     return thrd
+
+
+@pytest.fixture(
+    params=[
+        lazy_fixture(text_channel.__name__),
+        lazy_fixture(dm_channel.__name__),
+        lazy_fixture(group_channel.__name__),
+        lazy_fixture(thread.__name__),
+    ]
+)
+def channel(request):
+    """Returns a text based channel."""
+    return request.param
