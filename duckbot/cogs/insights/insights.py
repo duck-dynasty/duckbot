@@ -22,7 +22,6 @@ class Insights(commands.Cog):
 
     async def check_should_respond(self):
         channel = get(self.bot.get_all_channels(), guild__name="Friends Chat", name="general", type=ChannelType.text)
-        print(channel)
         message = await self.__get_last_message(channel)
         if self.should_respond(message):
             response = random.choice(responses)
