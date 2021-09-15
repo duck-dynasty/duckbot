@@ -3,7 +3,7 @@ import random
 
 from discord import ChannelType
 from discord.ext import commands, tasks
-from discord.utils import get
+from discord.utils import get, utcnow
 
 from .phrases import responses
 
@@ -35,7 +35,7 @@ class Insights(commands.Cog):
             return None
 
     def should_respond(self, message):
-        stamp = datetime.datetime.utcnow() - datetime.timedelta(minutes=23)
+        stamp = utcnow() - datetime.timedelta(minutes=23)
         return message is not None and stamp >= message.created_at and message.author.id == 244629273191645184
 
     @check_should_respond.before_loop

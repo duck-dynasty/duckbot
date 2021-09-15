@@ -1,5 +1,4 @@
 import datetime
-from asyncio import CancelledError
 from unittest import mock
 
 import pytest
@@ -34,9 +33,7 @@ async def test_before_loop_waits_for_bot(bot, dog_photos):
 async def test_cog_unload_cancels_task(bot, dog_photos):
     clazz = AnnounceDay(bot, dog_photos)
     clazz.cog_unload()
-    with pytest.raises(CancelledError):
-        await clazz.on_hour_loop.get_task()
-    assert not clazz.on_hour_loop.is_running()
+    clazz.on_hour_loop.cancel.assert_called()
 
 
 @pytest.mark.asyncio

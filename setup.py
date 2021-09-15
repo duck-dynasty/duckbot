@@ -43,7 +43,7 @@ if __name__ == "__main__":
             "textblob<1",
         ],
         install_requires=[
-            "discord.py[voice]>=1.7,<2",
+            "discord.py[voice] @ git+https://github.com/Rapptz/discord.py",
             "beautifulsoup4",
             "pytz",
             "timezonefinder>=5.2,<6",

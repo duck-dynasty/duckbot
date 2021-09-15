@@ -9,10 +9,3 @@ def patch_now(now):
     dt = mock.Mock(wraps=datetime.datetime)
     dt.now.return_value = now
     return mock.patch(DATETIME, new=dt)
-
-
-def patch_utcnow(utcnow):
-    """Returns a patched datetime with `utcnow` set to the given time."""
-    dt = mock.Mock(wraps=datetime.datetime)
-    dt.utcnow.return_value = utcnow
-    return mock.patch(DATETIME, new=dt)

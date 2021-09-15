@@ -52,10 +52,10 @@ async def bot_spy() -> DuckBot:
 
 @pytest.fixture
 @mock.patch("duckbot.DuckBot", autospec=True)
-def bot(b) -> DuckBot:
+def bot(b, monkeypatch) -> DuckBot:
     b.loop = mock.Mock()
-    with mock.patch("discord.ext.tasks.Loop"):  # mock out loop, it uses `asyncio.get_event_loop()` by default
-        return b
+    monkeypatch.setattr(discord.ext.tasks, "Loop", mock.Mock())  # mock out loop, it uses `asyncio.get_event_loop()` by default
+    return b
 
 
 @pytest.fixture
@@ -79,11 +79,11 @@ def message(m, channel, user, member) -> discord.Message:
     return m
 
 
-@pytest.fixture
+@pytest.fixture(params=["discord.TextChannel", "discord.Thread"])
 @mock.patch("discord.Message", autospec=True)
-def text_message(m, text_channel, member) -> discord.Message:
-    """Returns a guild TextChannel message with the channel property set."""
-    m.channel = text_channel
+def guild_message(m, request, text_channel, thread, member) -> discord.Message:
+    """Returns a guild TextChannel or Thread message with the channel property set."""
+    m.channel = text_channel if request.param == "discord.TextChannel" else thread
     m.author = member
     return m
 
@@ -100,11 +100,11 @@ def context(c, message) -> discord.ext.commands.Context:
 
 @pytest.fixture
 @mock.patch("discord.ext.commands.Context", autospec=True)
-def text_context(c, text_message) -> discord.ext.commands.Context:
+def guild_context(c, guild_message) -> discord.ext.commands.Context:
     """Returns a guild context with nested properties set."""
-    c.message = text_message
-    c.channel = text_message.channel
-    c.author = text_message.author
+    c.message = guild_message
+    c.channel = guild_message.channel
+    c.author = guild_message.author
     return c
 
 
@@ -120,18 +120,20 @@ def guild(g) -> discord.Guild:
     return g
 
 
-@pytest.fixture(params=["discord.TextChannel", "discord.VoiceChannel"])
-def guild_channel(request, text_channel, voice_channel):
+@pytest.fixture(params=["discord.TextChannel", "discord.VoiceChannel", "discord.Thread"])
+def guild_channel(request, text_channel, voice_channel, thread):
     """Returns a guild TextChannel and a VoiceChannel."""
     if request.param == "discord.TextChannel":
         return text_channel
     elif request.param == "discord.VoiceChannel":
         return voice_channel
+    elif request.param == "discord.Thread":
+        return thread
     raise AssertionError
 
 
-@pytest.fixture(params=["discord.TextChannel", "discord.DMChannel", "discord.GroupChannel"])
-def channel(request, text_channel, dm_channel, group_channel):
+@pytest.fixture(params=["discord.TextChannel", "discord.DMChannel", "discord.GroupChannel", "discord.Thread"])
+def channel(request, text_channel, dm_channel, group_channel, thread):
     """Returns a text based channel."""
     if request.param == "discord.TextChannel":
         return text_channel
@@ -139,6 +141,8 @@ def channel(request, text_channel, dm_channel, group_channel):
         return dm_channel
     elif request.param == "discord.GroupChannel":
         return group_channel
+    elif request.param == "discord.Thread":
+        return thread
     raise AssertionError
 
 
@@ -161,6 +165,13 @@ def dm_channel(dm) -> discord.DMChannel:
 def group_channel(g) -> discord.GroupChannel:
     g.type = discord.ChannelType.group
     return g
+
+
+@pytest.fixture
+@mock.patch("discord.Thread", autospec=True)
+def thread(thrd) -> discord.Thread:
+    thrd.type = discord.ChannelType.public_thread
+    return thrd
 
 
 @pytest.fixture
