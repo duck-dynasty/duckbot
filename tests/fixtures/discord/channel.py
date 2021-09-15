@@ -1,5 +1,3 @@
-from unittest import mock
-
 import discord
 import pytest
 
@@ -27,32 +25,32 @@ def skip_if_private_channel(channel, dm_channel, group_channel):
 
 
 @pytest.fixture
-@mock.patch("discord.TextChannel", autospec=True)
-def text_channel(tc) -> discord.TextChannel:
+def text_channel(autospec) -> discord.TextChannel:
     """Returns a text channel, a typical channel in a discord server."""
+    tc = autospec.of("discord.TextChannel")
     tc.type = discord.ChannelType.text
     return tc
 
 
 @pytest.fixture
-@mock.patch("discord.DMChannel", autospec=True)
-def dm_channel(dm) -> discord.DMChannel:
+def dm_channel(autospec) -> discord.DMChannel:
     """Returns a dm channel, a direct message between two users."""
+    dm = autospec.of("discord.DMChannel")
     dm.type = discord.ChannelType.private
     return dm
 
 
 @pytest.fixture
-@mock.patch("discord.GroupChannel", autospec=True)
-def group_channel(g) -> discord.GroupChannel:
+def group_channel(autospec) -> discord.GroupChannel:
     """Returns a group channel, a private channel between two or more users, outside of a server."""
+    g = autospec.of("discord.GroupChannel")
     g.type = discord.ChannelType.group
     return g
 
 
 @pytest.fixture
-@mock.patch("discord.Thread", autospec=True)
-def thread(thrd) -> discord.Thread:
+def thread(autospec) -> discord.Thread:
     """Returns a thread channel, an ephemeral channel inside of a discord server."""
+    thrd = autospec.of("discord.Thread")
     thrd.type = discord.ChannelType.public_thread
     return thrd
