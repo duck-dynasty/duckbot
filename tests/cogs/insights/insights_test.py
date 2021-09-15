@@ -2,7 +2,6 @@ import datetime
 from unittest import mock
 
 import pytest
-from discord import ChannelType
 
 from duckbot.cogs.insights import Insights
 from tests.duckmock.discord import MockAsyncIterator
@@ -23,19 +22,11 @@ async def test_cog_unload_cancels_task(bot):
 
 
 @pytest.mark.asyncio
-async def test_check_should_respond_no_history(bot, guild, channel):
-    bot.get_all_channels.return_value = [channel]
-    guild.name = "Friends Chat"
-    channel.guild = guild
-    channel.name = "general"
-    if channel.type == ChannelType.text:
-        channel.history.return_value = MockAsyncIterator(None)
+async def test_check_should_respond_no_history(bot, general_channel):
+    general_channel.history.return_value = MockAsyncIterator(None)
     clazz = Insights(bot)
     await clazz.check_should_respond()
-    if channel.type == ChannelType.text:
-        channel.send.assert_not_called()
-    else:
-        assert not channel.method_calls
+    general_channel.send.assert_not_called()
 
 
 @pytest.mark.asyncio
