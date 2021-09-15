@@ -11,7 +11,7 @@ from .channel import (
 from .context import context
 from .embed import patch_embed_equals
 from .emoji import emoji
-from .general_channel import setup_expected_general_channel
+from .general_channel import general_channel
 from .guild import guild
 from .message import message
 from .voice import voice_channel, voice_client
