@@ -15,8 +15,8 @@ async def test_car_do_be_going_fast_though_not_dank_channel(bot, message):
 
 @pytest.mark.asyncio
 @mock.patch("random.choice", return_value=["\U0001F170"])
-async def test_car_do_be_going_fast_though_dank_channel(random, bot, guild_message):
-    guild_message.channel.name = "dank"
+async def test_car_do_be_going_fast_though_dank_channel(random, bot, message):
+    message.channel.name = "dank"
     clazz = FormulaOne(bot)
-    await clazz.car_do_be_going_fast_though(guild_message)
-    guild_message.add_reaction.assert_called_once_with("\U0001F170")
+    await clazz.car_do_be_going_fast_though(message)
+    message.add_reaction.assert_called_once_with("\U0001F170")
