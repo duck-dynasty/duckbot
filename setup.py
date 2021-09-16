@@ -67,6 +67,7 @@ if __name__ == "__main__":
                 "flake8-black",
                 "isort",
                 "flake8-isort",
+                "pep8-naming",
                 "pytest-flake8",
                 "pytest-blockage",
                 "pytest-sugar",
