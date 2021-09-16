@@ -38,7 +38,7 @@ async def test_cog_unload_cancels_task(bot, dog_photos):
 
 @pytest.mark.asyncio
 @mock.patch("random.random", return_value=0.5)
-@mock.patch("random.choice", side_effect=["today", "tomorrow", "yesterday", "{0} {1} {2}"])
+@mock.patch("random.choice", side_effect=["today", "tomorrow", "yesterday", "{today} {tomorrow} {yesterday}"])
 async def test_on_hour_7am_eastern_special_day(random, choice, bot, dog_photos, guild_channel, setup_general_channel):
     with patch_now(datetime.datetime(2002, 1, 1, hour=7)):
         clazz = AnnounceDay(bot, dog_photos)
@@ -51,7 +51,7 @@ async def test_on_hour_7am_eastern_special_day(random, choice, bot, dog_photos, 
 
 @pytest.mark.asyncio
 @mock.patch("random.random", return_value=0.5)
-@mock.patch("random.choice", side_effect=["today", "tomorrow", "yesterday", "{0} {1} {2}"])
+@mock.patch("random.choice", side_effect=["today", "tomorrow", "yesterday", "{today} {tomorrow} {yesterday}"])
 async def test_on_hour_7am_eastern_not_special_day(random, choice, bot, dog_photos, guild_channel, setup_general_channel):
     with patch_now(datetime.datetime(2002, 1, 21, hour=7)):
         clazz = AnnounceDay(bot, dog_photos)
