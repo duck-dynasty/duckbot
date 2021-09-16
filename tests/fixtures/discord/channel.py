@@ -1,6 +1,5 @@
 import discord
 import pytest
-from pytest_lazyfixture import lazy_fixture
 
 
 @pytest.fixture
@@ -45,12 +44,12 @@ def thread(autospec) -> discord.Thread:
 
 @pytest.fixture(
     params=[
-        lazy_fixture(text_channel.__name__),
-        lazy_fixture(dm_channel.__name__),
-        lazy_fixture(group_channel.__name__),
-        lazy_fixture(thread.__name__),
+        text_channel.__name__,
+        dm_channel.__name__,
+        group_channel.__name__,
+        thread.__name__,
     ]
 )
 def channel(request):
     """Returns one of every text based channel."""
-    return request.param
+    return request.getfixturevalue(request.param)
