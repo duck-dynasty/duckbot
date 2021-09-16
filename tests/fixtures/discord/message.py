@@ -3,10 +3,11 @@ import pytest
 
 
 @pytest.fixture
-def message(raw_message, channel, user, member) -> discord.Message:
+def message(request, raw_message, channel) -> discord.Message:
     """Returns a message with nested properties set, for each channel type a message can be sent to."""
     raw_message.channel = channel
-    raw_message.author = user if channel.type in [discord.ChannelType.private, discord.ChannelType.group] else member
+    author = "user" if channel.type in [discord.ChannelType.private, discord.ChannelType.group] else "member"
+    raw_message.author = request.getfixturevalue(author)
     return raw_message
 
 
