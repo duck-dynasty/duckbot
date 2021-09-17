@@ -1,11 +1,8 @@
-from unittest import mock
-
 import discord
 import pytest
 
 
 @pytest.fixture
-@mock.patch("discord.Emoji", autospec=True)
-def emoji(e) -> discord.Emoji:
+def emoji(autospec) -> discord.Emoji:
     """Returns a mock Emoji."""
-    return e
+    return autospec.of("discord.Emoji")
