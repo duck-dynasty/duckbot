@@ -1,13 +1,17 @@
-from unittest import mock
-
 import discord
 import pytest
 
 
 @pytest.fixture
-@mock.patch("discord.Message", autospec=True)
-def message(m, channel, user, member) -> discord.Message:
+def message(request, raw_message, channel) -> discord.Message:
     """Returns a message with nested properties set, for each channel type a message can be sent to."""
-    m.channel = channel
-    m.author = user if channel.type in [discord.ChannelType.private, discord.ChannelType.group] else member
-    return m
+    raw_message.channel = channel
+    author = "user" if channel.type in [discord.ChannelType.private, discord.ChannelType.group] else "member"
+    raw_message.author = request.getfixturevalue(author)
+    return raw_message
+
+
+@pytest.fixture
+def raw_message(autospec) -> discord.Message:
+    """Returns a mock discord message with no properties set."""
+    return autospec.of("discord.Message")
