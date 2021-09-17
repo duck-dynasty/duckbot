@@ -34,7 +34,7 @@ class AnnounceDay(commands.Cog):
         today = random.choice(days[day]["names"])
         tomorrow = random.choice(days[(day + 1) % 7]["names"])
         yesterday = random.choice(days[(day + 6) % 7]["names"])  # +6 instead of -1 since modulo can be negative
-        message = random.choice(templates + days[day]["templates"]).format(today, tomorrow, yesterday)
+        message = random.choice(templates + days[day]["templates"]).format(today=today, tomorrow=tomorrow, yesterday=yesterday)
         if now in self.holidays:
             specials = " and ".join(self.holidays.get_list(now))
             return message + "\n" + "It is also " + specials + "."
