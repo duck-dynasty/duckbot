@@ -13,7 +13,7 @@ COPY pyproject.toml .
 COPY setup.py .
 RUN pip install --extra-index-url https://www.piwheels.org/simple .
 
-FROM python:3.8-slim as prod
+FROM python:3.8 as prod
 # ffmpeg: for discord audio
 # libpq-dev: postgres client libraries
 # libatlas-base-dev: matplotlib dependencies
