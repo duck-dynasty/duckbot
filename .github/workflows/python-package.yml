@@ -84,27 +84,27 @@ jobs:
           --cache-to='type=local,dest=/tmp/.buildx-cache' \
           --push
 
-#    - name: Configure AWS Credentials
-#      uses: aws-actions/configure-aws-credentials@v1
-#      with:
-#        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-#        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-#        aws-region: us-east-1
-#
-#    - name: Set up AWS Secrets
-#      env:
-#        DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
-#        OPENWEATHER_TOKEN: ${{ secrets.OPENWEATHER_TOKEN }}
-#      run: |
-#        aws ssm put-parameter --name /duckbot/token/discord --type String --value "$DISCORD_TOKEN" --overwrite
-#        aws ssm put-parameter --name /duckbot/token/openweather --type String --value "$OPENWEATHER_TOKEN" --overwrite
-#
-#    - name: Update CloudFormation Stack
-#      uses: aws-actions/aws-cloudformation-github-deploy@v1
-#      with:
-#        name: duckbot
-#        template: .aws/cloudformation.template.yml
-#        parameter-overrides: "DuckBotImageTag=latest"
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Set up AWS Secrets
+      env:
+        DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+        OPENWEATHER_TOKEN: ${{ secrets.OPENWEATHER_TOKEN }}
+      run: |
+        aws ssm put-parameter --name /duckbot/token/discord --type String --value "$DISCORD_TOKEN" --overwrite
+        aws ssm put-parameter --name /duckbot/token/openweather --type String --value "$OPENWEATHER_TOKEN" --overwrite
+
+    - name: Update CloudFormation Stack
+      uses: aws-actions/aws-cloudformation-github-deploy@v1
+      with:
+        name: duckbot
+        template: .aws/cloudformation.template.yml
+        parameter-overrides: "DuckBotImageTag=latest"
 
 #  deploy:
 #    needs:
