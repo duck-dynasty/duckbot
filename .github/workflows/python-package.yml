@@ -74,7 +74,7 @@ jobs:
 
     - name: Build and Push Docker Image
       env:
-        COMMIT_SHA: ${{ github_sha }}
+        COMMIT_SHA: ${{ github.sha }}
       run: |
         docker buildx build . \
           --tag twentylemon/duckbot:$COMMIT_SHA \
