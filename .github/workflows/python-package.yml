@@ -73,12 +73,16 @@ jobs:
         password: ${{ secrets.DOCKER_PASS }}
 
     - name: Build and Push Docker Image
+      env:
+        COMMIT_SHA: ${{ github_sha }}
       run: |
-        docker buildx bake \
-          --set '*.platform=linux/amd64' \
-          --push \
-          --set '*.cache-from=type=local,src=/tmp/.buildx-cache' \
-          --set '*.cache-to=type=local,dest=/tmp/.buildx-cache'
+        docker buildx build . \
+          --tag twentylemon/duckbot:$COMMIT_SHA \
+          --tag twentylemon/duckbot:latest \
+          --platform=linux/amd64 \
+          --cache-from='type=local,src=/tmp/.buildx-cache' \
+          --cache-to='type=local,dest=/tmp/.buildx-cache' \
+          --push
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
