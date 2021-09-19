@@ -77,7 +77,6 @@ jobs:
         COMMIT_SHA: ${{ github.sha }}
       run: |
         docker buildx build . \
-#          --tag twentylemon/duckbot:$COMMIT_SHA \
           --tag twentylemon/duckbot:latest \
           --platform=linux/amd64 \
           --cache-from='type=local,src=/tmp/.buildx-cache' \
