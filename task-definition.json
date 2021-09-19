@@ -1,0 +1,86 @@
+{
+  "family": "duckbot",
+  "containerDefinitions": [
+    {
+      "name": "duckbot",
+      "image": "twentylemon/duckbot:latest",
+      "essential": true,
+      "environment": [
+        {
+          "name": "DISCORD_TOKEN",
+          "value": ""
+        },
+        {
+          "name": "OPENWEATHER_TOKEN",
+          "value": ""
+        }
+      ],
+      "secrets": [
+        {
+          "name": "",
+          "valueFrom": ""
+        }
+      ],
+      "healthCheck": {
+        "command": [
+          "CMD",
+          "python",
+          "-m",
+          "duckbot.health"
+        ],
+        "interval": 60,
+        "timeout": 10,
+        "retries": 3,
+        "startPeriod": 10
+      }
+    },
+    {
+      "name": "postgres",
+      "image": "postgres:13.2",
+      "essential": false,
+      "environment": [
+        {
+          "name": "POSTGRES_USER",
+          "value": "duckbot"
+        },
+        {
+          "name": "POSTGRES_PASSWORD",
+          "value": "pond"
+        }
+      ],
+      "mountPoints": [
+        {
+          "sourceVolume": "duckbot_dbdata",
+          "containerPath": "/var/lib/postgresql/data",
+          "readOnly": false
+        }
+      ],
+      "healthCheck": {
+        "command": [
+          "CMD",
+          "pg_isready",
+          "-U",
+          "duckbot"
+        ],
+        "interval": 60,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 10
+      }
+    }
+  ],
+  "volumes": [
+    {
+      "name": "duckbot_dbdata",
+      "dockerVolumeConfiguration": {
+        "scope": "shared",
+        "autoprovision": true,
+        "driver": "local"
+      }
+    }
+  ],
+  "memory": 960,
+  "requiresCompatibilities": [
+    "EC2"
+  ]
+}
