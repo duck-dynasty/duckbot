@@ -95,7 +95,7 @@ jobs:
       env:
         DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
         OPENWEATHER_TOKEN: ${{ secrets.OPENWEATHER_TOKEN }}
-      run:
+      run: |
         aws ssm put-parameter --name /duckbot/token/discord --type String --value "$DISCORD_TOKEN" --overwrite
         aws ssm put-parameter --name /duckbot/token/openweather --type String --value "$OPENWEATHER_TOKEN" --overwrite
 
