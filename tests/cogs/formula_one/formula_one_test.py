@@ -7,7 +7,6 @@ from duckbot.cogs.formula_one import FormulaOne
 
 @pytest.mark.asyncio
 async def test_car_do_be_going_fast_though_not_dank_channel(bot, message):
-    message.channel.name = "general"
     clazz = FormulaOne(bot)
     await clazz.car_do_be_going_fast_though(message)
     message.add_reaction.assert_not_called()
