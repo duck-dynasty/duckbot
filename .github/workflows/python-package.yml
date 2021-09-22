@@ -104,6 +104,7 @@ jobs:
         name: duckbot
         template: .aws/cloudformation.template.yml
         parameter-overrides: "DuckBotImageTag=latest"
+        capabilities: CAPABILITY_IAM,CAPABILITY_NAMED_IAM
 
 #  deploy:
 #    needs:
