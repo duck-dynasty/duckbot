@@ -1,4 +1,5 @@
 version: "3.9"
+# NOTE when changing, ensure the task definition in the cloudformation stack matches!
 services:
     duckbot:
         build: .
@@ -6,6 +7,25 @@ services:
         environment:
             DISCORD_TOKEN: ${DISCORD_TOKEN}
             OPENWEATHER_TOKEN: ${OPENWEATHER_TOKEN}
+        healthcheck:
+            test: ["CMD", "python", "-m", "duckbot.health"]
+            interval: 30s
+            timeout: 10s
+            retries: 3
+            start_period: 30s
+        restart: always
+        deploy:
+            mode: replicated
+            replicas: 1
+            restart_policy:
+                condition: any
+                window: 10s
+            update_config:
+                failure_action: rollback
+                monitor: 300s
+                order: stop-first
+            rollback_config:
+                order: stop-first
 
     postgres:
         image: postgres:13.2
@@ -15,6 +35,25 @@ services:
             PGDATA: /data/postgres
         volumes:
         - duckbot_dbdata:/data/postgres
+        healthcheck:
+            test: ["CMD", "pg_isready", "-U", "duckbot"]
+            interval: 30s
+            timeout: 5s
+            retries: 3
+            start_period: 30s
+        restart: always
+        deploy:
+            mode: replicated
+            replicas: 1
+            restart_policy:
+                condition: any
+                window: 10s
+            update_config:
+                failure_action: rollback
+                monitor: 300s
+                order: stop-first
+            rollback_config:
+                order: stop-first
 
 volumes:
     duckbot_dbdata:

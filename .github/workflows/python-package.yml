@@ -51,7 +51,7 @@ jobs:
 #          -e "DISCORD_TOKEN=$(cat .github/workflows/test-token.txt | base64 --decode)" \
 #          duckbot
 
-  # FIXME only run on push
+  # FIXME only run on push, depend on other tasks
   aws-deploy:
     runs-on: ubuntu-latest
     concurrency: deploy
