@@ -3,7 +3,7 @@ version: "3.9"
 services:
     duckbot:
         build: .
-        image: twentylemon/duckbot:latest
+        image: chippers255/duckbot:latest
         environment:
             DISCORD_TOKEN: ${DISCORD_TOKEN}
             OPENWEATHER_TOKEN: ${OPENWEATHER_TOKEN}
