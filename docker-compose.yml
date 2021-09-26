@@ -12,8 +12,9 @@ services:
         environment:
             POSTGRES_USER: duckbot
             POSTGRES_PASSWORD: pond
+            PGDATA: /data/postgres
         volumes:
-        - duckbot_dbdata:/var/lib/postgresql/data
+        - duckbot_dbdata:/data/postgres
 
 volumes:
     duckbot_dbdata:
