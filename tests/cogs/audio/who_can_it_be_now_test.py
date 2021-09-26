@@ -75,8 +75,8 @@ async def test_task_loop_repeats_max_times(ffmpeg, vol, bot_spy, context, voice_
     for i in range(76):
         await clazz.stream.wait()
         await asyncio.sleep(0)
+        assert clazz.streaming is (i < 75)  # should be streaming 75 times only
     # stop() is called after song is played 75 times
-    assert clazz.streaming is False
     assert clazz.audio_task is None
     assert clazz.voice_client is None
 
