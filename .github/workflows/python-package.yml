@@ -53,7 +53,11 @@ jobs:
 
   # FIXME only run on push, depend on other tasks
   aws-deploy:
+#    needs:
+#    - release
+#    - sanity
     runs-on: ubuntu-latest
+#    if: github.event_name == 'push' && github.repository == 'Chippers255/duckbot'
     concurrency: deploy
     steps:
     - uses: actions/checkout@v2
@@ -67,20 +71,21 @@ jobs:
         key: ${{ runner.os }}-buildx-${{ github.sha }}
         restore-keys: ${{ runner.os }}-buildx-
 
-    # FIXME login as chippers
+    # FIXME login as chippers (or duckbot?)
     - name: Login to Docker
       uses: docker/login-action@v1
       with:
         username: twentylemon
         password: ${{ secrets.DOCKER_PASS }}
 
-    # FIXME publish commit specific image
+    # FIXME publish chippers255 image (or a new duckbot one)
     - name: Build and Push Docker Image
       env:
         COMMIT_SHA: ${{ github.sha }}
       run: |
         docker buildx build . \
           --tag twentylemon/duckbot:latest \
+          --tag twentylemon/duckbot:${COMMIT_SHA} \
           --platform=linux/amd64 \
           --cache-from='type=local,src=/tmp/.buildx-cache' \
           --cache-to='type=local,dest=/tmp/.buildx-cache' \
@@ -116,56 +121,5 @@ jobs:
       with:
         name: duckbot
         template: .aws/cloudformation.template.yml
-        parameter-overrides: "DuckBotImageTag=latest"
+        parameter-overrides: "DuckBotImage=twentylemon/duckbot:${{ github.sha }}"
         capabilities: CAPABILITY_IAM,CAPABILITY_NAMED_IAM
-
-#  deploy:
-#    needs:
-#    - release
-#    - sanity
-#    runs-on: ubuntu-latest
-#    if: github.event_name == 'push' && github.repository == 'Chippers255/duckbot'
-#    concurrency: docker-image-build
-#    steps:
-#    - uses: actions/checkout@v2
-#
-#    - name: Set up QEMU for ARM Platforms
-#      uses: docker/setup-qemu-action@v1
-#    - name: Set up Docker Buildx
-#      uses: docker/setup-buildx-action@v1
-#    - name: Set up Docker Build Cache
-#      uses: actions/cache@v2
-#      with:
-#        path: /tmp/.buildx-cache
-#        key: ${{ runner.os }}-buildx-${{ github.sha }}
-#        restore-keys: ${{ runner.os }}-buildx-
-#
-#    - name: Login to Docker
-#      uses: docker/login-action@v1
-#      with:
-#        username: chippers255
-#        password: ${{ secrets.DOCKER_PASS }}
-#    - name: Build and Push Docker Image
-#      run: |
-#        docker buildx bake \
-#          --set '*.platform=linux/arm/v7' \
-#          --push \
-#          --set '*.cache-from=type=local,src=/tmp/.buildx-cache' \
-#          --set '*.cache-to=type=local,dest=/tmp/.buildx-cache'
-#
-#    - name: Publish Wiki Documentation
-#      uses: SwiftDocOrg/github-wiki-publish-action@v1
-#      with:
-#        path: wiki
-#      env:
-#        GH_PERSONAL_ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-#        WIKI_COMMIT_MESSAGE: ${{ github.event.commits[0].message }}
-#        GITHUB_ACTOR: ${{ github.event.commits[0].author.name }}
-#
-#    - name: Trigger Deployment
-#      run: |
-#        curl -X POST $GITHUB_API_URL/repos/${{ secrets.DEPLOY_REPO }}/dispatches \
-#          -u "${{ secrets.ACCESS_TOKEN }}" \
-#          -H "Accept: application/vnd.github.everest-preview+json" \
-#          -H "Content-Type: application/json" \
-#          --data '{"event_type": "deploy-duckbot"}'
