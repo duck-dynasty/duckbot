@@ -62,10 +62,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Create Docker Image Tag
+    - name: Create Docker Image Tags
       id: image
       run: |
-        echo "::set-output name=tag::$(git rev-parse --short HEAD)"
+        echo "::set-output name=latest::twentylemon/duckbot:latest"
+        echo "::set-output name=commit::twentylemon/duckbot:$(git rev-parse --short HEAD)"
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
@@ -87,8 +88,8 @@ jobs:
     - name: Build and Push Docker Image
       run: |
         docker buildx build . \
-          --tag twentylemon/duckbot:latest \
-          --tag twentylemon/duckbot:${{ steps.image.outputs.tag }} \
+          --tag ${{ steps.image.outputs.latest }} \
+          --tag ${{ steps.image.outputs.commit }} \
           --platform=linux/amd64 \
           --cache-from='type=local,src=/tmp/.buildx-cache' \
           --cache-to='type=local,dest=/tmp/.buildx-cache' \
@@ -118,11 +119,10 @@ jobs:
         aws ssm put-parameter --name /duckbot/token/discord --type String --value "$DISCORD_TOKEN" --overwrite
         aws ssm put-parameter --name /duckbot/token/openweather --type String --value "$OPENWEATHER_TOKEN" --overwrite
 
-    # FIXME specify commit specific image
     - name: Update CloudFormation Stack
       uses: aws-actions/aws-cloudformation-github-deploy@v1
       with:
         name: duckbot
         template: .aws/cloudformation.template.yml
-        parameter-overrides: "DuckBotImage=twentylemon/duckbot:${{ steps.image.outputs.tag }}"
+        parameter-overrides: "DuckBotImage=${{ steps.image.outputs.commit }}"
         capabilities: CAPABILITY_IAM,CAPABILITY_NAMED_IAM
