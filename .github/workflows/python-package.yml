@@ -51,6 +51,7 @@ jobs:
 #          -e "DISCORD_TOKEN=$(cat .github/workflows/test-token.txt | base64 --decode)" \
 #          duckbot
 
+  # FIXME only run on push
   aws-deploy:
     runs-on: ubuntu-latest
     concurrency: deploy
@@ -66,12 +67,14 @@ jobs:
         key: ${{ runner.os }}-buildx-${{ github.sha }}
         restore-keys: ${{ runner.os }}-buildx-
 
+    # FIXME login as chippers
     - name: Login to Docker
       uses: docker/login-action@v1
       with:
         username: twentylemon
         password: ${{ secrets.DOCKER_PASS }}
 
+    # FIXME publish commit specific image
     - name: Build and Push Docker Image
       env:
         COMMIT_SHA: ${{ github.sha }}
@@ -107,6 +110,7 @@ jobs:
         aws ssm put-parameter --name /duckbot/token/discord --type String --value "$DISCORD_TOKEN" --overwrite
         aws ssm put-parameter --name /duckbot/token/openweather --type String --value "$OPENWEATHER_TOKEN" --overwrite
 
+    # FIXME specify commit specific image
     - name: Update CloudFormation Stack
       uses: aws-actions/aws-cloudformation-github-deploy@v1
       with:
