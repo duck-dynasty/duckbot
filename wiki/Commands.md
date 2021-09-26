@@ -29,7 +29,7 @@ Do you crave a particular food but want an arbitrary recipe?
 
 Music
 -----
-DuckBot plays everyone's favourite background noise inside whatever voice channel you're in. Use `!start` to summon the bot, and `!stop` to dismiss it.
+DuckBot plays everyone's favourite background noise inside whatever voice channel you're in. Use `!start` to summon the bot, and `!stop` to dismiss it. DuckBot only has so much stamina, and will stop playing music after about four hours.
 
 Weather
 -------

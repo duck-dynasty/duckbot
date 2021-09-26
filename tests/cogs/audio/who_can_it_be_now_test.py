@@ -18,15 +18,15 @@ def play(*args, **kwargs):
 async def test_task_loop_once(ffmpeg, vol, bot_spy, context, voice_client, skip_if_private_channel):
     context.voice_client = None
     context.author.voice.channel.connect.return_value = async_value(voice_client)
-    voice_client.play = play
+    voice_client.play.side_effect = play
     clazz = WhoCanItBeNow(bot_spy)
     await clazz.connect_to_voice(context)
     assert clazz.voice_client is not None
-    await clazz._WhoCanItBeNow__start(context)
+    await clazz.start(context)
     assert clazz.audio_task is not None
     assert clazz.streaming is True
     await clazz.stream.wait()
-    await clazz._WhoCanItBeNow__stop(context)
+    await clazz.stop(context)
     assert clazz.streaming is False
     assert clazz.audio_task is None
     assert clazz.voice_client is None
@@ -40,21 +40,43 @@ async def test_task_loop_repeats(ffmpeg, vol, bot_spy, context, voice_client, sk
     context.author.voice.channel.connect.return_value = async_value(voice_client)
 
     def loop_first(*args, **kwargs):
-        voice_client.play = play
+        voice_client.play.side_effect = play
         play(*args, **kwargs)
 
-    voice_client.play = loop_first
+    voice_client.play.side_effect = loop_first
     clazz = WhoCanItBeNow(bot_spy)
     await clazz.connect_to_voice(context)
     assert clazz.voice_client is not None
-    await clazz._WhoCanItBeNow__start(context)
+    await clazz.start(context)
     assert clazz.audio_task is not None
     assert clazz.streaming is True
     await clazz.stream.wait()
     await asyncio.sleep(0)
     await clazz.stream.wait()
-    await clazz._WhoCanItBeNow__stop(context)
+    await clazz.stop(context)
     assert clazz.streaming is False
+    assert clazz.audio_task is None
+    assert clazz.voice_client is None
+
+
+@pytest.mark.asyncio
+@mock.patch("duckbot.cogs.audio.who_can_it_be_now.PCMVolumeTransformer", autospec=True)
+@mock.patch("duckbot.cogs.audio.who_can_it_be_now.FFmpegPCMAudio", autospec=True)
+async def test_task_loop_repeats_max_times(ffmpeg, vol, bot_spy, context, voice_client, skip_if_private_channel):
+    context.voice_client = None
+    context.author.voice.channel.connect.return_value = async_value(voice_client)
+    voice_client.play.side_effect = play
+    clazz = WhoCanItBeNow(bot_spy)
+    await clazz.connect_to_voice(context)
+    assert clazz.voice_client is not None
+    await clazz.start(context)
+    assert clazz.audio_task is not None
+    assert clazz.streaming is True
+    for i in range(76):
+        await clazz.stream.wait()
+        await asyncio.sleep(0)
+        assert clazz.streaming is (i < 75)  # should be streaming 75 times only
+    # stop() is called after song is played 75 times
     assert clazz.audio_task is None
     assert clazz.voice_client is None
 
@@ -99,7 +121,7 @@ async def test_connect_to_voice_already_connected(bot, context, voice_client):
 async def test_start_already_started(bot, context):
     clazz = WhoCanItBeNow(bot)
     clazz.streaming = True
-    await clazz._WhoCanItBeNow__start(context)
+    await clazz.start(context)
     bot.loop.create_task.assert_not_called()
 
 
@@ -111,7 +133,7 @@ async def test_stop_disconnects(ffmpeg, vol, bot, context, voice_client):
     clazz.streaming = True
     clazz.audio_task = asyncio.create_task(clazz.stream_audio())
     clazz.voice_client = voice_client
-    await clazz._WhoCanItBeNow__stop(context)
+    await clazz.stop(context)
     voice_client.disconnect.assert_called()
     assert clazz.voice_client is None
     assert clazz.audio_task is None
@@ -122,7 +144,7 @@ async def test_stop_disconnects(ffmpeg, vol, bot, context, voice_client):
 async def test_stop_not_streaming(bot, context):
     clazz = WhoCanItBeNow(bot)
     clazz.streaming = False
-    await clazz._WhoCanItBeNow__stop(context)
+    await clazz.stop(context)
     context.send.assert_called_once_with("Brother, no :musical_note: :saxophone: is active.", delete_after=30)
 
 
@@ -130,7 +152,7 @@ async def test_stop_not_streaming(bot, context):
 async def test_stop_null_context_not_streaming(bot):
     clazz = WhoCanItBeNow(bot)
     clazz.streaming = False
-    await clazz._WhoCanItBeNow__stop()
+    await clazz.stop()
 
 
 @pytest.mark.asyncio
