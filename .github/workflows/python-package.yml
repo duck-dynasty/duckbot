@@ -62,6 +62,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+    # FIXME publish chippers255 image (or a new duckbot one)
     - name: Create Docker Image Tags
       id: image
       run: |
@@ -84,7 +85,6 @@ jobs:
         username: twentylemon
         password: ${{ secrets.DOCKER_PASS }}
 
-    # FIXME publish chippers255 image (or a new duckbot one)
     - name: Build and Push Docker Image
       run: |
         docker buildx build . \
