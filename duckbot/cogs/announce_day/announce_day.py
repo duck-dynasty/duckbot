@@ -34,7 +34,7 @@ class AnnounceDay(commands.Cog):
         today = random.choice(days[day]["names"])
         tomorrow = random.choice(days[(day + 1) % 7]["names"])
         yesterday = random.choice(days[(day + 6) % 7]["names"])  # +6 instead of -1 since modulo can be negative
-        message = random.choice(templates + days[day]["templates"]).format(today, tomorrow, yesterday)
+        message = random.choice(templates + days[day]["templates"]).format(today=today, tomorrow=tomorrow, yesterday=yesterday)
         if now in self.holidays:
             specials = " and ".join(self.holidays.get_list(now))
             return message + "\n" + "It is also " + specials + "."
@@ -48,14 +48,13 @@ class AnnounceDay(commands.Cog):
     async def on_hour(self):
         if self.should_announce_day():
             channel = get(self.bot.get_all_channels(), guild__name="Friends Chat", name="general", type=ChannelType.text)
-            if channel:
-                message = self.get_message()
-                await channel.send(message)
+            message = self.get_message()
+            await channel.send(message)
 
-                should_send_dog = random.random() < 1.0 / 10.0
-                should_send_gif = not should_send_dog and random.random() < 1.0 / 9.0  # 10%, since relies on not sending dog photo
-                await self.send_dog(channel) if should_send_dog else None
-                await self.send_gif(channel) if should_send_gif else None
+            should_send_dog = random.random() < 1.0 / 10.0
+            should_send_gif = not should_send_dog and random.random() < 1.0 / 9.0  # 10%, since relies on not sending dog photo
+            await self.send_dog(channel) if should_send_dog else None
+            await self.send_gif(channel) if should_send_gif else None
 
     async def send_dog(self, channel):
         try:
