@@ -12,7 +12,7 @@ class ThankingRobot(commands.Cog):
         if message.author == self.bot.user:
             return
 
-        thanks = ["thank you duckbot", "thanks duckbot", "thank you duck bot", "thanks duck bot"]
+        thanks = ["thank you duckbot", "thanks duckbot", "thank you duck bot", "thanks duck bot", "thx duckbot", "thx duck bot"]
         for t in thanks:
             if t in message.content.lower().replace(",", ""):
                 correction = f"I am just a robot.  Do not personify me, {message.author.display_name}"
