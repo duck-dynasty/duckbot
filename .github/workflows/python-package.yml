@@ -64,8 +64,8 @@ jobs:
     - name: Create Docker Image Tags
       id: image
       run: |
-        echo "::set-output name=latest::chippers255/duckbot:latest"
-        echo "::set-output name=commit::chippers255/duckbot:$(git rev-parse --short HEAD)"
+        echo "::set-output name=latest::duckdynasty/duckbot:latest"
+        echo "::set-output name=commit::duckdynasty/duckbot:$(git rev-parse --short HEAD)"
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
