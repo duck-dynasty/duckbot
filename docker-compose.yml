@@ -1,4 +1,4 @@
-version: 3.9
+version: "3.9"
 # NOTE when changing, ensure the task definition in the cloudformation stack matches!
 services:
   duckbot:
