@@ -13,7 +13,7 @@ async def test_correct_giving_thanks_bot_author(bot, message):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("text", ["Thank you DuckBot. You're becoming so much more polite.", " tHaNks, DuCK BOt"])
+@pytest.mark.parametrize("text", ["Thank you DuckBot. You're becoming so much more polite.", " tHaNks, DuCK BOt", "thx duck bot my man"])
 async def test_correct_giving_thanks_message_is_thanks(bot, message, text):
     message.content = text
     clazz = ThankingRobot(bot)
