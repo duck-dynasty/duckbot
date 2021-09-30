@@ -34,7 +34,7 @@ if __name__ == "__main__":
     setup(
         name="duckbot",
         version="1.0",
-        url="https://github.com/Chippers255/duckbot",
+        url="https://github.com/duck-dynasty/duckbot",
         python_requires=">=3.8",
         packages=find_packages(),
         cmdclass={"develop": PostDevelop, "install": PostInstall},
