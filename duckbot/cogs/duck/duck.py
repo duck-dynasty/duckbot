@@ -28,14 +28,14 @@ class Duck(commands.Cog):
         await self.github(context)
 
     async def github(self, context):
-        await context.send("https://github.com/Chippers255/duckbot")
+        await context.send("https://github.com/duck-dynasty/duckbot")
 
     @commands.command(name="help")
     async def wiki_command(self, context):
         await self.wiki(context)
 
     async def wiki(self, context):
-        await context.send("https://github.com/Chippers255/duckbot/wiki")
+        await context.send("https://github.com/duck-dynasty/duckbot/wiki")
 
     @duck_command.after_invoke
     @wiki_command.after_invoke
