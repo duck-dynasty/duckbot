@@ -52,11 +52,11 @@ jobs:
           duckbot
 
   deploy:
-    needs:
-    - release
-    - sanity
+#     needs:
+#     - release
+#     - sanity
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.repository == 'duck-dynasty/duckbot'
+#     if: github.event_name == 'push' && github.repository == 'duck-dynasty/duckbot'
     concurrency: deploy
     steps:
     - uses: actions/checkout@v2
@@ -64,8 +64,8 @@ jobs:
     - name: Create Docker Image Tags
       id: image
       run: |
-        echo "::set-output name=latest::duckdynasty/duckbot:latest"
-        echo "::set-output name=commit::duckdynasty/duckbot:$(git rev-parse --short HEAD)"
+        echo "::set-output name=latest::twentylemon/duckbot:latest"
+        echo "::set-output name=commit::twentylemon/duckbot:$(git rev-parse --short HEAD)"
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
@@ -92,14 +92,14 @@ jobs:
           --cache-to='type=local,dest=/tmp/.buildx-cache' \
           --push
 
-    - name: Publish Wiki Documentation
-      uses: SwiftDocOrg/github-wiki-publish-action@v1
-      with:
-        path: wiki
-      env:
-        GH_PERSONAL_ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-        WIKI_COMMIT_MESSAGE: ${{ github.event.commits[0].message }}
-        GITHUB_ACTOR: ${{ github.event.commits[0].author.name }}
+#     - name: Publish Wiki Documentation
+#       uses: SwiftDocOrg/github-wiki-publish-action@v1
+#       with:
+#         path: wiki
+#       env:
+#         GH_PERSONAL_ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+#         WIKI_COMMIT_MESSAGE: ${{ github.event.commits[0].message }}
+#         GITHUB_ACTOR: ${{ github.event.commits[0].author.name }}
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
