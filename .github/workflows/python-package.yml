@@ -56,7 +56,7 @@ jobs:
     - release
     - sanity
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.repository == 'Chippers255/duckbot'
+    if: github.event_name == 'push' && github.repository == 'duck-dynasty/duckbot'
     concurrency: docker-image-build
     steps:
     - uses: actions/checkout@v2

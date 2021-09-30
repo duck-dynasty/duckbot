@@ -64,14 +64,14 @@ async def test_react_with_duckbot_random_passes(random, bot, message):
 async def test_github(bot, context):
     clazz = Duck(bot)
     await clazz.github(context)
-    context.send.assert_called_once_with("https://github.com/Chippers255/duckbot")
+    context.send.assert_called_once_with("https://github.com/duck-dynasty/duckbot")
 
 
 @pytest.mark.asyncio
 async def test_wiki(bot, context):
     clazz = Duck(bot)
     await clazz.wiki(context)
-    context.send.assert_called_once_with("https://github.com/Chippers255/duckbot/wiki")
+    context.send.assert_called_once_with("https://github.com/duck-dynasty/duckbot/wiki")
 
 
 @pytest.mark.asyncio

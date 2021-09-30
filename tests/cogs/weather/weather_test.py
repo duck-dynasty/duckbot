@@ -62,7 +62,7 @@ async def test_weather_get_failure(clazz, owm, context):
 @pytest.mark.asyncio
 async def test_search_location_no_args(clazz, context):
     assert await clazz.search_location(context, None, None, None) is None
-    context.send.assert_called_once_with("Not enough arguments to determine weather location, see https://github.com/Chippers255/duckbot/wiki/Commands#weather")
+    context.send.assert_called_once_with("Not enough arguments to determine weather location, see https://github.com/duck-dynasty/duckbot/wiki/Commands#weather")
 
 
 @pytest.mark.asyncio
