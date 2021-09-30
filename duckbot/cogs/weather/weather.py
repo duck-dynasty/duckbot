@@ -79,7 +79,7 @@ class Weather(commands.Cog):
             else:
                 return locations[0]
         else:
-            await context.send("Not enough arguments to determine weather location, see https://github.com/Chippers255/duckbot/wiki/Commands#weather")
+            await context.send("Not enough arguments to determine weather location, see https://github.com/duck-dynasty/duckbot/wiki/Commands#weather")
             return None
 
     def __location_string(self, city: Location):
