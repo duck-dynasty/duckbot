@@ -11,6 +11,9 @@ A Discord bot for personal friend group. If you don't know me personally, consid
 
 View the [wiki](https://github.com/duck-dynasty/duckbot/wiki) for a short description on what the Duck does.
 
+https://user-images.githubusercontent.com/3149083/135647011-c5869f04-abef-41a9-9550-99292dc4e792.mp4
+
+
 ## Development
 Before running DuckBot, you want to create a virtualenv to develop in. DuckBot runs on `python3.8`, so prefer to use that.
 
