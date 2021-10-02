@@ -8,6 +8,7 @@ from .channel import (
     text_channel,
     thread,
 )
+from .command import command
 from .context import context
 from .embed import patch_embed_equals
 from .emoji import emoji
