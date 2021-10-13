@@ -10,6 +10,7 @@ import duckbot.cogs.duck
 import duckbot.cogs.formula_one
 import duckbot.cogs.fortune
 import duckbot.cogs.games
+import duckbot.cogs.github
 import duckbot.cogs.insights
 import duckbot.cogs.messages
 import duckbot.cogs.recipe
@@ -19,7 +20,6 @@ import duckbot.cogs.tito
 import duckbot.cogs.weather
 import duckbot.health
 import duckbot.logs
-import duckbot.cogs.github
 import duckbot.util.connection_test
 from duckbot import DuckBot
 
