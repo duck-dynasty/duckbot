@@ -22,7 +22,7 @@ Before running DuckBot, you want to create a virtualenv to develop in. DuckBot r
 python3.8 -m venv --clear --prompt duckbot venv
 . venv/bin/activate
 pip install --upgrade pip setuptools wheel
-pip install --editable .[dev]
+pip install .[dev]
 ```
 
 The `dev` extras will also install development dependencies, like `pytest`. The installation commands should be run whenever you merge from upstream.
