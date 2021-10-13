@@ -39,7 +39,7 @@ class YoloMerge(commands.Cog):
 
     async def list(self, context: commands.Context):
         repo = self.github.get_repo("duck-dynasty/duckbot")
-        pulls = list(repo.get_pulls()[:10])
+        pulls = list(repo.get_pulls()[:6])
         if pulls:
             embed = self.as_embed(pulls)
             await context.send(embed=embed)

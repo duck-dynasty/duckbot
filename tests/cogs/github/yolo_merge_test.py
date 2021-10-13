@@ -58,10 +58,10 @@ async def test_list_send_pull_status(yolo, context, gh, repo, skip_if_private_ch
 
 
 @pytest.mark.asyncio
-async def test_list_max_ten_pulls(yolo, context, gh, repo, skip_if_private_channel):
+async def test_list_max_six_pulls(yolo, context, gh, repo, skip_if_private_channel):
     gh.get_repo.return_value = repo
     all_pulls = [make_pull_request(i, i % 2 == 0) for i in range(15)]
-    kept_pulls = all_pulls[:10]
+    kept_pulls = all_pulls[:6]
     repo.get_pulls.return_value = [p[0] for p in all_pulls]
     await yolo.list(context)
     embed = discord.Embed()
