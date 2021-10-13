@@ -25,13 +25,14 @@ class Weather(commands.Cog):
     def __init__(self, bot, db: Database):
         self.bot = bot
         self.db = db
-        self.owm_client: pyowm.OWM = None
+        self._owm = None
 
+    @property
     def owm(self) -> pyowm.OWM:
-        if self.owm_client is None:
+        if self._owm is None:
             conf = config.get_default_config_for_subscription_type("free")
-            self.owm_client = pyowm.OWM(os.getenv("OPENWEATHER_TOKEN"), conf)
-        return self.owm_client
+            self._owm = pyowm.OWM(os.getenv("OPENWEATHER_TOKEN"), conf)
+        return self._owm
 
     @commands.group(name="weather", invoke_without_command=True)
     async def weather_command(self, context, city: str = None, country: str = None, index: int = None):
@@ -64,7 +65,7 @@ class Weather(commands.Cog):
             if country is not None and len(country) != 2:
                 await context.send("Country must be an ISO country code, such as CA for Canada.")
                 return None
-            locations = self.owm().city_id_registry().locations_for(city.replace(",", ""), country=country)
+            locations = self.owm.city_id_registry().locations_for(city.replace(",", ""), country=country)
             if not locations:
                 await context.send("No cities found matching search.")
                 return None
@@ -97,7 +98,7 @@ class Weather(commands.Cog):
         else:
             location = await self.search_location(context, city, country, index)
         if location is not None:
-            weather = self.owm().weather_manager().one_call(lat=location.lat, lon=location.lon, exclude="minutely", units="metric")
+            weather = self.owm.weather_manager().one_call(lat=location.lat, lon=location.lon, exclude="minutely", units="metric")
             await context.send(self.weather_message(location, weather), file=discord.File(self.weather_graph(location, weather)))
 
     def weather_message(self, city: Location, weather: OneCall) -> str:
