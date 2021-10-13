@@ -31,7 +31,7 @@ jobs:
         python -m venv --clear venv
         . ./venv/bin/activate
         pip install --upgrade pip setuptools wheel
-        pip install --editable .[dev]
+        pip install .[dev]
     - name: Run Tests
       run: |
         . venv/bin/activate
