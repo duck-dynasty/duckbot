@@ -19,6 +19,7 @@ import duckbot.cogs.tito
 import duckbot.cogs.weather
 import duckbot.health
 import duckbot.logs
+import duckbot.cogs.github
 import duckbot.util.connection_test
 from duckbot import DuckBot
 
@@ -35,6 +36,7 @@ def run_duckbot(bot: commands.Bot):
     bot.load_extension(duckbot.cogs.tito.__name__)
     bot.load_extension(duckbot.cogs.text.__name__)
     bot.load_extension(duckbot.cogs.games.__name__)
+    bot.load_extension(duckbot.cogs.github.__name__)
     bot.load_extension(duckbot.cogs.recipe.__name__)
     bot.load_extension(duckbot.cogs.fortune.__name__)
     bot.load_extension(duckbot.cogs.weather.__name__)
