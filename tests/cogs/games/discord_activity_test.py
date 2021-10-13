@@ -22,7 +22,7 @@ async def test_cog_unload_cancels_task(bot):
 
 @pytest.mark.asyncio
 @mock.patch("random.choice", return_value=discord.Game("game"))
-async def test_change_activity_changes_activity(bot):
+async def test_change_activity_changes_activity(choice, bot):
     clazz = DiscordActivity(bot)
     await clazz.change_activity()
     bot.change_presence.assert_called_once_with(activity=discord.Game("game"))
