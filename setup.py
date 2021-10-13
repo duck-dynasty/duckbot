@@ -63,7 +63,7 @@ if __name__ == "__main__":
                 "pytest",
                 "pytest-asyncio",
                 "pytest-xdist[psutil]",
-                "flake8",
+                "flake8<4",
                 "black",
                 "flake8-black",
                 "isort",
