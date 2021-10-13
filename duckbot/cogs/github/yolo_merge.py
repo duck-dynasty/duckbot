@@ -31,7 +31,7 @@ class YoloMerge(commands.Cog):
     @commands.command(name="yolo")
     @commands.check(is_repository_admin)
     async def yolo_command(self, context: commands.Context, pr_id: Optional[int] = None):
-        with context.typing():
+        async with context.typing():
             await self.yolo(context, pr_id)
 
     async def yolo(self, context: commands.Context, pr_id: Optional[int]):
