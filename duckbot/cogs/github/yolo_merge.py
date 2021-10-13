@@ -2,8 +2,8 @@ import os
 from typing import List, Optional
 
 import discord
-from discord.ext import commands
 import github
+from discord.ext import commands
 from github.PullRequest import PullRequest
 
 
@@ -57,10 +57,10 @@ class YoloMerge(commands.Cog):
             embed.add_field(
                 name=f"#{pr.number}",
                 value=f"""
-            [{pr.title}]({pr.html_url})
-            {pr.changed_files} changed file{"s" if pr.changed_files > 1 else ""}; +{pr.additions} -{pr.deletions}
-            Pull is {"" if pr.mergeable else "NOT "} mergeable. It is currently {pr.mergeable_state}.
-            {check_results}
-            """,
+                    [{pr.title}]({pr.html_url})
+                    {pr.changed_files} changed file{"s" if pr.changed_files > 1 else ""}; +{pr.additions} -{pr.deletions}
+                    Pull is {"" if pr.mergeable else "NOT "} mergeable. It is currently {pr.mergeable_state}.
+                    {check_results}
+                """,
             )
         return embed
