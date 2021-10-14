@@ -77,6 +77,7 @@ def make_pull_request(number: int, mergeable=True) -> Tuple[github.PullRequest.P
     pull.additions = 50
     pull.deletions = 25
     pull.mergeable = mergeable
+    pull.mergeable_status = "blocked" if mergeable else "behind"
     commits = MockPaginatedList([commit(), commit(), commit()])
     pull.get_commits.return_value = commits
     last_commit = commits[-1]
@@ -94,7 +95,8 @@ def make_pull_request(number: int, mergeable=True) -> Tuple[github.PullRequest.P
     lines = [
         f"[{pull.title}]({pull.html_url})",
         "10 changed files; +50 -25",
-        f"Pull is mergeable. It is currently {pull.mergeable_state}." if mergeable else f"Pull is NOT mergeable. It is currently {pull.mergeable_state}.",
+        "mergeable :white_check_mark:" if pull.mergeable else "mergeable :x:",
+        "up to date :white_check_mark:" if pull.mergeable_state == "blocked" else "up to date :x:",
         f"**{success_check.app.name}** :white_check_mark:",
         f"**{failure_check.app.name}** :x:",
         f"**{incomplete_check.app.name}** :coffee:",
