@@ -6,6 +6,10 @@ import github
 from discord.ext import commands
 from github.PullRequest import PullRequest
 
+CHECK_PASSED = ":white_check_mark:"
+CHECK_FAILED = ":x:"
+CHECK_PENDING = ":coffee:"
+
 
 async def is_repository_admin(context: commands.Context):
     """Disallow !yolo to be used outside of a server, and only allow the bot owner or
@@ -52,16 +56,17 @@ class YoloMerge(commands.Cog):
             lines = [
                 f"[{pr.title}]({pr.html_url})",
                 f"{pr.changed_files} changed file{'s' if pr.changed_files > 1 else ''}; +{pr.additions} -{pr.deletions}",
-                f"Pull is{'' if pr.mergeable else ' NOT'} mergeable. It is currently {pr.mergeable_state}.",
+                f"mergeable {CHECK_PASSED if pr.mergeable else CHECK_FAILED}",
+                f"up to date {CHECK_PASSED if pr.mergeable_state == 'blocked' else CHECK_FAILED}",
             ]
             commit = pr.get_commits().reversed[0]
             for suite in commit.get_check_suites():
                 completed = suite.status == "completed"
                 success = suite.conclusion == "success"
                 if completed:
-                    result = ":white_check_mark:" if success else ":x:"
+                    result = CHECK_PASSED if success else CHECK_FAILED
                 else:
-                    result = ":coffee:"
+                    result = CHECK_PENDING
                 lines.append(f"**{suite.app.name}** {result}")
             embed.add_field(name=f"#{pr.number}", value="\n".join(lines))
         return embed
