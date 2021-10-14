@@ -31,7 +31,7 @@ jobs:
         python -m venv --clear venv
         . ./venv/bin/activate
         pip install --upgrade pip setuptools wheel
-        pip install --editable .[dev]
+        pip install .[dev]
     - name: Run Tests
       run: |
         . venv/bin/activate
@@ -112,9 +112,11 @@ jobs:
       env:
         DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
         OPENWEATHER_TOKEN: ${{ secrets.OPENWEATHER_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       run: |
         aws ssm put-parameter --name /duckbot/token/discord --type String --value "$DISCORD_TOKEN" --overwrite
         aws ssm put-parameter --name /duckbot/token/openweather --type String --value "$OPENWEATHER_TOKEN" --overwrite
+        aws ssm put-parameter --name /duckbot/token/github --type String --value "$GITHUB_TOKEN" --overwrite
 
     - name: Update CloudFormation Stack
       uses: aws-actions/aws-cloudformation-github-deploy@v1

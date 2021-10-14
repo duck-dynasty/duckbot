@@ -56,13 +56,14 @@ if __name__ == "__main__":
             "textblob<1",
             "pyfiglet<1",
             "matplotlib>=3.4,<4",
+            "PyGithub>=1.55,<2",
         ],
         extras_require={
             "dev": [
                 "pytest",
                 "pytest-asyncio",
                 "pytest-xdist[psutil]",
-                "flake8",
+                "flake8<4",
                 "black",
                 "flake8-black",
                 "isort",
