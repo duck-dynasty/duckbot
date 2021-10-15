@@ -14,6 +14,7 @@ Command Overview
 | `!mock` | converts text into MoCkInG tExT |
 | [`!roll`](#dice) | rolls Dungeons and Dragons style dice |
 | `!coin` | flips a coin. in real life |
+| [`!yolo`](#yolo-pull-requests) | list open pull requests in this repo |
 | `!help` | gives a link to this wiki |
 | `!duck` | gives a link to this repo |
 
@@ -74,3 +75,7 @@ DuckBot will roll Dungeons and Dragons style dice for you. See [dice syntax](htt
 > Human: !roll 1d20  
 > DuckBot: Rolls: 1d20 (3)  
 > Total: 3
+
+Yolo Pull Requests
+------------------
+DuckBot will list the open pull requests when the bot owner or one of the repository owners uses the `!yolo` command. DuckBot will eventually learn how to merge his own pull requests, or something.

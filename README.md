@@ -22,7 +22,7 @@ Before running DuckBot, you want to create a virtualenv to develop in. DuckBot r
 python3.8 -m venv --clear --prompt duckbot venv
 . venv/bin/activate
 pip install --upgrade pip setuptools wheel
-pip install --editable .[dev]
+pip install .[dev]
 ```
 
 The `dev` extras will also install development dependencies, like `pytest`. The installation commands should be run whenever you merge from upstream.
@@ -43,7 +43,12 @@ Before running DuckBot, you need to have a `duckbot/.env` file with the API toke
 duck@pond$ cat duckbot/.env
 DISCORD_TOKEN=thesecrettoken
 OPENWEATHER_TOKEN=thesecrettoken
+GITHUB_TOKEN=thesecrettoken
 ```
+
+* Discord tokens available from [Discord Developer](https://discord.com/developers/applications)
+* You can get an [openweather api token](https://openweathermap.org/api) for free as well
+* The github token is a [personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
 
 With your tokens available, you can jam them into your shell environment, so you can run DuckBot. You may want to put this into your bashrc for convenience.
 ```sh
