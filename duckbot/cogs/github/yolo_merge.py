@@ -53,16 +53,20 @@ class YoloMerge(commands.Cog):
     def as_embed(self, prs: List[PullRequest]) -> discord.Embed:
         embed = discord.Embed()
         for pr in prs:
-            embed.add_field(name=f"#{pr.number}", value=self.get_pr_summary(pr))
+            embed.add_field(name=f"#{pr.number}", value="\n".join(self.get_pr_summary_lines(pr)))
         return embed
 
-    def get_pr_summary(self, pr: PullRequest) -> str:
+    def get_pr_summary_lines(self, pr: PullRequest) -> List[str]:
         lines = [
             f"[{pr.title}]({pr.html_url})",
             f"{pr.changed_files} changed file{'s' if pr.changed_files > 1 else ''}; +{pr.additions} -{pr.deletions}",
             f"mergeable {CHECK_PASSED if pr.mergeable else CHECK_FAILED}",
             f"up to date {CHECK_PASSED if pr.mergeable_state == 'blocked' else CHECK_FAILED}",
         ]
+        return lines + self.get_checks_summary_lines(pr)
+
+    def get_checks_summary_lines(self, pr: PullRequest) -> List[str]:
+        lines = []
         commit = pr.get_commits().reversed[0]
         for suite in commit.get_check_suites():
             completed = suite.status == "completed"
@@ -72,4 +76,4 @@ class YoloMerge(commands.Cog):
             else:
                 result = CHECK_PENDING
             lines.append(f"**{suite.app.name}** {result}")
-        return "\n".join(lines)
+        return lines
