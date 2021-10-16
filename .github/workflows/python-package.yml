@@ -23,7 +23,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: venv
-        key: ${{ env.pythonLocation }}-venv-${{ hashFiles('setup.py') }}
+        key: ${{ env.pythonLocation }}-env-${{ hashFiles('setup.py') }}
 
     - name: Install Packages
       if: steps.venv.outputs.cache-hit != 'true'
