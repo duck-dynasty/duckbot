@@ -1,3 +1,4 @@
+import discord
 import pytest
 import wolframalpha
 
@@ -10,8 +11,9 @@ def wra_client(autospec) -> wolframalpha.Client:
 
 
 @pytest.fixture
-def wolfram(bot) -> WolframAlpha:
+def wolfram(bot, wra_client) -> WolframAlpha:
     clazz = WolframAlpha(bot)
+    clazz._wolfram = wra_client
     return clazz
 
 
@@ -24,3 +26,61 @@ def test_github_creates_instance(bot, monkeypatch):
 def test_github_returns_cached_instance(wolfram, wra_client):
     wolfram._wolfram = wra_client
     assert wolfram.wolfram == wra_client
+
+
+@pytest.mark.asyncio
+async def test_calc_single_pod(wolfram, context, wra_client):
+    wra_client.query.return_value = result([pod(subpods=[subpod(img=image())])])
+    await wolfram.calc(context, "query")
+    embed = discord.Embed(title="title").set_image(url="src").add_field(name="subtitle", value="plaintext")
+    context.send.assert_called_once_with("https://www.wolframalpha.com/input/?i=query", embeds=[embed])
+
+
+@pytest.mark.asyncio
+async def test_calc_multiple_pods_and_subpods(wolfram, context, wra_client):
+    wra_client.query.return_value = result([pod(title="pod1", subpods=[subpod(title="1"), subpod(title="2", img=image(src="2.img"))]), pod(title="pod2", subpods=[subpod(title="3")])])
+    await wolfram.calc(context, "query things")
+    embed1 = discord.Embed(title="pod1").set_image(url="2.img").add_field(name="1", value="plaintext").add_field(name="2", value="plaintext")
+    embed2 = discord.Embed(title="pod2").add_field(name="3", value="plaintext")
+    context.send.assert_called_once_with("https://www.wolframalpha.com/input/?i=query%20things", embeds=[embed1, embed2])
+
+
+def result(pods=None):
+    return MockResult(pods)
+
+
+def pod(title="title", subpods=None):
+    return MockPod(title, subpods)
+
+
+def subpod(title="subtitle", plaintext="plaintext", img=None):
+    return MockSubPod(title, plaintext, img)
+
+
+def image(title="img", src="src", alt="alt"):
+    return MockImage(title, src, alt)
+
+
+class MockResult:
+    def __init__(self, pods):
+        self.pods = pods if pods else []
+
+
+class MockPod:
+    def __init__(self, title, subpods):
+        self.title = title
+        self.subpods = subpods
+
+
+class MockSubPod:
+    def __init__(self, title, plaintext, img):
+        self.title = title
+        self.plaintext = plaintext
+        self.img = img
+
+
+class MockImage:
+    def __init__(self, title="img", src="src", alt="alt"):
+        self.title = title
+        self.src = src
+        self.alt = alt
