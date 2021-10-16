@@ -23,7 +23,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: venv
-        key: ${{ env.pythonLocation }}-venv-${{ hashFiles('setup.py', 'pyproject.toml') }}
+        key: ${{ env.pythonLocation }}-venv-${{ hashFiles('setup.py') }}
 
     - name: Install Packages
       if: steps.venv.outputs.cache-hit != 'true'
@@ -31,7 +31,7 @@ jobs:
         python -m venv --clear venv
         . ./venv/bin/activate
         pip install --upgrade pip setuptools wheel
-        pip install --editable .[dev]
+        pip install .[dev]
     - name: Run Tests
       run: |
         . venv/bin/activate
