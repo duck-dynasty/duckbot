@@ -7,6 +7,7 @@ Command Overview
 | [`!recipe`](#recipe-search) | search for a random recipe |
 | [`!start`, `!stop`](#music) | start or stop playing music |
 | [`!weather`](#weather) | retrieve weather information |
+| `!lmgt` | generates a google search link for the given query |
 | `!8ball` | get a magic eight ball style fortune |
 | `!fortune` | get a random fortune told to you by a cow |
 | `!dog` | displays a random dog photo |
