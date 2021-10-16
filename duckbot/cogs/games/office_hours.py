@@ -1,7 +1,7 @@
-from discord.ext import commands, tasks
 import requests
-from discord.utils import get
 from discord import ChannelType
+from discord.ext import commands, tasks
+from discord.utils import get
 
 
 class OfficeHours(commands.Cog):
@@ -13,7 +13,7 @@ class OfficeHours(commands.Cog):
     def cog_unload(self):
         self.check_if_streaming_loop.cancel()
 
-    @tasks.loop(minutes=5.0)
+    @tasks.loop(minutes=15.0)
     async def check_if_streaming_loop(self):
         await self.check_if_streaming()
 
@@ -25,6 +25,9 @@ class OfficeHours(commands.Cog):
             if streaming:
                 channel = get(self.bot.get_all_channels(), guild__name="Friends Chat", name="general", type=ChannelType.text)
                 await channel.send("Office Hours have started!\nhttps://www.twitch.tv/conlabx")
+                self.check_if_streaming_loop.change_interval(hours=12.0)  # avoid polling for a while
+            else:
+                self.check_if_streaming_loop.change_interval(minutes=15.0)  # stream stopped, restart polling
 
     @check_if_streaming_loop.before_loop
     async def before_loop(self):
