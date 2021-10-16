@@ -38,11 +38,18 @@ async def test_calc_single_pod(wolfram, context, wra_client):
 
 @pytest.mark.asyncio
 async def test_calc_multiple_pods_and_subpods(wolfram, context, wra_client):
-    wra_client.query.return_value = result([pod(title="pod1", subpods=[subpod(title="1"), subpod(title="2", img=image(src="2.img"))]), pod(title="pod2", subpods=[subpod(title="3")])])
+    wra_client.query.return_value = result(
+        [
+            pod(title="pod1", subpods=[subpod(title="1"), subpod(title="2", img=image(src="2.img"))]),
+            pod(title="pod2", subpods=[subpod(title="3")]),
+            pod(title="pod3", subpods=[subpod(title=None, img=image(title="img", src="pod3.img"))]),
+        ]
+    )
     await wolfram.calc(context, "query things")
     embed1 = discord.Embed(title="pod1").set_image(url="2.img").add_field(name="1", value="plaintext").add_field(name="2", value="plaintext")
     embed2 = discord.Embed(title="pod2").add_field(name="3", value="plaintext")
-    context.send.assert_called_once_with("https://www.wolframalpha.com/input/?i=query%20things", embeds=[embed1, embed2])
+    embed3 = discord.Embed(title="pod3").set_image(url="pod3.img").add_field(name="img", value="plaintext")
+    context.send.assert_called_once_with("https://www.wolframalpha.com/input/?i=query%20things", embeds=[embed1, embed2, embed3])
 
 
 def result(pods=None):
