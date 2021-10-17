@@ -6,7 +6,7 @@ import pytest
 def skip_if_private_channel(channel, dm_channel, group_channel):
     """Skips the test if `channel` is a private channel (a DM or group channel).
     Meant to be used when the `channel` fixture is also used."""
-    if channel is dm_channel or channel is group_channel:
+    if channel.type in [discord.ChannelType.private, discord.ChannelType.group]:
         pytest.skip("test requires a non-private discord channel")
 
 

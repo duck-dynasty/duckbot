@@ -23,7 +23,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: venv
-        key: ${{ env.pythonLocation }}-venv-${{ hashFiles('setup.py') }}
+        key: ${{ env.pythonLocation }}-venv-${{ hashFiles('setup.py', 'pyproject.toml') }}
 
     - name: Install Packages
       if: steps.venv.outputs.cache-hit != 'true'
@@ -112,9 +112,11 @@ jobs:
       env:
         DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
         OPENWEATHER_TOKEN: ${{ secrets.OPENWEATHER_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       run: |
-        aws ssm put-parameter --name /duckbot/token/discord --type String --value "$DISCORD_TOKEN" --overwrite
-        aws ssm put-parameter --name /duckbot/token/openweather --type String --value "$OPENWEATHER_TOKEN" --overwrite
+        aws ssm put-parameter --name /duckbot/token/discord --type SecureString --value "$DISCORD_TOKEN" --overwrite
+        aws ssm put-parameter --name /duckbot/token/openweather --type SecureString --value "$OPENWEATHER_TOKEN" --overwrite
+        aws ssm put-parameter --name /duckbot/token/github --type SecureString --value "$GITHUB_TOKEN" --overwrite
 
     - name: Update CloudFormation Stack
       uses: aws-actions/aws-cloudformation-github-deploy@v1
