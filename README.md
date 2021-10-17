@@ -11,6 +11,10 @@ A Discord bot for personal friend group. If you don't know me personally, consid
 
 View the [wiki](https://github.com/duck-dynasty/duckbot/wiki) for a short description on what the Duck does.
 
+
+https://user-images.githubusercontent.com/3149083/135654217-244d7457-9db9-4c30-a98a-785b25453fd8.mp4
+
+
 ## Development
 Before running DuckBot, you want to create a virtualenv to develop in. DuckBot runs on `python3.8`, so prefer to use that.
 
@@ -39,7 +43,12 @@ Before running DuckBot, you need to have a `duckbot/.env` file with the API toke
 duck@pond$ cat duckbot/.env
 DISCORD_TOKEN=thesecrettoken
 OPENWEATHER_TOKEN=thesecrettoken
+GITHUB_TOKEN=thesecrettoken
 ```
+
+* Discord tokens available from [Discord Developer](https://discord.com/developers/applications)
+* You can get an [openweather api token](https://openweathermap.org/api) for free as well
+* The github token is a [personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
 
 With your tokens available, you can jam them into your shell environment, so you can run DuckBot. You may want to put this into your bashrc for convenience.
 ```sh

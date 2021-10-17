@@ -13,8 +13,17 @@ async def test_correct_giving_thanks_bot_author(bot, message):
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize("text", ["Thank you DuckBot. You're becoming so much more polite.", " tHaNks, DuCK BOt"])
+@pytest.mark.parametrize("text", ["Thank you DuckBot. You're becoming so much more polite.", " tHaNks, DuCK BOt", "thx duck bot my man"])
 async def test_correct_giving_thanks_message_is_thanks(bot, message, text):
+    message.content = text
+    clazz = ThankingRobot(bot)
+    await clazz.correct_giving_thanks(message)
+    message.channel.send.assert_called_once_with(f"I am just a robot.  Do not personify me, {message.author.display_name}")
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize("text", ["Thank you DuckBot. thanks duck bot. thx duck bot boy", " tHaNks, DuCK BOt"])
+async def test_correct_number_of_replies_to_very_thankful_messages(bot, message, text):
     message.content = text
     clazz = ThankingRobot(bot)
     await clazz.correct_giving_thanks(message)

@@ -23,7 +23,7 @@ jobs:
       uses: actions/cache@v2
       with:
         path: venv
-        key: ${{ env.pythonLocation }}-venv-${{ hashFiles('setup.py') }}
+        key: ${{ env.pythonLocation }}-venv-${{ hashFiles('setup.py', 'pyproject.toml') }}
 
     - name: Install Packages
       if: steps.venv.outputs.cache-hit != 'true'
@@ -57,12 +57,16 @@ jobs:
     - sanity
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.repository == 'duck-dynasty/duckbot'
-    concurrency: docker-image-build
+    concurrency: deploy
     steps:
     - uses: actions/checkout@v2
 
-    - name: Set up QEMU for ARM Platforms
-      uses: docker/setup-qemu-action@v1
+    - name: Create Docker Image Tags
+      id: image
+      run: |
+        echo "::set-output name=latest::duckdynasty/duckbot:latest"
+        echo "::set-output name=commit::duckdynasty/duckbot:$(git rev-parse --short HEAD)"
+
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v1
     - name: Set up Docker Build Cache
@@ -75,15 +79,18 @@ jobs:
     - name: Login to Docker
       uses: docker/login-action@v1
       with:
-        username: chippers255
+        username: duckdynasty
         password: ${{ secrets.DOCKER_PASS }}
+
     - name: Build and Push Docker Image
       run: |
-        docker buildx bake \
-          --set '*.platform=linux/arm/v7' \
-          --push \
-          --set '*.cache-from=type=local,src=/tmp/.buildx-cache' \
-          --set '*.cache-to=type=local,dest=/tmp/.buildx-cache'
+        docker buildx build . \
+          --tag ${{ steps.image.outputs.latest }} \
+          --tag ${{ steps.image.outputs.commit }} \
+          --platform=linux/amd64 \
+          --cache-from='type=local,src=/tmp/.buildx-cache' \
+          --cache-to='type=local,dest=/tmp/.buildx-cache' \
+          --push
 
     - name: Publish Wiki Documentation
       uses: SwiftDocOrg/github-wiki-publish-action@v1
@@ -94,10 +101,27 @@ jobs:
         WIKI_COMMIT_MESSAGE: ${{ github.event.commits[0].message }}
         GITHUB_ACTOR: ${{ github.event.commits[0].author.name }}
 
-    - name: Trigger Deployment
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+
+    - name: Set up AWS Secrets
+      env:
+        DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+        OPENWEATHER_TOKEN: ${{ secrets.OPENWEATHER_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
       run: |
-        curl -X POST $GITHUB_API_URL/repos/${{ secrets.DEPLOY_REPO }}/dispatches \
-          -u "${{ secrets.ACCESS_TOKEN }}" \
-          -H "Accept: application/vnd.github.everest-preview+json" \
-          -H "Content-Type: application/json" \
-          --data '{"event_type": "deploy-duckbot"}'
+        aws ssm put-parameter --name /duckbot/token/discord --type SecureString --value "$DISCORD_TOKEN" --overwrite
+        aws ssm put-parameter --name /duckbot/token/openweather --type SecureString --value "$OPENWEATHER_TOKEN" --overwrite
+        aws ssm put-parameter --name /duckbot/token/github --type SecureString --value "$GITHUB_TOKEN" --overwrite
+
+    - name: Update CloudFormation Stack
+      uses: aws-actions/aws-cloudformation-github-deploy@v1
+      with:
+        name: duckbot
+        template: .aws/cloudformation.template.yml
+        parameter-overrides: "DuckBotImage=${{ steps.image.outputs.commit }}"
+        capabilities: CAPABILITY_IAM,CAPABILITY_NAMED_IAM

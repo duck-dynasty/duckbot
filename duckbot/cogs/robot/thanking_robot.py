@@ -12,8 +12,7 @@ class ThankingRobot(commands.Cog):
         if message.author == self.bot.user:
             return
 
-        thanks = ["thank you duckbot", "thanks duckbot", "thank you duck bot", "thanks duck bot"]
-        for t in thanks:
-            if t in message.content.lower().replace(",", ""):
-                correction = f"I am just a robot.  Do not personify me, {message.author.display_name}"
-                await message.channel.send(correction)
+        thanks = ["thank you duckbot", "thanks duckbot", "thank you duck bot", "thanks duck bot", "thx duckbot", "thx duck bot"]
+        if any(t in message.content.lower().replace(",", "") for t in thanks):
+            correction = f"I am just a robot.  Do not personify me, {message.author.display_name}"
+            await message.channel.send(correction)
