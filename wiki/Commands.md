@@ -8,6 +8,7 @@ Command Overview
 | [`!start`, `!stop`](#music) | start or stop playing music |
 | [`!weather`](#weather) | retrieve weather information |
 | [`!calc`](#wolfram-alpha) | search for something on wolfram alpha |
+| `!lmgt` | generates a google search link for the given query |
 | `!8ball` | get a magic eight ball style fortune |
 | `!fortune` | get a random fortune told to you by a cow |
 | `!dog` | displays a random dog photo |
