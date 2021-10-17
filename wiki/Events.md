@@ -45,6 +45,10 @@ Josip Broz Tito
 ---------------
 Heeeyyyy Mr. Tito! DuckBot will react to messages containing the custom `:tito:` emoji with all the country flags of the formally Yugoslavian countries. DuckBot will do the same when someone reacts with `:tito:`.
 
+Office Hours
+------------
+Don't forget to stop by and ask questions! DuckBot will notify the general channel when office hours start, brother.
+
 Typo Correction
 ---------------
 DuckBot will attempt to correct typos a user's previous message when they send _fuck_. For example,
