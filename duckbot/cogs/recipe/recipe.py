@@ -45,9 +45,8 @@ class Recipe(commands.Cog):
 
         html_content = ""
         for page in range(1, 6):
-            query_dict = {"search": search_term, "page": page}
             url = "https://www.allrecipes.com/element-api/content-proxy/faceted-searches-load-more"
-            result = requests.get(url, params=query_dict, headers={"Cookie": "euConsent=true"}).json()
+            result = requests.get(url, params={"search": search_term, "page": page}, headers={"Cookie": "euConsent=true"}).json()
             html_content += result.get("html", "")
 
             if not result.get("hasNext", False):
