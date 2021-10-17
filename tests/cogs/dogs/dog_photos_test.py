@@ -6,14 +6,6 @@ RANDOM_IMAGE_URI = "https://dog.ceo/api/breeds/image/random"
 LIST_BREEDS_URI = "https://dog.ceo/api/breeds/list/all"
 
 
-def build_dog(img, success):
-    return {"message": img, "status": "success" if success else "failure"}
-
-
-def build_breeds(success):
-    return {"message": {"collie": ["border"], "dog": []}, "status": "success" if success else "failure"}
-
-
 def test_get_dog_image_any_breed_success(bot, responses):
     responses.add(responses.GET, RANDOM_IMAGE_URI, json=build_dog("dog", success=True))
     clazz = DogPhotos(bot)
@@ -101,3 +93,11 @@ async def test_dog_unknown_breed(bot, context, responses):
     assert len(responses.calls) == 2
     assert responses.calls[0].request.url == LIST_BREEDS_URI
     assert responses.calls[1].request.url == RANDOM_IMAGE_URI
+
+
+def build_dog(img, success):
+    return {"message": img, "status": "success" if success else "failure"}
+
+
+def build_breeds(success):
+    return {"message": {"collie": ["border"], "dog": []}, "status": "success" if success else "failure"}
