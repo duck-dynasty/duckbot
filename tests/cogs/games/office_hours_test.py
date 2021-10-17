@@ -36,7 +36,7 @@ async def test_check_if_streaming_stream_started(get, bot, general_channel):
     clazz = OfficeHours(bot)
     clazz.streaming = False
     await clazz.check_if_streaming()
-    general_channel.send.assert_called_once_with("Office Hours have started!\nhttps://www.twitch.tv/conlabx")
+    general_channel.send.assert_called_once_with("\"Office Hours\" have started!\nhttps://www.twitch.tv/conlabx")
     assert clazz.streaming
     clazz.check_if_streaming_loop.change_interval.assert_called_once_with(hours=12.0)
 

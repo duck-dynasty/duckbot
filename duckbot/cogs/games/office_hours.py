@@ -24,7 +24,7 @@ class OfficeHours(commands.Cog):
             self.streaming = streaming
             if streaming:
                 channel = get(self.bot.get_all_channels(), guild__name="Friends Chat", name="general", type=ChannelType.text)
-                await channel.send("Office Hours have started!\nhttps://www.twitch.tv/conlabx")
+                await channel.send("\"Office Hours\" have started!\nhttps://www.twitch.tv/conlabx")
                 self.check_if_streaming_loop.change_interval(hours=12.0)  # avoid polling for a while
             else:
                 self.check_if_streaming_loop.change_interval(minutes=15.0)  # stream stopped, restart polling
