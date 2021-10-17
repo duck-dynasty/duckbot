@@ -38,10 +38,6 @@ if __name__ == "__main__":
         python_requires=">=3.8",
         packages=find_packages(),
         cmdclass={"develop": PostDevelop, "install": PostInstall},
-        setup_requires=[
-            "nltk>=3.6,<4",
-            "textblob<1",
-        ],
         install_requires=[
             "discord.py[voice] @ git+https://github.com/Rapptz/discord.py",
             "beautifulsoup4",
@@ -52,8 +48,8 @@ if __name__ == "__main__":
             "psycopg2",
             "sqlalchemy>=1.4,<2",
             "d20>=1.1.0,<2",
-            "nltk>=3.6,<4",
-            "textblob<1",
+            "nltk>=3.6,<4",  # also in pyproject.toml, required for setup script above
+            "textblob<1",  # also in pyproject.toml, required for setup script above
             "pyfiglet<1",
             "matplotlib>=3.4,<4",
             "PyGithub>=1.55,<2",
