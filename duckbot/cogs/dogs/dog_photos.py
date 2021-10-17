@@ -33,7 +33,7 @@ class DogPhotos(commands.Cog):
             return result.get("message")
 
     def get_breeds(self) -> List[str]:
-        result = requests.get(f"https://dog.ceo/api/breeds/list/all").json()
+        result = requests.get("https://dog.ceo/api/breeds/list/all").json()
         if result.get("status", "ded") != "success" or not result.get("message", None):
             raise RuntimeError("could not fetch a puppy")
         else:
