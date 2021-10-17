@@ -1,7 +1,5 @@
-import json
 import random
 import re
-import urllib
 
 import requests
 from bs4 import BeautifulSoup
