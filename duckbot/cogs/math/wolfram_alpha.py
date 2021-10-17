@@ -26,7 +26,7 @@ class WolframAlpha(commands.Cog):
     async def calc(self, context: commands.Context, query: str):
         result = self.wolfram.query(query)
         embeds = [self.as_embed(pod) for pod in itertools.islice(result.pods, 5)]
-        await context.send(f"https://www.wolframalpha.com/input/?i={urllib.parse.quote(query)}", embeds=embeds)
+        await context.send(f"https://www.wolframalpha.com/input/?i={urllib.parse.quote_plus(query)}", embeds=embeds)
 
     def as_embed(self, pod) -> discord.Embed:
         embed = discord.Embed(title=pod.title)
