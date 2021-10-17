@@ -10,54 +10,52 @@ LIST_BREEDS_URI = "https://dog.ceo/api/breeds/list/all"
 
 
 def build_dog(img, success):
-    return '{"message": "' + img + '", "status": "' + ("success" if success else "failure") + '"}'
+    return {"message": img, "status": "success" if success else "failure"}
 
 
 def build_breeds(success):
-    return '{"message": {"collie": ["border"], "dog": []}, "status": "' + ("success" if success else "failure") + '"}'
+    return {"message": {"collie": ["border"], "dog": []}, "status": "success" if success else "failure"}
 
 
-@mock.patch("urllib.request.Request")
-def test_get_dog_image_any_breed_success(req, bot):
-    with patch_urlopen(build_dog("dog", True)):
-        clazz = DogPhotos(bot)
-        response = clazz.get_dog_image()
-        assert response == "dog"
-        req.assert_called_once_with(RANDOM_IMAGE_URI)
+def test_get_dog_image_any_breed_success(bot, responses):
+    responses.add(responses.GET, RANDOM_IMAGE_URI, json=build_dog("dog", True))
+    clazz = DogPhotos(bot)
+    response = clazz.get_dog_image()
+    assert response == "dog"
+    assert len(responses.calls) == 1
+    assert responses.calls[0].request.url == RANDOM_IMAGE_URI
 
 
 @pytest.mark.parametrize("breed,path", [("collie", "collie"), ("border collie", "collie/border"), ("dog", "dog")])
-@mock.patch("urllib.request.Request")
-def test_dog_given_breed_success(req, bot, breed, path):
-    with patch_urlopen(build_dog(f"{breed} result", True)):
-        clazz = DogPhotos(bot)
-        response = clazz.get_dog_image(breed)
-        assert response == f"{breed} result"
-        req.assert_any_call(f"https://dog.ceo/api/breed/{path}/images/random")
+def test_get_dog_image_given_breed_success(bot, responses, breed, path):
+    responses.add(responses.GET, f"https://dog.ceo/api/breed/{path}/images/random", json=build_dog(f"{breed} result", True))
+    clazz = DogPhotos(bot)
+    response = clazz.get_dog_image(breed)
+    assert response == f"{breed} result"
+    assert len(responses.calls) == 1
+    assert responses.calls[0].request.url == f"https://dog.ceo/api/breed/{path}/images/random"
+
+
+def test_get_dog_image_failure(bot, responses):
+    responses.add(responses.GET, RANDOM_IMAGE_URI, json=build_dog("dog", False))
+    clazz = DogPhotos(bot)
+    with pytest.raises(RuntimeError):
+        clazz.get_dog_image()
+    assert len(responses.calls) == 1
+    assert responses.calls[0].request.url == RANDOM_IMAGE_URI
+
+
+def test_get_dog_image_no_message(bot, responses):
+    responses.add(responses.GET, RANDOM_IMAGE_URI, json=build_dog("", True))
+    clazz = DogPhotos(bot)
+    with pytest.raises(RuntimeError):
+        clazz.get_dog_image()
+    assert len(responses.calls) == 1
+    assert responses.calls[0].request.url == RANDOM_IMAGE_URI
 
 
 @mock.patch("urllib.request.Request")
-def test_get_dog_image_failure(req, bot):
-    result = build_dog("dog", False)
-    with patch_urlopen(result):
-        clazz = DogPhotos(bot)
-        with pytest.raises(RuntimeError):
-            clazz.get_dog_image()
-        req.assert_called_once_with(RANDOM_IMAGE_URI)
-
-
-@mock.patch("urllib.request.Request")
-def test_get_dog_image_no_message(req, bot):
-    result = build_dog("", True)
-    with patch_urlopen(result):
-        clazz = DogPhotos(bot)
-        with pytest.raises(RuntimeError):
-            clazz.get_dog_image()
-        req.assert_called_once_with(RANDOM_IMAGE_URI)
-
-
-@mock.patch("urllib.request.Request")
-def test_get_breeds_success(req, bot):
+def get_breeds_success(req, bot):
     with patch_urlopen(build_breeds(True)):
         clazz = DogPhotos(bot)
         response = clazz.get_breeds()
@@ -66,7 +64,7 @@ def test_get_breeds_success(req, bot):
 
 
 @mock.patch("urllib.request.Request")
-def test_get_breeds_failure(req, bot):
+def get_breeds_failure(req, bot):
     with patch_urlopen(build_breeds(False)):
         clazz = DogPhotos(bot)
         with pytest.raises(RuntimeError):
@@ -76,7 +74,7 @@ def test_get_breeds_failure(req, bot):
 
 @pytest.mark.asyncio
 @mock.patch("urllib.request.Request")
-async def test_dog_no_breed(req, bot, context):
+async def dog_no_breed(req, bot, context):
     with patch_urlopen(build_dog("result", True)):
         clazz = DogPhotos(bot)
         await clazz.dog(context, None)
@@ -86,7 +84,7 @@ async def test_dog_no_breed(req, bot, context):
 
 @pytest.mark.asyncio
 @mock.patch("urllib.request.Request")
-async def test_dog_known_breed(req, bot, context):
+async def dog_known_breed(req, bot, context):
     with patch_urlopen([build_breeds(True), build_dog("pup", True)]):
         clazz = DogPhotos(bot)
         await clazz.dog(context, "collie")
@@ -97,7 +95,7 @@ async def test_dog_known_breed(req, bot, context):
 
 @pytest.mark.asyncio
 @mock.patch("urllib.request.Request")
-async def test_dog_unknown_breed(req, bot, context):
+async def dog_unknown_breed(req, bot, context):
     with patch_urlopen([build_breeds(True), build_dog("flup", True)]):
         clazz = DogPhotos(bot)
         await clazz.dog(context, "who?")
