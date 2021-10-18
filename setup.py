@@ -54,6 +54,7 @@ if __name__ == "__main__":
             "pyfiglet<1",
             "matplotlib>=3.4,<4",
             "PyGithub>=1.55,<2",
+            "wolframalpha>=5,<6",
         ],
         extras_require={
             "dev": [
