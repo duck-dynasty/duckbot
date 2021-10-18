@@ -13,6 +13,7 @@ import duckbot.cogs.games
 import duckbot.cogs.github
 import duckbot.cogs.google
 import duckbot.cogs.insights
+import duckbot.cogs.math
 import duckbot.cogs.messages
 import duckbot.cogs.recipe
 import duckbot.cogs.robot
@@ -36,6 +37,7 @@ def run_duckbot(bot: commands.Bot):
     bot.load_extension(duckbot.cogs.dogs.__name__)
     bot.load_extension(duckbot.cogs.tito.__name__)
     bot.load_extension(duckbot.cogs.text.__name__)
+    bot.load_extension(duckbot.cogs.math.__name__)
     bot.load_extension(duckbot.cogs.games.__name__)
     bot.load_extension(duckbot.cogs.github.__name__)
     bot.load_extension(duckbot.cogs.google.__name__)
