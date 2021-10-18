@@ -1,7 +1,6 @@
-import json
-import urllib
 from typing import List, Optional
 
+import requests
 from discord.ext import commands
 
 
@@ -27,16 +26,14 @@ class DogPhotos(commands.Cog):
                 path = f"breed/{breed}/images"
         else:
             path = f"breed/{breed.replace(' ', '/')}/images" if breed else "breeds/image"
-        req = urllib.request.Request(f"https://dog.ceo/api/{path}/random")
-        result = json.loads(urllib.request.urlopen(req).read())
+        result = requests.get(f"https://dog.ceo/api/{path}/random").json()
         if result.get("status", "ded") != "success" or not result.get("message", None):
             raise RuntimeError(f"could not fetch a puppy; breed = {breed}")
         else:
             return result.get("message")
 
     def get_breeds(self) -> List[str]:
-        req = urllib.request.Request("https://dog.ceo/api/breeds/list/all")
-        result = json.loads(urllib.request.urlopen(req).read())
+        result = requests.get("https://dog.ceo/api/breeds/list/all").json()
         if result.get("status", "ded") != "success" or not result.get("message", None):
             raise RuntimeError("could not fetch a puppy")
         else:
