@@ -51,7 +51,9 @@ days = {
         "templates": [
             "14",
         ],
-        "gifs": [],
+        "gifs": [
+            "https://tenor.com/view/simpsons-games-hard-gamenight-gif-7531474",
+        ],
     },
     4: {
         "names": [

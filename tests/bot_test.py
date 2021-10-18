@@ -1,5 +1,5 @@
 import pytest
-from discord import Game, Intents
+from discord import Intents
 
 from duckbot import DuckBot
 from duckbot.bot import intents
@@ -21,7 +21,6 @@ async def test_duckbot_constructor():
     assert bot.command_prefix == "!"
     assert bot.help_command is None
     assert bot.intents == intents()
-    assert bot.activity in [Game("Duck Game"), Game("the Banjo"), Game("Gloomhaven"), Game("with Fire"), Game("with the Boys")]
     await bot.close()
 
 
