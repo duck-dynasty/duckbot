@@ -18,7 +18,7 @@ class OfficeHours(commands.Cog):
         await self.check_if_streaming()
 
     async def check_if_streaming(self):
-        page = requests.get("https://www.twitch.tv/conlabx").content.decode("utf-8")
+        page = requests.get("https://www.twitch.tv/conlabx").text
         streaming = "isLiveBroadcast" in page
         if streaming != self.streaming:
             self.streaming = streaming

@@ -8,6 +8,7 @@ services:
       DISCORD_TOKEN: ${DISCORD_TOKEN}
       OPENWEATHER_TOKEN: ${OPENWEATHER_TOKEN}
       GITHUB_TOKEN: ${GITHUB_TOKEN}
+      WOLFRAM_ALPHA_TOKEN: ${WOLFRAM_ALPHA_TOKEN}
     healthcheck:
       test: [CMD, python, -m, duckbot.health]
       interval: 30s

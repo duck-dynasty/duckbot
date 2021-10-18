@@ -21,7 +21,16 @@ async def bot_spy() -> DuckBot:
 def bot(autospec, monkeypatch) -> DuckBot:
     """Returns a mock DuckBot instance. The default event loops are replaced by mocks."""
     b = autospec.of(DuckBot)
+    b.command_prefix = "!"
     b.loop = mock.Mock()
     # mock out loop, it uses `asyncio.get_event_loop()` by default
     monkeypatch.setattr(discord.ext.tasks, "Loop", mock.Mock())
     return b
+
+
+@pytest.fixture
+def http(autospec, bot):
+    """Returns a mock discord.py http client. The client is also attached to `bot.http`."""
+    h = autospec.of("discord.http.HTTPClient")
+    bot.http = h
+    return h
