@@ -3,15 +3,10 @@ import pytest
 
 
 @pytest.fixture
-def interaction(request, autospec, channel) -> discord.Interaction:
+def interaction(request, autospec, message) -> discord.Interaction:
     """Returns an interaction with nested properties set, for each channel type a command can be sent to."""
     i = autospec.of("discord.Interaction")
-    """Returns a message with nested properties set, for each channel type a message can be sent to."""
-    i.channel = channel
-    if channel.type in [discord.ChannelType.private, discord.ChannelType.group]:
-        i.guild = None
-    else:
-        i.guild = request.getfixturevalue("guild")
-    author = "user" if channel.type in [discord.ChannelType.private, discord.ChannelType.group] else "member"
-    i.user = request.getfixturevalue(author)
+    i.channel = message.channel
+    i.guild = message.guild
+    i.user = message.author
     return i

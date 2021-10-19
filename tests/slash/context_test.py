@@ -81,6 +81,10 @@ def test_voice_client_getter(bot, interaction, command):
         assert voice is None
 
 
+def test_message_getter(bot, interaction, command):
+    assert InteractionContext(bot=bot, interaction=interaction, command=command).message == interaction.message
+
+
 def test_author_getter(bot, interaction, command):
     assert InteractionContext(bot=bot, interaction=interaction, command=command).author == interaction.user
 
