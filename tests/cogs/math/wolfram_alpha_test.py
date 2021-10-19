@@ -7,7 +7,7 @@ from duckbot.cogs.math import WolframAlpha
 
 @pytest.fixture
 def wra_client(autospec) -> wolframalpha.Client:
-    return autospec.of("wolframalpha.Client")
+    return autospec.of(wolframalpha.Client)
 
 
 @pytest.fixture
