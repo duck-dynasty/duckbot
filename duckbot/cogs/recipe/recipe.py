@@ -1,8 +1,7 @@
-import json
 import random
 import re
-import urllib
 
+import requests
 from bs4 import BeautifulSoup
 from discord.ext import commands
 
@@ -44,13 +43,8 @@ class Recipe(commands.Cog):
 
         html_content = ""
         for page in range(1, 6):
-            query_dict = {"search": search_term, "page": page}
-            query_url = urllib.parse.urlencode(query_dict)
-            url = f"https://www.allrecipes.com/element-api/content-proxy/faceted-searches-load-more?{query_url}"
-            req = urllib.request.Request(url)
-            req.add_header("Cookie", "euConsent=true")
-
-            result = json.loads(urllib.request.urlopen(req).read())
+            url = "https://www.allrecipes.com/element-api/content-proxy/faceted-searches-load-more"
+            result = requests.get(url, params={"search": search_term, "page": page}, headers={"Cookie": "euConsent=true"}).json()
             html_content += result.get("html", "")
 
             if not result.get("hasNext", False):
@@ -58,7 +52,7 @@ class Recipe(commands.Cog):
 
         return html_content
 
-    async def __recipe(self, context, search_term):
+    async def recipe(self, context, search_term):
         # clean up the arguments to make a valid recipe search
         search_term = re.sub(r"[^\w\s]", "", search_term)
 
@@ -80,6 +74,6 @@ class Recipe(commands.Cog):
         await context.send(response)
 
     @commands.command(name="recipe")
-    async def recipe(self, context, *, search_term: str = ""):
+    async def recipe_command(self, context, *, search_term: str = ""):
         async with context.typing():
-            await self.__recipe(context, search_term)
+            await self.recipe(context, search_term)
