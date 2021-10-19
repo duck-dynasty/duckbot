@@ -1,5 +1,5 @@
 import logging
-from typing import Optional
+from typing import List, Optional
 
 from discord import Client, Embed, File, Guild, Interaction, Message, VoiceProtocol
 from discord.ext.commands import Command
@@ -77,20 +77,21 @@ class InteractionContext:
     def command(self, value):
         self._command = value
 
-    async def send(self, content="", *, embed: Optional[Embed] = None, file: Optional[File] = None, delete_after: Optional[float] = None) -> None:
+    async def send(self, content="", *, embed: Optional[Embed] = None, embeds: Optional[List[Embed]] = None, file: Optional[File] = None, delete_after: Optional[float] = None) -> None:
         """Send a message as a response to an interaction. There are some restrictions to this, see `typing()`.
 
         :param content: the message content to send
-        :param embed: embed message content to send
+        :param embed: embed message content to send, mutually exclusive with embeds
+        :param embeds: multiple embed message contents to send, mutually exclusive with embed
         :param file: a file to upload and sent; requires `typing()` first
         :param delete_after: does nothing, exists for interface parity with discord.py
         :return: None
         """
         if self.follow_up:
-            kwargs = {"embed": embed, "file": file}
+            kwargs = {"embed": embed, "embeds": embeds, "file": file}
             await self.interaction.followup.send(content, **{k: v for k, v in kwargs.items() if v})
         else:
-            kwargs = {"embed": embed}
+            kwargs = {"embed": embed, "embeds": embeds}
             await self.interaction.response.send_message(content, **{k: v for k, v in kwargs.items() if v})
 
     def typing(self):

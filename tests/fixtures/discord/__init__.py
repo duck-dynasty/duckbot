@@ -4,6 +4,7 @@ from .channel import (
     channel,
     dm_channel,
     group_channel,
+    is_private_channel,
     skip_if_private_channel,
     text_channel,
     thread,

@@ -117,10 +117,26 @@ async def test_send_response_embed_only(embed, bot, interaction, command):
 
 @pytest.mark.asyncio
 @mock.patch("discord.Embed")
+async def test_send_response_embeds_only(embed, bot, interaction, command):
+    clazz = InteractionContext(bot=bot, interaction=interaction, command=command)
+    await clazz.send(embeds=[embed])
+    interaction.response.send_message.assert_called_once_with("", embeds=[embed])
+
+
+@pytest.mark.asyncio
+@mock.patch("discord.Embed")
 async def test_send_response_message_and_embed(embed, bot, interaction, command):
     clazz = InteractionContext(bot=bot, interaction=interaction, command=command)
     await clazz.send("hi", embed=embed)
     interaction.response.send_message.assert_called_once_with("hi", embed=embed)
+
+
+@pytest.mark.asyncio
+@mock.patch("discord.Embed")
+async def test_send_response_message_and_embeds(embed, bot, interaction, command):
+    clazz = InteractionContext(bot=bot, interaction=interaction, command=command)
+    await clazz.send("hi", embeds=[embed])
+    interaction.response.send_message.assert_called_once_with("hi", embeds=[embed])
 
 
 @pytest.mark.asyncio
@@ -153,12 +169,23 @@ async def test_send_follow_up_file_only(file, bot, interaction, command):
 @pytest.mark.asyncio
 @mock.patch("discord.Embed")
 @mock.patch("discord.File")
-async def test_send_follow_up_all_args(file, embed, bot, interaction, command):
+async def test_send_follow_up_all_args_embed(file, embed, bot, interaction, command):
     clazz = InteractionContext(bot=bot, interaction=interaction, command=command)
     async with clazz.typing():
         await clazz.send("hi", embed=embed, file=file)
     interaction.response.defer.assert_called_once()
     interaction.followup.send.assert_called_once_with("hi", embed=embed, file=file)
+
+
+@pytest.mark.asyncio
+@mock.patch("discord.Embed")
+@mock.patch("discord.File")
+async def test_send_follow_up_all_args_embeds(file, embed, bot, interaction, command):
+    clazz = InteractionContext(bot=bot, interaction=interaction, command=command)
+    async with clazz.typing():
+        await clazz.send("hi", embeds=[embed], file=file)
+    interaction.response.defer.assert_called_once()
+    interaction.followup.send.assert_called_once_with("hi", embeds=[embed], file=file)
 
 
 @pytest.mark.asyncio
