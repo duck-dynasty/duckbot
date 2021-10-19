@@ -44,13 +44,15 @@ duck@pond$ cat duckbot/.env
 DISCORD_TOKEN=thesecrettoken
 OPENWEATHER_TOKEN=thesecrettoken
 GITHUB_TOKEN=thesecrettoken
+WOLFRAM_ALPHA_TOKEN=thesecrettoken
 ```
 
 * Discord tokens available from [Discord Developer](https://discord.com/developers/applications)
 * You can get an [openweather api token](https://openweathermap.org/api) for free as well
 * The github token is a [personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
+* The wolfram alpha token is available from their [api page](https://products.wolframalpha.com/api/)
 
-With your tokens available, you can jam them into your shell environment, so you can run DuckBot. You may want to put this into your bashrc for convenience.
+You only _need_ the discord token. DuckBot will still function without the others, but features that use the tokens won't work. With your tokens available, you can jam them into your shell environment, so you can run DuckBot. You may want to put this into your bashrc for convenience.
 ```sh
 export $(cat duckbot/.env | xargs)
 ```

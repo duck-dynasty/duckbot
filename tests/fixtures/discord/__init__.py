@@ -1,5 +1,5 @@
 from .author import member, user
-from .bot import bot, bot_spy
+from .bot import bot, bot_spy, http
 from .channel import (
     channel,
     dm_channel,

@@ -113,10 +113,12 @@ jobs:
         DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
         OPENWEATHER_TOKEN: ${{ secrets.OPENWEATHER_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        WOLFRAM_ALPHA_TOKEN: ${{ secrets.WOLFRAM_ALPHA_TOKEN }}
       run: |
         aws ssm put-parameter --name /duckbot/token/discord --type SecureString --value "$DISCORD_TOKEN" --overwrite
         aws ssm put-parameter --name /duckbot/token/openweather --type SecureString --value "$OPENWEATHER_TOKEN" --overwrite
         aws ssm put-parameter --name /duckbot/token/github --type SecureString --value "$GITHUB_TOKEN" --overwrite
+        aws ssm put-parameter --name /duckbot/token/wolfram-alpha --type SecureString --value "$WOLFRAM_ALPHA_TOKEN" --overwrite
 
     - name: Update CloudFormation Stack
       uses: aws-actions/aws-cloudformation-github-deploy@v1

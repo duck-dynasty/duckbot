@@ -7,6 +7,7 @@ Command Overview
 | [`!recipe`](#recipe-search) | search for a random recipe |
 | [`!start`, `!stop`](#music) | start or stop playing music |
 | [`!weather`](#weather) | retrieve weather information |
+| [`!calc`](#wolfram-alpha) | search for something on wolfram alpha |
 | `!lmgt` | generates a google search link for the given query |
 | `!8ball` | get a magic eight ball style fortune |
 | `!fortune` | get a random fortune told to you by a cow |
@@ -68,6 +69,10 @@ Here's an example usage:
 > 2: London, CA, geolocation = (42.983391, -81.23304)  
 > Human: !weather set london ca 2  
 > DuckBot: Location saved! London, CA, geolocation = (42.983391, -81.23304)
+
+Wolfram Alpha
+-------------
+DuckBot gives out a few results to arbitrary queries to [wolfram alpha](https://www.wolframalpha.com/). The results from wolfram are pretty complex, DuckBot spews out a few results in a fairly dumb manner, and gives you a link for your query on wolfram if you want to dig further.
 
 Dice
 ----
