@@ -9,7 +9,7 @@ from .channel import (
     thread,
 )
 from .command import command
-from .context import context
+from .context import command_context, context, interaction_context
 from .embed import patch_embed_equals
 from .emoji import emoji
 from .general_channel import general_channel

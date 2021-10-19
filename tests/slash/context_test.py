@@ -73,6 +73,14 @@ def test_guild_getter(bot, interaction, command):
     assert InteractionContext(bot=bot, interaction=interaction, command=command).guild == interaction.guild
 
 
+def test_voice_client_getter(bot, interaction, command):
+    voice = InteractionContext(bot=bot, interaction=interaction, command=command).voice_client
+    if interaction.guild:
+        assert voice is interaction.guild.voice_client
+    else:
+        assert voice is None
+
+
 def test_author_getter(bot, interaction, command):
     assert InteractionContext(bot=bot, interaction=interaction, command=command).author == interaction.user
 

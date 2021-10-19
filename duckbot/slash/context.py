@@ -1,7 +1,7 @@
 import logging
 from typing import Optional
 
-from discord import Client, Embed, File, Guild, Interaction
+from discord import Client, Embed, File, Guild, Interaction, VoiceProtocol
 from discord.ext.commands import Command
 from discord.ext.commands.view import StringView
 
@@ -56,6 +56,10 @@ class InteractionContext:
     @property
     def guild(self) -> Optional[Guild]:
         return self.interaction.guild
+
+    @property
+    def voice_client(self) -> Optional[VoiceProtocol]:
+        return self.guild.voice_client if self.guild else None
 
     @property
     def author(self):
