@@ -3,7 +3,7 @@ import pytest
 
 
 @pytest.fixture
-def interaction(request, autospec, message) -> discord.Interaction:
+def interaction(autospec, message) -> discord.Interaction:
     """Returns an interaction with nested properties set, for each channel type a command can be sent to."""
     i = autospec.of("discord.Interaction")
     i.message = message
