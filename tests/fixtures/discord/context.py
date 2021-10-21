@@ -23,6 +23,7 @@ def interaction_context(autospec, interaction, command) -> duckbot.slash.Interac
     c = autospec.of("duckbot.slash.InteractionContext")
     c.interaction = interaction
     c.command = command
+    c.message = interaction.message
     c.channel = interaction.channel
     c.author = interaction.user
     return c
