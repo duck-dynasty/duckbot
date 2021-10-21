@@ -1,23 +1,22 @@
 import json
 
 import pytest
+from responses import RequestsMock, matchers
 
 from duckbot.cogs.recipe import Recipe
-from tests.duckmock.urllib import patch_urlopen
 
-
-def get_mock_data(name, rating):
-    return {"name": name, "description": f"This is the {name} recipe.", "url": f"https://www.allrecipes.com/recipe/10759/{name}/", "rating": rating}
+RECIPE_SEARCH_URI = "https://www.allrecipes.com/element-api/content-proxy/faceted-searches-load-more"
 
 
 @pytest.mark.asyncio
-async def test_search_recipes_returns_scraped_html(bot):
-    mock_data = get_mock_data("test1", 5)
-    with patch_urlopen(with_articles(mock_data)):
-        search_term = "test1"
-        clazz = Recipe(bot)
-        response = clazz.search_recipes(search_term)
-        assert response == json_articles(mock_data)
+async def test_search_recipes_returns_scraped_html(bot, responses):
+    search_term = "test1"
+    mock_data = get_mock_data(search_term, 5)
+    setup_responses(responses, search_term, with_articles(mock_data))
+    clazz = Recipe(bot)
+    response = clazz.search_recipes(search_term)
+    assert response == json_articles(mock_data)
+    assert_requests(responses, search_term)
 
 
 @pytest.mark.asyncio
@@ -65,34 +64,59 @@ async def test_select_recipes_with_many_return_one(bot):
 
 
 @pytest.mark.asyncio
-async def test_command_with_content_return_recipe(bot, context):
-    mock_data = get_mock_data("test1", 5)
+async def test_recipe_with_content_return_recipe(bot, context, responses):
+    search_term = "test1"
+    mock_data = get_mock_data(search_term, 5)
     expected_response = f"How about a nice {mock_data['name']}. {mock_data['description']} This recipe has a {mock_data['rating']}/5 rating! {mock_data['url']}"
-    with patch_urlopen(with_articles(mock_data)):
-        search_term = "test1"
-        clazz = Recipe(bot)
-        await clazz._Recipe__recipe(context, search_term)
-        context.send.assert_called_once_with(expected_response)
+    setup_responses(responses, search_term, with_articles(mock_data))
+    clazz = Recipe(bot)
+    await clazz.recipe(context, search_term)
+    context.send.assert_called_once_with(expected_response)
+    assert_requests(responses, search_term)
 
 
 @pytest.mark.asyncio
-async def test_command_without_articles_return_sorry(bot, context):
-    with patch_urlopen(without_articles()):
-        search_term = "test1"
-        expected_response = f"I am terribly sorry. There doesn't seem to be any recipes for {search_term}."
-        clazz = Recipe(bot)
-        await clazz._Recipe__recipe(context, search_term)
-        context.send.assert_called_once_with(expected_response)
+async def test_recipe_without_articles_return_sorry(bot, context, responses):
+    search_term = "test1"
+    expected_response = f"I am terribly sorry. There doesn't seem to be any recipes for {search_term}."
+    setup_responses(responses, search_term, without_articles(), num_pages=1)
+    clazz = Recipe(bot)
+    await clazz.recipe(context, search_term)
+    context.send.assert_called_once_with(expected_response)
+    assert_requests(responses, search_term, num_pages=1)
 
 
 @pytest.mark.asyncio
-async def test_command_without_content_return_sorry(bot, context):
-    with patch_urlopen(without_content()):
-        search_term = "test1"
-        expected_response = "I am terribly sorry. I am having problems reading All Recipes for you."
-        clazz = Recipe(bot)
-        await clazz._Recipe__recipe(context, search_term)
-        context.send.assert_called_once_with(expected_response)
+async def test_recipe_without_content_return_sorry(bot, context, responses):
+    search_term = "test1"
+    expected_response = "I am terribly sorry. I am having problems reading All Recipes for you."
+    setup_responses(responses, search_term, without_content(), num_pages=1)
+    clazz = Recipe(bot)
+    await clazz.recipe(context, search_term)
+    context.send.assert_called_once_with(expected_response)
+    assert_requests(responses, search_term, num_pages=1)
+
+
+def setup_responses(responses: RequestsMock, search_term: str, body: str, num_pages: int = 5):
+    for page in range(1, num_pages + 1):
+        responses.add(
+            method=responses.GET,
+            url=RECIPE_SEARCH_URI,
+            match=[matchers.query_param_matcher({"search": search_term, "page": str(page)})],
+            match_querystring=False,
+            headers={"Cookie": "euConsent=true"},
+            body=body,
+        )
+
+
+def assert_requests(responses: RequestsMock, search_term: str, num_pages: int = 5):
+    assert len(responses.calls) == num_pages
+    for page in range(0, num_pages):
+        assert responses.calls[page].request.url == f"{RECIPE_SEARCH_URI}?search={search_term}&page={page+1}"
+
+
+def get_mock_data(name, rating):
+    return {"name": name, "description": f"This is the {name} recipe.", "url": f"https://www.allrecipes.com/recipe/10759/{name}/", "rating": rating}
 
 
 def with_articles(*args):
