@@ -21,7 +21,7 @@ async def test_expand_taunt_message_is_taunt_and_not_reply(get_message_reference
 @mock.patch("duckbot.cogs.games.aoe.get_message_reference")
 @pytest.mark.parametrize("text", ["105", "  105  "])
 async def test_expand_taunt_message_is_taunt_and_reply(get_message_reference, bot, message, text, autospec):
-    reply = autospec.of("discord.Message")
+    reply = autospec.of(discord.Message)
     get_message_reference.return_value = reply
     message.content = text
     clazz = AgeOfEmpires(bot)
