@@ -14,12 +14,12 @@ from duckbot.cogs.github import YoloMerge
 
 @pytest.fixture
 def repo(autospec) -> github.Repository.Repository:
-    return autospec.of("github.Repository.Repository")
+    return autospec.of(github.Repository.Repository)
 
 
 @pytest.fixture
 def gh(autospec) -> github.Github:
-    return autospec.of("github.Github")
+    return autospec.of(github.Github)
 
 
 @pytest.fixture
