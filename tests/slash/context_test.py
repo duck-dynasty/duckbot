@@ -9,13 +9,13 @@ from duckbot.slash import InteractionContext
 @pytest.fixture
 def interaction_response(autospec) -> discord.InteractionResponse:
     """Returns a mock interaction response."""
-    return autospec.of("discord.InteractionResponse")
+    return autospec.of(discord.InteractionResponse)
 
 
 @pytest.fixture
 def interaction_followup(autospec) -> discord.Webhook:
     """Returns a mock interaction followup webhook."""
-    return autospec.of("discord.Webhook")
+    return autospec.of(discord.Webhook)
 
 
 @pytest.fixture(autouse=True)
