@@ -1,5 +1,6 @@
 from unittest import mock
 
+import discord
 import pytest
 
 from duckbot.cogs.games import AgeOfEmpires
