@@ -6,14 +6,14 @@ from duckbot.util.messages import get_message_reference
 
 @pytest.fixture
 def message_reference(autospec, message) -> discord.MessageReference:
-    ref = autospec.of("discord.MessageReference")
+    ref = autospec.of(discord.MessageReference)
     message.reference = ref
     return ref
 
 
 @pytest.fixture
 def reply(autospec) -> discord.Message:
-    return autospec.of("discord.Message")
+    return autospec.of(discord.Message)
 
 
 @pytest.mark.asyncio
