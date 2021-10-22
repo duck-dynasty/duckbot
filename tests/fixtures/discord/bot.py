@@ -1,6 +1,7 @@
 from unittest import mock
 
 import discord.ext.tasks
+import discord.http
 import pytest
 
 from duckbot import DuckBot
@@ -20,7 +21,7 @@ async def bot_spy() -> DuckBot:
 @pytest.fixture
 def bot(autospec, monkeypatch) -> DuckBot:
     """Returns a mock DuckBot instance. The default event loops are replaced by mocks."""
-    b = autospec.of("duckbot.DuckBot")
+    b = autospec.of(DuckBot)
     b.command_prefix = "!"
     b.loop = mock.Mock()
     # mock out loop, it uses `asyncio.get_event_loop()` by default
@@ -29,8 +30,8 @@ def bot(autospec, monkeypatch) -> DuckBot:
 
 
 @pytest.fixture
-def http(autospec, bot):
+def http(autospec, bot) -> discord.http.HTTPClient:
     """Returns a mock discord.py http client. The client is also attached to `bot.http`."""
-    h = autospec.of("discord.http.HTTPClient")
+    h = autospec.of(discord.http.HTTPClient)
     bot.http = h
     return h
