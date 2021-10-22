@@ -20,7 +20,7 @@ def command_context(autospec, message) -> discord.ext.commands.Context:
 @pytest.fixture
 def interaction_context(autospec, interaction, command) -> duckbot.slash.InteractionContext:
     """Returns an interaction context with nested properties set, for each channel type a slash command can be sent to."""
-    c = autospec.of("duckbot.slash.InteractionContext")
+    c = autospec.of(duckbot.slash.InteractionContext)
     c.interaction = interaction
     c.command = command
     c.message = interaction.message
