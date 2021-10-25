@@ -14,4 +14,4 @@ def message(request, raw_message, channel) -> discord.Message:
 @pytest.fixture
 def raw_message(autospec) -> discord.Message:
     """Returns a mock discord message with no properties set."""
-    return autospec.of("discord.Message")
+    return autospec.of(discord.Message)

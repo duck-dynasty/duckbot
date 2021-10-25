@@ -1,3 +1,4 @@
+import discord
 import pytest
 
 from duckbot.cogs.corrections import Kubernetes
@@ -6,7 +7,7 @@ from duckbot.cogs.corrections import Kubernetes
 @pytest.fixture
 def k8s_emoji(autospec, guild):
     guild.name = "Friends Chat"
-    e = autospec.of("discord.Emoji")
+    e = autospec.of(discord.Emoji)
     e.guild = guild
     e.id = 1
     e.name = "k8s"
@@ -17,7 +18,7 @@ def k8s_emoji(autospec, guild):
 @pytest.fixture
 def kubernetes_emoji(autospec, guild):
     guild.name = "Friends Chat"
-    e = autospec.of("discord.Emoji")
+    e = autospec.of(discord.Emoji)
     e.guild = guild
     e.id = 2
     e.name = "kubernetes"
