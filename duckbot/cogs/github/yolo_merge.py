@@ -1,13 +1,13 @@
+import datetime
 import os
-from typing import List, Optional, Dict
+from typing import Dict, List, Optional
 
 import discord
 import github
 from discord.ext import commands
-from github.Repository import Repository
-from github.PullRequest import PullRequest
-import datetime
 from discord.utils import utcnow
+from github.PullRequest import PullRequest
+from github.Repository import Repository
 
 CHECK_PASSED = ":white_check_mark:"
 CHECK_FAILED = ":x:"

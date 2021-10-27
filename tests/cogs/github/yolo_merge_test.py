@@ -41,29 +41,29 @@ def test_github_returns_cached_instance(yolo, gh):
 
 
 @pytest.mark.asyncio
-async def test_list_no_pulls(yolo, context, gh, repo, skip_if_private_channel):
+async def test_yolo_list_no_pulls(yolo, context, gh, repo, skip_if_private_channel):
     gh.get_repo.return_value = repo
     repo.get_pulls.return_value = []
-    await yolo.list(context)
+    await yolo.yolo(context, None)
     context.send.assert_called_once_with("There's no open pull requests, brother. Never forget to wumbo.")
 
 
 @pytest.mark.asyncio
-async def test_list_send_pull_status(yolo, context, gh, repo, skip_if_private_channel):
+async def test_yolo_list_send_pull_status(yolo, context, gh, repo, skip_if_private_channel):
     gh.get_repo.return_value = repo
     pull, embed_value = make_pull_request(1)
     repo.get_pulls.return_value = [pull]
-    await yolo.list(context)
+    await yolo.yolo(context, None)
     context.send.assert_called_once_with(embed=discord.Embed().add_field(name="#1", value=embed_value))
 
 
 @pytest.mark.asyncio
-async def test_list_max_six_pulls(yolo, context, gh, repo, skip_if_private_channel):
+async def test_yolo_list_max_six_pulls(yolo, context, gh, repo, skip_if_private_channel):
     gh.get_repo.return_value = repo
     all_pulls = [make_pull_request(i, i % 2 == 0) for i in range(15)]
     kept_pulls = all_pulls[:6]
     repo.get_pulls.return_value = [p[0] for p in all_pulls]
-    await yolo.list(context)
+    await yolo.yolo(context, None)
     embed = discord.Embed()
     for pull, embed_value in kept_pulls:
         embed = embed.add_field(name=f"#{pull.number}", value=embed_value)
