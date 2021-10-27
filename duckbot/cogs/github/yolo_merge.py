@@ -1,10 +1,13 @@
 import os
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 import discord
 import github
 from discord.ext import commands
+from github.Repository import Repository
 from github.PullRequest import PullRequest
+import datetime
+from discord.utils import utcnow
 
 CHECK_PASSED = ":white_check_mark:"
 CHECK_FAILED = ":x:"
@@ -25,6 +28,7 @@ class YoloMerge(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self._github = None
+        self.merge_confirmations: Dict[int, MergeConfirmation] = {}
 
     @property
     def github(self) -> github.Github:
@@ -39,10 +43,13 @@ class YoloMerge(commands.Cog):
             await self.yolo(context, pr_id)
 
     async def yolo(self, context: commands.Context, pr_id: Optional[int]):
-        await self.list(context)
-
-    async def list(self, context: commands.Context):
         repo = self.github.get_repo("duck-dynasty/duckbot")
+        if pr_id is None:
+            await self.list(context, repo)
+        else:
+            await self.merge(context, repo, pr_id)
+
+    async def list(self, context: commands.Context, repo: Repository):
         pulls = list(repo.get_pulls()[:6])
         if pulls:
             embed = self.as_embed(pulls)
@@ -77,3 +84,46 @@ class YoloMerge(commands.Cog):
                 result = CHECK_PENDING
             lines.append(f"**{suite.app.name}** {result}")
         return lines
+
+    async def merge(self, context: commands.Context, repo: Repository, pr_id: int):
+        pr = repo.get_pull(pr_id)
+        embed = self.as_embed([pr])
+        mergeable = self.is_pr_mergeable(embed) and pr.state == "open"
+        if self.has_valid_request(pr_id, context.author.id) and mergeable:
+            self.merge_confirmations.pop(pr_id, None)
+            pr.create_review(body="YOLO", event="APPROVE")
+            pr.merge(commit_title=pr.title, commit_message="YOLO", merge_method="squash")
+            await context.send("Welp. See you on the other side, brother.")
+        elif mergeable:
+            await context.send("Bruh, that'll merge this god-awful pull request... are you sure you trust it? I sure as hell don't.", embed=embed)
+            self.merge_confirmations[pr_id] = MergeConfirmation(context.author.id, context.message.created_at)
+        else:
+            await context.send("Bruh. Come on. I can't merge this garbage.", embed=embed)
+
+    def has_valid_request(self, pr_id: int, requester: int):
+        stamp = utcnow() - datetime.timedelta(minutes=1)
+        return pr_id in self.merge_confirmations and requester == self.merge_confirmations[pr_id].requester and stamp < self.merge_confirmations[pr_id].time
+
+    def is_pr_mergeable(self, pull_embed: discord.Embed):
+        blob = str(pull_embed.to_dict())
+        return CHECK_PENDING not in blob and CHECK_FAILED not in blob
+
+
+class MergeConfirmation:
+    def __init__(self, requester: int, time: datetime.datetime):
+        self._requester = requester
+        self._time = time
+
+    @property
+    def requester(self) -> int:
+        return self._requester
+
+    @property
+    def time(self) -> datetime.datetime:
+        return self._time
+
+    def __str__(self):
+        return str({"requester", self.requester, "time", self.time})
+
+    def __repr__(self):
+        return str(self)
