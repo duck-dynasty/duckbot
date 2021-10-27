@@ -85,10 +85,11 @@ class YoloMerge(commands.Cog):
             lines.append(f"**{suite.app.name}** {result}")
         return lines
 
+    # https://github.com/twentylemon/duckbot/pull/34
     async def merge(self, context: commands.Context, repo: Repository, pr_id: int):
         pr = repo.get_pull(pr_id)
         embed = self.as_embed([pr])
-        mergeable = self.is_pr_mergeable(embed) and pr.state == "open"
+        mergeable = self.all_checks_passed(embed) and pr.state == "open"
         if self.has_valid_request(pr_id, context.author.id) and mergeable:
             self.merge_confirmations.pop(pr_id, None)
             pr.create_review(body="YOLO", event="APPROVE")
@@ -104,7 +105,7 @@ class YoloMerge(commands.Cog):
         stamp = utcnow() - datetime.timedelta(minutes=1)
         return pr_id in self.merge_confirmations and requester == self.merge_confirmations[pr_id].requester and stamp < self.merge_confirmations[pr_id].time
 
-    def is_pr_mergeable(self, pull_embed: discord.Embed):
+    def all_checks_passed(self, pull_embed: discord.Embed):
         blob = str(pull_embed.to_dict())
         return CHECK_PENDING not in blob and CHECK_FAILED not in blob
 
