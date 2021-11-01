@@ -8,6 +8,7 @@ import github.Commit
 import github.PullRequest
 import github.Repository
 import pytest
+from github.GithubException import UnknownObjectException
 
 from duckbot.cogs.github import YoloMerge
 
@@ -70,7 +71,24 @@ async def test_yolo_list_max_six_pulls(yolo, context, gh, repo, skip_if_private_
     context.send.assert_called_once_with(embed=embed)
 
 
-def make_pull_request(number: int, mergeable=True) -> Tuple[github.PullRequest.PullRequest, str]:
+@pytest.mark.asyncio
+async def test_yolo_merge_invalid_pull(yolo, context, gh, repo, skip_if_private_channel):
+    gh.get_repo.return_value = repo
+    repo.get_pull.side_effect = UnknownObjectException(status=404, data=None, headers=None)
+    with pytest.raises(UnknownObjectException):
+        await yolo.yolo(context, 404)
+    repo.get_pull.assert_called_once_with(404)
+
+
+@pytest.mark.asyncio
+async def test_yolo_merge_checks_failed(yolo, context, gh, repo, skip_if_private_channel):
+    gh.get_repo.return_value = repo
+    repo.get_pull.return_value = make_pull_request(101)
+    await yolo.yolo(context, 101)
+    repo.get_pull.assert_called_once_with(101)
+
+
+def make_pull_request(number: int, mergeable=True, checks_passed=False) -> Tuple[github.PullRequest.PullRequest, str]:
     pull = pr()
     pull.number = number
     pull.changed_files = 10
