@@ -124,7 +124,10 @@ class MergeConfirmation:
         return self._time
 
     def __str__(self):
-        return str({"requester", self.requester, "time", self.time})
+        return str({"requester": self.requester, "time": self.time})
 
     def __repr__(self):
         return str(self)
+
+    def __eq__(self, other):
+        return self.requester == other.requester and self.time == other.time if isinstance(other, MergeConfirmation) else False
