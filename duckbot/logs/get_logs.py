@@ -12,6 +12,7 @@ class GetLogs(commands.Cog):
 
     @commands.command(name="logs")
     async def logs_command(self, context):
+        raise RuntimeError("ded")
         await self.logs(context)
 
     async def logs(self, context):
