@@ -14,6 +14,7 @@ LOGS_DIRECTORY = "logs"
 class Logging(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        bot.on_error = self.log_event_exceptions
 
     @classmethod
     def define_logs(cls):
@@ -39,10 +40,10 @@ class Logging(commands.Cog):
         return logging.getLogger("duckbot")
 
     @commands.command(name="logs")
-    async def logs_command(self, context):
+    async def logs_command(self, context: commands.Context):
         await self.logs(context)
 
-    async def logs(self, context):
+    async def logs(self, context: commands.Context):
         archive_filename = "logs.tar.gz"
         archive = tarfile.open(archive_filename, "w:gz")
         archive.add(LOGS_DIRECTORY)
@@ -51,9 +52,24 @@ class Logging(commands.Cog):
         await context.send(file=log_archive)
 
     @commands.Cog.listener("on_command_error")
-    async def log_exceptions(self, context, exception):
-        logger = Logging.discord_logger()
-        exception_string = "".join(traceback.format_exception(etype=type(exception), value=exception, tb=exception.__traceback__))
-        logger.error(exception_string)
-        print(f"Brother, ignoring exception in command {context.command}:", file=sys.stderr)
+    async def log_command_exceptions(self, context: commands.Context, exception):
+        logger = Logging.duckbot_logger()
+        trace = "".join(traceback.format_exception(etype=type(exception), value=exception, tb=exception.__traceback__))
+        logger.error(f"{self.format_function(context.command.name, context.args, context.kwargs, context.message)}\n{trace}")
+        print(f"Brother, ignoring exception in command {self.format_function(context.command.name, context.args, context.kwargs)}", file=sys.stderr)
         traceback.print_exception(type(exception), exception, exception.__traceback__, file=sys.stderr)
+
+    async def log_event_exceptions(self, event: str, *args, **kwargs):
+        logger = Logging.duckbot_logger()
+        trace = traceback.format_exc()
+        logger.error(f"{self.format_function(event, args, kwargs)}\n{trace}")
+        print(f"Brother, ignoring exception in {self.format_function(event, args, kwargs)}", file=sys.stderr)
+        traceback.print_exc()
+
+    def format_function(self, name, args, kwargs, message=None):
+        args_str = ",".join([str(a) for a in args])
+        kwargs_str = ",".join([f"{k}={v}" for k, v in kwargs.items()])
+        if message is None:
+            message = next((x for x in args if isinstance(x, discord.Message)), None)
+        message_str = f"\nmessage = {message.content}" if message else ""
+        return f"{name}({args_str}, {kwargs_str}){message_str}"
