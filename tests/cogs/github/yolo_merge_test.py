@@ -127,7 +127,7 @@ async def test_yolo_merge_mergeable_second_attempt_late(utcnow, yolo, context, g
 
 @pytest.mark.asyncio
 @mock.patch("duckbot.cogs.github.yolo_merge.utcnow", return_value=datetime.datetime(2000, 1, 1, hour=12, minute=00, tzinfo=datetime.timezone.utc))
-async def test_yolo_merge_mergeable_second_attempt_merges_YOLO(utcnow, yolo, context, gh, repo, skip_if_private_channel):
+async def test_yolo_merge_mergeable_second_attempt_merges_yolo_bruh(utcnow, yolo, context, gh, repo, skip_if_private_channel):
     context.message.created_at = utcnow()
     yolo.merge_confirmations = {101: MergeConfirmation(context.author.id, utcnow() - datetime.timedelta(seconds=59))}
     gh.get_repo.return_value = repo
