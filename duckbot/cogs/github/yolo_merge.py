@@ -85,7 +85,6 @@ class YoloMerge(commands.Cog):
             lines.append(f"**{suite.app.name}** {result}")
         return lines
 
-    # https://github.com/twentylemon/duckbot/pull/34
     async def merge(self, context: commands.Context, repo: Repository, pr_id: int):
         pr = repo.get_pull(pr_id)
         embed = self.as_embed([pr])
