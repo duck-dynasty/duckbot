@@ -90,7 +90,7 @@ You can also automatically merge open pull requests by specifying the pull reque
 > Human: !yolo 69  
 > DuckBot: Bruh, that'll merge this god-awful pull request... are you sure you trust it? I sure as hell don't. (+pull request)
 
-Sending the same command within a minute of the first will initiate the merge.
+The same person needs to send the same command within a minute of the first will initiate the merge.
 > Human: !yolo 69  
 > DuckBot: Welp. See you on the other side, brother.
 
