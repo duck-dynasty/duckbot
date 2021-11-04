@@ -21,7 +21,7 @@ def loop_replacement(*args, **kwargs):
             logger = Logging.duckbot_logger()
             trace = "".join(traceback.format_exception(etype=type(exception), value=exception, tb=exception.__traceback__))
             logger.error(f"{loop.coro.__name__}\n{trace}")
-            print(f"Brother, ignoring exception in command {loop.coro.__name__}", file=sys.stderr)
+            print(f"Brother, ignoring exception in task {loop.coro.__name__}", file=sys.stderr)
             traceback.print_exception(type(exception), exception, exception.__traceback__, file=sys.stderr)
 
         return loop
