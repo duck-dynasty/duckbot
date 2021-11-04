@@ -1,5 +1,5 @@
 import discord.ext.tasks
 
-import duckbot.logs.loop
+import duckbot.logs
 
-discord.ext.tasks.loop = duckbot.logs.loop.loop_replacement
+discord.ext.tasks.loop = duckbot.logs.loop_replacement

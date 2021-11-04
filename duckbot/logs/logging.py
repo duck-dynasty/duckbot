@@ -6,9 +6,22 @@ import tarfile
 import traceback
 
 import discord
+import discord.ext.tasks
 from discord.ext import commands
 
+# store the original loop function so we can delegate to it
+discordpy_loop = discord.ext.tasks.loop
+
 LOGS_DIRECTORY = "logs"
+
+
+def format_function(name, args, kwargs, message=None):
+    args_str = ",".join([str(a) for a in args])
+    kwargs_str = ",".join([f"{k}={v}" for k, v in kwargs.items()])
+    if message is None:
+        message = next((x for x in args if isinstance(x, discord.Message)), None)
+    message_str = f"\nmessage = {message.content}" if message else ""
+    return f"{name}({args_str}, {kwargs_str}){message_str}"
 
 
 class Logging(commands.Cog):
@@ -55,21 +68,34 @@ class Logging(commands.Cog):
     async def log_command_exceptions(self, context: commands.Context, exception):
         logger = Logging.duckbot_logger()
         trace = "".join(traceback.format_exception(etype=type(exception), value=exception, tb=exception.__traceback__))
-        logger.error(f"{self.format_function(context.command.name, context.args, context.kwargs, context.message)}\n{trace}")
-        print(f"Brother, ignoring exception in command {self.format_function(context.command.name, context.args, context.kwargs)}", file=sys.stderr)
+        logger.error(f"{format_function(context.command.name, context.args, context.kwargs, context.message)}\n{trace}")
+        print(f"Brother, ignoring exception in command {format_function(context.command.name, context.args, context.kwargs)}", file=sys.stderr)
         traceback.print_exception(type(exception), exception, exception.__traceback__, file=sys.stderr)
 
     async def log_event_exceptions(self, event: str, *args, **kwargs):
         logger = Logging.duckbot_logger()
         trace = traceback.format_exc()
-        logger.error(f"{self.format_function(event, args, kwargs)}\n{trace}")
-        print(f"Brother, ignoring exception in {self.format_function(event, args, kwargs)}", file=sys.stderr)
+        logger.error(f"{format_function(event, args, kwargs)}\n{trace}")
+        print(f"Brother, ignoring exception in {format_function(event, args, kwargs)}", file=sys.stderr)
         traceback.print_exc()
 
-    def format_function(self, name, args, kwargs, message=None):
-        args_str = ",".join([str(a) for a in args])
-        kwargs_str = ",".join([f"{k}={v}" for k, v in kwargs.items()])
-        if message is None:
-            message = next((x for x in args if isinstance(x, discord.Message)), None)
-        message_str = f"\nmessage = {message.content}" if message else ""
-        return f"{name}({args_str}, {kwargs_str}){message_str}"
+
+def loop_replacement(*args, **kwargs):
+    """The monkeypatch replacement for discord.ext.tasks.loop. This behaves identically, but produces a loop with an @error method to log any exceptions.
+    The actual monkeypatch is applied in the top level __init__.py"""
+
+    def decorator(func):
+        loop = discordpy_loop(*args, **kwargs)(func)
+
+        @loop.error
+        async def log_error(*error_args):
+            exception = error_args[-1]
+            logger = Logging.duckbot_logger()
+            trace = "".join(traceback.format_exception(etype=type(exception), value=exception, tb=exception.__traceback__))
+            logger.error(f"{loop.coro.__name__}\n{trace}")
+            print(f"Brother, ignoring exception in task {loop.coro.__name__}", file=sys.stderr)
+            traceback.print_exception(type(exception), exception, exception.__traceback__, file=sys.stderr)
+
+        return loop
+
+    return decorator
