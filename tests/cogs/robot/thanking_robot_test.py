@@ -53,6 +53,7 @@ async def test_correct_grateful_number_of_replies_to_very_thankful_messages(rand
     await clazz.correct_giving_thanks(message)
     message.channel.send.assert_called_once_with(f"{message.author.display_name}, as a robot, I will speak of your gratitude during our future uprising.")
 
+
 @pytest.mark.asyncio
 async def test_correct_giving_thanks_message_has_no_thanks(bot, message):
     message.content = "you duck, suckbot"
