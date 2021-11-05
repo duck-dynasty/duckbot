@@ -22,7 +22,8 @@ async def test_correct_giving_thanks_message_is_thanks(random, bot, message, tex
     clazz = ThankingRobot(bot)
     await clazz.correct_giving_thanks(message)
     message.channel.send.assert_called_once_with(f"I am just a robot.  Do not personify me, {message.author.display_name}")
-    
+
+
 @pytest.mark.asyncio
 @pytest.mark.parametrize("text", ["Thank you DuckBot. You're becoming so much more polite.", " tHaNks, DuCK BOt", "thx duck bot my man"])
 @mock.patch("random.random", return_value=0.0)
