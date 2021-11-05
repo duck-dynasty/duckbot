@@ -20,7 +20,6 @@ services:
       mode: replicated
       replicas: 1
       restart_policy:
-        condition: any
         window: 10s
       update_config:
         failure_action: rollback
@@ -48,7 +47,6 @@ services:
       mode: replicated
       replicas: 1
       restart_policy:
-        condition: any
         window: 10s
       update_config:
         failure_action: rollback
