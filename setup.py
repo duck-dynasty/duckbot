@@ -61,7 +61,7 @@ if __name__ == "__main__":
                 "pytest",
                 "pytest-asyncio",
                 "pytest-xdist[psutil]",
-                "flake8<4",
+                "flake8<5",
                 "black",
                 "flake8-black",
                 "isort",
@@ -73,6 +73,7 @@ if __name__ == "__main__":
                 "pytest-sugar",
                 "pytest-icdiff",
                 "pytest-cov",
+                "pytest-lazy-fixture",
             ]
         },
     )

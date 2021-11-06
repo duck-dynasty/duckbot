@@ -3,17 +3,23 @@ import pytest
 
 
 @pytest.fixture
-def skip_if_private_channel(channel, dm_channel, group_channel):
+def is_private_channel(channel):
+    """Returns True if `channel` is a private channel (a DM or group channel), False otherwise."""
+    return channel.type in [discord.ChannelType.private, discord.ChannelType.group]
+
+
+@pytest.fixture
+def skip_if_private_channel(channel, is_private_channel):
     """Skips the test if `channel` is a private channel (a DM or group channel).
     Meant to be used when the `channel` fixture is also used."""
-    if channel.type in [discord.ChannelType.private, discord.ChannelType.group]:
+    if is_private_channel:
         pytest.skip("test requires a non-private discord channel")
 
 
 @pytest.fixture
 def text_channel(autospec) -> discord.TextChannel:
     """Returns a text channel, a typical channel in a discord server."""
-    tc = autospec.of("discord.TextChannel")
+    tc = autospec.of(discord.TextChannel)
     tc.type = discord.ChannelType.text
     return tc
 
@@ -21,7 +27,7 @@ def text_channel(autospec) -> discord.TextChannel:
 @pytest.fixture
 def dm_channel(autospec) -> discord.DMChannel:
     """Returns a dm channel, a direct message between two users."""
-    dm = autospec.of("discord.DMChannel")
+    dm = autospec.of(discord.DMChannel)
     dm.type = discord.ChannelType.private
     return dm
 
@@ -29,7 +35,7 @@ def dm_channel(autospec) -> discord.DMChannel:
 @pytest.fixture
 def group_channel(autospec) -> discord.GroupChannel:
     """Returns a group channel, a private channel between two or more users, outside of a server."""
-    g = autospec.of("discord.GroupChannel")
+    g = autospec.of(discord.GroupChannel)
     g.type = discord.ChannelType.group
     return g
 
@@ -37,7 +43,7 @@ def group_channel(autospec) -> discord.GroupChannel:
 @pytest.fixture
 def thread(autospec) -> discord.Thread:
     """Returns a thread channel, an ephemeral channel inside of a discord server."""
-    thrd = autospec.of("discord.Thread")
+    thrd = autospec.of(discord.Thread)
     thrd.type = discord.ChannelType.public_thread
     return thrd
 
