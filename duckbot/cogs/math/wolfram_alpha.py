@@ -21,7 +21,7 @@ class WolframAlpha(commands.Cog):
         return self._wolfram
 
     @commands.command(name="calc")
-    async def calc_command(self, context: commands.Context, *, query: str = "the answer to the ultimate question of life, the universe, and everything"):
+    async def calc_command(self, context: commands.Context, *, query: str = "charizard curve"):
         async with context.typing():
             await self.calc(context, query)
 
