@@ -3,6 +3,7 @@ import pytest
 import wolframalpha
 
 from duckbot.cogs.math import WolframAlpha
+from duckbot.util.embeds import MAX_EMBED_LENGTH, MAX_TITLE_LENGTH
 
 
 @pytest.fixture
@@ -17,13 +18,13 @@ def wolfram(bot, wra_client) -> WolframAlpha:
     return clazz
 
 
-def test_github_creates_instance(bot, monkeypatch):
+def test_wolfram_creates_instance(bot, monkeypatch):
     monkeypatch.setenv("WOLFRAM_ALPHA_TOKEN", "token")
     clazz = WolframAlpha(bot)
     assert clazz.wolfram == clazz._wolfram
 
 
-def test_github_returns_cached_instance(wolfram, wra_client):
+def test_wolfram_returns_cached_instance(wolfram, wra_client):
     wolfram._wolfram = wra_client
     assert wolfram.wolfram == wra_client
 
@@ -33,6 +34,14 @@ async def test_calc_single_pod(wolfram, context, wra_client):
     wra_client.query.return_value = result([pod(subpods=[subpod(img=image())])])
     await wolfram.calc(context, "query")
     embed = discord.Embed(title="title").set_image(url="src").add_field(name="subtitle", value="plaintext")
+    context.send.assert_called_once_with("https://www.wolframalpha.com/input/?i=query", embeds=[embed])
+
+
+@pytest.mark.asyncio
+async def test_calc_single_pod_large_embed(wolfram, context, wra_client):
+    wra_client.query.return_value = result([pod(title="p" * MAX_EMBED_LENGTH, subpods=[subpod(title="s" * MAX_EMBED_LENGTH, plaintext="t" * MAX_EMBED_LENGTH, img=image())])])
+    await wolfram.calc(context, "query")
+    embed = discord.Embed(title="p" * MAX_TITLE_LENGTH).set_image(url="src").add_field(name="s" * 64, value="t" * 512)
     context.send.assert_called_once_with("https://www.wolframalpha.com/input/?i=query", embeds=[embed])
 
 
