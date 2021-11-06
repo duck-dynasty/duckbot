@@ -17,13 +17,13 @@ def wolfram(bot, wra_client) -> WolframAlpha:
     return clazz
 
 
-def test_github_creates_instance(bot, monkeypatch):
+def test_wolfram_creates_instance(bot, monkeypatch):
     monkeypatch.setenv("WOLFRAM_ALPHA_TOKEN", "token")
     clazz = WolframAlpha(bot)
     assert clazz.wolfram == clazz._wolfram
 
 
-def test_github_returns_cached_instance(wolfram, wra_client):
+def test_wolfram_returns_cached_instance(wolfram, wra_client):
     wolfram._wolfram = wra_client
     assert wolfram.wolfram == wra_client
 
