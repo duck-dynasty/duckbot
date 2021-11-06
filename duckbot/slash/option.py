@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import typing
 
 
@@ -38,7 +40,7 @@ class Option:
         return self._required
 
     @property
-    def options(self) -> typing.List:
+    def options(self) -> typing.List[Option]:
         return []
 
     def to_dict(self) -> dict:
@@ -55,12 +57,12 @@ class Option:
 
 
 class SubCommand(Option):
-    def __init__(self, *, name: str, description: str, type: OptionType, options):
+    def __init__(self, *, name: str, description: str, type: OptionType, options: typing.List[Option]):
         super().__init__(name=name, description=description, type=type, required=False)
         self._options = options
 
     @property
-    def options(self) -> typing.List:
+    def options(self) -> typing.List[Option]:
         return self._options
 
     def __eq__(self, other) -> bool:
