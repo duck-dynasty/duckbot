@@ -95,7 +95,7 @@ class YoloMerge(commands.Cog):
             pr.merge(commit_title=pr.title, commit_message="YOLO", merge_method="squash")
             await context.send("Welp. See you on the other side, brother.")
         elif mergeable:
-            await context.send("Bruh, that'll merge this god-awful pull request... are you sure you trust it? I sure as hell don't.", embed=embed)
+            await context.send("Bruh, that'll merge this god-awful pull request... are you sure you trust it? Only Tom would push this...", embed=embed)
             self.merge_confirmations[pr_id] = MergeConfirmation(context.author.id, context.message.created_at)
         else:
             await context.send("Bruh. Come on. I can't merge this garbage.", embed=embed)

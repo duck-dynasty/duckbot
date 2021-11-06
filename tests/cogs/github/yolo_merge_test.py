@@ -107,7 +107,7 @@ async def test_yolo_merge_mergeable_first_attempt(yolo, context, gh, repo, skip_
     await yolo.yolo(context, 101)
     embed = discord.Embed().add_field(name="#101", value=embed_value)
     repo.get_pull.assert_called_once_with(101)
-    context.send.assert_called_once_with("Bruh, that'll merge this god-awful pull request... are you sure you trust it? I sure as hell don't.", embed=embed)
+    context.send.assert_called_once_with("Bruh, that'll merge this god-awful pull request... are you sure you trust it? Only Tom would push this...", embed=embed)
     assert yolo.merge_confirmations == {101: MergeConfirmation(context.author.id, context.message.created_at)}
 
 
