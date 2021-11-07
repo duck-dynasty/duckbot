@@ -1,4 +1,4 @@
-from .logging import Logging
+from .logging import Logging, loop_replacement
 
 
 def setup(bot):
