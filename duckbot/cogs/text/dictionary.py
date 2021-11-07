@@ -21,12 +21,14 @@ class Dictionary(commands.Cog):
         await context.send(embeds=[self.get_definition(x) for x in roots])
 
     def get_root_words(self, word: str) -> List[str]:
+        """Returns all roots of the given word."""
         response = requests.get(f"{self.url}/lemmas/en/{word}", headers=self.headers).json()
         results = response.get("results", [])
         inflections = [i.get("id") for r in results for lex in r.get("lexicalEntries", []) for i in lex.get("inflectionOf", [])]
         return sorted(set(inflections))
 
-    def get_definition(self, word) -> discord.Embed:
+    def get_definition(self, word: str) -> discord.Embed:
+        """Returns the full definition of the word as an embed."""
         embed = discord.Embed(title=word)
         response = requests.get(f"{self.url}/entries/en-us/{word}", headers=self.headers).json()
         results = response.get("results", [])
