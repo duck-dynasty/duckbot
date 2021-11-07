@@ -1,5 +1,5 @@
 import os
-from typing import List, Set, Tuple
+from typing import List, Tuple
 
 import discord
 import requests
