@@ -27,11 +27,12 @@ from duckbot import DuckBot
 
 
 def run_duckbot(bot: commands.Bot):
+    bot.load_extension(duckbot.logs.__name__)
+
     if "connection-test" in os.getenv("DUCKBOT_ARGS", ""):
         bot.load_extension(duckbot.util.connection_test.__name__)
 
     bot.load_extension(duckbot.health.__name__)
-    bot.load_extension(duckbot.logs.__name__)
 
     bot.load_extension(duckbot.cogs.duck.__name__)
     bot.load_extension(duckbot.cogs.dogs.__name__)
@@ -56,6 +57,5 @@ def run_duckbot(bot: commands.Bot):
 
 
 if __name__ == "__main__":
-    duckbot.logs.define_logs()
     bot = DuckBot()
     run_duckbot(bot)
