@@ -11,7 +11,7 @@ from duckbot.logs import loop_replacement
 @mock.patch("traceback.format_exception")
 @mock.patch("logging.getLogger")
 @mock.patch("logging.Logger")
-async def test_loop_replacement_adds_error_handler_only_error_arg(logger, get_logger, format_exc):
+async def test_loop_replacement_adds_error_handler_as_function(logger, get_logger, format_exc):
     get_logger.return_value = logger
     lock = asyncio.Event()
     lock.clear()
