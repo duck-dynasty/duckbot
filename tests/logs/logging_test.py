@@ -1,5 +1,4 @@
 import logging
-import os
 from unittest import mock
 
 import pytest
@@ -11,25 +10,14 @@ LOG_TAR_FILE = "logs.tar.gz"
 
 
 @pytest.mark.asyncio
+@mock.patch("logging.StreamHandler")
 @mock.patch("logging.handlers.RotatingFileHandler")
-@mock.patch("logging.Logger")
-@mock.patch("logging.Logger")
-@mock.patch("logging.getLogger")
+@mock.patch("logging.basicConfig")
 @mock.patch("os.makedirs")
-async def test_define_logs_create_logger(make_dirs, get_logger, discord, ducklog, handler):
-    get_logger.side_effect = [discord, ducklog]
-    mock_handler_id = handler.return_value
-
+async def test_define_logs_create_logger(make_dirs, log_config, filehandler, streamhandler):
     Logging.define_logs()
-
     make_dirs.assert_called_once_with(LOG_DIR, exist_ok=True)
-    handler.assert_called_once_with(filename=os.path.join(LOG_DIR, "duck.log"), mode="a", maxBytes=256000, backupCount=10)
-    get_logger.assert_any_call("discord")
-    discord.setLevel.assert_called_once_with(logging.INFO)
-    discord.addHandler.assert_called_once_with(mock_handler_id)
-    get_logger.assert_any_call("duckbot")
-    ducklog.setLevel.assert_called_once_with(logging.INFO)
-    ducklog.addHandler.assert_called_once_with(mock_handler_id)
+    log_config.assert_called_once_with(level=logging.INFO, format="%(asctime)s:%(levelname)s:%(name)s: %(message)s", handlers=[filehandler.return_value, streamhandler.return_value])
 
 
 @pytest.mark.asyncio
@@ -52,39 +40,58 @@ async def test_logs_sends_tarball_of_logs(tar, open, file, bot, context):
 
 
 @pytest.mark.asyncio
-@mock.patch("traceback.print_exception")
 @mock.patch("traceback.format_exception")
-@mock.patch("logging.Logger")
 @mock.patch("logging.getLogger")
-async def test_log_command_exceptions_log_exception(get_logger, logger, format_exc, print_exc, bot, context, command):
+@mock.patch("logging.Logger")
+async def test_log_command_exceptions_outside_of_cog(logger, get_logger, format_exc, bot, context, command):
     exception = mock.Mock(Exception)
     get_logger.return_value = logger
     command.name = "command"
     context.command = command
     context.args = ()
     context.kwargs = {}
+    context.cog = None
+    context.bot = bot
 
     clazz = Logging(bot)
     await clazz.log_command_exceptions(context, exception)
 
-    get_logger.assert_called_once_with("duckbot")
     format_exc.assert_called_once()
+    get_logger.assert_called_once_with(bot.__module__)
     logger.error.assert_called_once()
-    print_exc.assert_called_once()
 
 
 @pytest.mark.asyncio
-@mock.patch("traceback.print_exc")
-@mock.patch("traceback.format_exc")
-@mock.patch("logging.Logger")
+@mock.patch("discord.ext.commands.Cog")
+@mock.patch("traceback.format_exception")
 @mock.patch("logging.getLogger")
-async def test_log_event_exceptions_log_exception(get_logger, logger, format_exc, print_exc, bot):
+@mock.patch("logging.Logger")
+async def test_log_command_exceptions_in_cog(logger, get_logger, format_exc, cog, bot, context, command):
+    exception = mock.Mock(Exception)
     get_logger.return_value = logger
+    command.name = "command"
+    context.command = command
+    context.args = ()
+    context.kwargs = {}
+    context.cog = cog
 
+    clazz = Logging(bot)
+    await clazz.log_command_exceptions(context, exception)
+
+    format_exc.assert_called_once()
+    get_logger.assert_called_once_with(cog.__module__)
+    logger.error.assert_called_once()
+
+
+@pytest.mark.asyncio
+@mock.patch("traceback.format_exc")
+@mock.patch("logging.getLogger")
+@mock.patch("logging.Logger")
+async def test_log_event_exceptions_log_exception(logger, get_logger, format_exc, bot):
+    get_logger.return_value = logger
     clazz = Logging(bot)
     await clazz.log_event_exceptions("event", (), {})
 
-    get_logger.assert_called_once_with("duckbot")
     format_exc.assert_called_once()
+    get_logger.assert_called_once_with("duckbot")
     logger.error.assert_called_once()
-    print_exc.assert_called_once()
