@@ -26,6 +26,7 @@ async def test_loop_replacement_adds_error_handler_as_function(logger, get_logge
 
     func.start()
     await lock.wait()
+    assert func.get_task().exception() is not None
     format_exc.assert_called_once()
     get_logger.assert_called_once_with("duckbot")
     logger.error.assert_called_once()
@@ -52,15 +53,7 @@ async def test_loop_replacement_adds_error_handler_as_class_member(logger, get_l
     wrapper = Wrapper()
     wrapper.func.start()
     await lock.wait()
+    assert wrapper.func.get_task().exception() is not None
     format_exc.assert_called_once()
     get_logger.assert_called_once_with(wrapper.__module__)
     logger.error.assert_called_once()
-
-
-# 2021-11-04 22:48:13,114:ERROR:duckbot: on_hour_loop
-# Traceback (most recent call last):
-# File "/opt/venv/lib/python3.8/site-packages/discord/ext/tasks/__init__.py", line 168, in _loop
-# await self.coro(*args, **kwargs)
-# File "/duckbot/duckbot/cogs/announce_day/announce_day.py", line 46, in on_hour_loop
-# raise RuntimeError("ded")
-# RuntimeError: ded
