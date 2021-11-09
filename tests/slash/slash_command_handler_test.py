@@ -39,7 +39,7 @@ async def test_handle_slash_interaction_only_invokes_slashes(bot, interaction, c
 async def test_upsert_slash_commands_no_commands(bot, http, guild):
     bot.walk_commands.return_value = []
     bot.guilds = [guild]
-    clazz = SlashCommandPatch(bot)
+    clazz = SlashCommandHandler(bot)
     await clazz.upsert_slash_commands()
     bot.http.bulk_upsert_global_commands.assert_called_once_with(bot.user.id, [])
     bot.http.bulk_upsert_guild_commands.assert_called_once_with(bot.user.id, guild.id, [])
@@ -50,7 +50,7 @@ async def test_upsert_slash_commands_create_commands(bot, http, guild, command):
     create_slash_command(command, "command_name")
     bot.walk_commands.return_value = [command]
     bot.guilds = [guild]
-    clazz = SlashCommandPatch(bot)
+    clazz = SlashCommandHandler(bot)
     await clazz.upsert_slash_commands()
     bot.http.bulk_upsert_global_commands.assert_called_once_with(bot.user.id, [command.slash_ext.to_dict()])
     bot.http.bulk_upsert_guild_commands.assert_called_once_with(bot.user.id, guild.id, [command.slash_ext.to_dict()])
@@ -61,7 +61,7 @@ async def test_upsert_slash_commands_create_subcommand(bot, http, guild, command
     create_slash_command(command, "command_name", name="name", root="root", options=[Option(name="opt")])
     bot.walk_commands.return_value = [command]
     bot.guilds = [guild]
-    clazz = SlashCommandPatch(bot)
+    clazz = SlashCommandHandler(bot)
     await clazz.upsert_slash_commands()
     bot.http.bulk_upsert_global_commands.assert_called_once_with(bot.user.id, [command.slash_ext.to_dict()])
     bot.http.bulk_upsert_guild_commands.assert_called_once_with(bot.user.id, guild.id, [command.slash_ext.to_dict()])
@@ -76,7 +76,7 @@ async def test_upsert_slash_commands_create_subcommand_group(bot, http, guild, c
     expected.append_options(command2.slash_ext.options)
     bot.walk_commands.return_value = [command, command2]
     bot.guilds = [guild]
-    clazz = SlashCommandPatch(bot)
+    clazz = SlashCommandHandler(bot)
     await clazz.upsert_slash_commands()
     bot.http.bulk_upsert_global_commands.assert_called_once_with(bot.user.id, [expected.to_dict()])
     bot.http.bulk_upsert_guild_commands.assert_called_once_with(bot.user.id, guild.id, [expected.to_dict()])
