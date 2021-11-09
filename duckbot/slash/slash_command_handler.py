@@ -32,7 +32,7 @@ class SlashCommandHandler(Cog):
             log.info("registering slash commands in guild=%s", guild.id)
             await self.bot.http.bulk_upsert_guild_commands(self.bot.user.id, guild.id, slash_json)
 
-    def get_commands_registered_to_bot(self):
+    def get_commands_registered_to_bot(self) -> List[SlashCommand]:
         slash_commands: List[SlashCommand] = []
         for command in (c for c in self.bot.walk_commands() if get_slash_command(c)):
             slash = get_slash_command(command)
