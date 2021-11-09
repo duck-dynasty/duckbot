@@ -1,10 +1,12 @@
 import asyncio
 from importlib.resources import path
+from typing import Union, Optional
 
 from discord import FFmpegPCMAudio, PCMVolumeTransformer, VoiceClient
 from discord.ext import commands
 
 from duckbot.util.messages import try_delete
+from duckbot.slash import slash_command, InteractionContext
 
 
 class WhoCanItBeNow(commands.Cog):
@@ -19,12 +21,13 @@ class WhoCanItBeNow(commands.Cog):
         if self.streaming:
             return self.bot.loop.create_task(self.stop())
 
+    @slash_command()
     @commands.command("start")
-    async def start_command(self, context):
+    async def start_command(self, context: Union[commands.Context, InteractionContext]):
         await self.start(context)
 
     @start_command.before_invoke
-    async def connect_to_voice(self, context):
+    async def connect_to_voice(self, context: Union[commands.Context, InteractionContext]):
         if context.voice_client is None:
             if not hasattr(context.author, "voice"):
                 await context.send("Music can only be played in a discord server, not a private channel.", delete_after=30)
@@ -36,10 +39,11 @@ class WhoCanItBeNow(commands.Cog):
         else:
             context.voice_client.stop()
 
-    async def start(self, context):
+    async def start(self, context: Union[commands.Context, InteractionContext]):
         """Starts the music loop if it is not already playing."""
         if not self.streaming:
             self.streaming = True
+            await context.send(":saxophone:", delete_after=5)
             self.audio_task = self.bot.loop.create_task(self.stream_audio())
 
     async def stream_audio(self):
@@ -62,11 +66,12 @@ class WhoCanItBeNow(commands.Cog):
         if error:
             raise commands.CommandError(str(error))
 
+    @slash_command()
     @commands.command("stop")
-    async def stop_command(self, context):
+    async def stop_command(self, context: Union[commands.Context, InteractionContext]):
         await self.stop(context)
 
-    async def stop(self, context=None):
+    async def stop(self, context: Optional[Union[commands.Context, InteractionContext]]=None):
         """Stops the music loop if it is playing."""
         if self.streaming:
             await self.voice_client.disconnect()
@@ -82,5 +87,5 @@ class WhoCanItBeNow(commands.Cog):
 
     @start_command.after_invoke
     @stop_command.after_invoke
-    async def delete_command_message(self, context):
+    async def delete_command_message(self, context: Union[commands.Context, InteractionContext]):
         await try_delete(context.message)
