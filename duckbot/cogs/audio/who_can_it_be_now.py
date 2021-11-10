@@ -13,11 +13,11 @@ class WhoCanItBeNow(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.stream = asyncio.Event()
-        self.voice_client: VoiceClient = None
+        self.voice_client: Optional[VoiceClient] = None
         self.audio_task = None
         self.streaming = False
 
-    def cog_unload(self):
+    def cog_unload(self) -> Optional[asyncio.Task]:
         if self.streaming:
             return self.bot.loop.create_task(self.stop())
 
