@@ -1,7 +1,7 @@
 #### Summary 
 
 Contributing to Duckbot can be a fun and rewarding experience! 
-Before you do contribute please review these guidelines so that consistancy can be maintained.
+Before you contribute, please review these guidelines so that consistancy can be maintained.
 
 ##### Gitmoji standard
 
