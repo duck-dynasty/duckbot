@@ -1,12 +1,12 @@
 import asyncio
 from importlib.resources import path
-from typing import Union, Optional
+from typing import Optional, Union
 
 from discord import FFmpegPCMAudio, PCMVolumeTransformer, VoiceClient
 from discord.ext import commands
 
+from duckbot.slash import InteractionContext, slash_command
 from duckbot.util.messages import try_delete
-from duckbot.slash import slash_command, InteractionContext
 
 
 class WhoCanItBeNow(commands.Cog):
@@ -82,7 +82,8 @@ class WhoCanItBeNow(commands.Cog):
                 self.audio_task = None
             self.voice_client = None
             self.streaming = False
-            await context.send(":disappointed_relieved:", delete_after=30)
+            if context:
+                await context.send(":disappointed_relieved:", delete_after=30)
         elif context is not None:
             await context.send("Brother, no :musical_note: :saxophone: is active.", delete_after=30)
 
