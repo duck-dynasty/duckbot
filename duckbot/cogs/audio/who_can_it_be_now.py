@@ -43,7 +43,6 @@ class WhoCanItBeNow(commands.Cog):
         """Starts the music loop if it is not already playing."""
         if not self.streaming:
             self.streaming = True
-            await context.send(":saxophone:", delete_after=5)
             self.audio_task = self.bot.loop.create_task(self.stream_audio())
 
     async def stream_audio(self):
@@ -71,7 +70,7 @@ class WhoCanItBeNow(commands.Cog):
     async def stop_command(self, context: Union[commands.Context, InteractionContext]):
         await self.stop(context)
 
-    async def stop(self, context: Optional[Union[commands.Context, InteractionContext]]=None):
+    async def stop(self, context: Optional[Union[commands.Context, InteractionContext]] = None):
         """Stops the music loop if it is playing."""
         if self.streaming:
             await self.voice_client.disconnect()
