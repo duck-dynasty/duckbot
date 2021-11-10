@@ -22,7 +22,7 @@ class WhoCanItBeNow(commands.Cog):
             return self.bot.loop.create_task(self.stop())
 
     @slash_command()
-    @commands.command("start")
+    @commands.command(name="start", description='Start playing "music" in whatever voice channel you are currently in.')
     async def start_command(self, context: Union[commands.Context, InteractionContext]):
         await self.start(context)
 
@@ -41,6 +41,7 @@ class WhoCanItBeNow(commands.Cog):
 
     async def start(self, context: Union[commands.Context, InteractionContext]):
         """Starts the music loop if it is not already playing."""
+        await context.send(":musical_note: :saxophone:", delete_after=30)
         if not self.streaming:
             self.streaming = True
             self.audio_task = self.bot.loop.create_task(self.stream_audio())
@@ -66,7 +67,7 @@ class WhoCanItBeNow(commands.Cog):
             raise commands.CommandError(str(error))
 
     @slash_command()
-    @commands.command("stop")
+    @commands.command(name="stop", description='Stop playing "music" entirely.')
     async def stop_command(self, context: Union[commands.Context, InteractionContext]):
         await self.stop(context)
 
@@ -81,6 +82,7 @@ class WhoCanItBeNow(commands.Cog):
                 self.audio_task = None
             self.voice_client = None
             self.streaming = False
+            await context.send(":disappointed_relieved:", delete_after=30)
         elif context is not None:
             await context.send("Brother, no :musical_note: :saxophone: is active.", delete_after=30)
 
