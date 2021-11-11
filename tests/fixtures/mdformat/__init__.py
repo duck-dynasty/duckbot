@@ -55,11 +55,3 @@ class MdFormatItem(pytest.Item, pytest.File):
         assert md == formatted
         mtimes = getattr(self.config, "_mdformat_mtimes", {})
         mtimes[str(self.fspath)] = self._mdformat_mtime
-
-    def repr_failure(self, excinfo):
-        if excinfo.errisinstance(MdFormatError):
-            return excinfo.value.args[0].stdout
-        return super(MdFormatItem, self).repr_failure(excinfo)
-
-    def reportinfo(self):
-        return self.fspath, -1, "MdFormat check"
