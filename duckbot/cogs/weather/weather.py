@@ -63,7 +63,7 @@ class Weather(commands.Cog):
         name="set",
         description="Updates your default location for /weather get",
         options=[
-            Option(name="city", description="The city name to get the weather for."),
+            Option(name="city", description="The city name to get the weather for.", required=True),
             Option(name="country", description="The two letter country code (eg CA for Canada), or two letter US state code."),
             Option(name="index", type=OptionType.INTEGER, description="Index to disambiguate city when city/country are not enough."),
         ],
