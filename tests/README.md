@@ -41,6 +41,7 @@ class Foo(commands.Cog):
         print("I FOO")
 
 
+# test
 async def test_foo(bot, context):
     clazz = Foo(bot)
     await clazz._Foo__foo(context)
