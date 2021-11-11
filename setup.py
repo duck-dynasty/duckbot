@@ -1,8 +1,15 @@
 import os
+import subprocess
 
 from setuptools import find_packages, setup
 from setuptools.command.develop import develop
 from setuptools.command.install import install
+
+
+def run_code_formatters():
+    for tool in ["isort .", "black .", "mdformat ."]:
+        print(f"running `{tool}`")
+        subprocess.run(tool, shell=True)
 
 
 def download_nltk_data():
@@ -74,6 +81,11 @@ if __name__ == "__main__":
                 "pytest-icdiff",
                 "pytest-cov",
                 "pytest-lazy-fixture",
+            ]
+        },
+        entry_points={
+            "console_scripts": [
+                f"format = setup:{run_code_formatters.__name__} [dev]",
             ]
         },
     )
