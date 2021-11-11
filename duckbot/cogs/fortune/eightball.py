@@ -15,7 +15,7 @@ class EightBall(commands.Cog):
 
     @slash_command(options=[Option(name="question", description="The question to ask the magic 8 ball.")])
     @commands.command(name="eightball", aliases=["8ball"], description="Ask the magic 8 ball a question!")
-    async def eightball_command(self, context, *, question: str = None):
+    async def eightball_command(self, context, question: str = None):
         await self.eightball(context, question)
 
     async def eightball(self, context: commands.Context, question: str):
