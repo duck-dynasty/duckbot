@@ -11,8 +11,8 @@ from .option import Option, OptionType, SubCommand
 class SlashCommand:
     root: InitVar[str]
     command: InitVar[Command]
-    name: str = None
-    description: str = None
+    name: str = ""
+    description: str = ""
     options: List[Option] = field(default_factory=list)
 
     def __post_init__(self, root, command):
