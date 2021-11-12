@@ -30,6 +30,10 @@ Kubernetes
 ----------
 DuckBot kindly corrects the spelling of _k8s_ to _kubernetes_. Additionally, DuckBot corrects the spelling of _kubernetes_ to _k8s_.
 
+Bezos
+-----
+Jeff Bezos is no longer the CEO of Amazon, and thus has no reason to ever be spoken about ever again. DuckBot reminds you of the new and improved Andy Jassy when this slips your mind.
+
 Formula One
 -----------
 DuckBot gets HYPED UP over posts to the F1 related `#dank` channel, so it reacts to every single message there.
