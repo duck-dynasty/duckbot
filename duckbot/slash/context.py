@@ -16,10 +16,12 @@ def _create_arguments_view(interaction: Interaction, command: Command) -> String
     if options and not options[0].get("value", None):  # a command group
         if command._discordpy_include_subcommand_name[options[0]["name"]]:
             parts.append(options[0]["name"])
-        parts = parts + [f'"{x.get("value", "")}"' for x in options[0].get("options", [])]
+        parts = parts + [f'｢{x.get("value", "")}｣' for x in options[0].get("options", [])]
     else:
-        parts = parts + [f'"{x.get("value", "")}"' for x in options]
-    view = " ".join([x for x in parts])
+        parts = parts + [f'｢{x.get("value", "")}｣' for x in options]
+
+    # remove wrapping quotes if there's only one arg
+    view = " ".join(parts)[1:-1] if len(parts) == 1 else " ".join(parts)
     log.debug("args string=%s", view)
     return StringView(view)
 
