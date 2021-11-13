@@ -30,10 +30,6 @@ def pytest_unconfigure(config):
         config.cache.set(HIST_KEY, config._mdformat_mtimes)
 
 
-class MdFormatError(Exception):
-    """Indicates an error during mdformat checks."""
-
-
 class MdFormatItem(pytest.Item, pytest.File):
     def __init__(self, fspath, parent):
         super(MdFormatItem, self).__init__(fspath, parent)
