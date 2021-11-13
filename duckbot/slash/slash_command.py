@@ -9,13 +9,13 @@ from .option import Option, OptionType, SubCommand
 
 @dataclass
 class SlashCommand:
-    root: InitVar[str]
     command: InitVar[Command]
+    root: InitVar[str] = ""
     name: str = ""
     description: str = ""
     options: List[Option] = field(default_factory=list)
 
-    def __post_init__(self, root, command):
+    def __post_init__(self, command, root):
         if not isinstance(command, Command):
             raise TypeError("callback command must be a discord.ext.commads.Command")
         if root and not self.name or not root and self.name:
