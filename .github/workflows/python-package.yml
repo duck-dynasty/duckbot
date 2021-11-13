@@ -114,11 +114,15 @@ jobs:
         OPENWEATHER_TOKEN: ${{ secrets.OPENWEATHER_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
         WOLFRAM_ALPHA_TOKEN: ${{ secrets.WOLFRAM_ALPHA_TOKEN }}
+        OXFORD_DICTIONARY_ID: ${{ secrets.OXFORD_DICTIONARY_ID }}
+        OXFORD_DICTIONARY_KEY: ${{ secrets.OXFORD_DICTIONARY_KEY }}
       run: |
         aws ssm put-parameter --name /duckbot/token/discord --type SecureString --value "$DISCORD_TOKEN" --overwrite
         aws ssm put-parameter --name /duckbot/token/openweather --type SecureString --value "$OPENWEATHER_TOKEN" --overwrite
         aws ssm put-parameter --name /duckbot/token/github --type SecureString --value "$GITHUB_TOKEN" --overwrite
         aws ssm put-parameter --name /duckbot/token/wolfram-alpha --type SecureString --value "$WOLFRAM_ALPHA_TOKEN" --overwrite
+        aws ssm put-parameter --name /duckbot/token/oxford-dictionary/id --type SecureString --value "$OXFORD_DICTIONARY_ID" --overwrite
+        aws ssm put-parameter --name /duckbot/token/oxford-dictionary/key --type SecureString --value "$OXFORD_DICTIONARY_KEY" --overwrite
 
     - name: Update CloudFormation Stack
       uses: aws-actions/aws-cloudformation-github-deploy@v1
