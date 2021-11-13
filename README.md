@@ -1,4 +1,5 @@
 # duckbot
+
 [![GitHub License](https://img.shields.io/github/license/duck-dynasty/duckbot)](https://github.com/duck-dynasty/duckbot/blob/main/LICENSE)
 [![GitHub Issues](https://img.shields.io/github/issues/duck-dynasty/duckbot)](https://github.com/duck-dynasty/duckbot/issues)
 [![Build Status](https://img.shields.io/github/workflow/status/duck-dynasty/duckbot/DuckBot%20CI)](https://github.com/duck-dynasty/duckbot/actions/workflows/python-package.yml)
@@ -11,11 +12,10 @@ A Discord bot for personal friend group. If you don't know me personally, consid
 
 View the [wiki](https://github.com/duck-dynasty/duckbot/wiki) for a short description on what the Duck does.
 
-
 https://user-images.githubusercontent.com/3149083/135654217-244d7457-9db9-4c30-a98a-785b25453fd8.mp4
 
-
 ## Development
+
 Before running DuckBot, you want to create a virtualenv to develop in. DuckBot runs on `python3.8`, so prefer to use that.
 
 ```sh
@@ -28,6 +28,7 @@ pip install --editable .[dev]
 The `dev` extras will also install development dependencies, like `pytest`. The installation commands should be run whenever you merge from upstream.
 
 ### Run Tests & Formatter
+
 ```sh
 pytest              # runs tests, lint and format checks
 isort . && black .  # reformats the entire code base
@@ -35,8 +36,8 @@ isort . && black .  # reformats the entire code base
 
 The tests also collects code coverage. [View the configuration](https://github.com/duck-dynasty/duckbot/blob/main/pyproject.toml) to see the minimum required coverage. Discord.py decorators make it difficult to cover methods directly, so don't aim for 100% coverage.
 
-
 ### Run DuckBot
+
 Before running DuckBot, you need to have a `duckbot/.env` file with the API tokens. It should look something like this:
 
 ```
@@ -49,18 +50,20 @@ OXFORD_DICTIONARY_ID=icanttellyou
 OXFORD_DICTIONARY_KEY=itsasecret
 ```
 
-* Discord tokens available from [Discord Developer](https://discord.com/developers/applications)
-* You can get an [openweather api token](https://openweathermap.org/api) for free as well
-* The github token is a [personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
-* The wolfram alpha token is available from their [api page](https://products.wolframalpha.com/api/)
-* The oxford dictionary tokens are available from their [developer page](https://developer.oxforddictionaries.com/)
+- Discord tokens available from [Discord Developer](https://discord.com/developers/applications)
+- You can get an [openweather api token](https://openweathermap.org/api) for free as well
+- The github token is a [personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
+- The wolfram alpha token is available from their [api page](https://products.wolframalpha.com/api/)
+- The oxford dictionary tokens are available from their [developer page](https://developer.oxforddictionaries.com/)
 
 You only _need_ the discord token. DuckBot will still function without the others, but features that use the tokens won't work. With your tokens available, you can jam them into your shell environment, so you can run DuckBot. You may want to put this into your bashrc for convenience.
+
 ```sh
 export $(cat duckbot/.env | xargs)
 ```
 
 Finally, there are two ways to run DuckBot. For a production-like environment, you should run using [docker-compose](https://docs.docker.com/compose/).
+
 ```sh
 docker-compose up --build
 ```
