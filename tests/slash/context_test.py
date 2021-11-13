@@ -38,10 +38,25 @@ def test_ctor_empty_interaction_options(bot, interaction, command):
     assert_class_setup(clazz, bot)
 
 
+def test_ctor_command_single_option(bot, interaction, command):
+    interaction.data = {"options": [{"name": "first", "value": "one"}]}
+    clazz = InteractionContext(bot=bot, interaction=interaction, command=command)
+    assert clazz.view.buffer == "one"
+    assert_class_setup(clazz, bot)
+
+
 def test_ctor_command_options(bot, interaction, command):
     interaction.data = {"options": [{"name": "first", "value": "one"}, {"name": "second", "value": "two"}]}
     clazz = InteractionContext(bot=bot, interaction=interaction, command=command)
-    assert clazz.view.buffer == '"one" "two"'
+    assert clazz.view.buffer == "｢one｣ ｢two｣"
+    assert_class_setup(clazz, bot)
+
+
+def test_ctor_subcommand_single_option(bot, interaction, command):
+    command._discordpy_include_subcommand_name = {"sub": True}
+    interaction.data = {"options": [{"name": "sub", "options": [{"name": "first", "value": "one"}]}]}
+    clazz = InteractionContext(bot=bot, interaction=interaction, command=command)
+    assert clazz.view.buffer == "sub ｢one｣"
     assert_class_setup(clazz, bot)
 
 
@@ -49,7 +64,23 @@ def test_ctor_subcommand_options(bot, interaction, command):
     command._discordpy_include_subcommand_name = {"sub": True}
     interaction.data = {"options": [{"name": "sub", "options": [{"name": "first", "value": "one"}, {"name": "second", "value": "two"}]}]}
     clazz = InteractionContext(bot=bot, interaction=interaction, command=command)
-    assert clazz.view.buffer == 'sub "one" "two"'
+    assert clazz.view.buffer == "sub ｢one｣ ｢two｣"
+    assert_class_setup(clazz, bot)
+
+
+def test_ctor_subcommand_empty_options_no_subcommand_name(bot, interaction, command):
+    command._discordpy_include_subcommand_name = {"sub": False}
+    interaction.data = {"options": [{"name": "sub"}]}
+    clazz = InteractionContext(bot=bot, interaction=interaction, command=command)
+    assert clazz.view.buffer == ""
+    assert_class_setup(clazz, bot)
+
+
+def test_ctor_subcommand_single_option_no_subcommand_name(bot, interaction, command):
+    command._discordpy_include_subcommand_name = {"sub": False}
+    interaction.data = {"options": [{"name": "sub", "options": [{"name": "first", "value": "one"}]}]}
+    clazz = InteractionContext(bot=bot, interaction=interaction, command=command)
+    assert clazz.view.buffer == "one"
     assert_class_setup(clazz, bot)
 
 
@@ -57,7 +88,7 @@ def test_ctor_subcommand_options_no_subcommand_name(bot, interaction, command):
     command._discordpy_include_subcommand_name = {"sub": False}
     interaction.data = {"options": [{"name": "sub", "options": [{"name": "first", "value": "one"}, {"name": "second", "value": "two"}]}]}
     clazz = InteractionContext(bot=bot, interaction=interaction, command=command)
-    assert clazz.view.buffer == '"one" "two"'
+    assert clazz.view.buffer == "｢one｣ ｢two｣"
     assert_class_setup(clazz, bot)
 
 
