@@ -124,6 +124,13 @@ def test_command_getter(bot, interaction, command):
     assert InteractionContext(bot=bot, interaction=interaction, command=command).command == command
 
 
+def test_command_setter(bot, interaction, command):
+    clazz = InteractionContext(bot=bot, interaction=interaction, command=command)
+    new_command = mock.Mock()
+    clazz.command = new_command
+    assert clazz.command == new_command
+
+
 @pytest.mark.asyncio
 async def test_send_response_message_only(bot, interaction, command):
     clazz = InteractionContext(bot=bot, interaction=interaction, command=command)
