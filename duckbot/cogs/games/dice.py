@@ -1,6 +1,7 @@
 import d20
 from discord.ext import commands
 
+from duckbot.slash import Option, slash_command
 from duckbot.util.messages import MAX_MESSAGE_LENGTH
 
 
@@ -8,7 +9,8 @@ class Dice(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="roll", aliases=["r"])
+    @slash_command(options=[Option(name="expression", description="The number and type of dice to roll. Default is 1d20")])
+    @commands.command(name="roll", aliases=["r"], description="Roll some Dungeons & Dragons style dice!")
     async def roll_command(self, context, *, expression: str = "1d20"):
         await self.roll(context, expression)
 
