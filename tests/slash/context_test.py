@@ -124,18 +124,12 @@ def test_command_getter(bot, interaction, command):
     assert InteractionContext(bot=bot, interaction=interaction, command=command).command == command
 
 
-def test_command_setter(bot, interaction, command):
-    clazz = InteractionContext(bot=bot, interaction=interaction, command=command)
-    new_command = mock.Mock()
-    clazz.command = new_command
-    assert clazz.command == new_command
-
-
 @pytest.mark.asyncio
 async def test_send_response_message_only(bot, interaction, command):
     clazz = InteractionContext(bot=bot, interaction=interaction, command=command)
     await clazz.send("hi")
     interaction.response.send_message.assert_called_once_with("hi")
+    interaction.original_message.assert_not_called()
 
 
 @pytest.mark.asyncio
@@ -144,6 +138,7 @@ async def test_send_response_embed_only(embed, bot, interaction, command):
     clazz = InteractionContext(bot=bot, interaction=interaction, command=command)
     await clazz.send(embed=embed)
     interaction.response.send_message.assert_called_once_with("", embed=embed)
+    interaction.original_message.assert_not_called()
 
 
 @pytest.mark.asyncio
@@ -152,6 +147,7 @@ async def test_send_response_embeds_only(embed, bot, interaction, command):
     clazz = InteractionContext(bot=bot, interaction=interaction, command=command)
     await clazz.send(embeds=[embed])
     interaction.response.send_message.assert_called_once_with("", embeds=[embed])
+    interaction.original_message.assert_not_called()
 
 
 @pytest.mark.asyncio
@@ -160,6 +156,7 @@ async def test_send_response_message_and_embed(embed, bot, interaction, command)
     clazz = InteractionContext(bot=bot, interaction=interaction, command=command)
     await clazz.send("hi", embed=embed)
     interaction.response.send_message.assert_called_once_with("hi", embed=embed)
+    interaction.original_message.assert_not_called()
 
 
 @pytest.mark.asyncio
@@ -168,6 +165,7 @@ async def test_send_response_message_and_embeds(embed, bot, interaction, command
     clazz = InteractionContext(bot=bot, interaction=interaction, command=command)
     await clazz.send("hi", embeds=[embed])
     interaction.response.send_message.assert_called_once_with("hi", embeds=[embed])
+    interaction.original_message.assert_not_called()
 
 
 @pytest.mark.asyncio
@@ -176,6 +174,17 @@ async def test_send_response_file_ignored(file, bot, interaction, command):
     clazz = InteractionContext(bot=bot, interaction=interaction, command=command)
     await clazz.send(file=file)
     interaction.response.send_message.assert_called_once_with("")
+    interaction.original_message.assert_not_called()
+
+
+@pytest.mark.asyncio
+@mock.patch("discord.InteractionMessage")
+async def test_send_response_delete_after(interaction_message, bot, interaction, command):
+    interaction.original_message.return_value = interaction_message
+    clazz = InteractionContext(bot=bot, interaction=interaction, command=command)
+    await clazz.send("hi", delete_after=2)
+    interaction.response.send_message.assert_called_once_with("hi")
+    interaction_message.delete.assert_called_once_with(delay=2)
 
 
 @pytest.mark.asyncio
@@ -217,6 +226,28 @@ async def test_send_follow_up_all_args_embeds(file, embed, bot, interaction, com
         await clazz.send("hi", embeds=[embed], file=file)
     interaction.response.defer.assert_called_once()
     interaction.followup.send.assert_called_once_with("hi", embeds=[embed], file=file)
+
+
+@pytest.mark.asyncio
+@mock.patch("discord.WebhookMessage")
+async def test_send_follow_up_delete_after(webhook_message, bot, interaction, command):
+    interaction.followup.send.return_value = webhook_message
+    clazz = InteractionContext(bot=bot, interaction=interaction, command=command)
+    async with clazz.typing():
+        await clazz.send("hi", delete_after=2)
+    interaction.response.defer.assert_called_once()
+    interaction.followup.send.assert_called_once_with("hi")
+    webhook_message.delete.assert_called_once_with(delay=2)
+
+
+@pytest.mark.asyncio
+async def test_send_follow_up_delete_after_no_webhook_message(bot, interaction, command):
+    interaction.followup.send.return_value = None
+    clazz = InteractionContext(bot=bot, interaction=interaction, command=command)
+    async with clazz.typing():
+        await clazz.send("hi", delete_after=2)
+    interaction.response.defer.assert_called_once()
+    interaction.followup.send.assert_called_once_with("hi")
 
 
 @pytest.mark.asyncio
