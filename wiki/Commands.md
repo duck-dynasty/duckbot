@@ -8,6 +8,7 @@ Command Overview
 | [`!start`, `!stop`](#music) | start or stop playing music |
 | [`!weather`](#weather) | retrieve weather information |
 | [`!calc`](#wolfram-alpha) | search for something on wolfram alpha |
+| [`!define`](#definitions) | define a word |
 | `!lmgt` | generates a google search link for the given query |
 | `!8ball` | get a magic eight ball style fortune |
 | `!fortune` | get a random fortune told to you by a cow |
@@ -73,6 +74,10 @@ Here's an example usage:
 Wolfram Alpha
 -------------
 DuckBot gives out a few results to arbitrary queries to [wolfram alpha](https://www.wolframalpha.com/). The results from wolfram are pretty complex, DuckBot spews out a few results in a fairly dumb manner, and gives you a link for your query on wolfram if you want to dig further.
+
+Definitions
+-----------
+DuckBot can define words, source data from the Oxford Dictionary. In the cases where a word has multiple possible root words, DuckBot will try to define all of them.
 
 Dice
 ----
