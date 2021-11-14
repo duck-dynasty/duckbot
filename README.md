@@ -30,8 +30,8 @@ The `dev` extras will also install development dependencies, like `pytest`. The 
 ### Run Tests & Formatter
 
 ```sh
-pytest              # runs tests, lint and format checks
-isort . && black .  # reformats the entire code base
+pytest  # runs tests, lint and format checks
+format  # reformats the entire code base
 ```
 
 The tests also collects code coverage. [View the configuration](https://github.com/duck-dynasty/duckbot/blob/main/pyproject.toml) to see the minimum required coverage. Discord.py decorators make it difficult to cover methods directly, so don't aim for 100% coverage.
