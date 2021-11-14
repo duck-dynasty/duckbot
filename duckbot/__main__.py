@@ -20,7 +20,7 @@ def run_duckbot(bot: commands.Bot):
     bot.load_extension(duckbot.health.__name__)
     bot.load_extension(duckbot.slash.__name__)
 
-    for extension in pkgutil.iter_modules(duckbot.cogs.__path__):
+    for extension in (x for x in pkgutil.iter_modules(duckbot.cogs.__path__) if x.ispkg):
         bot.load_extension(f"{duckbot.cogs.__name__}.{extension.name}")
 
     bot.run(os.getenv("DISCORD_TOKEN"))
