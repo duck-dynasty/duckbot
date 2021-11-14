@@ -26,7 +26,7 @@ def slash_command(*, root: str = None, name: str = None, description: str = None
 
     def decorator(command):
         if not isinstance(command, Command):
-            raise TypeError("callback must be a discord.ext.commads.Command")
+            raise TypeError("callback must be a discord.ext.commands.Command")
         if root and not name or not root and name:
             raise BadArgument("root and name must both be provided if either is")
 
