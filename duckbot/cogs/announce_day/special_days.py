@@ -22,6 +22,7 @@ class SpecialDays(holidays.Canada):
 
         tito = discord.utils.get(self.bot.emojis, guild__name="Friends Chat", name="tito")
 
+        self[date(year, 1, 1)] = f"Male Kelly's birthday. He's {year-1900} years old according to most websites"
         self[date(year, 1, 31)] = f"Erin and Taras' Anniversary. It's been {year-2010} entire years"
         self[date(year, 2, 2)] = "Groundhog Day"
         self[date(year, 2, 14)] = "Valentine's Day"
