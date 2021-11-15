@@ -31,10 +31,10 @@ async def test_cog_unload_cancels_task(bot, dog_photos):
 @mock.patch("random.choice", side_effect=["today", "tomorrow", "yesterday", "{today} {tomorrow} {yesterday}"])
 @mock.patch("random.random", return_value=0.5)
 async def test_on_hour_7am_eastern_special_day(random, choice, bot, dog_photos, general_channel):
-    with patch_now(datetime.datetime(2002, 1, 1, hour=7)):
+    with patch_now(datetime.datetime(2002, 2, 2, hour=7)):
         clazz = AnnounceDay(bot, dog_photos)
         await clazz.on_hour()
-        general_channel.send.assert_called_once_with("today tomorrow yesterday\nIt is also New Year's Day.")
+        general_channel.send.assert_called_once_with("today tomorrow yesterday\nIt is also Groundhog Day.")
 
 
 @pytest.mark.asyncio
