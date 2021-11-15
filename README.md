@@ -29,8 +29,8 @@ The `dev` extras will also install development dependencies, like `pytest`. The 
 
 ### Run Tests & Formatter
 ```sh
-pytest              # runs tests, lint and format checks
-isort . && black .  # reformats the entire code base
+pytest  # runs tests, lint and format checks
+format  # reformats the entire code base
 ```
 
 The tests also collects code coverage. [View the configuration](https://github.com/duck-dynasty/duckbot/blob/main/pyproject.toml) to see the minimum required coverage. Discord.py decorators make it difficult to cover methods directly, so don't aim for 100% coverage.
@@ -43,14 +43,17 @@ Before running DuckBot, you need to have a `duckbot/.env` file with the API toke
 duck@pond$ cat duckbot/.env
 DISCORD_TOKEN=thesecrettoken
 OPENWEATHER_TOKEN=thesecrettoken
-GITHUB_TOKEN=thesecrettoken
-WOLFRAM_ALPHA_TOKEN=thesecrettoken
+GITHUB_TOKEN=somesecrettoken
+WOLFRAM_ALPHA_TOKEN=broitssecret
+OXFORD_DICTIONARY_ID=icanttellyou
+OXFORD_DICTIONARY_KEY=itsasecret
 ```
 
 * Discord tokens available from [Discord Developer](https://discord.com/developers/applications)
 * You can get an [openweather api token](https://openweathermap.org/api) for free as well
 * The github token is a [personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
 * The wolfram alpha token is available from their [api page](https://products.wolframalpha.com/api/)
+* The oxford dictionary tokens are available from their [developer page](https://developer.oxforddictionaries.com/)
 
 You only _need_ the discord token. DuckBot will still function without the others, but features that use the tokens won't work. With your tokens available, you can jam them into your shell environment, so you can run DuckBot. You may want to put this into your bashrc for convenience.
 ```sh
