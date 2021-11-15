@@ -17,7 +17,7 @@ class SlashCommand:
 
     def __post_init__(self, command, root):
         if not isinstance(command, Command):
-            raise TypeError("callback command must be a discord.ext.commads.Command")
+            raise TypeError("callback command must be a discord.ext.commands.Command")
         if root and not self.name or not root and self.name:
             raise ValueError("root and name must both be provided if either is")
         if root and re.search(r"\s", root):
