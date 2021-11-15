@@ -129,5 +129,7 @@ jobs:
       with:
         name: duckbot
         template: .aws/cloudformation.template.yml
-        parameter-overrides: "DuckBotImage=${{ steps.image.outputs.commit }}"
+        parameter-overrides: |-
+          DuckBotImage=${{ steps.image.outputs.commit }},
+          AlarmDiscordWebhook=${{ secrets.DISCORD_ALARMS_WEBHOOK }}
         capabilities: CAPABILITY_IAM,CAPABILITY_NAMED_IAM
