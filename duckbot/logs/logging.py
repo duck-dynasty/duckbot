@@ -26,7 +26,7 @@ class Logging(commands.Cog):
             level=logging.INFO,
             format="%(asctime)s:%(levelname)s:%(name)s: %(message)s",
             handlers=[
-                logging.handlers.RotatingFileHandler(filename=os.path.join(LOGS_DIRECTORY, "duck.log"), mode="a", maxBytes=256000, backupCount=10),
+                logging.handlers.RotatingFileHandler(filename=os.path.join(LOGS_DIRECTORY, "duck.log"), encoding="utf-8", mode="a", maxBytes=256000, backupCount=10),
                 logging.StreamHandler(),  # logs to stderr
             ],
         )
