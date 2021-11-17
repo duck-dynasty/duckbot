@@ -1,0 +1,13 @@
+name: Update Open Pull Requests
+
+on:
+  push:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: chinthakagodawita/autoupdate@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        MERGE_CONFLICT_ACTION: ignore
