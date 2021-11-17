@@ -212,17 +212,6 @@ def test_weather_message_hot(weather):
     assert "I might need to take a break today, it hot." in message
 
 
-@pytest.fixture
-@mock.patch("duckbot.cogs.weather.weather.plt")
-def plt(plot):
-    fig = mock.MagicMock()
-    axis = mock.MagicMock()
-    plot.subplots.return_value = (fig, axis)
-    axis.twinx.return_value = axis
-    axis.bar.return_value = []
-    return plot
-
-
 @mock.patch("timezonefinder.TimezoneFinder")
 def test_weather_graph_for_code_coverage(tzfinder, weather):
     tzfinder.return_value.timezone_at.return_value = "US/Eastern"
