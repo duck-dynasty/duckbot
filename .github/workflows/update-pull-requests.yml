@@ -2,6 +2,7 @@ name: Update Open Pull Requests
 
 on:
   push:
+  pull_request:
 
 jobs:
   update:
