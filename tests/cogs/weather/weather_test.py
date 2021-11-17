@@ -1,3 +1,4 @@
+import random
 from unittest import mock
 
 import pytest
@@ -239,12 +240,13 @@ def stub_weather_gph(city, weather):
 
 def one_call(status=None, prec_chance=49.9, max_temp=10):
     wea = make_weather(status, prec_chance, max_temp)
-    return OneCall(lat=1, lon=1, timezone="UTC", current=wea, forecast_daily=[wea], forecast_hourly=[wea] * 24)
+    wea_hourly = [make_weather(status, prec_chance, max_temp, ref_time=h * 3600) for h in range(24)]
+    return OneCall(lat=1, lon=1, timezone="UTC", current=wea, forecast_daily=[wea], forecast_hourly=wea_hourly)
 
 
-def make_weather(status, prec_chance, max_temp):
+def make_weather(status, prec_chance, max_temp, ref_time=0):
     return pyowmWeather(
-        reference_time=0,
+        reference_time=ref_time,
         sunset_time=0,
         sunrise_time=0,
         clouds=0,
