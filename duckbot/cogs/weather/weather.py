@@ -180,7 +180,7 @@ class Weather(commands.Cog):
         rain = [w.rain["1h"] if "1h" in w.rain else 0 for w in hourly]
         snow = [w.snow["1h"] if "1h" in w.snow else 0 for w in hourly]
         rects_rain = right_axis.bar(hours, rain, label="Rain (mm)", color="blue", alpha=0.3, width=1.0 / 24)
-        rects_snow = right_axis.bar(hours, snow, bottom=rain, label="Snow (cm)", color="powderblue", alpha=0.3, width=1.0 / 24)
+        rects_snow = right_axis.bar(hours, snow, bottom=rain, label="Snow (cm)", color="cyan", alpha=0.3, width=1.0 / 24)
         right_axis.legend(loc="upper right")
 
         y_max = max(1, max([r.get_height() + s.get_height() for r, s in zip(rects_rain, rects_snow)]))
