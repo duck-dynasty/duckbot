@@ -101,6 +101,15 @@ jobs:
         WIKI_COMMIT_MESSAGE: ${{ github.event.commits[0].message }}
         GITHUB_ACTOR: ${{ github.event.commits[0].author.name }}
 
+    - name: Set up Nodejs
+      uses: actions/setup-node@v1
+      with:
+        node-version: 16.x
+    - name: Install CDK
+      run: |
+        npm install -g aws-cdk@1.132.0
+        cdk --version
+
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:

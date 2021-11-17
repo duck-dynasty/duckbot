@@ -84,6 +84,16 @@ if __name__ == "__main__":
                 "pytest-icdiff==0.5",
                 "pytest-cov==3.0.0",
                 "pytest-lazy-fixture==0.6.3",
+            ],
+            "cdk": [
+                "aws-cdk.core==1.132.0",
+                "aws-cdk.aws-ec2==1.132.0",
+                "aws-cdk.aws-ecs==1.132.0",
+                "aws-cdk.aws-autoscaling==1.132.0",
+                "aws-cdk.aws-efs==1.132.0",
+                "aws-cdk.aws-iam==1.132.0",
+                "aws-cdk.aws-logs==1.132.0",
+                "aws-cdk.aws-ssm==1.132.0",
             ]
         },
         entry_points={
