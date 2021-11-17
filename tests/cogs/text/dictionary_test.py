@@ -15,6 +15,44 @@ def set_oxford_token_env(monkeypatch):
 
 
 @pytest.mark.asyncio
+async def test_define_no_root_words(bot, context, responses):
+    responses.add(responses.GET, f"{LEMMAS_URI}/nothing", json={"error": "No lemma was found in dictionary 'en' for the inflected form 'nothing'"})
+    responses.add(responses.GET, f"{ENTRIES_URI}/why", json=why_definition())
+    clazz = Dictionary(bot)
+    await clazz.define(context, "nothing")
+    embed = discord.Embed(title="why")
+    adverb_lines = [
+        "1. for what reason or purpose",
+        "_why did he do it?_",
+        "  • used to make or agree to a suggestion",
+        "    _why don't I give you a lift?_",
+        "",
+        "2. (with reference to a reason) on account of which; for which",
+        "_\n              the reason why flu shots need repeating every year is that the virus changes_",
+        "  • the reason for which",
+        "    _each has faced similar hardships, and perhaps that is why they are friends_",
+        "",
+    ]
+    interjection_lines = [
+        "1. expressing surprise or indignation",
+        "_why, that's absurd!_",
+        "",
+        "2. used to add emphasis to a response",
+        "_“You think so?” “Why, yes.”_",
+        "",
+    ]
+    noun_lines = [
+        "1. a reason or explanation",
+        "_the whys and wherefores of these procedures need to be explained to students_",
+        "",
+    ]
+    embed.add_field(name="adverb: **why**  /(h)wī/", value="\n".join(adverb_lines), inline=False)
+    embed.add_field(name="interjection: **why**  /(h)wī/", value="\n".join(interjection_lines), inline=False)
+    embed.add_field(name="noun: **why**  /(h)wī/", value="\n".join(noun_lines), inline=False)
+    context.send.assert_called_once_with(embeds=[embed])
+
+
+@pytest.mark.asyncio
 async def test_define_single_root_word(bot, context, responses):
     responses.add(responses.GET, f"{LEMMAS_URI}/cow", json=cow_lemma())
     responses.add(responses.GET, f"{ENTRIES_URI}/cow", json=cow_definition())
@@ -762,4 +800,151 @@ def cow_definition():
             },
         ],
         "word": "cow",
+    }
+
+
+def why_definition():
+    return {
+        "id": "why",
+        "metadata": {"operation": "retrieve", "provider": "Oxford University Press", "schema": "RetrieveEntry"},
+        "results": [
+            {
+                "id": "why",
+                "language": "en-us",
+                "lexicalEntries": [
+                    {
+                        "entries": [
+                            {
+                                "etymologies": ["Old English hwī, hwȳ ‘by what cause’, instrumental case of hwæt ‘what’, of Germanic origin"],
+                                "pronunciations": [
+                                    {"dialects": ["American English"], "phoneticNotation": "respell", "phoneticSpelling": "(h)wī"},
+                                    {
+                                        "audioFile": "https://audio.oxforddictionaries.com/en/mp3/why_us_1.mp3",
+                                        "dialects": ["American English"],
+                                        "phoneticNotation": "IPA",
+                                        "phoneticSpelling": "(h)waɪ",
+                                    },
+                                ],
+                                "senses": [
+                                    {
+                                        "definitions": ["for what reason or purpose"],
+                                        "examples": [{"text": "why did he do it?"}],
+                                        "id": "m_en_gbus1157440.005",
+                                        "shortDefinitions": ["for what reason or purpose"],
+                                        "subsenses": [
+                                            {
+                                                "definitions": ["used to make or agree to a suggestion"],
+                                                "examples": [{"text": "why don't I give you a lift?"}],
+                                                "id": "m_en_gbus1157440.007",
+                                                "notes": [{"text": "with negative", "type": "grammaticalNote"}],
+                                                "shortDefinitions": ["used to make or agree to suggestion"],
+                                            }
+                                        ],
+                                    }
+                                ],
+                            },
+                            {
+                                "grammaticalFeatures": [{"id": "relative", "text": "Relative", "type": "Referential"}],
+                                "pronunciations": [
+                                    {"dialects": ["American English"], "phoneticNotation": "respell", "phoneticSpelling": "(h)wī"},
+                                    {
+                                        "audioFile": "https://audio.oxforddictionaries.com/en/mp3/why_us_1.mp3",
+                                        "dialects": ["American English"],
+                                        "phoneticNotation": "IPA",
+                                        "phoneticSpelling": "(h)waɪ",
+                                    },
+                                ],
+                                "senses": [
+                                    {
+                                        "constructions": [{"text": "the reason why"}],
+                                        "definitions": ["(with reference to a reason) on account of which; for which"],
+                                        "examples": [{"text": "\n              the reason why flu shots need repeating every year is that the virus changes"}],
+                                        "id": "m_en_gbus1157440.009",
+                                        "shortDefinitions": ["on account of which"],
+                                        "subsenses": [
+                                            {
+                                                "definitions": ["the reason for which"],
+                                                "examples": [{"text": "each has faced similar hardships, and perhaps that is why they are friends"}],
+                                                "id": "m_en_gbus1157440.011",
+                                                "shortDefinitions": ["reason for which"],
+                                            }
+                                        ],
+                                    }
+                                ],
+                            },
+                        ],
+                        "language": "en-us",
+                        "lexicalCategory": {"id": "adverb", "text": "Adverb"},
+                        "phrases": [{"id": "why_so%3F", "text": "why so?"}],
+                        "text": "why",
+                    },
+                    {
+                        "entries": [
+                            {
+                                "pronunciations": [
+                                    {"dialects": ["American English"], "phoneticNotation": "respell", "phoneticSpelling": "(h)wī"},
+                                    {
+                                        "audioFile": "https://audio.oxforddictionaries.com/en/mp3/why_us_1.mp3",
+                                        "dialects": ["American English"],
+                                        "phoneticNotation": "IPA",
+                                        "phoneticSpelling": "(h)waɪ",
+                                    },
+                                ],
+                                "senses": [
+                                    {
+                                        "definitions": ["expressing surprise or indignation"],
+                                        "examples": [{"text": "why, that's absurd!"}],
+                                        "id": "m_en_gbus1157440.014",
+                                        "shortDefinitions": ["expressing surprise or indignation"],
+                                    },
+                                    {
+                                        "definitions": ["used to add emphasis to a response"],
+                                        "examples": [{"text": "“You think so?” “Why, yes.”"}],
+                                        "id": "m_en_gbus1157440.017",
+                                        "shortDefinitions": ["used to add emphasis to response"],
+                                    },
+                                ],
+                            }
+                        ],
+                        "language": "en-us",
+                        "lexicalCategory": {"id": "interjection", "text": "Interjection"},
+                        "phrases": [{"id": "why_so%3F", "text": "why so?"}],
+                        "text": "why",
+                    },
+                    {
+                        "entries": [
+                            {
+                                "inflections": [{"grammaticalFeatures": [{"id": "plural", "text": "Plural", "type": "Number"}], "inflectedForm": "whys"}],
+                                "pronunciations": [
+                                    {"dialects": ["American English"], "phoneticNotation": "respell", "phoneticSpelling": "(h)wī"},
+                                    {
+                                        "audioFile": "https://audio.oxforddictionaries.com/en/mp3/why_us_1.mp3",
+                                        "dialects": ["American English"],
+                                        "phoneticNotation": "IPA",
+                                        "phoneticSpelling": "(h)waɪ",
+                                    },
+                                ],
+                                "senses": [
+                                    {
+                                        "constructions": [{"text": "whys and wherefores"}],
+                                        "definitions": ["a reason or explanation"],
+                                        "examples": [{"text": "the whys and wherefores of these procedures need to be explained to students"}],
+                                        "id": "m_en_gbus1157440.020",
+                                        "semanticClasses": [{"id": "cause", "text": "Cause"}],
+                                        "shortDefinitions": ["reason or explanation"],
+                                    }
+                                ],
+                            }
+                        ],
+                        "language": "en-us",
+                        "lexicalCategory": {"id": "noun", "text": "Noun"},
+                        "phrases": [{"id": "why_so%3F", "text": "why so?"}],
+                        "text": "why",
+                    },
+                ],
+                "type": "headword",
+                "word": "why",
+            }
+        ],
+        "word": "why",
     }
