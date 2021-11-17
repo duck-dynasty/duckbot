@@ -8,7 +8,7 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-    - uses: chinthakagodawita/autoupdate@v1
+    - uses: chinthakagodawita/autoupdate@v1.5.0
       env:
         GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
         MERGE_CONFLICT_ACTION: ignore
