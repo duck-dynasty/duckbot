@@ -224,7 +224,7 @@ def plt(plot):
 
 
 @mock.patch("timezonefinder.TimezoneFinder")
-def test_weather_graph_for_code_coverage(tzfinder, weather, plt):
+def test_weather_graph_for_code_coverage(tzfinder, weather):
     tzfinder.return_value.timezone_at.return_value = "US/Eastern"
     img = weather.weather_graph(make_city("city"), one_call())
     assert img == "weather.png"
