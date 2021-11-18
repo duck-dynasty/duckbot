@@ -211,19 +211,8 @@ def test_weather_message_hot(weather):
     assert "I might need to take a break today, it hot." in message
 
 
-@pytest.fixture
-@mock.patch("duckbot.cogs.weather.weather.plt")
-def plt(plot):
-    fig = mock.MagicMock()
-    axis = mock.MagicMock()
-    plot.subplots.return_value = (fig, axis)
-    axis.twinx.return_value = axis
-    axis.bar.return_value = []
-    return plot
-
-
 @mock.patch("timezonefinder.TimezoneFinder")
-def test_weather_graph_for_code_coverage(tzfinder, weather, plt):
+def test_weather_graph_for_code_coverage(tzfinder, weather):
     tzfinder.return_value.timezone_at.return_value = "US/Eastern"
     img = weather.weather_graph(make_city("city"), one_call())
     assert img == "weather.png"
@@ -239,12 +228,13 @@ def stub_weather_gph(city, weather):
 
 def one_call(status=None, prec_chance=49.9, max_temp=10):
     wea = make_weather(status, prec_chance, max_temp)
-    return OneCall(lat=1, lon=1, timezone="UTC", current=wea, forecast_daily=[wea], forecast_hourly=[wea] * 24)
+    wea_hourly = [make_weather(status, prec_chance, max_temp, ref_time=h * 3600) for h in range(24)]
+    return OneCall(lat=1, lon=1, timezone="UTC", current=wea, forecast_daily=[wea], forecast_hourly=wea_hourly)
 
 
-def make_weather(status, prec_chance, max_temp):
+def make_weather(status, prec_chance, max_temp, ref_time=0):
     return pyowmWeather(
-        reference_time=0,
+        reference_time=ref_time,
         sunset_time=0,
         sunrise_time=0,
         clouds=0,
