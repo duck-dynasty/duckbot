@@ -1,8 +1,8 @@
 from aws_cdk import core, aws_ecs, aws_ec2, aws_autoscaling, aws_logs, aws_ssm
-
+from .secrets import Secrets
 
 class Service(core.Construct):
-    def __init__(self, scope: core.Construct, construct_id: str, *, vpc: aws_ec2.IVpc, auto_scaling_group=aws_autoscaling.IAutoScalingGroup):
+    def __init__(self, scope: core.Construct, construct_id: str, *, vpc: aws_ec2.IVpc, auto_scaling_group=aws_autoscaling.IAutoScalingGroup, secrets: Secrets):
         super().__init__(scope, construct_id)
 
         self._cluster = aws_ecs.Cluster(self, "Cluster", cluster_name="duckbot", vpc=vpc)
@@ -20,12 +20,18 @@ class Service(core.Construct):
         )
         task.add_volume(name="duckbot_dbdata", efs_volume_configuration=aws_ecs.EfsVolumeConfiguration(file_system_id="id", root_directory="/"))
 
-        discord_token = aws_ssm.StringParameter.from_string_parameter_name(self, "DiscordToken", "/duckbot/token/discord")
-        openweather_token = aws_ssm.StringParameter.from_string_parameter_name(self, "OpenWeatherToken", "/duckbot/token/openweather")
-        github_token = aws_ssm.StringParameter.from_string_parameter_name(self, "GitHubToken", "/duckbot/token/github")
-        wolfram_alpha_token = aws_ssm.StringParameter.from_string_parameter_name(self, "WolframAlphaToken", "/duckbot/token/wolfram-alpha")
-        oxford_dictionary_id = aws_ssm.StringParameter.from_string_parameter_name(self, "OxfordId", "/duckbot/token/oxford-dictionary/id")
-        oxford_dictionary_key = aws_ssm.StringParameter.from_string_parameter_name(self, "OxfordKey", "/duckbot/token/oxford-dictionary/key")
+        discord_token = aws_ssm.StringParameter.from_string_parameter_attributes(self, "DiscordToken", parameter_name="/duckbot/token/discord", type=aws_ssm.ParameterType.SECURE_STRING)
+        openweather_token = aws_ssm.StringParameter.from_string_parameter_attributes(self, "OpenWeatherToken", parameter_name="/duckbot/token/openweather", type=aws_ssm.ParameterType.SECURE_STRING)
+        github_token = aws_ssm.StringParameter.from_string_parameter_attributes(self, "GitHubToken", parameter_name="/duckbot/token/github", type=aws_ssm.ParameterType.SECURE_STRING)
+        wolfram_alpha_token = aws_ssm.StringParameter.from_string_parameter_attributes(
+            self, "WolframAlphaToken", parameter_name="/duckbot/token/wolfram-alpha", type=aws_ssm.ParameterType.SECURE_STRING
+        )
+        oxford_dictionary_id = aws_ssm.StringParameter.from_string_parameter_attributes(
+            self, "OxfordId", parameter_name="/duckbot/token/oxford-dictionary/id", type=aws_ssm.ParameterType.SECURE_STRING
+        )
+        oxford_dictionary_key = aws_ssm.StringParameter.from_string_parameter_attributes(
+            self, "OxfordKey", parameter_name="/duckbot/token/oxford-dictionary/key", type=aws_ssm.ParameterType.SECURE_STRING
+        )
 
         postgres = aws_ecs.ContainerDefinition(
             self,
@@ -54,14 +60,7 @@ class Service(core.Construct):
             image=aws_ecs.ContainerImage.from_registry("duckbot:latest"),  # FIXME
             essential=True,
             memory_reservation_mib=128,
-            secrets={
-                "DISCORD_TOKEN": aws_ecs.Secret.from_ssm_parameter(discord_token),
-                "OPENWEATHER_TOKEN": aws_ecs.Secret.from_ssm_parameter(openweather_token),
-                "GITHUB_TOKEN": aws_ecs.Secret.from_ssm_parameter(github_token),
-                "WOLFRAM_ALPHA_TOKEN": aws_ecs.Secret.from_ssm_parameter(wolfram_alpha_token),
-                "OXFORD_DICTIONARY_ID": aws_ecs.Secret.from_ssm_parameter(oxford_dictionary_id),
-                "OXFORD_DICTIONARY_KEY": aws_ecs.Secret.from_ssm_parameter(oxford_dictionary_key),
-            },
+            secrets=dict((s.environment_name, s.parameter) for s in secrets.params),
             # health_check=aws_ecs.HealthCheck(command=["CMD", "python", "-m", "duckbot.health"], interval=30, timeout=10, retries=3, start_period=30),
             logging=aws_ecs.LogDriver.aws_logs(stream_prefix="ecs", log_retention=aws_logs.RetentionDays.ONE_MONTH),
         )

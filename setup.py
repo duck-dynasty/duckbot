@@ -94,6 +94,7 @@ if __name__ == "__main__":
                 "aws-cdk.aws-iam==1.132.0",
                 "aws-cdk.aws-logs==1.132.0",
                 "aws-cdk.aws-ssm==1.132.0",
+                "aws-cdk.cloudformation-include==1.132.0",
             ]
         },
         entry_points={
