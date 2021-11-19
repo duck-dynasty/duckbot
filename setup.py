@@ -69,6 +69,7 @@ if __name__ == "__main__":
                 "pytest-asyncio==0.16.0",
                 "pytest-xdist[psutil]==2.4.0",
                 "pytest-split==0.5.0",
+                "pytest-randomly==3.10.2",
                 "flake8==4.0.1",
                 "black==21.10b0",
                 "flake8-black==0.2.3",

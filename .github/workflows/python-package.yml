@@ -38,7 +38,7 @@ jobs:
     - name: Run Tests
       run: |
         . venv/bin/activate
-        pytest --splits 3 --group ${{ matrix.group }} --cov=duckbot --cov-branch
+        pytest --randomly-seed=42069 --splits 3 --group ${{ matrix.group }} --cov=duckbot --cov-branch
     - name: Upload Code Coverage Artifact
       if: ${{ always() }}
       uses: actions/upload-artifact@v2
@@ -78,7 +78,7 @@ jobs:
       run: |
         . ./venv/bin/activate
         coverage combine coverage*/.coverage*
-        coverage report --fail-under=85
+        coverage report --fail-under=85 --skip-covered --show-missing
         coverage xml
     - name: Report Code Coverage
       if: ${{ always() }}
