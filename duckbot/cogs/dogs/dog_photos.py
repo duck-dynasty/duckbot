@@ -3,12 +3,15 @@ from typing import List, Optional
 import requests
 from discord.ext import commands
 
+from duckbot.slash import Option, slash_command
+
 
 class DogPhotos(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="dog", aliases=["doge"])
+    @slash_command(options=[Option(name="breed", description="The specific breed of dog to show. Defaults to any breed.")])
+    @commands.command(name="dog", aliases=["doge"], description="Show a random dog you probably don't know")
     async def dog_command(self, context, *, breed: Optional[str] = None):
         await self.dog(context, breed)
 
