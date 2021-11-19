@@ -74,7 +74,7 @@ jobs:
 
     - name: Download Code Coverage Artifacts
       uses: actions/download-artifact@v2
-    - name: Merge Code Coverage
+    - name: Merge Code Coverage Results
       run: |
         . ./venv/bin/activate
         coverage combine coverage*/.coverage*
