@@ -11,6 +11,8 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
+    strategy:
+      matrix: [1,2,3]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.8
@@ -35,7 +37,48 @@ jobs:
     - name: Run Tests
       run: |
         . venv/bin/activate
-        pytest
+        pytest --splits 3 --group ${{ matrix.group }} --cov=duckbot --cov-branch
+    - name: Upload Code Coverage Artifact
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: coverage.${{ matrix.group }}
+        path: .coverage
+
+  coverage:
+    needs: release
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+
+    - name: Setup Virtual Environment Cache
+      id: venv
+      uses: actions/cache@v2
+      with:
+        path: venv
+        key: ${{ env.pythonLocation }}-venv-${{ hashFiles('setup.py', 'pyproject.toml') }}
+
+    - name: Install Packages
+      if: steps.venv.outputs.cache-hit != 'true'
+      run: |
+        python -m venv --clear venv
+        . ./venv/bin/activate
+        pip install --upgrade pip setuptools wheel
+        pip install --editable .[dev]
+
+    - name: Download Code Coverage Artifacts
+      uses: actions/download-artifact@v2
+    - name: Merge Code Coverage
+      run: |
+        . ./venv/bin/activate
+        coverage combine coverage*/.coverage*
+        coverage report --fail-under=85
+        coverage xml
     - name: Report Code Coverage
       if: ${{ always() }}
       uses: codecov/codecov-action@v2

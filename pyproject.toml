@@ -15,9 +15,5 @@ addopts = """\
     -ra \
     --flake8 \
     --mdformat \
-    --cov=duckbot \
-    --cov-branch \
-    --cov-fail-under=85 \
-    --cov-report xml --cov-report term-missing:skip-covered \
     -n auto \
     --blockage"""
