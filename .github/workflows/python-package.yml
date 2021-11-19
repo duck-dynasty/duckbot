@@ -12,7 +12,8 @@ jobs:
   release:
     runs-on: ubuntu-latest
     strategy:
-      matrix: [1,2,3]
+      matrix:
+        group: [1,2,3]
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.8
