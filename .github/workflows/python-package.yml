@@ -78,10 +78,9 @@ jobs:
       run: |
         . ./venv/bin/activate
         coverage combine coverage*/.coverage*
-        coverage report --fail-under=85 --skip-covered --show-missing
+        coverage report --skip-covered --show-missing
         coverage xml
     - name: Report Code Coverage
-      if: ${{ always() }}
       uses: codecov/codecov-action@v2
 
   sanity:

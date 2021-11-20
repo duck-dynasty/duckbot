@@ -40,7 +40,7 @@ You can also collect code coverage locally using:
 pytest --cov=duckbot --cov-branch --cov-report term-missing:skip-covered
 ```
 
-Coverage is collected in the github actions. [View the workflow](.github/workflows/python-package.yml) to see the minimum required coverage. Discord.py decorators make it difficult to cover methods directly, so don't aim for 100% coverage.
+Coverage is collected in the github actions. [View the Codecov configuration](.github/.codecov.yml) to see the minimum required coverage. Discord.py decorators make it difficult to cover methods directly, so don't aim for 100% coverage.
 
 ### Run DuckBot
 
