@@ -9,7 +9,7 @@ on:
     - main
 
 jobs:
-  release:
+  test:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -47,7 +47,7 @@ jobs:
         path: .coverage
 
   coverage:
-    needs: release
+    needs: test
     if: ${{ always() }}
     runs-on: ubuntu-latest
     steps:
@@ -94,10 +94,17 @@ jobs:
           -e "DISCORD_TOKEN=$(cat .github/workflows/test-token.txt | base64 --decode)" \
           duckbot
 
+  release:
+    needs:
+    - test
+    - sanity
+    runs-on: ubuntu-latest
+    steps:
+    - run: echo all checks passed
+
   deploy:
     needs:
     - release
-    - sanity
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.repository == 'duck-dynasty/duckbot'
     concurrency: deploy
