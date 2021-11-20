@@ -34,7 +34,13 @@ pytest  # runs tests, lint and format checks
 format  # reformats the entire code base
 ```
 
-The tests also collects code coverage. [View the configuration](https://github.com/duck-dynasty/duckbot/blob/main/pyproject.toml) to see the minimum required coverage. Discord.py decorators make it difficult to cover methods directly, so don't aim for 100% coverage.
+You can also collect code coverage locally using:
+
+```sh
+pytest --cov=duckbot --cov-branch --cov-report term-missing:skip-covered
+```
+
+Coverage is collected in the github actions. [View the workflow](.github/workflows/python-project.yml) to see the minimum required coverage. Discord.py decorators make it difficult to cover methods directly, so don't aim for 100% coverage.
 
 ### Run DuckBot
 
