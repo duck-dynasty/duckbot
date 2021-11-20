@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        group: [1,2]  # needs to match --splits in tests below
+        group: [1,2,3]  # needs to match --splits in tests below
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python 3.8
@@ -38,7 +38,7 @@ jobs:
     - name: Run Tests
       run: |
         . venv/bin/activate
-        pytest --randomly-seed=42069 --splits 2 --group ${{ matrix.group }} --cov=duckbot --cov-branch
+        pytest --randomly-seed=42069 --splits 3 --group ${{ matrix.group }} --cov=duckbot --cov-branch
     - name: Upload Code Coverage Artifact
       if: ${{ always() }}
       uses: actions/upload-artifact@v2
