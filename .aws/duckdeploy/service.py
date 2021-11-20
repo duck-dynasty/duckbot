@@ -1,5 +1,7 @@
-from aws_cdk import core, aws_ecs, aws_ec2, aws_autoscaling, aws_logs, aws_ssm
+from aws_cdk import aws_autoscaling, aws_ec2, aws_ecs, aws_logs, aws_ssm, core
+
 from .secrets import Secrets
+
 
 class Service(core.Construct):
     def __init__(self, scope: core.Construct, construct_id: str, *, vpc: aws_ec2.IVpc, auto_scaling_group=aws_autoscaling.IAutoScalingGroup, secrets: Secrets):

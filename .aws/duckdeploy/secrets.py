@@ -1,14 +1,17 @@
-from aws_cdk import core, aws_ssm, aws_ecs, custom_resources
 from typing import List
 
+from aws_cdk import aws_ecs, aws_ssm, core, custom_resources
 
-def latest_version():
-    # FIXME https://github.com/aws/aws-cdk/tree/master/packages/%40aws-cdk/custom-resources#get-the-latest-version-of-a-secure-ssm-parameter
-    get_parameter = custom_resources.AwsCustomResource(None, 'GetParameter',
-                                                       on_update=custom_resources.AwsSdkCall(
-                                                           service="SSM",
-                                                           action="getParameter",
-                                                       )
+
+# FIXME https://github.com/aws/aws-cdk/tree/master/packages/%40aws-cdk/custom-resources#get-the-latest-version-of-a-secure-ssm-parameter
+class SecureStringParameter(custom_resources.AwsCustomResource, aws_ssm.IStringParameter):
+    def __init__(self, scope: core.Construct, construct_id: str):
+        super().__init__(
+            scope,
+            construct_id,
+            policy=custom_resources.AwsCustomResourcePolicy.from_sdk_calls(custom_resources.AwsCustomResourcePolicy.ANY_RESOURCE()),
+            on_update=custom_resources.AwsSdkCall(service="ssm", action="getParameter", parameters={"Name": "parameter-name", "WithDecryption": True}),
+        )
 
 
 class Secret(core.Construct):
