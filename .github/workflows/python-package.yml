@@ -141,6 +141,7 @@ jobs:
         SECRETS: ${{ toJson(secrets) }}
       working-directory: .aws
       run: |
+        . ../venv/bin/activate
         jq -r 'to_entries | .[] | "\(.key)=\(.value)"' <<< "$SECRETS" >> $GITHUB_ENV
         cdk synth
 
