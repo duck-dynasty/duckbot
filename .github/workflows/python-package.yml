@@ -136,14 +136,11 @@ jobs:
 #        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 #        aws-region: us-east-1
 
-    - name: Create Secrets
-      working-directory: ./.aws
-      run: jq -r '.context.secrets | .[] | "\(.environment_name)=${{ secrets[\(.environment_name)] }}"' cdk.json >> $GITHUB_ENV
-#      run: echo VALUE=${{ secrets.VALUE }} >> $GITHUB_ENV
-
     - name: View Secrets
-      working-directory: ./.aws
-      run:
+      env:
+        SECRETS: ${{ toJson(secrets) }}
+      run: |
+        jq -r 'to_entries | .[] | "\(.key)=\(.value)"' <<< "$SECRETS" >> $GITHUB_ENV
         echo ${{ env.VALUE }}
 
 #    - name: Set up AWS Secrets
