@@ -105,16 +105,27 @@ jobs:
       uses: actions/setup-python@v2
       with:
         python-version: '3.8'
+    - name: Setup Virtual Environment Cache
+      id: venv
+      uses: actions/cache@v2
+      with:
+        path: venv
+        key: ${{ env.pythonLocation }}-cdk-${{ hashFiles('setup.py', 'pyproject.toml') }}
+    - name: Install Packages
+      if: steps.venv.outputs.cache-hit != 'true'
+      run: |
+        python -m venv --clear venv
+        . ./venv/bin/activate
+        pip install --upgrade pip setuptools wheel
+        pip install --editable .[cdk]
+
     - name: Set up Nodejs
       uses: actions/setup-node@v1
       with:
         node-version: 16.x
     - name: Install CDK
       run: |
-        python -m venv --clear venv
         . ./venv/bin/activate
-        pip install --upgrade pip setuptools wheel
-        pip install --editable .[cdk]
         npm install -g aws-cdk@$(python -c 'from setup import CDK_VERSION; print(CDK_VERSION)')
         cdk --version
 
@@ -127,8 +138,8 @@ jobs:
 
     - name: Create Secrets
       working-directory: ./.aws
-#      run: jq -r '.context.secrets | .[] | "\(.environment_name)=${{ secrets[\(.environment_name)] }}"' cdk.json >> $GITHUB_ENV
-      run: echo VALUE=${{ secrets.VALUE }} >> $GITHUB_ENV
+      run: jq -r '.context.secrets | .[] | "\(.environment_name)=${{ secrets[\(.environment_name)] }}"' cdk.json >> $GITHUB_ENV
+#      run: echo VALUE=${{ secrets.VALUE }} >> $GITHUB_ENV
 
     - name: View Secrets
       working-directory: ./.aws
