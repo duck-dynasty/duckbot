@@ -61,11 +61,11 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-#    - name: Create Docker Image Tags
-#      id: image
-#      run: |
-#        echo "::set-output name=latest::duckdynasty/duckbot:latest"
-#        echo "::set-output name=commit::duckdynasty/duckbot:$(git rev-parse --short HEAD)"
+    - name: Create Docker Image Tags
+      id: image
+      run: |
+        echo "::set-output name=latest::duckdynasty/duckbot:latest"
+        echo "::set-output name=commit::duckdynasty/duckbot:$(git rev-parse --short HEAD)"
 #
 #    - name: Set up Docker Buildx
 #      uses: docker/setup-buildx-action@v1
@@ -143,24 +143,15 @@ jobs:
       run: |
         . ../venv/bin/activate
         jq -r 'to_entries | .[] | "\(.key)=\(.value)"' <<< "$SECRETS" >> $GITHUB_ENV
-        cdk diff
+        cdk synth
+        cdk diff --parameter DuckBotImage=${{ steps.image.outputs.commit }} || true
+#        cdk deploy \
+#          --parameter DuckBotImage=${{ steps.image.outputs.commit }} \
+#          --context write_secrets=true \
+#          --require-approval never \
+#          --progress events
 
-#    - name: Set up AWS Secrets
-#      env:
-#        DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
-#        OPENWEATHER_TOKEN: ${{ secrets.OPENWEATHER_TOKEN }}
-#        GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
-#        WOLFRAM_ALPHA_TOKEN: ${{ secrets.WOLFRAM_ALPHA_TOKEN }}
-#        OXFORD_DICTIONARY_ID: ${{ secrets.OXFORD_DICTIONARY_ID }}
-#        OXFORD_DICTIONARY_KEY: ${{ secrets.OXFORD_DICTIONARY_KEY }}
-#      run: |
-#        aws ssm put-parameter --name /duckbot/token/discord --type SecureString --value "$DISCORD_TOKEN" --overwrite
-#        aws ssm put-parameter --name /duckbot/token/openweather --type SecureString --value "$OPENWEATHER_TOKEN" --overwrite
-#        aws ssm put-parameter --name /duckbot/token/github --type SecureString --value "$GITHUB_TOKEN" --overwrite
-#        aws ssm put-parameter --name /duckbot/token/wolfram-alpha --type SecureString --value "$WOLFRAM_ALPHA_TOKEN" --overwrite
-#        aws ssm put-parameter --name /duckbot/token/oxford-dictionary/id --type SecureString --value "$OXFORD_DICTIONARY_ID" --overwrite
-#        aws ssm put-parameter --name /duckbot/token/oxford-dictionary/key --type SecureString --value "$OXFORD_DICTIONARY_KEY" --overwrite
-#
+
 #    - name: Update CloudFormation Stack
 #      uses: aws-actions/aws-cloudformation-github-deploy@v1
 #      with:

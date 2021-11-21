@@ -34,15 +34,14 @@ class Secrets(core.Construct):
         self.published = False
         self._secrets = [Secret(self, s["name"], environment_name=s["environment_name"], parameter_name=s["parameter_name"]) for s in self.node.try_get_context("secrets")]
 
-    # FIXME call put_parameter instead of get
     def publish(self):
         if not self.published and self.write_secrets:
             missing_values = [x.environment_name for x in self._secrets if not os.getenv(x.environment_name)]
             if missing_values:
                 raise EnvironmentError(f"missing environment values for secrets: {missing_values}")
-            # ssm_client = boto3.client("ssm")
-            # for s in self._secrets:
-            #     print(ssm_client.get_parameter(Name=s.parameter.parameter_name, WithDecryption=True))
+            ssm_client = boto3.client("ssm")
+            for s in self._secrets:
+                ssm_client.put_parameter(Name=s.parameter.parameter_name, Value=os.getenv(s.environment_name), Type="SecureString", Overwrite=True)
             self.published = True
 
     @property
