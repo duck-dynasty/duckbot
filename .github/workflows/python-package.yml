@@ -115,7 +115,7 @@ jobs:
         . ./venv/bin/activate
         pip install --upgrade pip setuptools wheel
         pip install --editable .[cdk]
-        npm install -g aws-cdk@$(python -c 'from setup import CDK_VERSION; print(CDK_VERSION)'
+        npm install -g aws-cdk@$(python -c 'from setup import CDK_VERSION; print(CDK_VERSION)')
         cdk --version
 
 #    - name: Configure AWS Credentials
