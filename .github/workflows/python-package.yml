@@ -143,6 +143,7 @@ jobs:
       run: |
         . ../venv/bin/activate
         jq -r 'to_entries | .[] | "\(.key)=\(.value)"' <<< "$SECRETS" >> $GITHUB_ENV
+        mkdir cdk.out
         cdk synth | tee cdk.out/duckbot.synth.template.yml
         cdk diff --parameter DuckBotImage=${{ steps.image.outputs.commit }} || true
 
