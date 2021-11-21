@@ -143,19 +143,18 @@ jobs:
       run: |
         . ../venv/bin/activate
         jq -r 'to_entries | .[] | "\(.key)=\(.value)"' <<< "$SECRETS" >> $GITHUB_ENV
-        cdk synth
+        cdk synth | tee cdk.out/duckbot.synth.template.yml
         cdk diff --parameter DuckBotImage=${{ steps.image.outputs.commit }} || true
+
 #        cdk deploy \
 #          --parameter DuckBotImage=${{ steps.image.outputs.commit }} \
 #          --context write_secrets=true \
 #          --require-approval never \
 #          --progress events
 
-
-#    - name: Update CloudFormation Stack
-#      uses: aws-actions/aws-cloudformation-github-deploy@v1
-#      with:
-#        name: duckbot
-#        template: .aws/cloudformation.template.yml
-#        parameter-overrides: "DuckBotImage=${{ steps.image.outputs.commit }}"
-#        capabilities: CAPABILITY_IAM,CAPABILITY_NAMED_IAM
+    - name: Upload CloudFormation Template
+      if: ${{ always() }}
+      uses: actions/upload-artifact@v2
+      with:
+        name: cloudformation-template
+        path: .aws/cdk.out/*.template.*
