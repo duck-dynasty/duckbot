@@ -29,25 +29,20 @@ class Secret(core.Construct):
 class Secrets(core.Construct):
     def __init__(self, scope: core.Construct, construct_id: str):
         super().__init__(scope, construct_id)
-        write_secrets_context = scope.node.try_get_context("write_secrets")
+        write_secrets_context = self.node.try_get_context("write_secrets")
         self.write_secrets = write_secrets_context and json.loads(write_secrets_context.lower())
         self.published = False
+        self._secrets = [Secret(self, s["name"], environment_name=s["environment_name"], parameter_name=s["parameter_name"]) for s in self.node.try_get_context("secrets")]
 
-        self._secrets = [
-            Secret(self, "Discord", environment_name="DISCORD_TOKEN", parameter_name="/duckbot/token/discord"),
-            Secret(self, "OpenWeather", environment_name="OPENWEATHER_TOKEN", parameter_name="/duckbot/token/openweather"),
-            Secret(self, "GitHub", environment_name="GITHUB_TOKEN", parameter_name="/duckbot/token/github"),
-            Secret(self, "WolframAlpha", environment_name="WOLFRAM_ALPHA_TOKEN", parameter_name="/duckbot/token/wolfram-alpha"),
-            Secret(self, "OxfordDictionaryId", environment_name="OXFORD_DICTIONARY_ID", parameter_name="/duckbot/token/oxford-dictionary/id"),
-            Secret(self, "OxfordDictionaryKey", environment_name="OXFORD_DICTIONARY_KEY", parameter_name="/duckbot/token/oxford-dictionary/key"),
-        ]
-
-    # FIXME implement!
     def publish(self):
         if not self.published and self.write_secrets:
-            for x in self._secrets:
-                print(os.environ[x.environment_name])
+            missing_values = [x.environment_name for x in self._secrets if not os.getenv(x.environment_name)]
+            if missing_values:
+                raise EnvironmentError(f"missing environment values for secrets: {missing_values}")
             ssm_client = boto3.client("ssm")
+            for s in self._secrets:
+                print(ssm_client.get_parameter(Name=s.parameter.parameter_name, WithDecryption=True))
+            self.published = True
 
     @property
     def secrets(self) -> Mapping[str, aws_ssm.StringParameter]:
