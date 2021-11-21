@@ -11,6 +11,12 @@ pip install --upgrade pip setuptools wheel
 pip install --editable .[dev,cdk]
 ```
 
+You'll then actually need CDK. It's a nodejs package, so you'll need that as well.
+
+```sh
+npm install -g aws-cdk
+```
+
 ## Adding New Secrets
 
 To add new secrets (like tokens), only [cdk.json](cdk.json) needs to be modified. Add a secret to the existing list of secrets there.
@@ -33,3 +39,25 @@ Secrets are annoyingly coupled so that we can end up only modifying a single pla
 - the `deploy` actions workflow injects all GitHub secrets into the environment then runs the CDK deployment
   - the environment variable name matches the name of the GitHub secret
   - so this ends up creating new versions of the secrets every deployment
+
+## Using CDK
+
+You'll need AWS credentials to use CDK. The following examples assume you have those credentials saved under a `duckbot` AWS CLI profile. The `cdk` commands need to be run from the `.aws` directory.
+
+You can also technically deploy using CDK, but should avoid that. Let the actions workflows do that.
+
+**Synthesize a Stack**
+
+```sh
+cdk synth --profile duckbot
+```
+
+Synthesizing products `cdk.out/duckbot.template.json`, the CloudFormation template that you can deploy. It also dumps the YML version out to the console.
+
+**Diff a Stack**
+
+```sh
+cdk diff --profile duckbot
+```
+
+Produces a diff between the stack already deployed and what you have locally.
