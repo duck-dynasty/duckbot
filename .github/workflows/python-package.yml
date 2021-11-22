@@ -9,7 +9,7 @@ on:
     - main
 
 jobs:
-  release:
+  test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -35,10 +35,10 @@ jobs:
     - name: Run Tests
       run: |
         . venv/bin/activate
-        pytest
+        pytest --cov=duckbot --cov-branch --cov-report xml --cov-report term-missing:skip-covered
     - name: Report Code Coverage
       if: ${{ always() }}
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v2
 
   sanity:
     runs-on: ubuntu-latest
@@ -51,10 +51,17 @@ jobs:
           -e "DISCORD_TOKEN=$(cat .github/workflows/test-token.txt | base64 --decode)" \
           duckbot
 
+  release:
+    needs:
+    - test
+    - sanity
+    runs-on: ubuntu-latest
+    steps:
+    - run: echo all checks passed
+
   deploy:
     needs:
     - release
-    - sanity
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.repository == 'duck-dynasty/duckbot'
     concurrency: deploy
