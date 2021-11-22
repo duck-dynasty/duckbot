@@ -5,10 +5,7 @@
 Deployment scripts are written using [CDK](https://docs.aws.amazon.com/cdk/latest/guide/home.html), the AWS Cloud Development Kit. The CDK dependencies can be installed alongside DuckBot.
 
 ```sh
-python3.8 -m venv --clear --prompt duckbot venv
-. venv/bin/activate
-pip install --upgrade pip setuptools wheel
-pip install --editable .[dev,cdk]
+pip install --editable .[cdk]  # run from repository root
 ```
 
 You'll then actually need CDK. It's a nodejs package, so you'll need that as well.
