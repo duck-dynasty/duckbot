@@ -1,11 +1,13 @@
-from aws_cdk import aws_autoscaling, aws_ec2, aws_ecs, aws_efs, aws_logs, core
+from typing import List
 
-from .secrets import Secrets
+from aws_cdk import aws_autoscaling, aws_ec2, aws_ecs, aws_efs, aws_logs, aws_ssm, core
+
+from .secret import Secret
 
 
 class DuckBotStack(core.Stack):
-    def __init__(self, scope: core.Construct, construct_id: str, **kwargs):
-        super().__init__(scope, construct_id, **kwargs)
+    def __init__(self, scope: core.Construct, construct_id: str, *, secrets: List[Secret]):
+        super().__init__(scope, construct_id)
 
         duckbot_image = core.CfnParameter(self, "DuckBotImage", type="String", default="duckdynasty/duckbot:latest", description="The DuckBot image to deploy.")
 
@@ -49,12 +51,21 @@ class DuckBotStack(core.Stack):
         task_definition.add_volume(name=postgres_volume_name, efs_volume_configuration=aws_ecs.EfsVolumeConfiguration(file_system_id=file_system.file_system_id, root_directory="/"))
         postgres.add_mount_points(aws_ecs.MountPoint(source_volume=postgres_volume_name, container_path=postgres_data_path, read_only=False))
 
+        secrets_as_parameters = dict(
+            [
+                (
+                    x.environment_name,
+                    aws_ssm.StringParameter.from_secure_string_parameter_attributes(self, x.environment_name, parameter_name=x.parameter_name, version=1),
+                )
+                for x in secrets
+            ]
+        )
         duckbot = task_definition.add_container(
             "duckbot",
             container_name="duckbot",
             essential=True,
             image=aws_ecs.ContainerImage.from_registry(duckbot_image.value_as_string),
-            secrets={k: aws_ecs.Secret.from_ssm_parameter(v) for k, v in Secrets(task_definition, "Secrets").secrets.items()},
+            secrets={k: aws_ecs.Secret.from_ssm_parameter(v) for k, v in secrets_as_parameters.items()},
             health_check=aws_ecs.HealthCheck(
                 command=["CMD", "python", "-m", "duckbot.health"],
                 interval=core.Duration.seconds(30),

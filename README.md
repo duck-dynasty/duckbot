@@ -81,7 +81,7 @@ If your work doesn't need a full setup, you can just run `python -m duckbot` for
 Deployment scripts are written using [CDK](https://docs.aws.amazon.com/cdk/latest/guide/home.html), the AWS Cloud Development Kit. The CDK dependencies can be installed alongside DuckBot.
 
 ```sh
-pip install --editable .[cdk]  # run from repository root
+pip install --editable .[dev,cdk]  # run from repository root
 ```
 
 You'll then actually need CDK. It's a nodejs package, so you'll need that as well.
@@ -92,26 +92,19 @@ npm install -g aws-cdk
 
 ## Adding New Secrets
 
-To add new secrets (like tokens), [cdk.json](.aws/cdk.json) needs to be modified. Add a secret to the existing list of secrets there.
+To add new secrets (like tokens), [`app.py`](.aws/app.py) needs to be modified. Add a secret to the existing list of secrets there.
 
-- `name`: a unique name for the secret, used within the CDK stack
 - `environment_name`: the name of the environment variable in the duckbot code base; also must match the GitHub secret name which houses the actual value
 - `parameter_name`: the name of the AWS Systems Manager parameter, must start with `/duckbot`
 
-Make sure you also update the [`docker-compose`](docker-compose.yml) file! And this [readme](#run-duckbot) to include information on how developers can get their own copy of the secrets.
+Make sure you also update the [`docker-compose`](docker-compose.yml) file, and this [readme](#run-duckbot) to include information on how developers can get their own copy of the secrets.
 
-### How Secrets Work
+### Note About Secrets and Deployments
 
-Secrets are annoyingly coupled so that we can end up only modifying a single place (well, plus `docker-compose.yml`, but for _prod_ at least it's one place).
+CDK is just python code at the end of the day, we take advantage of that to make sure the deployment process actually creates the secrets that DuckBot would use in prod.
+In  [`app.py`](.aws/app.py), there's logic which creates the secrets via API calls, taking the value from the current environment. Those same secrets are passed to the stack, which are used to inject the secrets into the duckbot container.
 
-- `cdk.json` puts all secrets into a CDK context variable
-  - the stack uses that variable to inject the secrets into the duckbot container
-- the stack also writes new versions of those secrets to AWS, pulling new values from the environment
-  - this is disabled by default, but enabled for the `deploy` action (enabled like `cdk synth --context write_secrets=true`)
-  - if enabled, the deployment will fail if any secret is missing a value
-- the `deploy` actions workflow injects all GitHub secrets into the environment then runs the CDK deployment
-  - the environment variable name matches the name of the GitHub secret
-  - so this ends up creating new versions of the secrets every deployment
+Actually saving the secrets is disabled by default, but is enabled for the GitHub actions deploy step. Writing secrets can be enabled by passing `--context write_secrets=true` to a `cdk` command.
 
 ## Using CDK
 
