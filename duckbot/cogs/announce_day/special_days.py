@@ -3,7 +3,7 @@ from datetime import date
 
 import discord
 import holidays
-from dateutil.relativedelta import SU, FR
+from dateutil.relativedelta import FR, SU
 from dateutil.relativedelta import relativedelta as rd
 
 
