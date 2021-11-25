@@ -53,7 +53,8 @@ class DuckBotStack(core.Stack):
 
         secrets_as_parameters = {
             # note, parameter version is required by cdk, but does not make it into the template; specify version 1 for simplicity
-            x.environment_name: aws_ssm.StringParameter.from_secure_string_parameter_attributes(self, x.environment_name, parameter_name=x.parameter_name, version=1) for x in secrets
+            x.environment_name: aws_ssm.StringParameter.from_secure_string_parameter_attributes(self, x.environment_name, parameter_name=x.parameter_name, version=1)
+            for x in secrets
         }
         duckbot = task_definition.add_container(
             "duckbot",
