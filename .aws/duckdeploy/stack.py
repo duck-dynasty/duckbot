@@ -51,15 +51,10 @@ class DuckBotStack(core.Stack):
         task_definition.add_volume(name=postgres_volume_name, efs_volume_configuration=aws_ecs.EfsVolumeConfiguration(file_system_id=file_system.file_system_id, root_directory="/"))
         postgres.add_mount_points(aws_ecs.MountPoint(source_volume=postgres_volume_name, container_path=postgres_data_path, read_only=False))
 
-        secrets_as_parameters = dict(
-            [
-                (
-                    x.environment_name,
-                    aws_ssm.StringParameter.from_secure_string_parameter_attributes(self, x.environment_name, parameter_name=x.parameter_name, version=1),
-                )
-                for x in secrets
-            ]
-        )
+        secrets_as_parameters = {
+            # note, parameter version is required by cdk, but does not make it into the template; specify version 1 for simplicity
+            x.environment_name: aws_ssm.StringParameter.from_secure_string_parameter_attributes(self, x.environment_name, parameter_name=x.parameter_name, version=1) for x in secrets
+        }
         duckbot = task_definition.add_container(
             "duckbot",
             container_name="duckbot",
