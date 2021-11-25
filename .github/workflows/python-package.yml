@@ -51,10 +51,50 @@ jobs:
           -e "DISCORD_TOKEN=$(cat .github/workflows/test-token.txt | base64 --decode)" \
           duckbot
 
+  synthesize:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+    - name: Setup Virtual Environment Cache
+      id: venv
+      uses: actions/cache@v2
+      with:
+        path: venv
+        key: ${{ env.pythonLocation }}-cdk-${{ hashFiles('setup.py', 'pyproject.toml') }}
+    - name: Install Packages
+      if: steps.venv.outputs.cache-hit != 'true'
+      run: |
+        python -m venv --clear venv
+        . ./venv/bin/activate
+        pip install --upgrade pip setuptools wheel
+        pip install --editable .[cdk]
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 16.x
+    - name: Install CDK
+      run: |
+        . ./venv/bin/activate
+        npm install -g aws-cdk@$(python -c 'from setup import CDK_VERSION; print(CDK_VERSION)')
+        cdk --version
+
+    - name: Synthesize CDK Stack
+      working-directory: .aws
+      run: |
+        . ../venv/bin/activate
+        cdk synth
+
   release:
     needs:
     - test
     - sanity
+    - synthesize
     runs-on: ubuntu-latest
     steps:
     - run: echo all checks passed
