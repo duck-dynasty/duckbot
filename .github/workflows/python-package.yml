@@ -13,28 +13,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.8'
-
-    - name: Setup Virtual Environment Cache
+    - name: Set up Python Environment
       id: venv
-      uses: actions/cache@v2
-      with:
-        path: venv
-        key: ${{ env.pythonLocation }}-venv-${{ hashFiles('setup.py', 'pyproject.toml') }}
-
-    - name: Install Packages
-      if: steps.venv.outputs.cache-hit != 'true'
-      run: |
-        python -m venv --clear venv
-        . ./venv/bin/activate
-        pip install --upgrade pip setuptools wheel
-        pip install --editable .[dev]
+      uses: ./.github/actions/setup-python-venv
     - name: Run Tests
       run: |
-        . venv/bin/activate
+        . ${{ steps.venv.outputs.path }}/bin/activate
         pytest --cov=duckbot --cov-branch --cov-report xml --cov-report term-missing:skip-covered
     - name: Report Code Coverage
       if: ${{ always() }}
