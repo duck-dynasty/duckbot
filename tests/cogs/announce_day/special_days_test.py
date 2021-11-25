@@ -24,3 +24,9 @@ def test_populate_mothers_day(bot, date):
 def test_populate_fathers_day(bot, date):
     clazz = SpecialDays(bot)
     assert clazz.get_list(date) == ["Father's Day"]
+
+
+@pytest.mark.parametrize("date", [datetime(2020, 11, 27), datetime(2021, 11, 26), datetime(2022, 11, 25)])
+def test_populate_black_friday(bot, date):
+    clazz = SpecialDays(bot)
+    assert clazz.get_list(date) == ["Black Friday. I hope I can get some new socks"]
