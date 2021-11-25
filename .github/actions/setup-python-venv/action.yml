@@ -30,13 +30,13 @@ runs:
     uses: actions/cache@v2
     with:
       path: ${{ steps.path.outputs.path }}
-      key: ${{ env.pythonLocation }}-${{ steps.path.outputs.path }}2-${{ hashFiles('setup.py', 'pyproject.toml') }}
+      key: ${{ env.pythonLocation }}-${{ steps.path.outputs.path }}-${{ hashFiles('setup.py', 'pyproject.toml') }}
 
   - name: Install Packages
     if: steps.venv.outputs.cache-hit != 'true'
     shell: bash
     run: |
       python -m venv --clear ${{ steps.path.outputs.path }}
-      . ./${{ steps.path.outputs.path }}/bin/activate
+      . ${{ steps.path.outputs.path }}/bin/activate
       pip install --upgrade pip setuptools wheel
       pip install --editable .[${{ inputs.extras }}]
