@@ -61,6 +61,7 @@ class DuckBotStack(core.Stack):
             container_name="duckbot",
             essential=True,
             image=aws_ecs.ContainerImage.from_registry(duckbot_image.value_as_string),
+            environment={"STAGE": "prod"},
             secrets={k: aws_ecs.Secret.from_ssm_parameter(v) for k, v in secrets_as_parameters.items()},
             health_check=aws_ecs.HealthCheck(
                 command=["CMD", "python", "-m", "duckbot.health"],
