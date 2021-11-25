@@ -13,9 +13,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
+
     - name: Set up Python Environment
       id: venv
       uses: ./.github/actions/setup-python-venv
+      with:
+        extras: dev
+
     - name: Run Tests
       run: |
         . ${{ steps.venv.outputs.path }}/bin/activate
