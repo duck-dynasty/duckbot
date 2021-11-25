@@ -2,6 +2,8 @@ import os
 
 
 class AppConfig:
+    """Utility class to house application configuration, such as running environment."""
+
     @staticmethod
     def _stage() -> str:
         return os.getenv("STAGE") or "test"
