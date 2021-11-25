@@ -5,6 +5,7 @@ services:
     build: .
     image: duckdynasty/duckbot:latest
     environment:
+      STAGE: test
       DISCORD_TOKEN: ${DISCORD_TOKEN}
       OPENWEATHER_TOKEN: ${OPENWEATHER_TOKEN}
       GITHUB_TOKEN: ${GITHUB_TOKEN}

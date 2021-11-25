@@ -4,6 +4,8 @@ from typing import List
 from discord import Interaction
 from discord.ext.commands import Bot, Cog
 
+from duckbot import AppConfig
+
 from .context import InteractionContext
 from .slash_command import SlashCommand
 from .slash_command_decorator import get_slash_command
@@ -26,11 +28,15 @@ class SlashCommandHandler(Cog):
     @Cog.listener("on_ready")
     async def upsert_slash_commands(self):
         slash_json = [x.to_dict() for x in self.get_commands_registered_to_bot()]
-        log.info("registered slash commands=%s", slash_json)
+
+        log.info("registering global slash commands=%s", slash_json)
         await self.bot.http.bulk_upsert_global_commands(self.bot.user.id, slash_json)
+
+        # create only global slash commands in prod; guild commands in non-prod for quicker testing
+        guild_commands = [] if AppConfig.is_production() else slash_json
         for guild in self.bot.guilds:
-            log.info("registering slash commands in guild=%s", guild.id)
-            await self.bot.http.bulk_upsert_guild_commands(self.bot.user.id, guild.id, slash_json)
+            log.info("registering slash commands in guild=%s commands=%s", guild.id, guild_commands)
+            await self.bot.http.bulk_upsert_guild_commands(self.bot.user.id, guild.id, guild_commands)
 
     def get_commands_registered_to_bot(self) -> List[SlashCommand]:
         slash_commands: List[SlashCommand] = []
