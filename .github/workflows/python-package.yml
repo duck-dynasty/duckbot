@@ -51,7 +51,7 @@ jobs:
           -e "DISCORD_TOKEN=$(cat .github/workflows/test-token.txt | base64 --decode)" \
           duckbot
 
-  analyze:
+  analyze-codeql:
     runs-on: ubuntu-latest
     permissions:
       security-events: write
@@ -66,11 +66,30 @@ jobs:
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
 
+  analyze-anchore:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build Docker Image
+      run: docker build . --tag localbuild/testimage:latest
+    - name: Run Anchore Scan
+      uses: anchore/scan-action@latest
+      with:
+        image: "localbuild/testimage:latest"
+        acs-report-enable: true
+    - name: Upload Anchore Scan Report
+      uses: github/codeql-action/upload-sarif@v1
+      with:
+        sarif_file: results.sarif
+
   release:
     needs:
     - test
     - sanity
-    - analyze
+    - analyze-codeql
+    - analyze-anchore
     runs-on: ubuntu-latest
     steps:
     - run: echo all checks passed
