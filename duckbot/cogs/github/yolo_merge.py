@@ -77,7 +77,7 @@ class YoloMerge(commands.Cog):
         commit = pr.get_commits().reversed[0]
         for suite in commit.get_check_suites():
             completed = suite.status == "completed"
-            success = suite.conclusion == "success"
+            success = suite.conclusion in ["success", "neutral", "skipped"]
             if completed:
                 result = CHECK_PASSED if success else CHECK_FAILED
             else:
