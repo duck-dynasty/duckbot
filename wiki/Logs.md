@@ -1,6 +1,5 @@
-Command Overview
-----------------
+## Command Overview
 
-| Command | Description |
-|:-:|-|
+| Command | Description                                            |
+| :-----: | ------------------------------------------------------ |
 | `!logs` | attaches an archive of logs files to a discord message |

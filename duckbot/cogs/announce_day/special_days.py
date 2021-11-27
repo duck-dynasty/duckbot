@@ -3,7 +3,7 @@ from datetime import date
 
 import discord
 import holidays
-from dateutil.relativedelta import SU
+from dateutil.relativedelta import FR, SU
 from dateutil.relativedelta import relativedelta as rd
 
 
@@ -22,6 +22,7 @@ class SpecialDays(holidays.Canada):
 
         tito = discord.utils.get(self.bot.emojis, guild__name="Friends Chat", name="tito")
 
+        self[date(year, 1, 1)] = f"Male Kelly's birthday. He's {year-1900} years old according to most websites"
         self[date(year, 1, 31)] = f"Erin and Taras' Anniversary. It's been {year-2010} entire years"
         self[date(year, 2, 2)] = "Groundhog Day"
         self[date(year, 2, 14)] = "Valentine's Day"
@@ -43,6 +44,7 @@ class SpecialDays(holidays.Canada):
         self[date(year, 10, 31)] = "Halloween"
         self[date(year, 11, 10)] = f"Tom and Kelly's fake wedding anniversary. They've been fake together for {year-2014} years"
         self[date(year, 11, 12)] = f"Sabrina's Birthday. She is {year-1996} years old. Good work on surviving"
+        self[date(year, 11, 1) + rd(weekday=FR(+4))] = "Black Friday. I hope I can get some new socks"
         self[date(year, 12, 2)] = f"Female Kelly's Birthday. She's {year-1989} years old"
         self[date(year, 12, 3)] = "DuckBot's Inception Day"
         self[date(year, 12, 5)] = f"Taras' Birthday. He's {year-1989} years old"

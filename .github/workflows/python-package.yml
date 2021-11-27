@@ -9,7 +9,7 @@ on:
     - main
 
 jobs:
-  release:
+  test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
@@ -35,10 +35,10 @@ jobs:
     - name: Run Tests
       run: |
         . venv/bin/activate
-        pytest
+        pytest --cov=duckbot --cov-branch --cov-report xml --cov-report term-missing:skip-covered
     - name: Report Code Coverage
       if: ${{ always() }}
-      uses: codecov/codecov-action@v1
+      uses: codecov/codecov-action@v2
 
   sanity:
     runs-on: ubuntu-latest
@@ -54,8 +54,6 @@ jobs:
   analyze:
     runs-on: ubuntu-latest
     permissions:
-      actions: read
-      contents: read
       security-events: write
     steps:
     - uses: actions/checkout@v2
@@ -68,10 +66,18 @@ jobs:
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v1
 
+  release:
+    needs:
+    - test
+    - sanity
+    - analyze
+    runs-on: ubuntu-latest
+    steps:
+    - run: echo all checks passed
+
   deploy:
     needs:
     - release
-    - sanity
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.repository == 'duck-dynasty/duckbot'
     concurrency: deploy
@@ -129,13 +135,17 @@ jobs:
       env:
         DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
         OPENWEATHER_TOKEN: ${{ secrets.OPENWEATHER_TOKEN }}
-        GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
         WOLFRAM_ALPHA_TOKEN: ${{ secrets.WOLFRAM_ALPHA_TOKEN }}
+        OXFORD_DICTIONARY_ID: ${{ secrets.OXFORD_DICTIONARY_ID }}
+        OXFORD_DICTIONARY_KEY: ${{ secrets.OXFORD_DICTIONARY_KEY }}
       run: |
         aws ssm put-parameter --name /duckbot/token/discord --type SecureString --value "$DISCORD_TOKEN" --overwrite
         aws ssm put-parameter --name /duckbot/token/openweather --type SecureString --value "$OPENWEATHER_TOKEN" --overwrite
         aws ssm put-parameter --name /duckbot/token/github --type SecureString --value "$GITHUB_TOKEN" --overwrite
         aws ssm put-parameter --name /duckbot/token/wolfram-alpha --type SecureString --value "$WOLFRAM_ALPHA_TOKEN" --overwrite
+        aws ssm put-parameter --name /duckbot/token/oxford-dictionary/id --type SecureString --value "$OXFORD_DICTIONARY_ID" --overwrite
+        aws ssm put-parameter --name /duckbot/token/oxford-dictionary/key --type SecureString --value "$OXFORD_DICTIONARY_KEY" --overwrite
 
     - name: Update CloudFormation Stack
       uses: aws-actions/aws-cloudformation-github-deploy@v1

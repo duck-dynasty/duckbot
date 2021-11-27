@@ -4,6 +4,8 @@ import random
 from discord import Colour, Embed
 from discord.ext import commands
 
+from duckbot.slash import Option, slash_command
+
 from .eightball_phrases import joke_phrases, phrases
 
 
@@ -11,7 +13,8 @@ class EightBall(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="eightball", aliases=["8ball"])
+    @slash_command(options=[Option(name="question", description="The question to ask the magic 8 ball.")])
+    @commands.command(name="eightball", aliases=["8ball"], description="Ask the magic 8 ball a question!")
     async def eightball_command(self, context, *, question: str = None):
         await self.eightball(context, question)
 

@@ -17,6 +17,7 @@ days = {
         "names": [
             "Tyr's day",
             "Tuesday",
+            "Dndndndndndndnd",
             "Taco Tuesday",
         ],
         "templates": [
@@ -31,7 +32,6 @@ days = {
             "Wednesday, my dudes",
             "hump day",
             "Ness' wedding day",
-            "Dndndndndndndnd",
             "https://www.youtube.com/watch?v=du-TY1GUFGk",
         ],
         "templates": [
