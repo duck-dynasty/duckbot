@@ -86,15 +86,30 @@ jobs:
         sarif_file: results.sarif
         wait-for-processing: true
 
-# FIXME also add bandit scans  https://github.com/PyCQA/bandit
-# or semgrep  https://github.com/returntocorp/semgrep
+  analyze-semgrep:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+      - uses: actions/checkout@v2
+      - name: Perform Semgrep Analysis
+        uses: returntocorp/semgrep-action@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          generateSarif: "1"
+      - name: Upload Semgrep Report
+        if: ${{ always() }}
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: semgrep.sarif
+
+# FIXME also add bandit scans  https://github.com/PyCQA/bandit  or semgrep  https://github.com/returntocorp/semgrep
 
   release:
     needs:
     - test
     - sanity
-    - analyze-codeql
-    - analyze-anchore
     runs-on: ubuntu-latest
     steps:
     - run: echo all checks passed
