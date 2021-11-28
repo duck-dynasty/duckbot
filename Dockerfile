@@ -6,7 +6,7 @@ ENV PATH "$VIRTUAL_ENV/bin:$PATH"
 WORKDIR /pip-dependencies
 RUN pip install --upgrade pip setuptools wheel
 # install atlas for numpy (matplotlib dependency)
-RUN apt-get update && apt-get upgrade -y && apt-get -y install \
+RUN apt-get update && apt-get -y install \
     libatlas-base-dev \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 COPY pyproject.toml .
@@ -18,7 +18,7 @@ FROM python:3.8-slim as prod
 # libpq-dev: postgres client libraries
 # libatlas-base-dev: matplotlib dependencies
 # fortune/cowsay: for !fortune command
-RUN apt-get update && apt-get upgrade -y && apt-get -y install \
+RUN apt-get update && apt-get -y install \
     ffmpeg \
     libpq-dev \
     libatlas-base-dev \
