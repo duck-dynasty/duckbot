@@ -97,7 +97,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          generateSarif: "1"
+          config: auto
+          generateSarif: 1
       - name: Upload Semgrep Report
         if: ${{ always() }}
         uses: github/codeql-action/upload-sarif@v1
