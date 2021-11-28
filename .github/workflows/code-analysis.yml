@@ -26,7 +26,7 @@ jobs:
       uses: github/codeql-action/analyze@v1
 
   analyze-grype:
-    if: ${{ never() }}
+    if: ${{ false }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
