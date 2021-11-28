@@ -1,3 +1,5 @@
+name: Memes
+
 on:
   pull_request_target:
     types:
