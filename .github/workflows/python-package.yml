@@ -77,7 +77,7 @@ jobs:
     - name: Run Anchore Scan
       uses: anchore/scan-action@latest
       with:
-        image: "localbuild/testimage:latest"
+        image: localbuild/testimage:latest
         acs-report-enable: true
     - name: Upload Anchore Scan Report
       if: ${{ always() }}
@@ -97,7 +97,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        config: auto
+        config: p/r2c-ci
         generateSarif: 1
     - name: Upload Semgrep Report
       if: ${{ always() }}
