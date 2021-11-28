@@ -87,6 +87,7 @@ jobs:
         wait-for-processing: true
 
 # FIXME also add bandit scans  https://github.com/PyCQA/bandit
+# or semgrep  https://github.com/returntocorp/semgrep
 
   release:
     needs:
