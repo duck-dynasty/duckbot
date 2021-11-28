@@ -30,7 +30,7 @@ runs:
     uses: actions/cache@v2
     with:
       path: ${{ steps.path.outputs.path }}
-      key: ${{ env.pythonLocation }}-${{ steps.path.outputs.path }}-${{ hashFiles('setup.py', 'pyproject.toml') }}
+      key: ${{ env.pythonLocation }}-${{ inputs.extras }}-${{ hashFiles('setup.py', 'pyproject.toml') }}
 
   - name: Install Packages
     if: steps.venv.outputs.cache-hit != 'true'
