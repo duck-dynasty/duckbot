@@ -1,4 +1,4 @@
-name: Setup Python Virtual Environment
+name: Set Up Python Virtual Environment
 description: creates a python virtual environment for duckbot
 
 inputs:
@@ -25,7 +25,7 @@ runs:
     shell: bash
     run: echo "::set-output name=path::venv"
 
-  - name: Setup Virtual Environment Cache
+  - name: Set up Virtual Environment Cache
     id: venv
     uses: actions/cache@v2
     with:
