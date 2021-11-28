@@ -1,5 +1,8 @@
 on:
-  pull_request:
+  pull_request_target:
+    types:
+    - opened
+  issues:
     types:
     - opened
 
@@ -7,7 +10,6 @@ jobs:
   roll:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - uses: ./.github/actions/rickroll
+    - uses: duck-dynasty/rick-roll-action@latest
       with:
-        chance: 100
+        chance: 2
