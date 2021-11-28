@@ -86,6 +86,8 @@ jobs:
         sarif_file: results.sarif
         wait-for-processing: true
 
+# FIXME also add bandit scans  https://github.com/PyCQA/bandit
+
   release:
     needs:
     - test
