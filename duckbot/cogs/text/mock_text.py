@@ -34,5 +34,5 @@ class MockText(commands.Cog):
         return "".join(char_list)
 
     @mock_text_command.after_invoke
-    async def delete_command_message(self, context):
+    async def delete_command_message(self, context: commands.Context):
         await try_delete(context.message)
