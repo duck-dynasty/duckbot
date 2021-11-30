@@ -1,6 +1,6 @@
 from discord.ext import commands
 
-from duckbot.util.messages import try_delete
+from duckbot.util.messages import get_message_reference, try_delete
 
 
 class MockText(commands.Cog):
@@ -8,7 +8,7 @@ class MockText(commands.Cog):
         self.bot = bot
 
     @commands.command(name="mock")
-    async def mock_text_command(self, context, *, text: str = ""):
+    async def mock_text_command(self, context: commands.Context, *, text: str = ""):
         await self.mock_text(context, text)
 
     async def mock_text(self, context, text: str):
@@ -16,8 +16,11 @@ class MockText(commands.Cog):
             mocked_text = await self.mockify(f"{context.message.author.display_name}, based on this, I should mock you... I need text dude.")
         else:
             mocked_text = await self.mockify(text.strip())
-        await context.send(f"{mocked_text}")
-        await try_delete(context.message)
+        reply = await get_message_reference(context.message)
+        if reply:
+            await reply.reply(mocked_text)
+        else:
+            await context.send(mocked_text)
 
     async def mockify(self, text: str):
         counter = 0
@@ -29,3 +32,7 @@ class MockText(commands.Cog):
                 counter += 1
             char_list.append(char)
         return "".join(char_list)
+
+    @mock_text_command.after_invoke
+    async def delete_command_message(self, context: commands.Context):
+        await try_delete(context.message)
