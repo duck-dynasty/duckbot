@@ -10,7 +10,7 @@ from duckdeploy.stack import DuckBotStack
 SECRETS = [
     Secret(environment_name="DISCORD_TOKEN", parameter_name="/duckbot/token/discord"),
     Secret(environment_name="OPENWEATHER_TOKEN", parameter_name="/duckbot/token/openweather"),
-    Secret(environment_name="GITHUB_TOKEN", parameter_name="/duckbot/token/github"),
+    Secret(environment_name="BOT_GITHUB_TOKEN", parameter_name="/duckbot/token/github"),
     Secret(environment_name="WOLFRAM_ALPHA_TOKEN", parameter_name="/duckbot/token/wolfram-alpha"),
     Secret(environment_name="OXFORD_DICTIONARY_ID", parameter_name="/duckbot/token/oxford-dictionary/id"),
     Secret(environment_name="OXFORD_DICTIONARY_KEY", parameter_name="/duckbot/token/oxford-dictionary/key"),

@@ -189,8 +189,7 @@ jobs:
       working-directory: .aws
       run: |
         . ../venv/bin/activate
-        jq -r 'to_entries | .[] | "\(.key)=\(.value)"' <<< "$SECRETS" >> $GITHUB_ENV
-        export $(cat "$GITHUB_ENV" | xargs)
+        export $(jq -r 'to_entries | .[] | "\(.key)=\(.value)"' <<< "$SECRETS" | xargs)
         echo "::group::cdk synth"
         cdk synth
         echo "::endgroup::"
