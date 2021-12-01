@@ -1,4 +1,5 @@
 import datetime
+import random
 from typing import Tuple
 from unittest import mock
 
@@ -155,13 +156,13 @@ def make_pull_request(number: int, mergeable=True, checks_passed=False) -> Tuple
     last_commit = commits[-1]
     success_check = check_suite()
     success_check.status = "completed"
-    success_check.conclusion = "success"
+    success_check.conclusion = random.choice(["success", "skipped", "neutral"])
     failure_check = check_suite()
     failure_check.status = "completed"
     failure_check.conclusion = "failed"
     incomplete_check = check_suite()
     incomplete_check.status = "queued"
-    incomplete_check.conclusion = "pending"
+    incomplete_check.conclusion = None
     if checks_passed:
         last_commit.get_check_suites.return_value = [success_check, success_check, success_check]
         lines = [
