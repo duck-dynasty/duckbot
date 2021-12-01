@@ -50,7 +50,7 @@ Before running DuckBot, you need to have a `duckbot/.env` file with the API toke
 duck@pond$ cat duckbot/.env
 DISCORD_TOKEN=thesecrettoken
 OPENWEATHER_TOKEN=thesecrettoken
-GITHUB_TOKEN=somesecrettoken
+BOT_GITHUB_TOKEN=somesecrettoken
 WOLFRAM_ALPHA_TOKEN=broitssecret
 OXFORD_DICTIONARY_ID=icanttellyou
 OXFORD_DICTIONARY_KEY=itsasecret
