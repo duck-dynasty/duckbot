@@ -10,4 +10,4 @@ from duckbot.cogs.games import CoinFlip
 async def test_coin_flip_sends_result(random, bot, context):
     clazz = CoinFlip(bot)
     await clazz.coin_flip(context)
-    context.send.assert_called_once_with(":coin: :coin: some coin flip result :coin: :coin:")
+    context.send.assert_called_once_with(":coin: :coin: some coin flip result! :coin: :coin:")
