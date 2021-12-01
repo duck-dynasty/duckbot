@@ -12,5 +12,5 @@ class CoinFlip(commands.Cog):
         await self.coin_flip(context)
 
     async def coin_flip(self, context):
-        faces = ["Heads!", "Tails"] * 50 + ["The Side"]
-        await context.send(f":coin: :coin: {random.choice(faces)} :coin: :coin:")
+        faces = ["Heads", "Tails"] * 50 + ["The Side"]
+        await context.send(f":coin: :coin: {random.choice(faces)}! :coin: :coin:")
