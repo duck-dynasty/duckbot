@@ -1,5 +1,5 @@
 import locale
-from typing import List, Set
+from typing import List
 
 import discord
 import yfinance
