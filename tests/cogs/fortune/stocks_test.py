@@ -25,7 +25,7 @@ async def test_stock_info_no_stocks_in_message(bot, message):
 @pytest.mark.asyncio
 @pytest.mark.parametrize("text", ["$dux", "$DUX me up so I can do the $dux", "I got me some $dux"])
 @mock.patch("yfinance.Ticker")
-async def test_stock_info_single_stock(ticker, bot, message, text):
+async def test_stock_info_single_stock_ignores_duplicates(ticker, bot, message, text):
     ticker.return_value.info = info()
     message.content = text
     clazz = Stocks(bot)
