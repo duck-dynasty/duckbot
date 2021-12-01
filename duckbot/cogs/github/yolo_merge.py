@@ -33,7 +33,7 @@ class YoloMerge(commands.Cog):
     @property
     def github(self) -> github.Github:
         if self._github is None:
-            self._github = github.Github(os.getenv("GITHUB_TOKEN"))
+            self._github = github.Github(os.getenv("BOT_GITHUB_TOKEN"))
         return self._github
 
     @commands.command(name="yolo")
