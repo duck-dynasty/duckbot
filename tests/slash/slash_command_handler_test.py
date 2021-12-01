@@ -73,7 +73,7 @@ async def test_upsert_slash_commands_create_commands_not_prod(bot, http, guild, 
 @pytest.mark.asyncio
 async def test_upsert_slash_commands_create_subcommand_prod(bot, http, guild, command, app_config):
     app_config.is_production = True
-    create_slash_command(command, "command_name", name="name", root="root", options=[Option(name="opt")])
+    create_slash_command(command, "command_name", name="name", root="root", options=[Option(name="opt", description="d")])
     bot.walk_commands.return_value = [command]
     bot.guilds = [guild]
     clazz = SlashCommandHandler(bot)
@@ -84,7 +84,7 @@ async def test_upsert_slash_commands_create_subcommand_prod(bot, http, guild, co
 
 @pytest.mark.asyncio
 async def test_upsert_slash_commands_create_subcommand_not_prod(bot, http, guild, command):
-    create_slash_command(command, "command_name", name="name", root="root", options=[Option(name="opt")])
+    create_slash_command(command, "command_name", name="name", root="root", options=[Option(name="opt", description="d")])
     bot.walk_commands.return_value = [command]
     bot.guilds = [guild]
     clazz = SlashCommandHandler(bot)
