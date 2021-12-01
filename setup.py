@@ -55,7 +55,7 @@ if __name__ == "__main__":
             "timezonefinder==5.2.0",
             "holidays==0.11.3.1",
             "pyowm==3.2.0",  # openweather
-            "psycopg2==2.9.1",
+            "psycopg2==2.9.2",
             "SQLAlchemy==1.4.26",
             "d20==1.1.2",
             "nltk==3.6.5",  # also in pyproject.toml, required for setup script above
@@ -71,7 +71,7 @@ if __name__ == "__main__":
                 "pytest-asyncio==0.16.0",
                 "pytest-xdist[psutil]==2.4.0",
                 "flake8==4.0.1",
-                "black==21.10b0",
+                "black==21.11b1",
                 "flake8-black==0.2.3",
                 "isort==5.10.1",
                 "flake8-isort==4.1.1",
@@ -80,7 +80,7 @@ if __name__ == "__main__":
                 "mdformat==0.7.10",
                 "mdformat-gfm==0.3.4",
                 "mdformat-black==0.1.1",
-                "responses==0.15.0",
+                "responses==0.16.0",
                 "pytest-blockage==0.2.2",
                 "pytest-sugar==0.9.4",
                 "pytest-icdiff==0.5",
