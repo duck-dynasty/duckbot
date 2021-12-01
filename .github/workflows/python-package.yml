@@ -51,10 +51,50 @@ jobs:
           -e "DISCORD_TOKEN=$(cat .github/workflows/test-token.txt | base64 --decode)" \
           duckbot
 
+  synthesize:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+    - name: Setup Virtual Environment Cache
+      id: venv
+      uses: actions/cache@v2
+      with:
+        path: venv
+        key: ${{ env.pythonLocation }}-cdk-${{ hashFiles('setup.py', 'pyproject.toml') }}
+    - name: Install Packages
+      if: steps.venv.outputs.cache-hit != 'true'
+      run: |
+        python -m venv --clear venv
+        . ./venv/bin/activate
+        pip install --upgrade pip setuptools wheel
+        pip install --editable .[cdk]
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 16.x
+    - name: Install CDK
+      run: |
+        . ./venv/bin/activate
+        npm install -g aws-cdk@$(python -c 'from setup import CDK_VERSION; print(CDK_VERSION)')
+        cdk --version
+
+    - name: Synthesize CDK Stack
+      working-directory: .aws
+      run: |
+        . ../venv/bin/activate
+        cdk synth
+
   release:
     needs:
     - test
     - sanity
+    - synthesize
     runs-on: ubuntu-latest
     steps:
     - run: echo all checks passed
@@ -108,6 +148,34 @@ jobs:
         WIKI_COMMIT_MESSAGE: ${{ github.event.commits[0].message }}
         GITHUB_ACTOR: ${{ github.event.commits[0].author.name }}
 
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+    - name: Setup Virtual Environment Cache
+      id: venv
+      uses: actions/cache@v2
+      with:
+        path: venv
+        key: ${{ env.pythonLocation }}-cdk-${{ hashFiles('setup.py', 'pyproject.toml') }}
+    - name: Install Packages
+      if: steps.venv.outputs.cache-hit != 'true'
+      run: |
+        python -m venv --clear venv
+        . ./venv/bin/activate
+        pip install --upgrade pip setuptools wheel
+        pip install --editable .[cdk]
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v1
+      with:
+        node-version: 16.x
+    - name: Install CDK
+      run: |
+        . ./venv/bin/activate
+        npm install -g aws-cdk@$(python -c 'from setup import CDK_VERSION; print(CDK_VERSION)')
+        cdk --version
+
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -115,26 +183,24 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
 
-    - name: Set up AWS Secrets
+    - name: Synthesize CDK Stack
       env:
-        DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
-        OPENWEATHER_TOKEN: ${{ secrets.OPENWEATHER_TOKEN }}
-        GITHUB_TOKEN: ${{ secrets.BOT_GITHUB_TOKEN }}
-        WOLFRAM_ALPHA_TOKEN: ${{ secrets.WOLFRAM_ALPHA_TOKEN }}
-        OXFORD_DICTIONARY_ID: ${{ secrets.OXFORD_DICTIONARY_ID }}
-        OXFORD_DICTIONARY_KEY: ${{ secrets.OXFORD_DICTIONARY_KEY }}
+        SECRETS: ${{ toJson(secrets) }}
+      working-directory: .aws
       run: |
-        aws ssm put-parameter --name /duckbot/token/discord --type SecureString --value "$DISCORD_TOKEN" --overwrite
-        aws ssm put-parameter --name /duckbot/token/openweather --type SecureString --value "$OPENWEATHER_TOKEN" --overwrite
-        aws ssm put-parameter --name /duckbot/token/github --type SecureString --value "$GITHUB_TOKEN" --overwrite
-        aws ssm put-parameter --name /duckbot/token/wolfram-alpha --type SecureString --value "$WOLFRAM_ALPHA_TOKEN" --overwrite
-        aws ssm put-parameter --name /duckbot/token/oxford-dictionary/id --type SecureString --value "$OXFORD_DICTIONARY_ID" --overwrite
-        aws ssm put-parameter --name /duckbot/token/oxford-dictionary/key --type SecureString --value "$OXFORD_DICTIONARY_KEY" --overwrite
-
-    - name: Update CloudFormation Stack
-      uses: aws-actions/aws-cloudformation-github-deploy@v1
-      with:
-        name: duckbot
-        template: .aws/cloudformation.template.yml
-        parameter-overrides: "DuckBotImage=${{ steps.image.outputs.commit }}"
-        capabilities: CAPABILITY_IAM,CAPABILITY_NAMED_IAM
+        . ../venv/bin/activate
+        jq -r 'to_entries | .[] | "\(.key)=\(.value)"' <<< "$SECRETS" >> $GITHUB_ENV
+        echo "::group::cdk synth"
+        cdk synth
+        echo "::endgroup::"
+        echo "::group::cdk diff"
+        cdk diff --parameter DuckBotImage=${{ steps.image.outputs.commit }} || true
+        echo "::endgroup::"
+        echo "::group::cdk deploy"
+        cdk deploy \
+          --all \
+          --parameter DuckBotImage=${{ steps.image.outputs.commit }} \
+          --context write_secrets=true \
+          --require-approval never \
+          --progress events
+        echo "::endgroup::"
