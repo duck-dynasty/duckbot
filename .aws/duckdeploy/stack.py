@@ -9,8 +9,6 @@ class DuckBotStack(core.Stack):
     def __init__(self, scope: core.Construct, construct_id: str, *, secrets: List[Secret]):
         super().__init__(scope, construct_id)
 
-        duckbot_image = core.CfnParameter(self, "DuckBotImage", type="String", default="duckdynasty/duckbot:latest", description="The DuckBot image to deploy.")
-
         vpc = aws_ec2.Vpc(
             self,
             "Vpc",
@@ -60,7 +58,7 @@ class DuckBotStack(core.Stack):
             "duckbot",
             container_name="duckbot",
             essential=True,
-            image=aws_ecs.ContainerImage.from_registry(duckbot_image.value_as_string),
+            image=aws_ecs.ContainerImage.from_registry(self.node.try_get_context("duckbot_image")),
             environment={"STAGE": "prod"},
             secrets={k: aws_ecs.Secret.from_ssm_parameter(v) for k, v in secrets_as_parameters.items()},
             health_check=aws_ecs.HealthCheck(

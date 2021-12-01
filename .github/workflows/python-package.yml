@@ -199,7 +199,7 @@ jobs:
         echo "::group::cdk deploy"
         cdk deploy \
           --all \
-          --parameter DuckBotImage=${{ steps.image.outputs.commit }} \
+          --context duckbot_image=${{ steps.image.outputs.commit }} \
           --context write_secrets=true \
           --require-approval never \
           --progress events
