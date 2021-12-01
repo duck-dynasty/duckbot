@@ -34,7 +34,7 @@ def yolo(bot, gh) -> YoloMerge:
 
 
 def test_github_creates_instance(bot, monkeypatch):
-    monkeypatch.setenv("GITHUB_TOKEN", "token")
+    monkeypatch.setenv("BOT_GITHUB_TOKEN", "token")
     clazz = YoloMerge(bot)
     assert clazz.github == clazz._github
 
