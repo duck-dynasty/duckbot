@@ -1,5 +1,5 @@
 import pytest
-from discord.ext.commands import BadArgument, command
+from discord.ext.commands import command
 
 from duckbot.slash import Option, OptionType, slash_command
 from duckbot.slash.option import SubCommand
@@ -93,13 +93,13 @@ def test_slash_command_slash_options_is_empty():
 
 
 def test_slash_command_slash_options_is_provided():
-    options = [Option(name="opt")]
+    options = [Option(name="opt", description="desc")]
     slash = slash_command(options=options)(command()(func))
     assert slash.slash_ext.options == options
 
 
 def test_slash_command_slash_options_subcommand():
-    options = [Option(name="opt")]
+    options = [Option(name="opt", description="desc")]
     slash = slash_command(root="root", name="name", options=options)(command()(func))
     assert slash.slash_ext.options == [SubCommand(name="name", description=None, type=OptionType.SUB_COMMAND, options=options)]
 
@@ -113,10 +113,10 @@ def test_slash_command_not_decorating_command():
 
 
 def test_slash_command_root_but_no_name():
-    with pytest.raises(BadArgument):
+    with pytest.raises(ValueError):
         slash_command(root="root", name=None)(command()(func))
 
 
 def test_slash_command_name_but_no_root():
-    with pytest.raises(BadArgument):
+    with pytest.raises(ValueError):
         slash_command(root=None, name="name")(command()(func))

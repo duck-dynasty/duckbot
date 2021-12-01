@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from discord.ext.commands import BadArgument, Command
+from discord.ext.commands import Command
 
 from .option import Option
 from .slash_command import SlashCommand
@@ -25,13 +25,8 @@ def slash_command(*, root: str = None, name: str = None, description: str = None
     """
 
     def decorator(command):
-        if not isinstance(command, Command):
-            raise TypeError("callback must be a discord.ext.commands.Command")
-        if root and not name or not root and name:
-            raise BadArgument("root and name must both be provided if either is")
-
         # patch the command instance with extra info so we can register it with discord and delegate executions to the discord.py command
-        command.slash_ext = SlashCommand(command, root=root, name=name, description=description, options=options)
+        command.slash_ext = SlashCommand(command=command, root=root, name=name, description=description, options=options)
         command._discordpy_include_subcommand_name = {name: discordpy_include_subcommand_name}
         if hasattr(command, "parent") and command.parent:
             if not hasattr(command.parent, "_discordpy_include_subcommand_name"):
