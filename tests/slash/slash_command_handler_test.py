@@ -6,8 +6,9 @@ from duckbot.slash import Option, SlashCommandHandler, slash_command
 @pytest.mark.asyncio
 async def test_handle_slash_interaction_calls_command_invoke(bot, interaction, command):
     bot.commands = [command]
-    slash_command()(command)
     command.name = "command_name"
+    command.description = "command_desc"
+    slash_command()(command)
     interaction.data = {"name": "command_name"}
     clazz = SlashCommandHandler(bot)
     await clazz.handle_slash_interaction(interaction)
@@ -17,8 +18,9 @@ async def test_handle_slash_interaction_calls_command_invoke(bot, interaction, c
 @pytest.mark.asyncio
 async def test_handle_slash_interaction_no_matching_command(bot, interaction, command):
     bot.commands = [command]
-    slash_command()(command)
     command.name = "some_other_command"
+    command.description = "command_desc"
+    slash_command()(command)
     interaction.data = {"name": "command_name"}
     clazz = SlashCommandHandler(bot)
     await clazz.handle_slash_interaction(interaction)
@@ -95,8 +97,8 @@ async def test_upsert_slash_commands_create_subcommand_not_prod(bot, http, guild
 async def test_upsert_slash_commands_create_subcommand_group_prod(bot, http, guild, command, autospec, app_config):
     app_config.is_production = True
     command2 = autospec.of("discord.ext.commands.Command")
-    create_slash_command(command, "first", name="1", root="root", options=[Option(name="1")])
-    create_slash_command(command2, "second", name="2", root="root", options=[Option(name="2")])
+    create_slash_command(command, "first", name="1", root="root", options=[Option(name="1", description="d1")])
+    create_slash_command(command2, "second", name="2", root="root", options=[Option(name="2", description="d2")])
     expected = command.slash_ext
     expected.append_options(command2.slash_ext.options)
     bot.walk_commands.return_value = [command, command2]
@@ -110,8 +112,8 @@ async def test_upsert_slash_commands_create_subcommand_group_prod(bot, http, gui
 @pytest.mark.asyncio
 async def test_upsert_slash_commands_create_subcommand_group_not_prod(bot, http, guild, command, autospec):
     command2 = autospec.of("discord.ext.commands.Command")
-    create_slash_command(command, "first", name="1", root="root", options=[Option(name="1")])
-    create_slash_command(command2, "second", name="2", root="root", options=[Option(name="2")])
+    create_slash_command(command, "first", name="1", root="root", options=[Option(name="1", description="d1")])
+    create_slash_command(command2, "second", name="2", root="root", options=[Option(name="2", description="d2")])
     expected = command.slash_ext
     expected.append_options(command2.slash_ext.options)
     bot.walk_commands.return_value = [command, command2]

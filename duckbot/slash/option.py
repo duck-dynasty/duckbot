@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-import typing
+import re
+from dataclasses import asdict, dataclass, field
+from typing import List
 
 
 class OptionType:
@@ -16,54 +18,22 @@ class OptionType:
     NUMBER = 10
 
 
+@dataclass(frozen=True)
 class Option:
-    def __init__(self, *, name: str, description: str = None, type: OptionType = OptionType.STRING, required: bool = False):
-        self._name = name
-        self._description = description
-        self._type = type
-        self._required = required
+    name: str
+    description: str
+    options: List[Option] = field(default_factory=list, init=False)
+    type: OptionType = OptionType.STRING
+    required: bool = False
 
-    @property
-    def name(self) -> str:
-        return self._name
-
-    @property
-    def description(self) -> str:
-        return self._description or self.name
-
-    @property
-    def type(self) -> OptionType:
-        return self._type
-
-    @property
-    def required(self) -> bool:
-        return self._required
-
-    @property
-    def options(self) -> typing.List[Option]:
-        return []
+    def __post_init__(self):
+        if re.search(r"\s", self.name):
+            raise ValueError(f"option name cannot contain whitespace: {self.name}")
 
     def to_dict(self) -> dict:
-        return {"name": self.name, "description": self.description, "type": self.type, "required": self.required, "options": [x.to_dict() for x in self.options]}
-
-    def __eq__(self, other) -> bool:
-        return self.to_dict() == other.to_dict() if isinstance(other, Option) else False
-
-    def __str__(self) -> str:
-        return str(self.to_dict())
-
-    def __repr__(self) -> str:
-        return str(self.to_dict())
+        return asdict(self)
 
 
+@dataclass(frozen=True)
 class SubCommand(Option):
-    def __init__(self, *, name: str, description: str, type: OptionType, options: typing.List[Option]):
-        super().__init__(name=name, description=description, type=type, required=False)
-        self._options = options
-
-    @property
-    def options(self) -> typing.List[Option]:
-        return self._options
-
-    def __eq__(self, other) -> bool:
-        return super().__eq__(other)  # just to make LGTM happy, no real need to override since it uses to_dict()
+    options: List[Option]
