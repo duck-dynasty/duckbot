@@ -5,6 +5,8 @@ from setuptools import find_packages, setup
 from setuptools.command.develop import develop
 from setuptools.command.install import install
 
+CDK_VERSION = "1.132.0"
+
 
 def run_code_formatters():
     for tool in ["isort .", "black .", "mdformat ."]:
@@ -84,7 +86,18 @@ if __name__ == "__main__":
                 "pytest-icdiff==0.5",
                 "pytest-cov==3.0.0",
                 "pytest-lazy-fixture==0.6.3",
-            ]
+            ],
+            "cdk": [
+                f"aws-cdk.core=={CDK_VERSION}",
+                f"aws-cdk.aws-ec2=={CDK_VERSION}",
+                f"aws-cdk.aws-ecs=={CDK_VERSION}",
+                f"aws-cdk.aws-autoscaling=={CDK_VERSION}",
+                f"aws-cdk.aws-efs=={CDK_VERSION}",
+                f"aws-cdk.aws-iam=={CDK_VERSION}",
+                f"aws-cdk.aws-logs=={CDK_VERSION}",
+                f"aws-cdk.aws-ssm=={CDK_VERSION}",
+                "boto3==1.20.10",
+            ],
         },
         entry_points={
             "console_scripts": [
