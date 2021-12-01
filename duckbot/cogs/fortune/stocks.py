@@ -1,5 +1,5 @@
 import locale
-from typing import List
+from typing import List, Optional
 
 import discord
 import yfinance
@@ -15,16 +15,20 @@ class Stocks(commands.Cog):
         if not message.author.bot:
             symbols = self.get_stock_symbols(message.content)
             if symbols:
-                infos = [self.get_stock_summary(stock) for stock in symbols]
-                await message.channel.send("\n".join(infos))
+                summaries = [self.get_stock_summary(ticker) for ticker in map(self.get_ticker, symbols) if ticker]
+                if summaries:
+                    await message.channel.send("\n".join(summaries))
 
     def get_stock_symbols(self, content: str) -> List[str]:
         # list(dict.fromkeys(x)) removes duplicates but maintains ordering
         return list(dict.fromkeys(word[1:].upper() for word in content.split() if word.startswith("$")))
 
-    def get_stock_summary(self, symbol: str):
-        locale.setlocale(locale.LC_MONETARY, "en_US.UTF-8")
+    def get_ticker(self, symbol: str) -> Optional[yfinance.Ticker]:
         ticker = yfinance.Ticker(symbol)
+        return ticker if ticker.info.get("symbol", None) else None
+
+    def get_stock_summary(self, ticker: yfinance.Ticker):
+        locale.setlocale(locale.LC_MONETARY, "en_US.UTF-8")
         info = ticker.info
         price = info["currentPrice"]
         price_s = locale.currency(price, grouping=True)
