@@ -12,6 +12,6 @@ jobs:
   roll:
     runs-on: ubuntu-latest
     steps:
-    - uses: duck-dynasty/rick-roll-action@latest
+    - uses: duck-dynasty/rick-roll-action@main
       with:
         chance: 2
