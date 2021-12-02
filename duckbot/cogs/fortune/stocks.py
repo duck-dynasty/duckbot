@@ -1,4 +1,3 @@
-import locale
 from typing import List, Optional
 
 import discord
@@ -30,7 +29,6 @@ class Stocks(commands.Cog):
     def get_stock_summary(self, ticker: yfinance.Ticker):
         info = ticker.info
         price = info["currentPrice"]
-        price_s = locale.format_string("%.2f", price, grouping=True, monetary=True)
         currency = info["currency"]
         company = info["shortName"]
         reported_symbol = info["symbol"]
@@ -38,4 +36,4 @@ class Stocks(commands.Cog):
         year_change_percent = f"{'+' if info['52WeekChange'] >= 0 else ''}{round(info['52WeekChange'] * 10000) / 100}"
         daily_change = price - close
         daily_change_percent = f"{'+' if daily_change >= 0 else ''}{round(daily_change / close * 10000) / 100}"
-        return f"{reported_symbol} ({company}): **{price_s}** ({currency}) per share, {daily_change_percent}% today; {year_change_percent}% over a year"
+        return f"{reported_symbol} ({company}): **{price:,.2f}** ({currency}) per share, {daily_change_percent}% today; {year_change_percent}% over a year"
