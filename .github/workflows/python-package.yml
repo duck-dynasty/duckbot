@@ -179,15 +179,15 @@ jobs:
         . ../venv/bin/activate
         export $(jq -r 'to_entries | .[] | "\(.key)=\(.value)"' <<< "$SECRETS" | xargs)
         echo "::group::cdk synth"
-        cdk synth
+        cdk synth --context duckbot_image=${{ steps.image.outputs.commit }}
         echo "::endgroup::"
         echo "::group::cdk diff"
-        cdk diff --parameter DuckBotImage=${{ steps.image.outputs.commit }} || true
+        cdk diff --context duckbot_image=${{ steps.image.outputs.commit }} || true
         echo "::endgroup::"
         echo "::group::cdk deploy"
         cdk deploy \
-          --all \
-          --parameter DuckBotImage=${{ steps.image.outputs.commit }} \
+          --force --all \
+          --context duckbot_image=${{ steps.image.outputs.commit }} \
           --context write_secrets=true \
           --require-approval never \
           --progress events
