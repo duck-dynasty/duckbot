@@ -198,7 +198,7 @@ jobs:
         echo "::endgroup::"
         echo "::group::cdk deploy"
         cdk deploy \
-          --all \
+          --force --all \
           --context duckbot_image=${{ steps.image.outputs.commit }} \
           --context write_secrets=true \
           --require-approval never \
