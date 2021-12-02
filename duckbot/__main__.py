@@ -1,3 +1,4 @@
+import locale
 import os
 import pkgutil
 
@@ -12,6 +13,8 @@ from duckbot import DuckBot
 
 
 def run_duckbot(bot: commands.Bot):
+    locale.setlocale(locale.LC_ALL, "")
+
     bot.load_extension(duckbot.logs.__name__)
 
     if "connection-test" in os.getenv("DUCKBOT_ARGS", ""):
