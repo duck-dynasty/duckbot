@@ -44,38 +44,14 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.8'
-    - name: Setup Virtual Environment Cache
-      id: venv
-      uses: actions/cache@v2
-      with:
-        path: venv
-        key: ${{ env.pythonLocation }}-cdk-${{ hashFiles('setup.py', 'pyproject.toml') }}
-    - name: Install Packages
-      if: steps.venv.outputs.cache-hit != 'true'
-      run: |
-        python -m venv --clear venv
-        . ./venv/bin/activate
-        pip install --upgrade pip setuptools wheel
-        pip install --editable .[cdk]
-
-    - name: Set up Node.js
-      uses: actions/setup-node@v1
-      with:
-        node-version: 16.x
-    - name: Install CDK
-      run: |
-        . ./venv/bin/activate
-        npm install -g aws-cdk@$(python -c 'from setup import CDK_VERSION; print(CDK_VERSION)')
-        cdk --version
+    - name: Set up CDK
+      id: cdk
+      uses: ./.github/actions/setup-awk-cdk
 
     - name: Synthesize CDK Stack
       working-directory: .aws
       run: |
-        . ../venv/bin/activate
+        . ../${{ steps.cdk.outputs.venv-path }}/bin/activate
         cdk synth
 
   release:
@@ -96,36 +72,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
-    - name: Create Docker Image Tags
-      id: image
-      run: |
-        echo "::set-output name=latest::duckdynasty/duckbot:latest"
-        echo "::set-output name=commit::duckdynasty/duckbot:$(git rev-parse --short HEAD)"
-
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v1
-    - name: Set up Docker Build Cache
-      uses: actions/cache@v2
-      with:
-        path: /tmp/.buildx-cache
-        key: ${{ runner.os }}-buildx-${{ github.sha }}
-        restore-keys: ${{ runner.os }}-buildx-
-
-    - name: Login to Docker
-      uses: docker/login-action@v1
-      with:
-        username: duckdynasty
-        password: ${{ secrets.DOCKER_PASS }}
-
     - name: Build and Push Docker Image
-      run: |
-        docker buildx build . \
-          --tag ${{ steps.image.outputs.latest }} \
-          --tag ${{ steps.image.outputs.commit }} \
-          --platform=linux/amd64 \
-          --cache-from='type=local,src=/tmp/.buildx-cache' \
-          --cache-to='type=local,dest=/tmp/.buildx-cache' \
-          --push
+      id: image
+      uses: ./.github/actions/build-push-docker-image
 
     - name: Publish Wiki Documentation
       uses: SwiftDocOrg/github-wiki-publish-action@v1
@@ -136,47 +85,21 @@ jobs:
         WIKI_COMMIT_MESSAGE: ${{ github.event.commits[0].message }}
         GITHUB_ACTOR: ${{ github.event.commits[0].author.name }}
 
-    - name: Set up Python 3.8
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.8'
-    - name: Setup Virtual Environment Cache
-      id: venv
-      uses: actions/cache@v2
-      with:
-        path: venv
-        key: ${{ env.pythonLocation }}-cdk-${{ hashFiles('setup.py', 'pyproject.toml') }}
-    - name: Install Packages
-      if: steps.venv.outputs.cache-hit != 'true'
-      run: |
-        python -m venv --clear venv
-        . ./venv/bin/activate
-        pip install --upgrade pip setuptools wheel
-        pip install --editable .[cdk]
-
-    - name: Set up Node.js
-      uses: actions/setup-node@v1
-      with:
-        node-version: 16.x
-    - name: Install CDK
-      run: |
-        . ./venv/bin/activate
-        npm install -g aws-cdk@$(python -c 'from setup import CDK_VERSION; print(CDK_VERSION)')
-        cdk --version
-
+    - name: Set up CDK
+      id: cdk
+      uses: ./.github/actions/setup-aws-cdk
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: us-east-1
-
     - name: Synthesize CDK Stack
       env:
         SECRETS: ${{ toJson(secrets) }}
       working-directory: .aws
       run: |
-        . ../venv/bin/activate
+        . ../${{ steps.cdk.outputs.venv-path }}/bin/activate
         export $(jq -r 'to_entries | .[] | "\(.key)=\(.value)"' <<< "$SECRETS" | xargs)
         echo "::group::cdk synth"
         cdk synth --context duckbot_image=${{ steps.image.outputs.commit }}
