@@ -1,10 +1,12 @@
 import math
-from datetime import date
+from datetime import date, datetime
 
 import discord
 import holidays
 from dateutil.relativedelta import FR, SU
 from dateutil.relativedelta import relativedelta as rd
+
+from .datetime import now, timezone
 
 
 class SpecialDays(holidays.Canada):
@@ -46,5 +48,5 @@ class SpecialDays(holidays.Canada):
         self[date(year, 11, 12)] = f"Sabrina's Birthday. She is {year-1996} years old. Good work on surviving"
         self[date(year, 11, 1) + rd(weekday=FR(+4))] = "Black Friday. I hope I can get some new socks"
         self[date(year, 12, 2)] = f"Female Kelly's Birthday. She's {year-1989} years old"
-        self[date(year, 12, 3)] = "DuckBot's Inception Day"
+        self[date(year, 12, 3)] = f"DuckBot's Inception Day. I'm about {(now()-datetime(2020, 12, 3, 10, 39, tzinfo=timezone())).seconds}s old"
         self[date(year, 12, 5)] = f"Taras' Birthday. He's {year-1989} years old"
