@@ -5,7 +5,7 @@ import pytz
 
 def timezone():
     """
-    Returns the default timezone of duckbot.
+    Returns the default timezone of this module.
     :return: US/Eastern
     """
     return pytz.timezone("US/Eastern")
@@ -13,7 +13,7 @@ def timezone():
 
 def now():
     """
-    Returns the current time in duckbot's default timezone.
+    Returns the current time in the default timezone.
     :return: the current time
     """
     return datetime.datetime.now(timezone())

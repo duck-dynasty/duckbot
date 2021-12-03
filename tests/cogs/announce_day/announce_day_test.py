@@ -29,7 +29,7 @@ async def test_cog_unload_cancels_task(bot, dog_photos):
 @pytest.mark.asyncio
 @mock.patch("random.choice", side_effect=["today", "tomorrow", "yesterday", "{today} {tomorrow} {yesterday}"])
 @mock.patch("random.random", return_value=0.5)
-@mock.patch("duckbot.util.datetime.now", return_value=datetime.datetime(2002, 2, 2, hour=7))
+@mock.patch("duckbot.cogs.announce_day.announce_day.now", return_value=datetime.datetime(2002, 2, 2, hour=7))
 async def test_on_hour_7am_eastern_special_day(now, random, choice, bot, dog_photos, general_channel):
     clazz = AnnounceDay(bot, dog_photos)
     await clazz.on_hour()
@@ -39,7 +39,7 @@ async def test_on_hour_7am_eastern_special_day(now, random, choice, bot, dog_pho
 @pytest.mark.asyncio
 @mock.patch("random.choice", side_effect=["today", "tomorrow", "yesterday", "{today} {tomorrow} {yesterday}"])
 @mock.patch("random.random", return_value=0.5)
-@mock.patch("duckbot.util.datetime.now", return_value=datetime.datetime(2002, 1, 21, hour=7))
+@mock.patch("duckbot.cogs.announce_day.announce_day.now", return_value=datetime.datetime(2002, 1, 21, hour=7))
 async def test_on_hour_7am_eastern_not_special_day(now, random, choice, bot, dog_photos, general_channel):
     clazz = AnnounceDay(bot, dog_photos)
     await clazz.on_hour()
@@ -48,7 +48,7 @@ async def test_on_hour_7am_eastern_not_special_day(now, random, choice, bot, dog
 
 @pytest.mark.asyncio
 @mock.patch("random.random", side_effect=[0.09, 0.1])
-@mock.patch("duckbot.util.datetime.now", return_value=datetime.datetime(2002, 1, 21, hour=7))
+@mock.patch("duckbot.cogs.announce_day.announce_day.now", return_value=datetime.datetime(2002, 1, 21, hour=7))
 async def test_on_hour_7am_eastern_send_dog_photo(now, random, bot, dog_photos, general_channel):
     clazz = AnnounceDay(bot, dog_photos)
     await clazz.on_hour()
@@ -58,7 +58,7 @@ async def test_on_hour_7am_eastern_send_dog_photo(now, random, bot, dog_photos, 
 
 @pytest.mark.asyncio
 @mock.patch("random.random", side_effect=[0.09, 0.1])
-@mock.patch("duckbot.util.datetime.now", return_value=datetime.datetime(2002, 1, 21, hour=7))
+@mock.patch("duckbot.cogs.announce_day.announce_day.now", return_value=datetime.datetime(2002, 1, 21, hour=7))
 async def test_on_hour_7am_eastern_send_dog_photo_failure(now, random, bot, dog_photos, general_channel):
     dog_photos.get_dog_image.side_effect = RuntimeError("ded")
     clazz = AnnounceDay(bot, dog_photos)
@@ -69,7 +69,7 @@ async def test_on_hour_7am_eastern_send_dog_photo_failure(now, random, bot, dog_
 
 @pytest.mark.asyncio
 @mock.patch("random.random", side_effect=[0.1, 0.09])
-@mock.patch("duckbot.util.datetime.now", return_value=datetime.datetime(2002, 1, 25, hour=7))
+@mock.patch("duckbot.cogs.announce_day.announce_day.now", return_value=datetime.datetime(2002, 1, 25, hour=7))
 async def test_on_hour_7am_eastern_send_gif(now, random, bot, dog_photos, general_channel):
     clazz = AnnounceDay(bot, dog_photos)
     await clazz.on_hour()
@@ -80,7 +80,7 @@ async def test_on_hour_7am_eastern_send_gif(now, random, bot, dog_photos, genera
 @pytest.mark.asyncio
 @mock.patch("duckbot.cogs.announce_day.announce_day.days")
 @mock.patch("random.random", side_effect=[0.1, 0.09])
-@mock.patch("duckbot.util.datetime.now", return_value=datetime.datetime(2002, 1, 25, hour=7))
+@mock.patch("duckbot.cogs.announce_day.announce_day.now", return_value=datetime.datetime(2002, 1, 25, hour=7))
 async def test_on_hour_7am_eastern_no_gifs_to_send(now, random, days, bot, dog_photos, general_channel):
     days.__getitem__.return_value = {"names": ["name"], "templates": [], "gifs": []}
     clazz = AnnounceDay(bot, dog_photos)
@@ -91,7 +91,7 @@ async def test_on_hour_7am_eastern_no_gifs_to_send(now, random, days, bot, dog_p
 
 @pytest.mark.asyncio
 @pytest.mark.parametrize("hour", [h for h in range(0, 24) if h != 7])
-@mock.patch("duckbot.util.datetime.now")
+@mock.patch("duckbot.cogs.announce_day.announce_day.now")
 async def test_on_hour_not_7am(now, bot, dog_photos, hour):
     now.return_value = datetime.datetime(2002, 1, 1, hour=hour)
     clazz = AnnounceDay(bot, dog_photos)

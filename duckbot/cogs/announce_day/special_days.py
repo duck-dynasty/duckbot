@@ -6,7 +6,7 @@ import holidays
 from dateutil.relativedelta import FR, SU
 from dateutil.relativedelta import relativedelta as rd
 
-from duckbot.util.datetime import now, timezone
+from .datetime import now, timezone
 
 
 class SpecialDays(holidays.Canada):

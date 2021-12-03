@@ -5,8 +5,7 @@ from discord import ChannelType
 from discord.ext import commands, tasks
 from discord.utils import get
 
-import duckbot.util.datetime
-
+from .datetime import now
 from .phrases import days, templates
 from .special_days import SpecialDays
 
@@ -24,17 +23,17 @@ class AnnounceDay(commands.Cog):
         self.on_hour_loop.cancel()
 
     def should_announce_day(self):
-        return duckbot.util.datetime.now().hour == 7
+        return now().hour == 7
 
     def get_message(self):
-        now = duckbot.util.datetime.now()
-        day = now.weekday()
+        current_time = now()
+        day = current_time.weekday()
         today = random.choice(days[day]["names"])
         tomorrow = random.choice(days[(day + 1) % 7]["names"])
         yesterday = random.choice(days[(day + 6) % 7]["names"])  # +6 instead of -1 since modulo can be negative
         message = random.choice(templates + days[day]["templates"]).format(today=today, tomorrow=tomorrow, yesterday=yesterday)
-        if now in self.holidays:
-            specials = " and ".join(self.holidays.get_list(now))
+        if current_time in self.holidays:
+            specials = " and ".join(self.holidays.get_list(current_time))
             return message + "\n" + "It is also " + specials + "."
         else:
             return message
@@ -62,8 +61,7 @@ class AnnounceDay(commands.Cog):
             log.warning(e, exc_info=True)  # ignore failures for sending dog photo
 
     async def send_gif(self, channel):
-        now = duckbot.util.datetime.now()
-        day = now.weekday()
+        day = now().weekday()
         if days[day]["gifs"]:
             await channel.send(random.choice(days[day]["gifs"]))
 

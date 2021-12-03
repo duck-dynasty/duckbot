@@ -3,8 +3,8 @@ from unittest import mock
 
 import pytest
 
+from duckbot.cogs.announce_day.datetime import timezone
 from duckbot.cogs.announce_day.special_days import SpecialDays
-from duckbot.util.datetime import timezone
 
 
 def test_populate_bro_tito_day(bot, guild, emoji):
@@ -34,7 +34,7 @@ def test_populate_black_friday(bot, date):
     assert clazz.get_list(date) == ["Black Friday. I hope I can get some new socks"]
 
 
-@mock.patch("duckbot.util.datetime.now")
+@mock.patch("duckbot.cogs.announce_day.special_days.now")
 @pytest.mark.parametrize("time", [datetime(2021, 12, 3, 11, tzinfo=timezone()), datetime(2022, 12, 3, 7, tzinfo=timezone())])
 def test_populate_duckbot_day(now, bot, time):
     initial_commit_datetime = datetime(2020, 12, 3, 10, 39, tzinfo=timezone())
