@@ -1,8 +1,6 @@
 name: Build and Push DuckBot Docker Image
 description: builds and pushes the duckbot docker image to docker hub
 
-# FIXME look up composite actions secrets, I don't remember if they implicitly get access to them
-
 outputs:
   latest:
     description: the docker image tag for the latest version
