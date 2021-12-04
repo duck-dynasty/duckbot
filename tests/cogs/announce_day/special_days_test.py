@@ -1,7 +1,9 @@
 from datetime import datetime
+from unittest import mock
 
 import pytest
 
+from duckbot.cogs.announce_day.datetime import timezone
 from duckbot.cogs.announce_day.special_days import SpecialDays
 
 
@@ -30,3 +32,13 @@ def test_populate_fathers_day(bot, date):
 def test_populate_black_friday(bot, date):
     clazz = SpecialDays(bot)
     assert clazz.get_list(date) == ["Black Friday. I hope I can get some new socks"]
+
+
+@mock.patch("duckbot.cogs.announce_day.special_days.now")
+@pytest.mark.parametrize("time", [datetime(2021, 12, 3, 11, tzinfo=timezone()), datetime(2022, 12, 3, 7, tzinfo=timezone())])
+def test_populate_duckbot_day(now, bot, time):
+    initial_commit_datetime = datetime(2020, 12, 3, 10, 39, tzinfo=timezone())
+    seconds_since_commit = (time - initial_commit_datetime).seconds
+    now.return_value = time
+    clazz = SpecialDays(bot)
+    assert clazz.get_list(time) == [f"DuckBot's Inception Day. I'm about {seconds_since_commit}s old"]
