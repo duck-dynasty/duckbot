@@ -81,7 +81,7 @@ jobs:
     - name: Install CDK
       run: |
         . ./venv/bin/activate
-        npm install -g aws-cdk@$(python -c 'from setup import CDK_VERSION; print(CDK_VERSION)')
+        npm install -g aws-cdk@$(python -c 'from importlib.metadata import version; print(version("aws-cdk.core"))')
         cdk --version
 
     - name: Synthesize CDK Stack
@@ -173,7 +173,7 @@ jobs:
     - name: Install CDK
       run: |
         . ./venv/bin/activate
-        npm install -g aws-cdk@$(python -c 'from setup import CDK_VERSION; print(CDK_VERSION)')
+        npm install -g aws-cdk@$(python -c 'from importlib.metadata import version; print(version("aws-cdk.core"))')
         cdk --version
 
     - name: Configure AWS Credentials
