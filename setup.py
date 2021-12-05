@@ -5,8 +5,6 @@ from setuptools import find_packages, setup
 from setuptools.command.develop import develop
 from setuptools.command.install import install
 
-CDK_VERSION = "1.132.0"
-
 
 def run_code_formatters():
     for tool in ["isort .", "black .", "mdformat ."]:
@@ -78,8 +76,8 @@ if __name__ == "__main__":
                 "flake8-isort==4.1.1",
                 "pep8-naming==0.12.1",
                 "pytest-flake8==1.0.7",
-                "mdformat==0.7.10",
-                "mdformat-gfm==0.3.4",
+                "mdformat==0.7.11",
+                "mdformat-gfm==0.3.5",
                 "mdformat-black==0.1.1",
                 "responses==0.16.0",
                 "pytest-blockage==0.2.2",
@@ -89,15 +87,15 @@ if __name__ == "__main__":
                 "pytest-lazy-fixture==0.6.3",
             ],
             "cdk": [
-                f"aws-cdk.core=={CDK_VERSION}",
-                f"aws-cdk.aws-ec2=={CDK_VERSION}",
-                f"aws-cdk.aws-ecs=={CDK_VERSION}",
-                f"aws-cdk.aws-autoscaling=={CDK_VERSION}",
-                f"aws-cdk.aws-efs=={CDK_VERSION}",
-                f"aws-cdk.aws-iam=={CDK_VERSION}",
-                f"aws-cdk.aws-logs=={CDK_VERSION}",
-                f"aws-cdk.aws-ssm=={CDK_VERSION}",
-                "boto3==1.20.10",
+                "aws-cdk.core==1.134.0",
+                "aws-cdk.aws-ec2==1.134.0",
+                "aws-cdk.aws-ecs==1.134.0",
+                "aws-cdk.aws-autoscaling==1.134.0",
+                "aws-cdk.aws-efs==1.134.0",
+                "aws-cdk.aws-iam==1.134.0",
+                "aws-cdk.aws-logs==1.134.0",
+                "aws-cdk.aws-ssm==1.134.0",
+                "boto3==1.20.20",
             ],
         },
         entry_points={
