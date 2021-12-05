@@ -63,13 +63,13 @@ jobs:
         pip install --editable .[cdk]
 
     - name: Set up Node.js
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v2.5.0
       with:
         node-version: 16.x
     - name: Install CDK
       run: |
         . ./venv/bin/activate
-        npm install -g aws-cdk@$(python -c 'from setup import CDK_VERSION; print(CDK_VERSION)')
+        npm install -g aws-cdk@$(python -c 'from importlib.metadata import version; print(version("aws-cdk.core"))')
         cdk --version
 
     - name: Synthesize CDK Stack
@@ -155,13 +155,13 @@ jobs:
         pip install --editable .[cdk]
 
     - name: Set up Node.js
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v2.5.0
       with:
         node-version: 16.x
     - name: Install CDK
       run: |
         . ./venv/bin/activate
-        npm install -g aws-cdk@$(python -c 'from setup import CDK_VERSION; print(CDK_VERSION)')
+        npm install -g aws-cdk@$(python -c 'from importlib.metadata import version; print(version("aws-cdk.core"))')
         cdk --version
 
     - name: Configure AWS Credentials
