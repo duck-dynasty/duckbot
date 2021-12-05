@@ -77,7 +77,7 @@ if __name__ == "__main__":
                 "pep8-naming==0.12.1",
                 "pytest-flake8==1.0.7",
                 "mdformat==0.7.11",
-                "mdformat-gfm==0.3.4",
+                "mdformat-gfm==0.3.5",
                 "mdformat-black==0.1.1",
                 "responses==0.16.0",
                 "pytest-blockage==0.2.2",
