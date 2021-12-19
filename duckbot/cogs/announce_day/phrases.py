@@ -106,6 +106,7 @@ templates = [
     "What if I said to you that in fact, today is not {tomorrow}? I'd be right. It's {today}.",
     "Rejoice, for today is {today}.",
     "Don't get it twisted, it's {today}.",
+    "Behold! It is {today}!",
     "{today}",
     "It {today}.",
     "Today is {today}, I hope you have your pants on.",
