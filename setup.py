@@ -80,7 +80,7 @@ if __name__ == "__main__":
                 "mdformat-gfm==0.3.5",
                 "mdformat-black==0.1.1",
                 "responses==0.16.0",
-                "pytest-blockage==0.2.2",
+                "pytest-blockage==0.2.4",
                 "pytest-sugar==0.9.4",
                 "pytest-icdiff==0.5",
                 "pytest-cov==3.0.0",
