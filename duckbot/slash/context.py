@@ -86,15 +86,21 @@ class InteractionContext:
         :param embed: embed message content to send, mutually exclusive with embeds
         :param embeds: multiple embed message contents to send, mutually exclusive with embed
         :param file: a file to upload and sent; requires `typing()` first
-        :param delete_after: does nothing, exists for interface parity with discord.py
+        :param delete_after: the number of seconds to wait before deleting the sent message
         :return: None
         """
         if self.follow_up:
             kwargs = {"embed": embed, "embeds": embeds, "file": file}
-            await self.interaction.followup.send(content, **{k: v for k, v in kwargs.items() if v})
+            webhook_message = await self.interaction.followup.send(content, **{k: v for k, v in kwargs.items() if v})
+            if delete_after and webhook_message:
+                await webhook_message.delete(delay=delete_after)
         else:
             kwargs = {"embed": embed, "embeds": embeds}
             await self.interaction.response.send_message(content, **{k: v for k, v in kwargs.items() if v})
+            if delete_after:
+                interaction_message = await self.interaction.original_message()
+                if interaction_message:
+                    await interaction_message.delete(delay=delete_after)
 
     def typing(self):
         """Triggers a "Bot is thinking..." response to the interaction. Should be used in any of the following conditions:
