@@ -93,7 +93,7 @@ if __name__ == "__main__":
                 "aws-cdk.aws-autoscaling==1.134.0",
                 "aws-cdk.aws-efs==1.134.0",
                 "aws-cdk.aws-iam==1.134.0",
-                "aws-cdk.aws-logs==1.134.0",
+                "aws-cdk.aws-logs==1.137.0",
                 "aws-cdk.aws-ssm==1.134.0",
                 "boto3==1.20.20",
             ],
