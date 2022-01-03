@@ -4,7 +4,7 @@ description: installs dependencies to be able to run cdk
 outputs:
   venv-path:
     description: path to the created virtual environment relative to repository root
-    value: ${{ steps.path.outputs.path }}
+    value: ${{ steps.venv.outputs.path }}
 
 runs:
   using: composite
