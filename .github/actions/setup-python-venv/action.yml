@@ -1,0 +1,42 @@
+name: Set Up Python Virtual Environment
+description: creates a python virtual environment for duckbot
+
+inputs:
+  extras:
+    description: duckbot package extras to install
+    required: false
+    default: none  # pip warns about extras not existing, but otherwise is ok with it
+outputs:
+  path:
+    description: path to the created virtual environment relative to repository root
+    value: ${{ steps.path.outputs.path }}
+
+runs:
+  using: composite
+  steps:
+  - uses: actions/checkout@v2
+  - name: Set up Python 3.8
+    uses: actions/setup-python@v2
+    with:
+      python-version: '3.8'
+
+  - name: Create path Output
+    id: path
+    shell: bash
+    run: echo "::set-output name=path::venv"
+
+  - name: Set up Virtual Environment Cache
+    id: venv
+    uses: actions/cache@v2
+    with:
+      path: ${{ steps.path.outputs.path }}
+      key: ${{ env.pythonLocation }}-${{ inputs.extras }}-${{ hashFiles('setup.py', 'pyproject.toml') }}
+
+  - name: Install Packages
+    if: steps.venv.outputs.cache-hit != 'true'
+    shell: bash
+    run: |
+      python -m venv --clear ${{ steps.path.outputs.path }}
+      . ${{ steps.path.outputs.path }}/bin/activate
+      pip install --upgrade pip setuptools wheel
+      pip install --editable .[${{ inputs.extras }}]
