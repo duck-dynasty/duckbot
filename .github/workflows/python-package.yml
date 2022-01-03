@@ -44,7 +44,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Set up CDK
       id: cdk
-      uses: ./.github/actions/setup-awk-cdk
+      uses: ./.github/actions/setup-aws-cdk
 
     - name: Synthesize CDK Stack
       working-directory: .aws
