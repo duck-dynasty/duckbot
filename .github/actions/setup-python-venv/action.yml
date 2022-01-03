@@ -10,6 +10,7 @@ inputs:
     description: where to place the virtual environment relative to repository root
     required: false
     default: venv
+
 outputs:
   path:
     description: path to the created virtual environment relative to repository root

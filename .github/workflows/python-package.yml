@@ -44,9 +44,39 @@ jobs:
     steps:
     - uses: actions/checkout@v2
 
+<<<<<<< HEAD
     - name: Set up CDK
       id: cdk
       uses: ./.github/actions/setup-awk-cdk
+=======
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+    - name: Setup Virtual Environment Cache
+      id: venv
+      uses: actions/cache@v2
+      with:
+        path: venv
+        key: ${{ env.pythonLocation }}-cdk-${{ hashFiles('setup.py', 'pyproject.toml') }}
+    - name: Install Packages
+      if: steps.venv.outputs.cache-hit != 'true'
+      run: |
+        python -m venv --clear venv
+        . ./venv/bin/activate
+        pip install --upgrade pip setuptools wheel
+        pip install --editable .[cdk]
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2.5.1
+      with:
+        node-version: 16.x
+    - name: Install CDK
+      run: |
+        . ./venv/bin/activate
+        npm install -g aws-cdk@$(python -c 'from importlib.metadata import version; print(version("aws-cdk.core"))')
+        cdk --version
+>>>>>>> main
 
     - name: Synthesize CDK Stack
       working-directory: .aws
@@ -85,9 +115,40 @@ jobs:
         WIKI_COMMIT_MESSAGE: ${{ github.event.commits[0].message }}
         GITHUB_ACTOR: ${{ github.event.commits[0].author.name }}
 
+<<<<<<< HEAD
     - name: Set up CDK
       id: cdk
       uses: ./.github/actions/setup-aws-cdk
+=======
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+    - name: Setup Virtual Environment Cache
+      id: venv
+      uses: actions/cache@v2
+      with:
+        path: venv
+        key: ${{ env.pythonLocation }}-cdk-${{ hashFiles('setup.py', 'pyproject.toml') }}
+    - name: Install Packages
+      if: steps.venv.outputs.cache-hit != 'true'
+      run: |
+        python -m venv --clear venv
+        . ./venv/bin/activate
+        pip install --upgrade pip setuptools wheel
+        pip install --editable .[cdk]
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2.5.1
+      with:
+        node-version: 16.x
+    - name: Install CDK
+      run: |
+        . ./venv/bin/activate
+        npm install -g aws-cdk@$(python -c 'from importlib.metadata import version; print(version("aws-cdk.core"))')
+        cdk --version
+
+>>>>>>> main
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:

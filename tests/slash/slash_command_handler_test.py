@@ -48,7 +48,19 @@ async def test_upsert_slash_commands_no_commands(bot, http, guild):
 
 
 @pytest.mark.asyncio
-async def test_upsert_slash_commands_create_commands(bot, http, guild, command):
+async def test_upsert_slash_commands_create_commands_prod(bot, http, guild, command, app_config):
+    app_config.is_production = True
+    create_slash_command(command, "command_name")
+    bot.walk_commands.return_value = [command]
+    bot.guilds = [guild]
+    clazz = SlashCommandHandler(bot)
+    await clazz.upsert_slash_commands()
+    bot.http.bulk_upsert_global_commands.assert_called_once_with(bot.user.id, [command.slash_ext.to_dict()])
+    bot.http.bulk_upsert_guild_commands.assert_called_once_with(bot.user.id, guild.id, [])
+
+
+@pytest.mark.asyncio
+async def test_upsert_slash_commands_create_commands_not_prod(bot, http, guild, command, app_config):
     create_slash_command(command, "command_name")
     bot.walk_commands.return_value = [command]
     bot.guilds = [guild]
@@ -59,8 +71,20 @@ async def test_upsert_slash_commands_create_commands(bot, http, guild, command):
 
 
 @pytest.mark.asyncio
-async def test_upsert_slash_commands_create_subcommand(bot, http, guild, command):
-    create_slash_command(command, "command_name", name="name", root="root", options=[Option(name="opt", description="desc")])
+async def test_upsert_slash_commands_create_subcommand_prod(bot, http, guild, command, app_config):
+    app_config.is_production = True
+    create_slash_command(command, "command_name", name="name", root="root", options=[Option(name="opt", description="d")])
+    bot.walk_commands.return_value = [command]
+    bot.guilds = [guild]
+    clazz = SlashCommandHandler(bot)
+    await clazz.upsert_slash_commands()
+    bot.http.bulk_upsert_global_commands.assert_called_once_with(bot.user.id, [command.slash_ext.to_dict()])
+    bot.http.bulk_upsert_guild_commands.assert_called_once_with(bot.user.id, guild.id, [])
+
+
+@pytest.mark.asyncio
+async def test_upsert_slash_commands_create_subcommand_not_prod(bot, http, guild, command):
+    create_slash_command(command, "command_name", name="name", root="root", options=[Option(name="opt", description="d")])
     bot.walk_commands.return_value = [command]
     bot.guilds = [guild]
     clazz = SlashCommandHandler(bot)
@@ -70,7 +94,23 @@ async def test_upsert_slash_commands_create_subcommand(bot, http, guild, command
 
 
 @pytest.mark.asyncio
-async def test_upsert_slash_commands_create_subcommand_group(bot, http, guild, command, autospec):
+async def test_upsert_slash_commands_create_subcommand_group_prod(bot, http, guild, command, autospec, app_config):
+    app_config.is_production = True
+    command2 = autospec.of("discord.ext.commands.Command")
+    create_slash_command(command, "first", name="1", root="root", options=[Option(name="1", description="d1")])
+    create_slash_command(command2, "second", name="2", root="root", options=[Option(name="2", description="d2")])
+    expected = command.slash_ext
+    expected.append_options(command2.slash_ext.options)
+    bot.walk_commands.return_value = [command, command2]
+    bot.guilds = [guild]
+    clazz = SlashCommandHandler(bot)
+    await clazz.upsert_slash_commands()
+    bot.http.bulk_upsert_global_commands.assert_called_once_with(bot.user.id, [expected.to_dict()])
+    bot.http.bulk_upsert_guild_commands.assert_called_once_with(bot.user.id, guild.id, [])
+
+
+@pytest.mark.asyncio
+async def test_upsert_slash_commands_create_subcommand_group_not_prod(bot, http, guild, command, autospec):
     command2 = autospec.of("discord.ext.commands.Command")
     create_slash_command(command, "first", name="1", root="root", options=[Option(name="1", description="d1")])
     create_slash_command(command2, "second", name="2", root="root", options=[Option(name="2", description="d2")])

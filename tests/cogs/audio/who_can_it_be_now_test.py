@@ -30,6 +30,8 @@ async def test_task_loop_once(ffmpeg, vol, bot_spy, context, voice_client, skip_
     assert clazz.streaming is False
     assert clazz.audio_task is None
     assert clazz.voice_client is None
+    context.send.assert_any_call(":musical_note: :saxophone:", delete_after=30)
+    context.send.assert_any_call(":disappointed_relieved:", delete_after=30)
 
 
 @pytest.mark.asyncio
@@ -57,6 +59,8 @@ async def test_task_loop_repeats(ffmpeg, vol, bot_spy, context, voice_client, sk
     assert clazz.streaming is False
     assert clazz.audio_task is None
     assert clazz.voice_client is None
+    context.send.assert_any_call(":musical_note: :saxophone:", delete_after=30)
+    context.send.assert_any_call(":disappointed_relieved:", delete_after=30)
 
 
 @pytest.mark.asyncio
@@ -79,6 +83,7 @@ async def test_task_loop_repeats_max_times(ffmpeg, vol, bot_spy, context, voice_
     # stop() is called after song is played 75 times
     assert clazz.audio_task is None
     assert clazz.voice_client is None
+    context.send.assert_called_once_with(":musical_note: :saxophone:", delete_after=30)
 
 
 @pytest.mark.asyncio
@@ -122,6 +127,7 @@ async def test_start_already_started(bot, context):
     clazz = WhoCanItBeNow(bot)
     clazz.streaming = True
     await clazz.start(context)
+    context.send.assert_called_once_with(":musical_note: :saxophone:", delete_after=30)
     bot.loop.create_task.assert_not_called()
 
 
@@ -138,6 +144,7 @@ async def test_stop_disconnects(ffmpeg, vol, bot, context, voice_client):
     assert clazz.voice_client is None
     assert clazz.audio_task is None
     assert clazz.streaming is False
+    context.send.assert_called_once_with(":disappointed_relieved:", delete_after=30)
 
 
 @pytest.mark.asyncio
