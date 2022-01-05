@@ -1,6 +1,11 @@
 name: Build and Push DuckBot Docker Image
 description: builds and pushes the duckbot docker image to docker hub
 
+inputs:
+  docker-pass:
+    description: the docker hub password
+    required: true
+
 outputs:
   latest:
     description: the docker image tag for the latest version
@@ -35,7 +40,7 @@ runs:
     uses: docker/login-action@v1
     with:
       username: duckdynasty
-      password: ${{ secrets.DOCKER_PASS }}
+      password: ${{ inputs.docker-pass }}
 
   - name: Build and Push Docker Image
     shell: bash
