@@ -72,6 +72,8 @@ jobs:
     - name: Build and Push Docker Image
       id: image
       uses: ./.github/actions/build-push-docker-image
+      with:
+        docker-pass: ${{ secrets.DOCKER_PASS }}
 
     - name: Publish Wiki Documentation
       uses: SwiftDocOrg/github-wiki-publish-action@v1
