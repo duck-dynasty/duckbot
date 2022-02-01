@@ -54,7 +54,7 @@ if __name__ == "__main__":
             "holidays==0.12",
             "pyowm==3.2.0",  # openweather
             "psycopg2==2.9.3",
-            "SQLAlchemy==1.4.29",
+            "SQLAlchemy==1.4.31",
             "d20==1.1.2",
             "nltk==3.6.7",  # also in pyproject.toml, required for setup script above
             "textblob==0.17.1",  # also in pyproject.toml, required for setup script above
