@@ -70,7 +70,7 @@ if __name__ == "__main__":
                 "pytest-asyncio==0.17.2",
                 "pytest-xdist[psutil]==2.5.0",
                 "flake8==4.0.1",
-                "black==21.12b0",
+                "black==22.1.0",
                 "flake8-black==0.2.4",
                 "isort==5.10.1",
                 "flake8-isort==4.1.1",
