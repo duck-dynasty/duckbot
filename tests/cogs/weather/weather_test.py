@@ -51,7 +51,6 @@ def test_owm_returns_cached_instance(weather, owm):
     assert weather.owm == owm
 
 
-@pytest.mark.asyncio
 async def test_weather_get_failure(weather, owm, context):
     owm.weather_manager.side_effect = Exception("ded")
     with pytest.raises(Exception):
@@ -59,20 +58,17 @@ async def test_weather_get_failure(weather, owm, context):
     context.send.assert_called_once_with("Iunno. Figure it out.\nded")
 
 
-@pytest.mark.asyncio
 async def test_search_location_no_args(weather, context):
     assert await weather.search_location(context, None, None, None) is None
     context.send.assert_called_once_with("Not enough arguments to determine weather location, see https://github.com/duck-dynasty/duckbot/wiki/Commands#weather")
 
 
-@pytest.mark.asyncio
 async def test_search_location_no_matches(weather, context, city_id):
     city_id.locations_for.return_value = []
     assert await weather.search_location(context, "city", None, None) is None
     context.send.assert_called_once_with("No cities found matching search.")
 
 
-@pytest.mark.asyncio
 async def test_search_location_single_return_city_only(weather, context, city_id):
     city_id.locations_for.return_value = [make_city("city")]
     city = await weather.search_location(context, "city", None, None)
@@ -80,7 +76,6 @@ async def test_search_location_single_return_city_only(weather, context, city_id
     assert city.to_dict() == make_city("city").to_dict()
 
 
-@pytest.mark.asyncio
 async def test_search_location_city_name_with_comma_removed(weather, context, city_id):
     city_id.locations_for.return_value = [make_city("city")]
     city = await weather.search_location(context, "city,", None, None)
@@ -88,7 +83,6 @@ async def test_search_location_city_name_with_comma_removed(weather, context, ci
     assert city.to_dict() == make_city("city").to_dict()
 
 
-@pytest.mark.asyncio
 async def test_search_location_single_return_country_arg(weather, context, city_id):
     city_id.locations_for.return_value = [make_city("city")]
     city = await weather.search_location(context, "city", "US", None)
@@ -96,7 +90,6 @@ async def test_search_location_single_return_country_arg(weather, context, city_
     assert city.to_dict() == make_city("city").to_dict()
 
 
-@pytest.mark.asyncio
 async def test_search_location_single_return_invalid_country_code(weather, context, city_id):
     city_id.locations_for.return_value = [make_city("city")]
     city = await weather.search_location(context, "city", "invalid", None)
@@ -104,7 +97,6 @@ async def test_search_location_single_return_invalid_country_code(weather, conte
     context.send.assert_called_once_with("Country must be an ISO country code, such as CA for Canada.")
 
 
-@pytest.mark.asyncio
 async def test_search_location_multiple_matches(weather, context, city_id):
     city_id.locations_for.return_value = [make_city("1"), make_city("2")]
     city = await weather.search_location(context, "city", None, None)
@@ -112,14 +104,12 @@ async def test_search_location_multiple_matches(weather, context, city_id):
     context.send.assert_called()
 
 
-@pytest.mark.asyncio
 async def test_search_location_multiple_matches_with_index(weather, context, city_id):
     city_id.locations_for.return_value = [make_city("1"), make_city("2")]
     city = await weather.search_location(context, "city", "US", 1)
     assert city.to_dict() == make_city("1").to_dict()
 
 
-@pytest.mark.asyncio
 async def test_set_default_location_location_saved(weather, session, context):
     async def mock_search_location(context, city, country, index):
         return make_city("city")
@@ -132,7 +122,6 @@ async def test_set_default_location_location_saved(weather, session, context):
     session.commit.assert_called()
 
 
-@pytest.mark.asyncio
 async def test_set_default_location_location_not_saved(weather, session, context):
     async def mock_search_location(context, city, country, index):
         return None
@@ -143,14 +132,12 @@ async def test_set_default_location_location_not_saved(weather, session, context
     session.commit.assert_not_called()
 
 
-@pytest.mark.asyncio
 async def test_send_weather_no_default_no_args(weather, session, context):
     session.get.return_value = None
     await weather.send_weather(context, None, None, None)
     context.send.assert_called_once_with("Set a default location using `!weather set city country-code`")
 
 
-@pytest.mark.asyncio
 @mock.patch("discord.File")
 async def test_send_weather_default_location(file, weather, session, context):
     session.get.return_value = SavedLocation(id=1, name="city", country="country", city_id=123, latitude=1, longitude=2)
@@ -160,7 +147,6 @@ async def test_send_weather_default_location(file, weather, session, context):
     context.send.assert_called_once_with("weather", file=file.return_value)
 
 
-@pytest.mark.asyncio
 @mock.patch("discord.File")
 async def test_send_weather_provided_location(file, weather, context):
     async def mock_search_location(context, *args):

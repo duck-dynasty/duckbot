@@ -6,7 +6,6 @@ import pytest
 from duckbot.cogs.games import AgeOfEmpires
 
 
-@pytest.mark.asyncio
 @mock.patch("duckbot.cogs.games.aoe.get_message_reference", return_value=None)
 @pytest.mark.parametrize("text", ["105", "  105  "])
 async def test_expand_taunt_message_is_taunt_and_not_reply(get_message_reference, bot, message, text):
@@ -18,7 +17,6 @@ async def test_expand_taunt_message_is_taunt_and_not_reply(get_message_reference
     get_message_reference.assert_called()
 
 
-@pytest.mark.asyncio
 @mock.patch("duckbot.cogs.games.aoe.get_message_reference")
 @pytest.mark.parametrize("text", ["105", "  105  "])
 async def test_expand_taunt_message_is_taunt_and_reply(get_message_reference, bot, message, text, autospec):
@@ -32,7 +30,6 @@ async def test_expand_taunt_message_is_taunt_and_reply(get_message_reference, bo
     get_message_reference.assert_called()
 
 
-@pytest.mark.asyncio
 @mock.patch("duckbot.cogs.games.aoe.get_message_reference")
 async def test_expand_taunt_message_is_not_taunt(get_message_reference, bot, message):
     message.content = "0"

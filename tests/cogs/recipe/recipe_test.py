@@ -1,6 +1,5 @@
 import json
 
-import pytest
 from responses import RequestsMock, matchers
 
 from duckbot.cogs.recipe import Recipe
@@ -8,7 +7,6 @@ from duckbot.cogs.recipe import Recipe
 RECIPE_SEARCH_URI = "https://www.allrecipes.com/element-api/content-proxy/faceted-searches-load-more"
 
 
-@pytest.mark.asyncio
 async def test_search_recipes_returns_scraped_html(bot, responses):
     search_term = "test1"
     mock_data = get_mock_data(search_term, 5)
@@ -19,7 +17,6 @@ async def test_search_recipes_returns_scraped_html(bot, responses):
     assert_requests(responses, search_term)
 
 
-@pytest.mark.asyncio
 async def test_parse_recipes_returns_articles(bot):
     mock_data = get_mock_data("test1", 5)
     expected_response = [get_mock_data("test1", 5) for _ in range(5)]
@@ -29,7 +26,6 @@ async def test_parse_recipes_returns_articles(bot):
     assert response == expected_response
 
 
-@pytest.mark.asyncio
 async def test_parse_recipes_returns_empty(bot):
     expected_response = []
     html = without_articles()
@@ -38,7 +34,6 @@ async def test_parse_recipes_returns_empty(bot):
     assert response == expected_response
 
 
-@pytest.mark.asyncio
 async def test_parse_recipes_no_content_returns_empty(bot):
     expected_response = []
     html = without_content()
@@ -47,7 +42,6 @@ async def test_parse_recipes_no_content_returns_empty(bot):
     assert response == expected_response
 
 
-@pytest.mark.asyncio
 async def test_select_recipes_with_one_return_one(bot):
     recipe_list = [get_mock_data("test1", 5)]
     clazz = Recipe(bot)
@@ -55,7 +49,6 @@ async def test_select_recipes_with_one_return_one(bot):
     assert response == recipe_list[0]
 
 
-@pytest.mark.asyncio
 async def test_select_recipes_with_many_return_one(bot):
     recipe_list = [get_mock_data("test1", 5), get_mock_data("test2", 4)]
     clazz = Recipe(bot)
@@ -63,7 +56,6 @@ async def test_select_recipes_with_many_return_one(bot):
     assert response in recipe_list
 
 
-@pytest.mark.asyncio
 async def test_recipe_with_content_return_recipe(bot, context, responses):
     search_term = "test1"
     mock_data = get_mock_data(search_term, 5)
@@ -75,7 +67,6 @@ async def test_recipe_with_content_return_recipe(bot, context, responses):
     assert_requests(responses, search_term)
 
 
-@pytest.mark.asyncio
 async def test_recipe_without_articles_return_sorry(bot, context, responses):
     search_term = "test1"
     expected_response = f"I am terribly sorry. There doesn't seem to be any recipes for {search_term}."
@@ -86,7 +77,6 @@ async def test_recipe_without_articles_return_sorry(bot, context, responses):
     assert_requests(responses, search_term, num_pages=1)
 
 
-@pytest.mark.asyncio
 async def test_recipe_without_content_return_sorry(bot, context, responses):
     search_term = "test1"
     expected_response = "I am terribly sorry. I am having problems reading All Recipes for you."
@@ -103,7 +93,6 @@ def setup_responses(responses: RequestsMock, search_term: str, body: str, num_pa
             method=responses.GET,
             url=RECIPE_SEARCH_URI,
             match=[matchers.query_param_matcher({"search": search_term, "page": str(page)})],
-            match_querystring=False,
             headers={"Cookie": "euConsent=true"},
             body=body,
         )

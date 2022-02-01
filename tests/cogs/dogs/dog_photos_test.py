@@ -61,7 +61,6 @@ def test_get_breeds_failure(bot, responses):
     assert responses.calls[0].request.url == LIST_BREEDS_URI
 
 
-@pytest.mark.asyncio
 async def test_dog_no_breed(bot, context, responses):
     responses.add(responses.GET, RANDOM_IMAGE_URI, json=build_dog("result", success=True))
     clazz = DogPhotos(bot)
@@ -71,7 +70,6 @@ async def test_dog_no_breed(bot, context, responses):
     assert responses.calls[0].request.url == RANDOM_IMAGE_URI
 
 
-@pytest.mark.asyncio
 async def test_dog_known_breed(bot, context, responses):
     responses.add(responses.GET, LIST_BREEDS_URI, json=build_breeds(success=True))
     responses.add(responses.GET, "https://dog.ceo/api/breed/collie/images/random", json=build_dog("pup", success=True))
@@ -83,7 +81,6 @@ async def test_dog_known_breed(bot, context, responses):
     assert responses.calls[1].request.url == "https://dog.ceo/api/breed/collie/images/random"
 
 
-@pytest.mark.asyncio
 async def test_dog_unknown_breed(bot, context, responses):
     responses.add(responses.GET, LIST_BREEDS_URI, json=build_breeds(success=True))
     responses.add(responses.GET, RANDOM_IMAGE_URI, json=build_dog("flup", success=True))
