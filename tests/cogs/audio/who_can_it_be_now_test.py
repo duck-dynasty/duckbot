@@ -12,7 +12,6 @@ def play(*args, **kwargs):
     kwargs.get("after")(None)
 
 
-@pytest.mark.asyncio
 @mock.patch("duckbot.cogs.audio.who_can_it_be_now.PCMVolumeTransformer", autospec=True)
 @mock.patch("duckbot.cogs.audio.who_can_it_be_now.FFmpegPCMAudio", autospec=True)
 async def test_task_loop_once(ffmpeg, vol, bot_spy, context, voice_client, skip_if_private_channel):

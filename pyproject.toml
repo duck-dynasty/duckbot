@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.black]
 line-length = 200
-target-version = ['py38']
+target-version = ["py38"]
 
 [tool.isort]
 profile = "black"
@@ -17,3 +17,4 @@ addopts = """\
     --mdformat \
     -n auto \
     --blockage"""
+asyncio_mode = "auto"
