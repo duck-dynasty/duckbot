@@ -16,13 +16,10 @@ def pytest_configure(config):
             config._mdformat_mtimes = config.cache.get(HIST_KEY, {})
 
 
-def pytest_collect_file(path, parent):
+def pytest_collect_file(file_path, path, parent):
     config = parent.config
-    if config.option.mdformat and path.ext == ".md":
-        if hasattr(MdFormatItem, "from_parent"):
-            return MdFormatItem.from_parent(parent, fspath=path)
-        else:
-            return MdFormatItem(path, parent)
+    if config.option.mdformat and file_path.suffix == ".md":
+        return MdFormatFile.from_parent(parent, path=file_path)
 
 
 def pytest_unconfigure(config):
@@ -30,9 +27,14 @@ def pytest_unconfigure(config):
         config.cache.set(HIST_KEY, config._mdformat_mtimes)
 
 
-class MdFormatItem(pytest.Item, pytest.File):
-    def __init__(self, fspath, parent):
-        super(MdFormatItem, self).__init__(fspath, parent)
+class MdFormatFile(pytest.File):
+    def collect(self):
+        return [MdFormatItem.from_parent(self, name="mdformat")]
+
+
+class MdFormatItem(pytest.Item):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self._nodeid += "::MDFORMAT"
         self.add_marker("mdformat")
 
