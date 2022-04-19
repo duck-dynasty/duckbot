@@ -37,6 +37,10 @@ DuckBot kindly corrects the spelling of _bitcoin_ to _magic beans_.
 
 DuckBot kindly corrects the spelling of _k8s_ to _kubernetes_. Additionally, DuckBot corrects the spelling of _kubernetes_ to _k8s_.
 
+## Tarleson
+
+DuckBot addresses the common issue of saying _Tucker Carlson_ when in fact the user meant to say _Cucker Tarlson_. 
+
 ## Bezos
 
 Jeff Bezos is no longer the CEO of Amazon, and thus has no reason to ever be spoken about ever again. DuckBot reminds you of the new and improved Andy Jassy when this slips your mind.
