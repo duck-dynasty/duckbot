@@ -39,7 +39,7 @@ DuckBot kindly corrects the spelling of _k8s_ to _kubernetes_. Additionally, Duc
 
 ## Tarleson
 
-DuckBot addresses the common issue of saying _Tucker Carlson_ when in fact the user meant to say _Cucker Tarlson_. 
+DuckBot addresses the common issue of saying _Tucker Carlson_ when in fact the user meant to say _Cucker Tarlson_.
 
 ## Bezos
 
