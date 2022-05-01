@@ -25,7 +25,7 @@ jobs:
         pytest --cov=duckbot --cov-branch --cov-report xml --cov-report term-missing:skip-covered
     - name: Report Code Coverage
       if: ${{ always() }}
-      uses: codecov/codecov-action@v2
+      uses: codecov/codecov-action@v3
 
   sanity:
     runs-on: ubuntu-latest
