@@ -36,6 +36,7 @@ days = {
         ],
         "templates": [
             "It is {today}, my dudes.",
+            "Tuesday's gone; today is {today}.",
         ],
         "gifs": [
             "https://giphy.com/gifs/yazagames-frog-wednesday-inkulinati-d7HbZN8aQh1Mh3ZnKw",
