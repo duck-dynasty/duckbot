@@ -48,7 +48,7 @@ if __name__ == "__main__":
         install_requires=[
             "discord.py[voice] @ git+https://github.com/duck-dynasty/discord.py@2.0a-freeze",
             "beautifulsoup4==4.11.1",
-            "requests==2.27.1",
+            "requests==2.28.1",
             "pytz==2022.1",
             "timezonefinder==6.0.1",
             "holidays==0.14.2",
