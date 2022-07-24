@@ -1,4 +1,4 @@
-from duckbot.util.emojis import red_a, red_b, regional_indicator, digit
+from duckbot.util.emojis import digit, red_a, red_b, regional_indicator
 
 phrases = [
     [  # car go fast
