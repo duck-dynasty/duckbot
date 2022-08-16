@@ -118,6 +118,7 @@ templates = [
     "I take no pleasure in announcing that today is {today}, for I am a robot.",
     "I take no displeasure in announcing that today is {today}, for I am a robot.",
     "I'm glad I got turned on today, for it is {today}.",
+    "It's {today}. Also, consider flossing today.",
     "Today was {yesterday}. But, that's over.",
     "Fek, figure it out.",
     "Tuesday? I think?",
