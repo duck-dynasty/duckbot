@@ -28,7 +28,6 @@ class DiscordActivity(commands.Cog):
             [
                 discord.Game("Duck Game"),
                 discord.Game("the Banjo"),
-                discord.Game("Gloomhaven"),
                 discord.Game("with Fire"),
                 discord.Game("with the Boys"),
             ]
