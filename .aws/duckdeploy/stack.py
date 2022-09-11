@@ -80,7 +80,7 @@ class DuckBotStack(core.Stack):
             max_capacity=1,
             desired_capacity=1,
             machine_image=aws_ecs.EcsOptimizedImage.amazon_linux2(),
-            instance_type=aws_ec2.InstanceType("t2.micro"),
+            instance_type=aws_ec2.InstanceType.of(instance_class=aws_ec2.InstanceClass.T3, instance_size=aws_ec2.InstanceSize.NANO),
             key_name="duckbot",  # needs to be created manually
             instance_monitoring=aws_autoscaling.Monitoring.BASIC,
             vpc=vpc,
