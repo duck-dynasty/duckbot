@@ -39,7 +39,7 @@ class SpecialDays(holidays.Canada):
         self[date(year, 5, 25)] = "Towel Day! DON'T PANIC :thumbsup:"
         self[date(year, 6, 1) + rd(weekday=SU(+3))] = "Father's Day"
         self[date(year, 6, 21)] = f"Erin's Birthday. She's {year-1991} years old"
-        self[date(year, 9, 8)] = f"Dan's Birthday. He {year-1989} old"
+        self[date(year, 9, 8)] = f"Dan's Birthday. He {year-1989} old. :headstone: to a legend"
         self[date(year, 9, 26)] = f"Tom's Birthday. He's {year-1990} years old. How he made it this far, we'll never know"
         self[date(year, 10, 7)] = f"Delta's Birthday. He's {year-2015} years old and is a good boy"
         self[date(year, 10, 11)] = "Leif Erikson Day. Hinga Dinga Durgen! https://tenor.com/view/viking-spongebob-squarepants-durgen-fall-down-hard-gif-7302846 "  # intentional trailing space for gif
