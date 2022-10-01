@@ -23,7 +23,7 @@ class DuckBotStack(core.Stack):
         file_system = aws_efs.FileSystem(self, "PostgresFileSystem", vpc=vpc, encrypted=True, file_system_name=postgres_volume_name, removal_policy=core.RemovalPolicy.DESTROY)
         file_system.node.default_child.override_logical_id("FileSystem")  # rename for compatibility with legacy cloudformation template
 
-        task_definition = aws_ecs.TaskDefinition(self, "TaskDefinition", compatibility=aws_ecs.Compatibility.EC2, family="duckbot", memory_mib="475", network_mode=aws_ecs.NetworkMode.BRIDGE)
+        task_definition = aws_ecs.TaskDefinition(self, "TaskDefinition", compatibility=aws_ecs.Compatibility.EC2, family="duckbot", network_mode=aws_ecs.NetworkMode.BRIDGE)
 
         postgres_data_path = "/data/postgres"
         postgres = task_definition.add_container(
@@ -44,7 +44,7 @@ class DuckBotStack(core.Stack):
                 start_period=core.Duration.seconds(30),
             ),
             logging=aws_ecs.LogDriver.aws_logs(stream_prefix="ecs", log_retention=aws_logs.RetentionDays.ONE_MONTH),
-            memory_reservation_mib=128,
+            memory_reservation_mib=96,
         )
         task_definition.add_volume(name=postgres_volume_name, efs_volume_configuration=aws_ecs.EfsVolumeConfiguration(file_system_id=file_system.file_system_id, root_directory="/"))
         postgres.add_mount_points(aws_ecs.MountPoint(source_volume=postgres_volume_name, container_path=postgres_data_path, read_only=False))
@@ -69,7 +69,7 @@ class DuckBotStack(core.Stack):
                 start_period=core.Duration.seconds(30),
             ),
             logging=aws_ecs.LogDriver.aws_logs(stream_prefix="ecs", log_retention=aws_logs.RetentionDays.ONE_MONTH),
-            memory_reservation_mib=128,
+            memory_reservation_mib=320,
         )
         duckbot.add_link(postgres)
 
