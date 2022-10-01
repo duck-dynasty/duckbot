@@ -85,9 +85,9 @@ class DuckBotStack(core.Stack):
             min_capacity=0,
             max_capacity=1,
             desired_capacity=1,
-            machine_image=ecs.EcsOptimizedImage.amazon_linux2(),
+            machine_image=ec2.MachineImage.generic_linux(ami_map={"us-east-1": "ami-0c90bcaed0062d19b"}),  # custom ECS AMI created manually via https://github.com/aws/amazon-ecs-ami
             instance_type=ec2.InstanceType.of(instance_class=ec2.InstanceClass.T3, instance_size=ec2.InstanceSize.NANO),
-            block_devices=[autoscaling.BlockDevice(device_name="/dev/xvda", volume=autoscaling.BlockDeviceVolume.ebs(volume_size=10, volume_type=autoscaling.EbsDeviceVolumeType.GP3))],
+            block_devices=[autoscaling.BlockDevice(device_name="/dev/xvda", volume=autoscaling.BlockDeviceVolume.ebs(volume_size=8, volume_type=autoscaling.EbsDeviceVolumeType.GP3))],
             key_name="duckbot",  # needs to be created manually
             instance_monitoring=autoscaling.Monitoring.BASIC,
             vpc=vpc,
