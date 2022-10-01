@@ -69,7 +69,7 @@ class DuckBotStack(core.Stack):
                 start_period=core.Duration.seconds(30),
             ),
             logging=aws_ecs.LogDriver.aws_logs(stream_prefix="ecs", log_retention=aws_logs.RetentionDays.ONE_MONTH),
-            memory_reservation_mib=128,
+            memory_reservation_mib=256,
         )
         duckbot.add_link(postgres)
 
