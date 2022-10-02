@@ -85,6 +85,7 @@ class DuckBotStack(core.Stack):
             min_capacity=0,
             max_capacity=1,
             desired_capacity=1,
+            new_instances_protected_from_scale_in=False,
             machine_image=ec2.MachineImage.generic_linux(ami_map={"us-east-1": "ami-0c90bcaed0062d19b"}),  # custom ECS AMI created manually via https://github.com/aws/amazon-ecs-ami
             instance_type=ec2.InstanceType.of(instance_class=ec2.InstanceClass.T3, instance_size=ec2.InstanceSize.MICRO),
             spot_price="0.0052",  # t3.nano on-demand price
