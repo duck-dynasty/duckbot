@@ -50,7 +50,7 @@ class DuckBotStack(core.Stack):
                 start_period=core.Duration.seconds(30),
             ),
             logging=ecs.LogDriver.aws_logs(stream_prefix="ecs", log_retention=logs.RetentionDays.ONE_MONTH),
-            memory_reservation_mib=96,
+            memory_reservation_mib=64,
         )
         task_definition.add_volume(name=postgres_volume_name, efs_volume_configuration=ecs.EfsVolumeConfiguration(file_system_id=file_system.file_system_id, root_directory="/"))
         postgres.add_mount_points(ecs.MountPoint(source_volume=postgres_volume_name, container_path=postgres_data_path, read_only=False))
