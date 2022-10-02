@@ -101,7 +101,9 @@ class DuckBotStack(core.Stack):
         asg.connections.allow_from(ec2.Peer.any_ipv4(), ec2.Port.tcp(443))
 
         cluster = ecs.Cluster(self, "Cluster", cluster_name="duckbot", vpc=vpc)
-        cluster.add_asg_capacity_provider(ecs.AsgCapacityProvider(cluster, "AsgCapacityProvider", auto_scaling_group=asg), can_containers_access_instance_role=True)
+        cluster.add_asg_capacity_provider(
+            ecs.AsgCapacityProvider(cluster, "AsgCapacityProvider", auto_scaling_group=asg), can_containers_access_instance_role=True, enable_managed_termination_protection=False
+        )
 
         ecs.Ec2Service(
             self,
