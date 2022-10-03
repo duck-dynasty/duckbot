@@ -84,6 +84,7 @@ class DuckBotStack(core.Stack):
             "LaunchTemplate",
             block_devices=[ec2.BlockDevice(device_name="/dev/xvda", volume=ec2.BlockDeviceVolume.ebs(volume_size=8, volume_type=ec2.EbsDeviceVolumeType.GP3))],
             instance_type=ec2.InstanceType.of(instance_class=ec2.InstanceClass.T3, instance_size=ec2.InstanceSize.MICRO),
+            spot_options=ec2.LaunchTemplateSpotOptions(max_price=0.0052),  # $0.0052 is t3.nano on-demand price
             key_name="duckbot",  # needs to be created manually
             machine_image=ec2.MachineImage.generic_linux(ami_map={"us-east-1": "ami-0c90bcaed0062d19b"}),  # custom ECS AMI created manually via https://github.com/aws/amazon-ecs-ami
             security_group=ec2.SecurityGroup(self, "HostSecurityGroup", vpc=vpc),
@@ -99,11 +100,7 @@ class DuckBotStack(core.Stack):
             min_capacity=0,
             max_capacity=1,
             desired_capacity=1,
-            machine_image=ec2.MachineImage.generic_linux(ami_map={"us-east-1": "ami-0c90bcaed0062d19b"}),  # custom ECS AMI created manually via https://github.com/aws/amazon-ecs-ami
-            instance_type=ec2.InstanceType.of(instance_class=ec2.InstanceClass.T3, instance_size=ec2.InstanceSize.MICRO),
-            spot_price="0.0052",  # t3.nano on-demand price
-            block_devices=[autoscaling.BlockDevice(device_name="/dev/xvda", volume=autoscaling.BlockDeviceVolume.ebs(volume_size=8, volume_type=autoscaling.EbsDeviceVolumeType.GP3))],
-            key_name="duckbot",  # needs to be created manually
+            launch_template=launch_template,
             instance_monitoring=autoscaling.Monitoring.BASIC,
             vpc=vpc,
         )
