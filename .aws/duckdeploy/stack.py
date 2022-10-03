@@ -102,7 +102,8 @@ class DuckBotStack(core.Stack):
 
         cluster = ecs.Cluster(self, "Cluster", cluster_name="duckbot", vpc=vpc)
         cluster.add_asg_capacity_provider(
-            ecs.AsgCapacityProvider(cluster, "AsgCapacityProvider", auto_scaling_group=asg, enable_managed_termination_protection=False), can_containers_access_instance_role=True
+            ecs.AsgCapacityProvider(cluster, "AsgCapacityProvider", auto_scaling_group=asg, enable_managed_termination_protection=False, enable_managed_scaling=False),
+            can_containers_access_instance_role=True,
         )
 
         ecs.Ec2Service(
