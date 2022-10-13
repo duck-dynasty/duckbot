@@ -1,3 +1,4 @@
+from discord import Message
 from discord.ext import commands
 from textblob import TextBlob
 
@@ -7,7 +8,7 @@ class Typos(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener("on_message")
-    async def correct_typos(self, message):
+    async def correct_typos(self, message: Message):
         """Try to correct common typos for user's previous message."""
         if message.content.strip().lower() == "fuck":
             prev = await self.get_previous_message(message)
@@ -21,9 +22,9 @@ class Typos(commands.Cog):
     def correct(self, sentence):
         return str(TextBlob(sentence).correct())
 
-    async def get_previous_message(self, message):
+    async def get_previous_message(self, message: Message):
         # limit of 20 may be restricting, since it includes everyone's messages
-        hist = await message.channel.history(limit=20, before=message).flatten()
+        hist = [msg async for msg in message.channel.history(limit=20, before=message)]
         by_same_author = list(x for x in hist if x.author.id == message.author.id)
         if not by_same_author:
             return None

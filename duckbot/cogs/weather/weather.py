@@ -15,7 +15,6 @@ from pyowm.weatherapi25.location import Location
 from pyowm.weatherapi25.one_call import OneCall
 
 from duckbot.db import Database
-from duckbot.slash import Option, OptionType, slash_command
 
 from .saved_location import SavedLocation
 
@@ -35,22 +34,20 @@ class Weather(commands.Cog):
             self._owm = pyowm.OWM(os.getenv("OPENWEATHER_TOKEN"), conf)
         return self._owm
 
-    @slash_command(
-        root="weather",
-        name="get",
-        description="Gives weather information for your default location or the provided city.",
-        options=[
-            Option(name="city", description="The city name to get the weather for."),
-            Option(name="country", description="The two letter country code (eg CA for Canada), or two letter US state code."),
-            Option(name="index", type=OptionType.INTEGER, description="Index to disambiguate city when city/country are not enough."),
-        ],
-        discordpy_include_subcommand_name=False,
-    )
-    @commands.group(name="weather", invoke_without_command=True)
-    async def weather_command(self, context, city: str = None, country: str = None, index: int = None):
+    @commands.hybrid_group(name="weather", invoke_without_command=True)
+    async def weather_command(self, context: commands.Context, city: Optional[str] = None, country: Optional[str] = None, index: Optional[int] = None):
+        await self.weather_get_command(context, city, country, index)
+
+    @weather_command.command(name="get", description="Gives weather information for your default location or the provided city.")
+    async def weather_get_command(self, context: commands.Context, city: Optional[str] = None, country: Optional[str] = None, index: Optional[int] = None):
+        """
+        :param city: The city name to get the weather for.
+        :param country: The two letter country code (eg CA for Canada), or two letter US state code.
+        :param index: Index to disambiguate city when city/country are not enough.
+        """
         await self.weather(context, city, country, index)
 
-    async def weather(self, context, city: str, country: str, index: int):
+    async def weather(self, context: commands.Context, city: Optional[str], country: Optional[str], index: Optional[int]) -> None:
         async with context.typing():
             try:
                 return await self.send_weather(context, city, country, index)
@@ -58,22 +55,16 @@ class Weather(commands.Cog):
                 await context.send(f"Iunno. Figure it out.\n{e}")
                 raise e
 
-    @slash_command(
-        root="weather",
-        name="set",
-        description="Updates your default location for /weather get",
-        options=[
-            Option(name="city", description="The city name to get the weather for.", required=True),
-            Option(name="country", description="The two letter country code (eg CA for Canada), or two letter US state code."),
-            Option(name="index", type=OptionType.INTEGER, description="Index to disambiguate city when city/country are not enough."),
-        ],
-        discordpy_include_subcommand_name=True,
-    )
-    @weather_command.command(name="set", invoke_without_command=True)
-    async def weather_set_command(self, context, city: str = None, country: str = None, index: int = None):
+    @weather_command.command(name="set", description="Updates your default location for /weather get")
+    async def weather_set_command(self, context: commands.Context, city: Optional[str] = None, country: Optional[str] = None, index: Optional[int] = None):
+        """
+        :param city: The city name to get the weather for.
+        :param country: The two letter country code (eg CA for Canada), or two letter US state code.
+        :param index: Index to disambiguate city when city/country are not enough.
+        """
         await self.set_default_location(context, city, country, index)
 
-    async def set_default_location(self, context, city: str, country: str, index: int) -> None:
+    async def set_default_location(self, context: commands.Context, city: Optional[str], country: Optional[str], index: Optional[int]) -> None:
         location = await self.search_location(context, city, country, index)
         if location is not None:
             saved_location = SavedLocation(id=context.author.id, name=location.name, country=location.country, city_id=location.id, latitude=location.lat, longitude=location.lon)
@@ -82,7 +73,7 @@ class Weather(commands.Cog):
                 session.commit()
             await context.send(f"Location saved! {self.__location_string(location)}")
 
-    async def search_location(self, context, city: str, country: str, index: int) -> Optional[Location]:
+    async def search_location(self, context: commands.Context, city: Optional[str], country: Optional[str], index: Optional[int]) -> Optional[Location]:
         if city is not None:
             country = country.upper().replace(",", "") if country is not None else None
             if country is not None and len(country) != 2:
@@ -109,7 +100,7 @@ class Weather(commands.Cog):
     def __location_string(self, city: Location):
         return f"{city.name}, {city.country}, geolocation = ({city.lat}, {city.lon})"
 
-    async def send_weather(self, context, city: str, country: str, index: int) -> None:
+    async def send_weather(self, context: commands.Context, city: Optional[str], country: Optional[str], index: Optional[int]) -> None:
         location = None
         if city is None:
             with self.db.session(SavedLocation) as session:

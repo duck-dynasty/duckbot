@@ -1,11 +1,8 @@
 from unittest import mock
 
-import pytest
-
 from duckbot.cogs.games import CoinFlip
 
 
-@pytest.mark.asyncio
 @mock.patch("random.random", return_value=0.5)
 @mock.patch("random.choice", return_value="some coin flip result")
 async def test_coin_flip_sends_result(choice, random, bot, context):
@@ -14,7 +11,6 @@ async def test_coin_flip_sends_result(choice, random, bot, context):
     context.send.assert_called_once_with(":coin: :coin: some coin flip result :coin: :coin:")
 
 
-@pytest.mark.asyncio
 @mock.patch("random.random", return_value=0.9 / 6000.0)
 async def test_coin_flip_lands_on_side(random, bot, context):
     clazz = CoinFlip(bot)

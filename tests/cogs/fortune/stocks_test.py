@@ -5,7 +5,6 @@ import pytest
 from duckbot.cogs.fortune import Stocks
 
 
-@pytest.mark.asyncio
 async def test_stock_info_bot_author(bot, message):
     message.author.bot = True
     message.content = "$DUX"
@@ -14,7 +13,6 @@ async def test_stock_info_bot_author(bot, message):
     message.channel.send.assert_not_called()
 
 
-@pytest.mark.asyncio
 async def test_stock_info_no_stocks_in_message(bot, message):
     message.content = "bruh, no stocks!"
     clazz = Stocks(bot)
@@ -22,7 +20,6 @@ async def test_stock_info_no_stocks_in_message(bot, message):
     message.channel.send.assert_not_called()
 
 
-@pytest.mark.asyncio
 @pytest.mark.parametrize("text", ["$dux", "$DUX me up so I can do the $dux", "I got me some $dux"])
 @mock.patch("yfinance.Ticker")
 async def test_stock_info_single_stock_ignores_duplicates(ticker, bot, message, text):
@@ -34,7 +31,6 @@ async def test_stock_info_single_stock_ignores_duplicates(ticker, bot, message, 
     message.channel.send.assert_called_once_with("DUX (Ducks): **1,000.00** (USD) per share, -0.99% today; +10.0% over a year")
 
 
-@pytest.mark.asyncio
 @pytest.mark.parametrize("text", ["$dux", "$DUX me up so I can do the $dux", "I got me some $dux"])
 @mock.patch("yfinance.Ticker")
 async def test_stock_info_ignores_failed_symbols(ticker, bot, message, text):
@@ -46,7 +42,6 @@ async def test_stock_info_ignores_failed_symbols(ticker, bot, message, text):
     message.channel.send.assert_not_called()
 
 
-@pytest.mark.asyncio
 @pytest.mark.parametrize("text", ["$dux1 $dux2", "$DUX1 me up so I can do the $dux2"])
 @mock.patch("yfinance.Ticker")
 async def test_stock_info_multiple_stocks(ticker, bot, message, text):
@@ -68,7 +63,6 @@ async def test_stock_info_multiple_stocks(ticker, bot, message, text):
     )
 
 
-@pytest.mark.asyncio
 @pytest.mark.parametrize("text", ["$dux1 $dux2", "$DUX1 me up so I can do the $dux2"])
 @mock.patch("yfinance.Ticker")
 async def test_stock_info_ignores_failed_symbols_when_multiple(ticker, bot, message, text):

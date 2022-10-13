@@ -1,8 +1,5 @@
-from .context import InteractionContext
-from .option import Option, OptionType
-from .slash_command_decorator import slash_command
-from .slash_command_handler import SlashCommandHandler
+from .sync_command_tree import SyncCommandTree
 
 
-def setup(bot):
-    bot.add_cog(SlashCommandHandler(bot))
+async def setup(bot):
+    await bot.add_cog(SyncCommandTree(bot))

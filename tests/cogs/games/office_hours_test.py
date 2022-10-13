@@ -1,11 +1,8 @@
-import pytest
-
 from duckbot.cogs.games import OfficeHours
 
 TWITCH_URI = "https://www.twitch.tv/conlabx"
 
 
-@pytest.mark.asyncio
 async def test_before_loop_waits_for_bot(bot):
     clazz = OfficeHours(bot)
     await clazz.before_loop()
@@ -18,7 +15,6 @@ def test_cog_unload_cancels_task(bot):
     clazz.check_if_streaming_loop.cancel.assert_called()
 
 
-@pytest.mark.asyncio
 async def test_check_if_streaming_stream_started(bot, responses, general_channel):
     responses.add(responses.GET, TWITCH_URI, body="isLiveBroadcast")
     clazz = OfficeHours(bot)
@@ -31,7 +27,6 @@ async def test_check_if_streaming_stream_started(bot, responses, general_channel
     assert responses.calls[0].request.url == TWITCH_URI
 
 
-@pytest.mark.asyncio
 async def test_check_if_streaming_stream_ongoing(bot, responses, general_channel):
     responses.add(responses.GET, TWITCH_URI, body="isLiveBroadcast")
     clazz = OfficeHours(bot)
@@ -43,7 +38,6 @@ async def test_check_if_streaming_stream_ongoing(bot, responses, general_channel
     assert responses.calls[0].request.url == TWITCH_URI
 
 
-@pytest.mark.asyncio
 async def test_check_if_streaming_stream_not_started(bot, responses, general_channel):
     responses.add(responses.GET, TWITCH_URI, body="bruh")
     clazz = OfficeHours(bot)
@@ -55,7 +49,6 @@ async def test_check_if_streaming_stream_not_started(bot, responses, general_cha
     assert responses.calls[0].request.url == TWITCH_URI
 
 
-@pytest.mark.asyncio
 async def test_check_if_streaming_stream_stopped(bot, responses, general_channel):
     responses.add(responses.GET, TWITCH_URI, body="bruh")
     clazz = OfficeHours(bot)

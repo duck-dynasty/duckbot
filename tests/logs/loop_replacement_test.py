@@ -2,12 +2,9 @@ import asyncio
 import datetime
 from unittest import mock
 
-import pytest
-
 from duckbot.logs import loop_replacement
 
 
-@pytest.mark.asyncio
 @mock.patch("traceback.format_exception")
 @mock.patch("logging.getLogger")
 @mock.patch("logging.Logger")
@@ -32,7 +29,6 @@ async def test_loop_replacement_adds_error_handler_as_function(logger, get_logge
     logger.error.assert_called_once()
 
 
-@pytest.mark.asyncio
 @mock.patch("traceback.format_exception")
 @mock.patch("logging.getLogger")
 @mock.patch("logging.Logger")

@@ -5,8 +5,6 @@ import discord
 import requests
 from discord.ext import commands
 
-from duckbot.slash import Option, slash_command
-
 
 class Dictionary(commands.Cog):
     def __init__(self, bot):
@@ -14,12 +12,14 @@ class Dictionary(commands.Cog):
         self.headers = {"app_id": os.getenv("OXFORD_DICTIONARY_ID"), "app_key": os.getenv("OXFORD_DICTIONARY_KEY")}
         self.url = "https://od-api.oxforddictionaries.com/api/v2"
 
-    @slash_command(options=[Option(name="word", description="The word to define.", required=True)])
-    @commands.command(name="define", description="Define a brother, word.")
-    async def define_command(self, context, *, word: str = "taco"):
+    @commands.hybrid_command(name="define", description="Define a brother, word.")
+    async def define_command(self, context: commands.Context, *, word: str = "taco"):
+        """
+        :param word: The word to define.
+        """
         await self.define(context, word)
 
-    async def define(self, context, word: str):
+    async def define(self, context: commands.Context, word: str):
         roots = self.get_root_words(word.lower()) or ["why"]
         await context.send(embeds=[self.get_definition(x) for x in roots])
 

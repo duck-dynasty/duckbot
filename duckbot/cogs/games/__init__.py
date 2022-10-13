@@ -5,9 +5,9 @@ from .discord_activity import DiscordActivity
 from .office_hours import OfficeHours
 
 
-def setup(bot):
-    bot.add_cog(Dice(bot))
-    bot.add_cog(AgeOfEmpires(bot))
-    bot.add_cog(CoinFlip(bot))
-    bot.add_cog(DiscordActivity(bot))
-    bot.add_cog(OfficeHours(bot))
+async def setup(bot):
+    await bot.add_cog(Dice(bot))
+    await bot.add_cog(AgeOfEmpires(bot))
+    await bot.add_cog(CoinFlip(bot))
+    await bot.add_cog(DiscordActivity(bot))
+    await bot.add_cog(OfficeHours(bot))

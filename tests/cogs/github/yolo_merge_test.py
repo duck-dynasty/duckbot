@@ -44,7 +44,6 @@ def test_github_returns_cached_instance(yolo, gh):
     assert yolo.github == gh
 
 
-@pytest.mark.asyncio
 async def test_yolo_list_no_pulls(yolo, context, gh, repo, skip_if_private_channel):
     gh.get_repo.return_value = repo
     repo.get_pulls.return_value = []
@@ -52,7 +51,6 @@ async def test_yolo_list_no_pulls(yolo, context, gh, repo, skip_if_private_chann
     context.send.assert_called_once_with("There's no open pull requests, brother. Never forget to wumbo.")
 
 
-@pytest.mark.asyncio
 async def test_yolo_list_send_pull_status(yolo, context, gh, repo, skip_if_private_channel):
     gh.get_repo.return_value = repo
     pull, embed_value = make_pull_request(1)
@@ -61,7 +59,6 @@ async def test_yolo_list_send_pull_status(yolo, context, gh, repo, skip_if_priva
     context.send.assert_called_once_with(embed=discord.Embed().add_field(name="#1", value=embed_value))
 
 
-@pytest.mark.asyncio
 async def test_yolo_list_max_six_pulls(yolo, context, gh, repo, skip_if_private_channel):
     gh.get_repo.return_value = repo
     all_pulls = [make_pull_request(i, i % 2 == 0) for i in range(15)]
@@ -74,7 +71,6 @@ async def test_yolo_list_max_six_pulls(yolo, context, gh, repo, skip_if_private_
     context.send.assert_called_once_with(embed=embed)
 
 
-@pytest.mark.asyncio
 async def test_yolo_merge_invalid_pull(yolo, context, gh, repo, skip_if_private_channel):
     gh.get_repo.return_value = repo
     repo.get_pull.side_effect = UnknownObjectException(status=404, data=None, headers=None)
@@ -83,7 +79,6 @@ async def test_yolo_merge_invalid_pull(yolo, context, gh, repo, skip_if_private_
     repo.get_pull.assert_called_once_with(404)
 
 
-@pytest.mark.asyncio
 async def test_yolo_merge_checks_failed(yolo, context, gh, repo, skip_if_private_channel):
     gh.get_repo.return_value = repo
     repo.get_pull.return_value, embed_value = make_pull_request(101, mergeable=True, checks_passed=False)
@@ -92,7 +87,6 @@ async def test_yolo_merge_checks_failed(yolo, context, gh, repo, skip_if_private
     context.send.assert_called_once_with("Bruh. Come on. I can't merge this garbage.", embed=discord.Embed().add_field(name="#101", value=embed_value))
 
 
-@pytest.mark.asyncio
 async def test_yolo_merge_not_mergeable(yolo, context, gh, repo, skip_if_private_channel):
     gh.get_repo.return_value = repo
     repo.get_pull.return_value, embed_value = make_pull_request(101, mergeable=False, checks_passed=True)
@@ -101,7 +95,6 @@ async def test_yolo_merge_not_mergeable(yolo, context, gh, repo, skip_if_private
     context.send.assert_called_once_with("Bruh. Come on. I can't merge this garbage.", embed=discord.Embed().add_field(name="#101", value=embed_value))
 
 
-@pytest.mark.asyncio
 async def test_yolo_merge_mergeable_first_attempt(yolo, context, gh, repo, skip_if_private_channel):
     gh.get_repo.return_value = repo
     repo.get_pull.return_value, embed_value = make_pull_request(101, mergeable=True, checks_passed=True)
@@ -112,7 +105,6 @@ async def test_yolo_merge_mergeable_first_attempt(yolo, context, gh, repo, skip_
     assert yolo.merge_confirmations == {101: MergeConfirmation(context.author.id, context.message.created_at)}
 
 
-@pytest.mark.asyncio
 @mock.patch("duckbot.cogs.github.yolo_merge.utcnow", return_value=datetime.datetime(2000, 1, 1, hour=12, minute=00, tzinfo=datetime.timezone.utc))
 async def test_yolo_merge_mergeable_second_attempt_late(utcnow, yolo, context, gh, repo, skip_if_private_channel):
     context.message.created_at = utcnow()
@@ -126,7 +118,6 @@ async def test_yolo_merge_mergeable_second_attempt_late(utcnow, yolo, context, g
     assert yolo.merge_confirmations == {101: MergeConfirmation(context.author.id, context.message.created_at)}
 
 
-@pytest.mark.asyncio
 @mock.patch("duckbot.cogs.github.yolo_merge.utcnow", return_value=datetime.datetime(2000, 1, 1, hour=12, minute=00, tzinfo=datetime.timezone.utc))
 async def test_yolo_merge_mergeable_second_attempt_merges_yolo_bruh(utcnow, yolo, context, gh, repo, skip_if_private_channel):
     context.message.created_at = utcnow()

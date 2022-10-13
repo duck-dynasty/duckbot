@@ -3,7 +3,7 @@ from unittest import mock
 from textblob import TextBlob
 
 from duckbot.cogs.corrections import Typos
-from tests.duckmock.discord import MockAsyncIterator
+from tests import list_as_async_generator
 
 
 async def test_correct_typos_bot_user(bot, message):
@@ -22,7 +22,7 @@ async def test_correct_typos_message_is_not_fuck(bot, message):
 
 async def test_correct_typos_no_previous_message(bot, message):
     message.content = "fuck"
-    message.channel.history.return_value = MockAsyncIterator(None)
+    message.channel.history.return_value = list_as_async_generator([])
     clazz = Typos(bot)
     await clazz.correct_typos(message)
     message.reply.assert_not_called()
@@ -35,7 +35,7 @@ async def test_correct_typos_no_typos_in_previous(textblob, prev_message, bot, m
     prev_message.author = message.author
     message.content = "fuck"
     prev_message.content = "hello"
-    message.channel.history.return_value = MockAsyncIterator(prev_message)
+    message.channel.history.return_value = list_as_async_generator([prev_message])
     textblob.return_value.correct.return_value = TextBlob(prev_message.content)
     clazz = Typos(bot)
     await clazz.correct_typos(message)
@@ -49,7 +49,7 @@ async def test_correct_typos_sends_correction(textblob, prev_message, bot, messa
     prev_message.author = message.author
     message.content = "fuck"
     prev_message.content = "henlo"
-    message.channel.history.return_value = MockAsyncIterator(prev_message)
+    message.channel.history.return_value = list_as_async_generator([prev_message])
     textblob.return_value.correct.return_value = TextBlob("hello")
     clazz = Typos(bot)
     await clazz.correct_typos(message)
