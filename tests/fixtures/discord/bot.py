@@ -26,5 +26,5 @@ def bot(autospec, monkeypatch) -> DuckBot:
     b.command_prefix = "!"
     b.loop = mock.Mock()
     # mock out loop, it uses `asyncio.get_event_loop()` by default
-    monkeypatch.setattr(discord.ext.tasks, "Loop", mock.Mock())
+    monkeypatch.setattr(discord.ext.tasks, "Loop", mock.Mock(spec=discord.ext.tasks.Loop))
     return b
