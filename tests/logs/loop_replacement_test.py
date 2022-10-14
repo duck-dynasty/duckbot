@@ -1,6 +1,7 @@
 import asyncio
-import datetime
 from unittest import mock
+
+import discord.utils
 
 from duckbot.logs import loop_replacement
 
@@ -13,7 +14,7 @@ async def test_loop_replacement_adds_error_handler_as_function(logger, get_logge
     lock = asyncio.Event()
     lock.clear()
 
-    @loop_replacement(time=datetime.datetime.utcnow().time())
+    @loop_replacement(time=discord.utils.utcnow().time())
     async def func():
         raise RuntimeError("blerg")
 
@@ -38,7 +39,7 @@ async def test_loop_replacement_adds_error_handler_as_class_member(logger, get_l
     lock.clear()
 
     class Wrapper:
-        @loop_replacement(time=datetime.datetime.utcnow().time())
+        @loop_replacement(time=discord.utils.utcnow().time())
         async def func(self):
             raise RuntimeError("blorg")
 
