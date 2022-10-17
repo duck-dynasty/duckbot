@@ -1,7 +1,5 @@
 from unittest import mock
 
-import pytest
-
 from duckbot.health import HealthCheck
 
 
@@ -64,7 +62,6 @@ def test_healthcheck_healthy(reader, writer, bot):
     writer.close.assert_called()
 
 
-@pytest.mark.asyncio
 @mock.patch("asyncio.start_server", return_value=None)
 async def test_start_health_check_tasks(server, bot):
     clazz = HealthCheck(bot)

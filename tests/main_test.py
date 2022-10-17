@@ -13,17 +13,17 @@ def set_discord_token_env(monkeypatch):
     monkeypatch.setenv("DISCORD_TOKEN", DISCORD_TOKEN)
 
 
-def test_run_duckbot_connection_test(bot_spy, monkeypatch):
+async def test_run_duckbot_connection_test(bot_spy, monkeypatch):
     monkeypatch.setenv("DUCKBOT_ARGS", "connection-test")
-    run_duckbot(bot_spy)
+    await run_duckbot(bot_spy)
     assert_extensions_loaded(bot_spy, [duckbot.util.connection_test.__name__])
-    bot_spy.run.assert_called_once_with(DISCORD_TOKEN)
+    bot_spy.start.assert_called_once_with(DISCORD_TOKEN)
 
 
-def test_run_duckbot_normal_run(bot_spy):
-    run_duckbot(bot_spy)
+async def test_run_duckbot_normal_run(bot_spy):
+    await run_duckbot(bot_spy)
     assert_extensions_loaded(bot_spy)
-    bot_spy.run.assert_called_once_with(DISCORD_TOKEN)
+    bot_spy.start.assert_called_once_with(DISCORD_TOKEN)
 
 
 def assert_extensions_loaded(bot_spy, additional_extensions=[]):

@@ -1,5 +1,5 @@
 from .insights import Insights
 
 
-def setup(bot):
-    bot.add_cog(Insights(bot))
+async def setup(bot):
+    await bot.add_cog(Insights(bot))

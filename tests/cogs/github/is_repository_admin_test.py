@@ -6,7 +6,6 @@ from discord.ext import commands
 from duckbot.cogs.github.yolo_merge import is_repository_admin
 
 
-@pytest.mark.asyncio
 @mock.patch("discord.ext.commands.Context")
 async def test_is_repository_admin_not_in_guild(context):
     context.guild = None
@@ -14,7 +13,6 @@ async def test_is_repository_admin_not_in_guild(context):
         await is_repository_admin(context)
 
 
-@pytest.mark.asyncio
 @mock.patch("discord.ext.commands.Context")
 async def test_is_repository_admin_not_bot_owner_or_repo_admin(context, guild, bot, user):
     context.guild = guild
@@ -27,7 +25,6 @@ async def test_is_repository_admin_not_bot_owner_or_repo_admin(context, guild, b
     bot.is_owner.assert_called_once_with(user)
 
 
-@pytest.mark.asyncio
 @pytest.mark.parametrize("admin", [368038054558171141, 776607982472921088, 375024417358479380])
 @mock.patch("discord.ext.commands.Context")
 async def test_is_repository_admin_repo_admin(context, guild, bot, user, admin):
@@ -40,7 +37,6 @@ async def test_is_repository_admin_repo_admin(context, guild, bot, user, admin):
     bot.is_owner.assert_called_once_with(user)
 
 
-@pytest.mark.asyncio
 @mock.patch("discord.ext.commands.Context")
 async def test_is_repository_admin_bot_owner(context, guild, bot, user):
     context.guild = guild

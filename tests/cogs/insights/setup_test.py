@@ -4,5 +4,5 @@ from tests.discord_test_ext import assert_cog_added_of_type
 
 
 async def test_setup(bot):
-    extension_setup(bot)
+    await extension_setup(bot)
     assert_cog_added_of_type(bot, Insights)

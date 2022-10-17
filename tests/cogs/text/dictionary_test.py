@@ -14,7 +14,6 @@ def set_oxford_token_env(monkeypatch):
     monkeypatch.setenv("OXFORD_DICTIONARY_KEY", HEADERS["app_key"])
 
 
-@pytest.mark.asyncio
 async def test_define_no_root_words(bot, context, responses):
     responses.add(responses.GET, f"{LEMMAS_URI}/nothing", json={"error": "No lemma was found in dictionary 'en' for the inflected form 'nothing'"})
     responses.add(responses.GET, f"{ENTRIES_URI}/why", json=why_definition())
@@ -52,7 +51,6 @@ async def test_define_no_root_words(bot, context, responses):
     context.send.assert_called_once_with(embeds=[embed])
 
 
-@pytest.mark.asyncio
 async def test_define_single_root_word(bot, context, responses):
     responses.add(responses.GET, f"{LEMMAS_URI}/cow", json=cow_lemma())
     responses.add(responses.GET, f"{ENTRIES_URI}/cow", json=cow_definition())
@@ -81,7 +79,6 @@ async def test_define_single_root_word(bot, context, responses):
     context.send.assert_called_once_with(embeds=[embed])
 
 
-@pytest.mark.asyncio
 async def test_define_multiple_root_words(bot, context, responses):
     responses.add(responses.GET, f"{LEMMAS_URI}/homing", json=homing_lemma())
     responses.add(responses.GET, f"{ENTRIES_URI}/homing", json=homing_definition())

@@ -1,5 +1,5 @@
 from .duck import Duck
 
 
-def setup(bot):
-    bot.add_cog(Duck(bot))
+async def setup(bot):
+    await bot.add_cog(Duck(bot))

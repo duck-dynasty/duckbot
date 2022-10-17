@@ -12,21 +12,18 @@ def dog_photos(d):
     return d
 
 
-@pytest.mark.asyncio
 async def test_before_loop_waits_for_bot(bot, dog_photos):
     clazz = AnnounceDay(bot, dog_photos)
     await clazz.before_loop()
     bot.wait_until_ready.assert_called()
 
 
-@pytest.mark.asyncio
 async def test_cog_unload_cancels_task(bot, dog_photos):
     clazz = AnnounceDay(bot, dog_photos)
     clazz.cog_unload()
     clazz.on_hour_loop.cancel.assert_called()
 
 
-@pytest.mark.asyncio
 @mock.patch("random.choice", side_effect=["today", "tomorrow", "yesterday", "{today} {tomorrow} {yesterday}"])
 @mock.patch("random.random", return_value=0.5)
 @mock.patch("duckbot.cogs.announce_day.announce_day.now", return_value=datetime.datetime(2002, 2, 2, hour=7))
@@ -36,7 +33,6 @@ async def test_on_hour_7am_eastern_special_day(now, random, choice, bot, dog_pho
     general_channel.send.assert_called_once_with("today tomorrow yesterday\nIt is also Groundhog Day.")
 
 
-@pytest.mark.asyncio
 @mock.patch("random.choice", side_effect=["today", "tomorrow", "yesterday", "{today} {tomorrow} {yesterday}"])
 @mock.patch("random.random", return_value=0.5)
 @mock.patch("duckbot.cogs.announce_day.announce_day.now", return_value=datetime.datetime(2002, 1, 21, hour=7))
@@ -46,7 +42,6 @@ async def test_on_hour_7am_eastern_not_special_day(now, random, choice, bot, dog
     general_channel.send.assert_called_once_with("today tomorrow yesterday")
 
 
-@pytest.mark.asyncio
 @mock.patch("random.random", side_effect=[0.09, 0.1])
 @mock.patch("duckbot.cogs.announce_day.announce_day.now", return_value=datetime.datetime(2002, 1, 21, hour=7))
 async def test_on_hour_7am_eastern_send_dog_photo(now, random, bot, dog_photos, general_channel):
@@ -56,7 +51,6 @@ async def test_on_hour_7am_eastern_send_dog_photo(now, random, bot, dog_photos, 
     dog_photos.get_dog_image.assert_called()
 
 
-@pytest.mark.asyncio
 @mock.patch("random.random", side_effect=[0.09, 0.1])
 @mock.patch("duckbot.cogs.announce_day.announce_day.now", return_value=datetime.datetime(2002, 1, 21, hour=7))
 async def test_on_hour_7am_eastern_send_dog_photo_failure(now, random, bot, dog_photos, general_channel):
@@ -67,7 +61,6 @@ async def test_on_hour_7am_eastern_send_dog_photo_failure(now, random, bot, dog_
     dog_photos.get_dog_image.assert_called()
 
 
-@pytest.mark.asyncio
 @mock.patch("random.random", side_effect=[0.1, 0.09])
 @mock.patch("duckbot.cogs.announce_day.announce_day.now", return_value=datetime.datetime(2002, 1, 25, hour=7))
 async def test_on_hour_7am_eastern_send_gif(now, random, bot, dog_photos, general_channel):
@@ -77,7 +70,6 @@ async def test_on_hour_7am_eastern_send_gif(now, random, bot, dog_photos, genera
     dog_photos.get_dog_image.assert_not_called()
 
 
-@pytest.mark.asyncio
 @mock.patch("duckbot.cogs.announce_day.announce_day.days")
 @mock.patch("random.random", side_effect=[0.1, 0.09])
 @mock.patch("duckbot.cogs.announce_day.announce_day.now", return_value=datetime.datetime(2002, 1, 25, hour=7))
@@ -89,7 +81,6 @@ async def test_on_hour_7am_eastern_no_gifs_to_send(now, random, days, bot, dog_p
     dog_photos.get_dog_image.assert_not_called()
 
 
-@pytest.mark.asyncio
 @pytest.mark.parametrize("hour", [h for h in range(0, 24) if h != 7])
 @mock.patch("duckbot.cogs.announce_day.announce_day.now")
 async def test_on_hour_not_7am(now, bot, dog_photos, hour):
