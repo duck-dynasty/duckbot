@@ -1,7 +1,7 @@
 import datetime
 import random
 
-from discord import ChannelType
+from discord import ChannelType, Client, TextChannel
 from discord.ext import commands, tasks
 from discord.utils import get, utcnow
 
@@ -9,7 +9,7 @@ from .phrases import responses
 
 
 class Insights(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: Client):
         self.bot = bot
         self.check_should_respond_loop.start()
 
@@ -27,8 +27,8 @@ class Insights(commands.Cog):
             response = random.choice(responses)
             await channel.send(response)
 
-    async def __get_last_message(self, channel):
-        message = await channel.history(limit=1).flatten() if channel is not None else None
+    async def __get_last_message(self, channel: TextChannel):
+        message = [msg async for msg in channel.history(limit=1)] if channel is not None else None
         if message:
             return message[0]
         else:

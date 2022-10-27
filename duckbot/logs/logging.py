@@ -6,6 +6,7 @@ import traceback
 
 import discord
 import discord.ext.tasks
+import discord.utils
 from discord.ext import commands
 
 # store the original loop function so we can delegate to it
@@ -19,8 +20,7 @@ class Logging(commands.Cog):
         self.bot = bot
         bot.on_error = self.log_event_exceptions
 
-    @classmethod
-    def define_logs(cls):
+    async def cog_load(self):
         os.makedirs(LOGS_DIRECTORY, exist_ok=True)
         logging.basicConfig(
             level=logging.INFO,

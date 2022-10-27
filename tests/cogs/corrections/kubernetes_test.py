@@ -101,7 +101,6 @@ async def test_correct_k8s_message_is_k8s(bot, message, text):
     message.channel.send.assert_called_once_with(f"I think {message.author.display_name} means Kubernetes")
 
 
-@pytest.mark.asyncio
 @pytest.mark.parametrize("text", ["kubernetes", "duckbot"])
 async def test_correct_k8s_message_is_not_k8s(bot, message, text):
     message.content = text
@@ -110,7 +109,6 @@ async def test_correct_k8s_message_is_not_k8s(bot, message, text):
     message.channel.send.assert_not_called()
 
 
-@pytest.mark.asyncio
 async def test_correct_k8s_message_is_k8s_emoji_but_unknown(bot, message, k8s_emoji):
     message.content = str(k8s_emoji)
     clazz = Kubernetes(bot)
@@ -118,7 +116,6 @@ async def test_correct_k8s_message_is_k8s_emoji_but_unknown(bot, message, k8s_em
     message.channel.send.assert_called_once_with(f"I think {message.author.display_name} means Kubernetes")
 
 
-@pytest.mark.asyncio
 async def test_correct_k8s_message_is_k8s_emoji(bot, message, kubernetes_emoji, k8s_emoji, setup_emojis):
     message.content = str(k8s_emoji)
     clazz = Kubernetes(bot)
