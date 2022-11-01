@@ -53,7 +53,7 @@ if __name__ == "__main__":
             "timezonefinder==6.1.6",
             "holidays==0.16",
             "pyowm==3.3.0",  # openweather
-            "psycopg2==2.9.3",
+            "psycopg2==2.9.5",
             "SQLAlchemy==1.4.42",
             "d20==1.1.2",
             "nltk==3.7",  # also in pyproject.toml, required for setup script above
