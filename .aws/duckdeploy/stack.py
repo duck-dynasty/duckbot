@@ -112,6 +112,8 @@ class DuckBotStack(core.Stack):
             instance_monitoring=autoscaling.Monitoring.BASIC,
             vpc=vpc,
         )
+        asg.scale_on_schedule("Night", schedule=autoscaling.Schedule.cron(hour="23", minute="55"), desired_capacity=0, time_zone="America/Toronto")
+        asg.scale_on_schedule("Day", schedule=autoscaling.Schedule.cron(hour="5", minute="57"), desired_capacity=1, time_zone="America/Toronto")
 
         cluster = ecs.Cluster(self, "Cluster", cluster_name="duckbot", vpc=vpc)
         cluster.add_asg_capacity_provider(
