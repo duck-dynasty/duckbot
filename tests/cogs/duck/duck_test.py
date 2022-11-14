@@ -5,14 +5,14 @@ from duckbot.util.emojis import regional_indicator
 
 
 @mock.patch("random.random", return_value=0.0001)
-async def test_react_duck_random_passes(random, bot, message):
+async def test_react_duck_random_fails(random, bot, message):
     clazz = Duck(bot)
     await clazz.react_duck(message)
     message.add_reaction.assert_not_called()
 
 
 @mock.patch("random.random", return_value=0.000009)
-async def test_react_duck_random_fails(random, bot, message):
+async def test_react_duck_random_passes(random, bot, message):
     clazz = Duck(bot)
     await clazz.react_duck(message)
     message.add_reaction.assert_called_once_with("\U0001F986")
