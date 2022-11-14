@@ -1,11 +1,8 @@
 from unittest import mock
 
-import pytest
-
 from duckbot.cogs.text import AsciiArt
 
 
-@pytest.mark.asyncio
 @mock.patch("pyfiglet.figlet_format", return_value="ascii text")
 async def test_ascii_formats_message(figlet, bot, context):
     clazz = AsciiArt(bot)
@@ -14,7 +11,6 @@ async def test_ascii_formats_message(figlet, bot, context):
     figlet.assert_called_once_with("some text")
 
 
-@pytest.mark.asyncio
 @mock.patch("pyfiglet.figlet_format", side_effect=["x" * 2000, "happy birthday"])
 async def test_ascii_message_too_long(figlet, bot, context):
     clazz = AsciiArt(bot)

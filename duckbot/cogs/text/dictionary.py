@@ -5,8 +5,6 @@ import discord
 import requests
 from discord.ext import commands
 
-from duckbot.slash import Option, slash_command
-
 
 class Dictionary(commands.Cog):
     def __init__(self, bot):
@@ -14,13 +12,15 @@ class Dictionary(commands.Cog):
         self.headers = {"app_id": os.getenv("OXFORD_DICTIONARY_ID"), "app_key": os.getenv("OXFORD_DICTIONARY_KEY")}
         self.url = "https://od-api.oxforddictionaries.com/api/v2"
 
-    @slash_command(options=[Option(name="word", description="The word to define.", required=True)])
-    @commands.command(name="define", description="Define a brother, word.")
-    async def define_command(self, context, *, word: str = "taco"):
+    @commands.hybrid_command(name="define", description="Define a brother, word.")
+    async def define_command(self, context: commands.Context, *, word: str = "taco"):
+        """
+        :param word: The word to define.
+        """
         await self.define(context, word)
 
-    async def define(self, context, word: str):
-        roots = self.get_root_words(word.lower())
+    async def define(self, context: commands.Context, word: str):
+        roots = self.get_root_words(word.lower()) or ["why"]
         await context.send(embeds=[self.get_definition(x) for x in roots])
 
     def get_root_words(self, word: str) -> List[str]:
@@ -61,19 +61,19 @@ class Dictionary(commands.Cog):
         pronunciation = "screw flanders"
         n = entry_number
         for entry in lexical_entry.get("entries", []):
-            pronunciation, entry_lines, count = self.entry_data(entry, n)
+            pronunciation, entry_lines, count = self.entry_data(word, entry, n)
             n += count
             lines = lines + entry_lines
         return text, pronunciation, lines, n
 
-    def entry_data(self, entry: dict, entry_number: int) -> Tuple[str, List[str], int]:
+    def entry_data(self, word: str, entry: dict, entry_number: int) -> Tuple[str, List[str], int]:
         lines = []
         n = entry_number
         pronunciation = next((x.get("phoneticSpelling", "") for x in entry.get("pronunciations", []) if x.get("phoneticNotation", "") == "respell"), "")
         for sense in entry.get("senses", []):
             n += 1
             definition = next(iter(sense.get("definitions", [])), "it means things")
-            example = next(iter(sense.get("examples", [])), {}).get("text", "this is where I'd use it in a sentence... IF I HAD ONE")
+            example = next(iter(sense.get("examples", [])), {}).get("text", f"this is where I'd use {word} in a sentence... IF I HAD ONE")
             lines.append(f"{n}. {definition}\n_{example}_") if example else lines.append(f"{n}. {definition}")
             for sub in sense.get("subsenses", []):
                 definition = next(iter(sub.get("definitions", [])), "")

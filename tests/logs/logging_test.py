@@ -1,26 +1,23 @@
 import logging
 from unittest import mock
 
-import pytest
-
 from duckbot.logs import Logging
 
 LOG_DIR = "logs"
 LOG_TAR_FILE = "logs.tar.gz"
 
 
-@pytest.mark.asyncio
 @mock.patch("logging.StreamHandler")
 @mock.patch("logging.handlers.RotatingFileHandler")
 @mock.patch("logging.basicConfig")
 @mock.patch("os.makedirs")
-async def test_define_logs_create_logger(make_dirs, log_config, filehandler, streamhandler):
-    Logging.define_logs()
+async def test_cog_load_create_logger(make_dirs, log_config, filehandler, streamhandler, bot):
+    clazz = Logging(bot)
+    await clazz.cog_load()
     make_dirs.assert_called_once_with(LOG_DIR, exist_ok=True)
     log_config.assert_called_once_with(level=logging.INFO, format="%(asctime)s:%(levelname)s:%(name)s: %(message)s", handlers=[filehandler.return_value, streamhandler.return_value])
 
 
-@pytest.mark.asyncio
 @mock.patch("discord.File")
 @mock.patch("tarfile.open")
 @mock.patch("tarfile.TarFile")
@@ -39,7 +36,6 @@ async def test_logs_sends_tarball_of_logs(tar, open, file, bot, context):
     assert context.send.call_args.kwargs["file"] == mock_file_id
 
 
-@pytest.mark.asyncio
 @mock.patch("traceback.format_exception")
 @mock.patch("logging.getLogger")
 @mock.patch("logging.Logger")
@@ -61,7 +57,6 @@ async def test_log_command_exceptions_outside_of_cog(logger, get_logger, format_
     logger.error.assert_called_once()
 
 
-@pytest.mark.asyncio
 @mock.patch("discord.ext.commands.Cog")
 @mock.patch("traceback.format_exception")
 @mock.patch("logging.getLogger")
@@ -83,7 +78,6 @@ async def test_log_command_exceptions_in_cog(logger, get_logger, format_exc, cog
     logger.error.assert_called_once()
 
 
-@pytest.mark.asyncio
 @mock.patch("traceback.format_exc")
 @mock.patch("logging.getLogger")
 @mock.patch("logging.Logger")

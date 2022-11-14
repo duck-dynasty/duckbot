@@ -8,11 +8,14 @@ class DogPhotos(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="dog", aliases=["doge"])
-    async def dog_command(self, context, *, breed: Optional[str] = None):
+    @commands.hybrid_command(name="dog", aliases=["doge"], description="Show a random dog you probably don't know")
+    async def dog_command(self, context: commands.Context, *, breed: Optional[str] = None):
+        """
+        :param breed: The specific breed of dog to show. Defaults to any breed.
+        """
         await self.dog(context, breed)
 
-    async def dog(self, context, breed: Optional[str]):
+    async def dog(self, context: commands.Context, breed: Optional[str]):
         if breed and breed in self.get_breeds():
             await context.send(self.get_dog_image(breed))
         else:

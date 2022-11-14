@@ -1,10 +1,12 @@
 import math
-from datetime import date
+from datetime import date, datetime
 
 import discord
 import holidays
 from dateutil.relativedelta import FR, SU
 from dateutil.relativedelta import relativedelta as rd
+
+from .datetime import now, timezone
 
 
 class SpecialDays(holidays.Canada):
@@ -37,14 +39,15 @@ class SpecialDays(holidays.Canada):
         self[date(year, 5, 25)] = "Towel Day! DON'T PANIC :thumbsup:"
         self[date(year, 6, 1) + rd(weekday=SU(+3))] = "Father's Day"
         self[date(year, 6, 21)] = f"Erin's Birthday. She's {year-1991} years old"
-        self[date(year, 9, 8)] = f"Dan's Birthday. He {year-1989} old"
+        self[date(year, 9, 8)] = f"Dan's Birthday. He {year-1989} old. :headstone: to a legend"
         self[date(year, 9, 26)] = f"Tom's Birthday. He's {year-1990} years old. How he made it this far, we'll never know"
         self[date(year, 10, 7)] = f"Delta's Birthday. He's {year-2015} years old and is a good boy"
-        self[date(year, 10, 11)] = "Leif Erikson Day. Hinga Dinga Durgen! https://tenor.com/view/viking-spongebob-squarepants-durgen-fall-down-hard-gif-7302846 "  # intentional trailing space for gif
+        self[date(year, 10, 9)] = "Leif Erikson Day. Hinga Dinga Durgen! https://tenor.com/view/viking-spongebob-squarepants-durgen-fall-down-hard-gif-7302846 "  # intentional trailing space for gif
         self[date(year, 10, 31)] = "Halloween"
         self[date(year, 11, 10)] = f"Tom and Kelly's fake wedding anniversary. They've been fake together for {year-2014} years"
         self[date(year, 11, 12)] = f"Sabrina's Birthday. She is {year-1996} years old. Good work on surviving"
+        self[date(year, 11, 14)] = f"Male Kelly's birthday... Maybe... idk. He's around {year - 1989} years old now."
         self[date(year, 11, 1) + rd(weekday=FR(+4))] = "Black Friday. I hope I can get some new socks"
         self[date(year, 12, 2)] = f"Female Kelly's Birthday. She's {year-1989} years old"
-        self[date(year, 12, 3)] = "DuckBot's Inception Day"
+        self[date(year, 12, 3)] = f"DuckBot's Inception Day. I'm about {(now()-datetime(2020, 12, 3, 10, 39, tzinfo=timezone())).seconds}s old"
         self[date(year, 12, 5)] = f"Taras' Birthday. He's {year-1989} years old"

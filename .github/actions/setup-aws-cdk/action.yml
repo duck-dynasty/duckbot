@@ -1,0 +1,31 @@
+name: Set Up AWK Cloud Development Kit (CDK)
+description: installs dependencies to be able to run cdk
+
+outputs:
+  venv-path:
+    description: path to the created virtual environment relative to repository root
+    value: ${{ steps.venv.outputs.path }}
+
+runs:
+  using: composite
+  steps:
+  - uses: actions/checkout@v2
+
+  - name: Set up Python Environment
+    id: venv
+    uses: ./.github/actions/setup-python-venv
+    with:
+      extras: cdk
+      path: cdk
+
+  - name: Set up Node.js
+    uses: actions/setup-node@v2.5.1
+    with:
+      node-version: 16.x
+
+  - name: Install CDK
+    shell: bash
+    run: |
+      . ${{ steps.venv.outputs.path }}/bin/activate
+      npm install -g aws-cdk@$(python -c 'from importlib.metadata import version; print(version("aws-cdk.core"))')
+      cdk --version

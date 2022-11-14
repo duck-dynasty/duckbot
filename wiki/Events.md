@@ -22,6 +22,13 @@ Then DuckBot will respond with the following message (it is deleted after a shor
 
 DuckBot will let you know if a message is a 5/7/5 haiku.
 
+## Stocks
+
+DuckBot will try to provide basic stock information for any word starting with `$` in a message.
+
+> Human: Hurb. $amzn tho.\
+> DuckBot: AMZN (Amazon.com, Inc.): $3,507.07 (USD) per share, -1.53% today; +10.61% over a year
+
 ## Bitcoin
 
 DuckBot kindly corrects the spelling of _bitcoin_ to _magic beans_.
@@ -29,6 +36,10 @@ DuckBot kindly corrects the spelling of _bitcoin_ to _magic beans_.
 ## Kubernetes
 
 DuckBot kindly corrects the spelling of _k8s_ to _kubernetes_. Additionally, DuckBot corrects the spelling of _kubernetes_ to _k8s_.
+
+## Tarleson
+
+DuckBot addresses the common issue of saying _Tucker Carlson_ when in fact the user meant to say _Cucker Tarlson_.
 
 ## Bezos
 

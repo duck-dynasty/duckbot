@@ -5,14 +5,13 @@ import pytest
 from discord.ext.commands import CommandError
 
 from duckbot.cogs.audio import WhoCanItBeNow
-from tests.async_mock_ext import async_value
+from tests import async_value
 
 
 def play(*args, **kwargs):
     kwargs.get("after")(None)
 
 
-@pytest.mark.asyncio
 @mock.patch("duckbot.cogs.audio.who_can_it_be_now.PCMVolumeTransformer", autospec=True)
 @mock.patch("duckbot.cogs.audio.who_can_it_be_now.FFmpegPCMAudio", autospec=True)
 async def test_task_loop_once(ffmpeg, vol, bot_spy, context, voice_client, skip_if_private_channel):
@@ -30,9 +29,10 @@ async def test_task_loop_once(ffmpeg, vol, bot_spy, context, voice_client, skip_
     assert clazz.streaming is False
     assert clazz.audio_task is None
     assert clazz.voice_client is None
+    context.send.assert_any_call(":musical_note: :saxophone:", delete_after=30)
+    context.send.assert_any_call(":disappointed_relieved:", delete_after=30)
 
 
-@pytest.mark.asyncio
 @mock.patch("duckbot.cogs.audio.who_can_it_be_now.PCMVolumeTransformer", autospec=True)
 @mock.patch("duckbot.cogs.audio.who_can_it_be_now.FFmpegPCMAudio", autospec=True)
 async def test_task_loop_repeats(ffmpeg, vol, bot_spy, context, voice_client, skip_if_private_channel):
@@ -57,9 +57,10 @@ async def test_task_loop_repeats(ffmpeg, vol, bot_spy, context, voice_client, sk
     assert clazz.streaming is False
     assert clazz.audio_task is None
     assert clazz.voice_client is None
+    context.send.assert_any_call(":musical_note: :saxophone:", delete_after=30)
+    context.send.assert_any_call(":disappointed_relieved:", delete_after=30)
 
 
-@pytest.mark.asyncio
 @mock.patch("duckbot.cogs.audio.who_can_it_be_now.PCMVolumeTransformer", autospec=True)
 @mock.patch("duckbot.cogs.audio.who_can_it_be_now.FFmpegPCMAudio", autospec=True)
 async def test_task_loop_repeats_max_times(ffmpeg, vol, bot_spy, context, voice_client, skip_if_private_channel):
@@ -79,9 +80,9 @@ async def test_task_loop_repeats_max_times(ffmpeg, vol, bot_spy, context, voice_
     # stop() is called after song is played 75 times
     assert clazz.audio_task is None
     assert clazz.voice_client is None
+    context.send.assert_called_once_with(":musical_note: :saxophone:", delete_after=30)
 
 
-@pytest.mark.asyncio
 async def test_connect_to_voice_no_voice(bot, context):
     context.voice_client = None
     delattr(context.author, "voice")
@@ -90,7 +91,6 @@ async def test_connect_to_voice_no_voice(bot, context):
     context.send.assert_called_once_with("Music can only be played in a discord server, not a private channel.", delete_after=30)
 
 
-@pytest.mark.asyncio
 async def test_connect_to_voice_author_in_channel(bot, context, voice_client, skip_if_private_channel):
     context.voice_client = None
     context.author.voice.channel.connect.return_value = async_value(voice_client)
@@ -99,7 +99,6 @@ async def test_connect_to_voice_author_in_channel(bot, context, voice_client, sk
     assert clazz.voice_client == voice_client
 
 
-@pytest.mark.asyncio
 async def test_connect_to_voice_author_not_in_channel(bot, context):
     context.voice_client = None
     context.author.voice = None
@@ -109,7 +108,6 @@ async def test_connect_to_voice_author_not_in_channel(bot, context):
     context.send.assert_called_once_with("Connect to a voice channel so I know where to `!start`.", delete_after=30)
 
 
-@pytest.mark.asyncio
 async def test_connect_to_voice_already_connected(bot, context, voice_client):
     context.voice_client = voice_client
     clazz = WhoCanItBeNow(bot)
@@ -117,15 +115,14 @@ async def test_connect_to_voice_already_connected(bot, context, voice_client):
     voice_client.stop.assert_called()
 
 
-@pytest.mark.asyncio
 async def test_start_already_started(bot, context):
     clazz = WhoCanItBeNow(bot)
     clazz.streaming = True
     await clazz.start(context)
+    context.send.assert_called_once_with(":musical_note: :saxophone:", delete_after=30)
     bot.loop.create_task.assert_not_called()
 
 
-@pytest.mark.asyncio
 @mock.patch("duckbot.cogs.audio.who_can_it_be_now.PCMVolumeTransformer", autospec=True)
 @mock.patch("duckbot.cogs.audio.who_can_it_be_now.FFmpegPCMAudio", autospec=True)
 async def test_stop_disconnects(ffmpeg, vol, bot, context, voice_client):
@@ -138,9 +135,9 @@ async def test_stop_disconnects(ffmpeg, vol, bot, context, voice_client):
     assert clazz.voice_client is None
     assert clazz.audio_task is None
     assert clazz.streaming is False
+    context.send.assert_called_once_with(":disappointed_relieved:", delete_after=30)
 
 
-@pytest.mark.asyncio
 async def test_stop_not_streaming(bot, context):
     clazz = WhoCanItBeNow(bot)
     clazz.streaming = False
@@ -148,14 +145,12 @@ async def test_stop_not_streaming(bot, context):
     context.send.assert_called_once_with("Brother, no :musical_note: :saxophone: is active.", delete_after=30)
 
 
-@pytest.mark.asyncio
 async def test_stop_null_context_not_streaming(bot):
     clazz = WhoCanItBeNow(bot)
     clazz.streaming = False
     await clazz.stop()
 
 
-@pytest.mark.asyncio
 @mock.patch("duckbot.cogs.audio.who_can_it_be_now.PCMVolumeTransformer", autospec=True)
 @mock.patch("duckbot.cogs.audio.who_can_it_be_now.FFmpegPCMAudio", autospec=True)
 async def test_cog_unload_stops_streaming(ffmpeg, vol, bot, voice_client):
@@ -171,7 +166,6 @@ async def test_cog_unload_stops_streaming(ffmpeg, vol, bot, voice_client):
     assert clazz.audio_task is None
 
 
-@pytest.mark.asyncio
 async def test_delete_command_message(bot, context):
     clazz = WhoCanItBeNow(bot)
     await clazz.delete_command_message(context)

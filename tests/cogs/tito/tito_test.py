@@ -1,11 +1,8 @@
 from unittest import mock
 
-import pytest
-
 from duckbot.cogs.tito import Tito
 
 
-@pytest.mark.asyncio
 async def test_react_to_tito_with_yugoslavia_no_tito_emoji(bot, message):
     message.content = "josip bro tito, brother"
     clazz = Tito(bot)
@@ -13,7 +10,6 @@ async def test_react_to_tito_with_yugoslavia_no_tito_emoji(bot, message):
     message.add_reaction.assert_not_called()
 
 
-@pytest.mark.asyncio
 async def test_react_to_tito_with_yugoslavia_message_contains_tito_text(bot, message):
     message.content = "josip bro :tito:, brother"
     clazz = Tito(bot)
@@ -21,7 +17,6 @@ async def test_react_to_tito_with_yugoslavia_message_contains_tito_text(bot, mes
     assert_flags_sent(message)
 
 
-@pytest.mark.asyncio
 async def test_react_to_tito_with_yugoslavia_message_contains_tito_emoji(bot, message):
     message.content = "josip bro <:tito:780954015285641276>, brother"
     clazz = Tito(bot)
@@ -29,7 +24,6 @@ async def test_react_to_tito_with_yugoslavia_message_contains_tito_emoji(bot, me
     assert_flags_sent(message)
 
 
-@pytest.mark.asyncio
 @mock.patch("discord.RawReactionActionEvent")
 async def test_react_to_tito_reaction_no_tito_emoji(payload, bot):
     payload.emoji.name = "not-tito"
@@ -38,7 +32,6 @@ async def test_react_to_tito_reaction_no_tito_emoji(payload, bot):
     bot.fetch_channel.assert_not_called()
 
 
-@pytest.mark.asyncio
 @mock.patch("discord.RawReactionActionEvent")
 async def test_react_to_tito_reaction_tito_emoji(payload, bot, channel, message):
     payload.channel_id = 123

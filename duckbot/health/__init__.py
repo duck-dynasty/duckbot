@@ -1,5 +1,5 @@
 from .health_check import HealthCheck
 
 
-def setup(bot):
-    bot.add_cog(HealthCheck(bot))
+async def setup(bot):
+    await bot.add_cog(HealthCheck(bot))

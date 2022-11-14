@@ -3,21 +3,19 @@ from discord.ext import commands
 
 
 def intents() -> Intents:
-    intent = Intents.default()
-    intent.members = False
-    intent.presences = False
-    intent.bans = False
-    intent.integrations = False
-    intent.invites = False
-    intent.webhooks = False
-    intent.typing = False
+    intent = Intents.none()
+    intent.guilds = True
+    intent.emojis = True
+    intent.messages = True
+    intent.message_content = True
+    intent.reactions = True
+    intent.voice_states = True
     return intent
 
 
 class DuckBot(commands.Bot):
     def __init__(self):
         super().__init__(command_prefix="!", help_command=None, intents=intents())
-        self.add_listener(self.ready, name="on_ready")
 
-    async def ready(self):
+    async def setup_hook(self):
         print("DuckBot online")

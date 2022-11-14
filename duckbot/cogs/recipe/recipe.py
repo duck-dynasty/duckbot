@@ -5,8 +5,6 @@ import requests
 from bs4 import BeautifulSoup
 from discord.ext import commands
 
-from duckbot.slash import Option, slash_command
-
 
 class Recipe(commands.Cog):
     def __init__(self, bot):
@@ -54,7 +52,7 @@ class Recipe(commands.Cog):
 
         return html_content
 
-    async def recipe(self, context, search_term):
+    async def recipe(self, context: commands.Context, search_term: str):
         # clean up the arguments to make a valid recipe search
         search_term = re.sub(r"[^\w\s]", "", search_term)
 
@@ -75,8 +73,10 @@ class Recipe(commands.Cog):
 
         await context.send(response)
 
-    @slash_command(options=[Option(name="search", description="Search terms for the recipe")])
-    @commands.command(name="recipe", description="Get a random recipe for something.")
-    async def recipe_command(self, context, *, search_term: str = ""):
+    @commands.hybrid_command(name="recipe", description="Get a random recipe for something.")
+    async def recipe_command(self, context: commands.Context, *, search_term: str = ""):
+        """
+        :param search_term: Search terms for the recipe
+        """
         async with context.typing():
             await self.recipe(context, search_term)

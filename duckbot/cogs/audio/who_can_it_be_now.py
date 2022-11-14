@@ -1,5 +1,6 @@
 import asyncio
 from importlib.resources import path
+from typing import Optional
 
 from discord import FFmpegPCMAudio, PCMVolumeTransformer, VoiceClient
 from discord.ext import commands
@@ -8,23 +9,23 @@ from duckbot.util.messages import try_delete
 
 
 class WhoCanItBeNow(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.stream = asyncio.Event()
-        self.voice_client: VoiceClient = None
-        self.audio_task = None
+        self.voice_client: Optional[VoiceClient] = None
+        self.audio_task: Optional[asyncio.Task] = None
         self.streaming = False
 
-    def cog_unload(self):
+    def cog_unload(self) -> Optional[asyncio.Task]:
         if self.streaming:
             return self.bot.loop.create_task(self.stop())
 
-    @commands.command("start")
-    async def start_command(self, context):
+    @commands.hybrid_command(name="start", description='Start playing "music" in whatever voice channel you are currently in.')
+    async def start_command(self, context: commands.Context):
         await self.start(context)
 
     @start_command.before_invoke
-    async def connect_to_voice(self, context):
+    async def connect_to_voice(self, context: commands.Context):
         if context.voice_client is None:
             if not hasattr(context.author, "voice"):
                 await context.send("Music can only be played in a discord server, not a private channel.", delete_after=30)
@@ -36,8 +37,9 @@ class WhoCanItBeNow(commands.Cog):
         else:
             context.voice_client.stop()
 
-    async def start(self, context):
+    async def start(self, context: commands.Context):
         """Starts the music loop if it is not already playing."""
+        await context.send(":musical_note: :saxophone:", delete_after=30)
         if not self.streaming:
             self.streaming = True
             self.audio_task = self.bot.loop.create_task(self.stream_audio())
@@ -62,11 +64,11 @@ class WhoCanItBeNow(commands.Cog):
         if error:
             raise commands.CommandError(str(error))
 
-    @commands.command("stop")
-    async def stop_command(self, context):
+    @commands.hybrid_command(name="stop", description='Stop playing "music" entirely.')
+    async def stop_command(self, context: commands.Context):
         await self.stop(context)
 
-    async def stop(self, context=None):
+    async def stop(self, context: Optional[commands.Context] = None):
         """Stops the music loop if it is playing."""
         if self.streaming:
             await self.voice_client.disconnect()
@@ -77,10 +79,12 @@ class WhoCanItBeNow(commands.Cog):
                 self.audio_task = None
             self.voice_client = None
             self.streaming = False
+            if context:
+                await context.send(":disappointed_relieved:", delete_after=30)
         elif context is not None:
             await context.send("Brother, no :musical_note: :saxophone: is active.", delete_after=30)
 
     @start_command.after_invoke
     @stop_command.after_invoke
-    async def delete_command_message(self, context):
+    async def delete_command_message(self, context: commands.Context):
         await try_delete(context.message)

@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools", "wheel", "nltk==3.6.5", "textblob==0.17.1"]
+requires = ["setuptools", "wheel", "nltk==3.7", "textblob==0.17.1"]
 build-backend = "setuptools.build_meta"
 
 [tool.black]
 line-length = 200
-target-version = ['py38']
+target-version = ["py38"]
 
 [tool.isort]
 profile = "black"
@@ -17,3 +17,4 @@ addopts = """\
     --mdformat \
     -n auto \
     --blockage"""
+asyncio_mode = "auto"

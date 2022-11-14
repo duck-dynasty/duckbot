@@ -36,6 +36,7 @@ days = {
         ],
         "templates": [
             "It is {today}, my dudes.",
+            "Tuesday's gone; today is {today}.",
         ],
         "gifs": [
             "https://giphy.com/gifs/yazagames-frog-wednesday-inkulinati-d7HbZN8aQh1Mh3ZnKw",
@@ -106,6 +107,7 @@ templates = [
     "What if I said to you that in fact, today is not {tomorrow}? I'd be right. It's {today}.",
     "Rejoice, for today is {today}.",
     "Don't get it twisted, it's {today}.",
+    "Behold! It is {today}!",
     "{today}",
     "It {today}.",
     "Today is {today}, I hope you have your pants on.",
@@ -115,6 +117,10 @@ templates = [
     "Beep boop: {today}.",
     "I take no pleasure in announcing that today is {today}, for I am a robot.",
     "I take no displeasure in announcing that today is {today}, for I am a robot.",
+    "I'm glad I got turned on today, for it is {today}.",
+    "It's {today}. One may consider flossing on such a day.",
+    "It's {today}. Floss today, ya dinks.",
     "Today was {yesterday}. But, that's over.",
     "Fek, figure it out.",
+    "Tuesday? I think?",
 ]
