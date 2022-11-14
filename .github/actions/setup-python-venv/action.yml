@@ -28,7 +28,7 @@ runs:
   - name: Create path Output
     id: path
     shell: bash
-    run: echo "::set-output name=path::${{ inputs.path }}"
+    run: echo "path=${{ inputs.path }}" >> $GITHUB_OUTPUT
 
   - name: Set up Virtual Environment Cache
     id: venv

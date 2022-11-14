@@ -23,8 +23,8 @@ runs:
     id: image
     shell: bash
     run: |
-      echo "::set-output name=latest::duckdynasty/duckbot:latest"
-      echo "::set-output name=commit::duckdynasty/duckbot:$(git rev-parse --short HEAD)"
+      echo "latest=duckdynasty/duckbot:latest" >> $GITHUB_OUTPUT
+      echo "commit=duckdynasty/duckbot:$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
 
   - name: Set up Docker Buildx
     uses: docker/setup-buildx-action@v1
