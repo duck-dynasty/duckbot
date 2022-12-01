@@ -9,7 +9,7 @@ outputs:
 runs:
   using: composite
   steps:
-  - uses: actions/checkout@v2
+  - uses: actions/checkout@v3
 
   - name: Set up Python Environment
     id: venv
@@ -19,7 +19,7 @@ runs:
       path: cdk
 
   - name: Set up Node.js
-    uses: actions/setup-node@v2.5.1
+    uses: actions/setup-node@v3
     with:
       node-version: 16.x
 
