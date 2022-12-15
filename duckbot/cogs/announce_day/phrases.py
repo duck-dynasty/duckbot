@@ -4,9 +4,13 @@ days = {
             "the day of the moon",
             "Moonday",
             "Monday",
+            "the first day of the week according to the ISO 8601 standard",
         ],
         "templates": [
-            "Screw this, it is {0}.",
+            "Screw this, it is {today}.",
+        ],
+        "gifs": [
+            "https://tenor.com/view/monday-hate-mondays-gif-14157166",
         ],
     },
     1: {
@@ -17,8 +21,9 @@ days = {
             "Taco Tuesday",
         ],
         "templates": [
-            "Yo, one of my favourite days ever: {0}.",
+            "Yo, one of my favourite days ever: {today}.",
         ],
+        "gifs": [],
     },
     2: {
         "names": [
@@ -29,7 +34,13 @@ days = {
             "Ness' wedding day",
             "https://www.youtube.com/watch?v=du-TY1GUFGk",
         ],
-        "templates": [],
+        "templates": [
+            "It is {today}, my dudes.",
+            "Tuesday's gone; today is {today}.",
+        ],
+        "gifs": [
+            "https://giphy.com/gifs/yazagames-frog-wednesday-inkulinati-d7HbZN8aQh1Mh3ZnKw",
+        ],
     },
     3: {
         "names": [
@@ -38,16 +49,26 @@ days = {
             "civ day",
             "Thursday",
         ],
-        "templates": [],
+        "templates": [
+            "14",
+        ],
+        "gifs": [
+            "https://tenor.com/view/simpsons-games-hard-gamenight-gif-7531474",
+        ],
     },
     4: {
         "names": [
             "Frigga's day",
             "Friday, Friday, gotta get down on Friday",
             "Stir Fry day",
+            "Friyay",
             "Friday",
         ],
         "templates": [],
+        "gifs": [
+            "https://tenor.com/view/nicolas-cage-friday-feel-that-friday-feeling-feel-that-thats-friday-gif-12235300",
+            "https://i.redd.it/sp2b24o1e4a71.jpg",
+        ],
     },
     5: {
         "names": [
@@ -56,39 +77,50 @@ days = {
             "Saturday",
         ],
         "templates": [
-            "WEEKEND ALERT: {0}!",
+            "WEEKEND ALERT: {today}!",
         ],
+        "gifs": [],
     },
     6: {
         "names": [
             "the day of the sun",
             "Sunday",
             "Sunday, Sunday, Sunday",
+            "the first day of the week",
         ],
         "templates": [
-            "WEEKEND ALERT: {0}!",
+            "WEEKEND ALERT: {today}!",
+            "It's {today}, but is it RACE DAY?",
         ],
+        "gifs": [],
     },
 }
 
 templates = [
-    "Today is {0}.",
-    "Today: {0}. Tomorrow: {1}.",
-    "Brothers, the day is {0}.",
-    "Yoooooo, today is {0}! Brother.",
-    "The day is {0}. Prepare yourself.",
-    "What if I said to you that in fact, today is not {0}? I'd be lying.",
-    "What if I said to you that in fact, today is not {1}? I'd be right. It's {0}.",
-    "Rejoice, for today is {0}.",
-    "Don't get it twisted, it's {0}.",
-    "{0}",
-    "It {0}.",
-    "Today is {0}, I hope you have your pants on.",
-    "Gentlemen, it is with great pleasure that I inform you. Today is {0}.",
-    "Huh, it's {0}, but it feels more like {1}.",
-    "The day of the week according to the Gregorian calendar is {0}.",
-    "Beep boop: {0}.",
-    "I take no pleasure in announcing that today is {0}, for I am a robot.",
-    "I take no displeasure in announcing that today is {0}, for I am a robot.",
+    "Today is {today}.",
+    "Today: {today}. Tomorrow: {tomorrow}.",
+    "Brothers, the day is {today}.",
+    "yo it's {today}",
+    "Yoooooo, today is {today}! Brother.",
+    "The day is {today}. Prepare yourself.",
+    "What if I said to you that in fact, today is not {today}? I'd be lying.",
+    "What if I said to you that in fact, today is not {tomorrow}? I'd be right. It's {today}.",
+    "Rejoice, for today is {today}.",
+    "Don't get it twisted, it's {today}.",
+    "Behold! It is {today}!",
+    "{today}",
+    "It {today}.",
+    "Today is {today}, I hope you have your pants on.",
+    "Gentlemen, it is with great pleasure that I inform you. Today is {today}.",
+    "Huh, it's {today}, but it feels more like {tomorrow}.",
+    "The day of the week according to the Gregorian calendar is {today}.",
+    "Beep boop: {today}.",
+    "I take no pleasure in announcing that today is {today}, for I am a robot.",
+    "I take no displeasure in announcing that today is {today}, for I am a robot.",
+    "I'm glad I got turned on today, for it is {today}.",
+    "It's {today}. One may consider flossing on such a day.",
+    "It's {today}. Floss today, ya dinks.",
+    "Today was {yesterday}. But, that's over.",
     "Fek, figure it out.",
+    "Tuesday? I think?",
 ]

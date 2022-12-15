@@ -1,10 +1,18 @@
+import datetime
 import os
 from math import ceil
+from typing import Optional
 
+import discord
+import matplotlib.dates as mdates
+import matplotlib.pyplot as plt
 import pyowm
+import pytz
+import timezonefinder
 from discord.ext import commands
 from pyowm.utils import config
 from pyowm.weatherapi25.location import Location
+from pyowm.weatherapi25.one_call import OneCall
 
 from duckbot.db import Database
 
@@ -17,29 +25,46 @@ class Weather(commands.Cog):
     def __init__(self, bot, db: Database):
         self.bot = bot
         self.db = db
-        self.owm_client = None
+        self._owm = None
 
+    @property
     def owm(self) -> pyowm.OWM:
-        if self.owm_client is None:
+        if self._owm is None:
             conf = config.get_default_config_for_subscription_type("free")
-            self.owm_client = pyowm.OWM(os.getenv("OPENWEATHER_TOKEN"), conf)
-        return self.owm_client
+            self._owm = pyowm.OWM(os.getenv("OPENWEATHER_TOKEN"), conf)
+        return self._owm
 
-    @commands.group(name="weather", invoke_without_command=True)
-    async def weather_command(self, context, city: str = None, country: str = None, index: int = None):
+    @commands.hybrid_group(name="weather", invoke_without_command=True)
+    async def weather_command(self, context: commands.Context, city: Optional[str] = None, country: Optional[str] = None, index: Optional[int] = None):
+        await self.weather_get_command(context, city, country, index)
+
+    @weather_command.command(name="get", description="Gives weather information for your default location or the provided city.")
+    async def weather_get_command(self, context: commands.Context, city: Optional[str] = None, country: Optional[str] = None, index: Optional[int] = None):
+        """
+        :param city: The city name to get the weather for.
+        :param country: The two letter country code (eg CA for Canada), or two letter US state code.
+        :param index: Index to disambiguate city when city/country are not enough.
+        """
         await self.weather(context, city, country, index)
 
-    async def weather(self, context, city: str, country: str, index: int):
-        try:
-            return await self.get_weather(context, city, country, index)
-        except Exception as e:
-            await context.send(f"Iunno. Figure it out.\n{e}")
+    async def weather(self, context: commands.Context, city: Optional[str], country: Optional[str], index: Optional[int]) -> None:
+        async with context.typing():
+            try:
+                return await self.send_weather(context, city, country, index)
+            except Exception as e:
+                await context.send(f"Iunno. Figure it out.\n{e}")
+                raise e
 
-    @weather_command.command(name="set", invoke_without_command=True)
-    async def weather_set_command(self, context, city: str = None, country: str = None, index: int = None):
+    @weather_command.command(name="set", description="Updates your default location for /weather get")
+    async def weather_set_command(self, context: commands.Context, city: Optional[str] = None, country: Optional[str] = None, index: Optional[int] = None):
+        """
+        :param city: The city name to get the weather for.
+        :param country: The two letter country code (eg CA for Canada), or two letter US state code.
+        :param index: Index to disambiguate city when city/country are not enough.
+        """
         await self.set_default_location(context, city, country, index)
 
-    async def set_default_location(self, context, city: str, country: str, index: int):
+    async def set_default_location(self, context: commands.Context, city: Optional[str], country: Optional[str], index: Optional[int]) -> None:
         location = await self.search_location(context, city, country, index)
         if location is not None:
             saved_location = SavedLocation(id=context.author.id, name=location.name, country=location.country, city_id=location.id, latitude=location.lat, longitude=location.lon)
@@ -48,13 +73,13 @@ class Weather(commands.Cog):
                 session.commit()
             await context.send(f"Location saved! {self.__location_string(location)}")
 
-    async def search_location(self, context, city: str, country: str, index: int):
+    async def search_location(self, context: commands.Context, city: Optional[str], country: Optional[str], index: Optional[int]) -> Optional[Location]:
         if city is not None:
-            country = country.upper() if country is not None else None
+            country = country.upper().replace(",", "") if country is not None else None
             if country is not None and len(country) != 2:
                 await context.send("Country must be an ISO country code, such as CA for Canada.")
                 return None
-            locations = self.owm().city_id_registry().locations_for(city, country=country)
+            locations = self.owm.city_id_registry().locations_for(city.replace(",", ""), country=country)
             if not locations:
                 await context.send("No cities found matching search.")
                 return None
@@ -63,19 +88,19 @@ class Weather(commands.Cog):
                     return locations[int(index) - 1]
                 else:
                     message = "Multiple cities found matching search.\nNarrow your search or specify an index to pick one of the following:\n"
-                    options = [f"{i+1}: {self.__location_string(city)}" for i, city in enumerate(locations)]
+                    options = [f"{i+1}: {self.__location_string(c)}" for i, c in enumerate(locations)]
                     await context.send(message + "\n".join(options))
                     return None
             else:
                 return locations[0]
         else:
-            await context.send("Not enough arguments to determine weather location, see https://github.com/Chippers255/duckbot/wiki#weather")
+            await context.send("Not enough arguments to determine weather location, see https://github.com/duck-dynasty/duckbot/wiki/Commands#weather")
             return None
 
-    def __location_string(self, city):
+    def __location_string(self, city: Location):
         return f"{city.name}, {city.country}, geolocation = ({city.lat}, {city.lon})"
 
-    async def get_weather(self, context, city: str, country: str, index: int):
+    async def send_weather(self, context: commands.Context, city: Optional[str], country: Optional[str], index: Optional[int]) -> None:
         location = None
         if city is None:
             with self.db.session(SavedLocation) as session:
@@ -87,10 +112,10 @@ class Weather(commands.Cog):
         else:
             location = await self.search_location(context, city, country, index)
         if location is not None:
-            weather = self.owm().weather_manager().one_call(lat=location.lat, lon=location.lon, exclude="minutely,hourly", units="metric")
-            await context.send(self.weather_message(location, weather))
+            weather = self.owm.weather_manager().one_call(lat=location.lat, lon=location.lon, exclude="minutely", units="metric")
+            await context.send(self.weather_message(location, weather), file=discord.File(self.weather_graph(location, weather)))
 
-    def weather_message(self, city, weather):
+    def weather_message(self, city: Location, weather: OneCall) -> str:
         messages = []
         current = weather.current
         temp = current.temperature()
@@ -123,8 +148,45 @@ class Weather(commands.Cog):
             messages.append("I might need to take a break today, it hot.")
         return " ".join(messages)
 
-    def __is_rainy(self, weather):
+    def __is_rainy(self, weather) -> str:
         return (weather.status and "rain" in weather.status.lower()) or (weather.detailed_status and "rain" in weather.detailed_status.lower())
 
-    def __is_snowy(self, weather):
+    def __is_snowy(self, weather) -> str:
         return (weather.status and "snow" in weather.status.lower()) or (weather.detailed_status and "snow" in weather.detailed_status.lower())
+
+    def weather_graph(self, city: Location, weather: OneCall):
+        hourly = [weather.forecast_hourly[i] for i in range(24)]
+        tz = pytz.timezone(timezonefinder.TimezoneFinder().timezone_at(lat=city.lat, lng=city.lon))
+        hours = [w.reference_time("date").astimezone(tz=tz) for w in hourly]
+        figure, left_axis = plt.subplots()
+        left_axis.set_xlabel("Time")
+        left_axis.set_ylabel(f"Temperature ({degrees})")
+        left_axis.plot(hours, [w.temperature()["temp"] for w in hourly], label="Temperature", color="orangered")
+        left_axis.plot(hours, [w.temperature()["feels_like"] for w in hourly], label="Feels Like", color="forestgreen")
+        left_axis.legend(loc="upper left")
+        left_axis.set_facecolor("ghostwhite")
+
+        right_axis = left_axis.twinx()
+        right_axis.set_ylabel("Precipitation")
+        rain = [w.rain["1h"] if "1h" in w.rain else 0 for w in hourly]
+        snow = [w.snow["1h"] if "1h" in w.snow else 0 for w in hourly]
+        rects_rain = right_axis.bar(hours, rain, label="Rain (mm)", color="blue", alpha=0.3, width=1.0 / 24)
+        rects_snow = right_axis.bar(hours, snow, bottom=rain, label="Snow (cm)", color="cyan", alpha=0.3, width=1.0 / 24)
+        right_axis.legend(loc="upper right")
+
+        y_max = max(1, max([r.get_height() + s.get_height() for r, s in zip(rects_rain, rects_snow)]))
+        right_axis.set_ylim([0, y_max])
+
+        for i, w in enumerate(hourly):
+            probability = round(w.precipitation_probability * 100)
+            plt.text(hours[i], 0.2 * y_max, f"{probability}%", ha="center", va="center", rotation=90, color="darkblue", alpha=0.5)
+            plt.text(hours[i], 0.75 * y_max, w.detailed_status, ha="center", va="center", rotation=90, color="black", alpha=0.5)
+
+        one_hour = datetime.timedelta(hours=1)
+        left_axis.xaxis.set_major_locator(mdates.HourLocator(interval=4, tz=tz))
+        left_axis.xaxis.set_major_formatter(mdates.DateFormatter("%I%p" if os.name == "nt" else "%-I%p", tz=tz))
+        left_axis.set_xlim(min(hours) - one_hour, max(hours) + one_hour)
+        plt.setp(left_axis.get_xticklabels(), rotation=30, horizontalalignment="right")
+        figure.tight_layout()
+        plt.savefig("weather.png", facecolor="ghostwhite")
+        return "weather.png"

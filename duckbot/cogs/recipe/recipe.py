@@ -1,8 +1,7 @@
-import json
 import random
 import re
-import urllib
 
+import requests
 from bs4 import BeautifulSoup
 from discord.ext import commands
 
@@ -29,7 +28,7 @@ class Recipe(commands.Cog):
             try:
                 data["name"] = article.find("h3", {"class": "card__title"}).get_text().strip(" \t\n\r")
                 data["description"] = article.find("div", {"class": "card__summary"}).get_text().strip(" \t\n\r")
-                data["url"] = article.find("a", href=re.compile("^https://www.allrecipes.com/recipe/"))["href"]
+                data["url"] = article.find("a", href=re.compile(r"^https://www\.allrecipes\.com/recipe/"))["href"]
                 data["rating"] = len(article.findAll("span", {"class": "rating-star active"}))
 
                 recipe_list.append(data)
@@ -44,13 +43,8 @@ class Recipe(commands.Cog):
 
         html_content = ""
         for page in range(1, 6):
-            query_dict = {"search": search_term, "page": page}
-            query_url = urllib.parse.urlencode(query_dict)
-            url = f"https://www.allrecipes.com/element-api/content-proxy/faceted-searches-load-more?{query_url}"
-            req = urllib.request.Request(url)
-            req.add_header("Cookie", "euConsent=true")
-
-            result = json.loads(urllib.request.urlopen(req).read())
+            url = "https://www.allrecipes.com/element-api/content-proxy/faceted-searches-load-more"
+            result = requests.get(url, params={"search": search_term, "page": page}, headers={"Cookie": "euConsent=true"}).json()
             html_content += result.get("html", "")
 
             if not result.get("hasNext", False):
@@ -58,9 +52,8 @@ class Recipe(commands.Cog):
 
         return html_content
 
-    async def __recipe(self, context, *args):
+    async def recipe(self, context: commands.Context, search_term: str):
         # clean up the arguments to make a valid recipe search
-        search_term = " ".join(args)
         search_term = re.sub(r"[^\w\s]", "", search_term)
 
         try:
@@ -80,7 +73,10 @@ class Recipe(commands.Cog):
 
         await context.send(response)
 
-    @commands.command(name="recipe")
-    async def recipe(self, context, *args):
+    @commands.hybrid_command(name="recipe", description="Get a random recipe for something.")
+    async def recipe_command(self, context: commands.Context, *, search_term: str = ""):
+        """
+        :param search_term: Search terms for the recipe
+        """
         async with context.typing():
-            await self.__recipe(context, *args)
+            await self.recipe(context, search_term)

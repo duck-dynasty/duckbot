@@ -1,4 +1,5 @@
-import subprocess
+import re
+from difflib import ndiff
 
 from discord.ext import commands
 
@@ -12,11 +13,29 @@ class EditDiff(commands.Cog):
         if before.author == self.bot.user or after.author == self.bot.user or before.content == after.content:
             return
 
-        before_file = f'echo "$BEFORE" > {before.id}.before'
-        after_file = f'echo "$AFTER" > {after.id}.after'
-        diff_cmd = f"git diff --no-index -U10000 --word-diff=plain --word-diff-regex=. {before.id}.before {after.id}.after | tail -n +6"
-        cleanup = f"rm -rf {before.id}.before {after.id}.after"
-        env = {"BEFORE": before.clean_content, "AFTER": after.clean_content}
+        msg = ""
+        prev = " "  # start out as no change
+        for d in ndiff(self.split_words(before.clean_content), self.split_words(after.clean_content)):
+            change = d[0]
+            if change != "?":  # ignore stuff not in either message
+                msg += self.try_leave_diff_chunk(change, prev)
+                msg += self.try_enter_diff_chunk(change, prev)
+                msg += d[2:]  # append the letter
+                prev = change
+        msg += self.try_leave_diff_chunk(" ", prev)  # close the final diff chunk if necessary
+        await after.channel.send(f":eyes: {after.author.mention}.\n{msg}", delete_after=300)
 
-        process = subprocess.run(f"{before_file} && {after_file} && {diff_cmd} ; {cleanup}", shell=True, capture_output=True, env=env)
-        await after.channel.send(f":eyes: {after.author.mention}.\n{process.stdout.decode()}", delete_after=300)
+    def split_words(self, content):
+        return re.split(r"(\s+)", content)
+
+    def try_leave_diff_chunk(self, change, prev):
+        if change != prev and prev != " ":
+            return prev + ("}" if prev == "+" else "]")
+        else:
+            return ""
+
+    def try_enter_diff_chunk(self, change, prev):
+        if change != prev and change != " ":
+            return ("{" if change == "+" else "[") + change
+        else:
+            return ""

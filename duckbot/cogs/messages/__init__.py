@@ -2,6 +2,6 @@ from .edit_diff import EditDiff
 from .haiku import Haiku
 
 
-def setup(bot):
-    bot.add_cog(EditDiff(bot))
-    bot.add_cog(Haiku(bot))
+async def setup(bot):
+    await bot.add_cog(EditDiff(bot))
+    await bot.add_cog(Haiku(bot))

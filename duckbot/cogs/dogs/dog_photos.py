@@ -1,6 +1,6 @@
-import json
-import urllib
+from typing import List, Optional
 
+import requests
 from discord.ext import commands
 
 
@@ -8,15 +8,41 @@ class DogPhotos(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="dog")
-    async def dog_command(self, context):
-        await context.send(self.get_dog_image())
+    @commands.hybrid_command(name="dog", aliases=["doge"], description="Show a random dog you probably don't know")
+    async def dog_command(self, context: commands.Context, *, breed: Optional[str] = None):
+        """
+        :param breed: The specific breed of dog to show. Defaults to any breed.
+        """
+        await self.dog(context, breed)
 
-    def get_dog_image(self):
-        req = urllib.request.Request("https://dog.ceo/api/breeds/image/random")
-        req.add_header("Cookie", "euConsent=true")
-        result = json.loads(urllib.request.urlopen(req).read())
+    async def dog(self, context: commands.Context, breed: Optional[str]):
+        if breed and breed in self.get_breeds():
+            await context.send(self.get_dog_image(breed))
+        else:
+            await context.send(self.get_dog_image(None))
+
+    def get_dog_image(self, breed: Optional[str] = None) -> str:
+        if breed:
+            if " " in breed:
+                path = f"breed/{'/'.join(reversed(breed.split()))}/images"
+            else:
+                path = f"breed/{breed}/images"
+        else:
+            path = f"breed/{breed.replace(' ', '/')}/images" if breed else "breeds/image"
+        result = requests.get(f"https://dog.ceo/api/{path}/random").json()
+        if result.get("status", "ded") != "success" or not result.get("message", None):
+            raise RuntimeError(f"could not fetch a puppy; breed = {breed}")
+        else:
+            return result.get("message")
+
+    def get_breeds(self) -> List[str]:
+        result = requests.get("https://dog.ceo/api/breeds/list/all").json()
         if result.get("status", "ded") != "success" or not result.get("message", None):
             raise RuntimeError("could not fetch a puppy")
         else:
-            return result.get("message")
+            breeds = []
+            for breed, sub_breeds in result.get("message").items():
+                breeds.append(breed)
+                for sub in sub_breeds:
+                    breeds.append(f"{sub} {breed}")
+            return breeds
