@@ -38,6 +38,7 @@ class SpecialDays(holidays.Canada):
         self[date(year, 9, 8)] = f"Dan's Birthday. He {year-1989} old"
         self[date(year, 9, 26)] = f"Tom's Birthday. He's {year-1990} years old. How he made it this far, we'll never know"
         self[date(year, 10, 5)] = f"Delta's Birthday. He's {year-2015} years old and is a good boy"
+        self[date(year, 10, 21)] = f"G-dawg's Birthday. He is a glorious {year-1989} years old!"
         self[date(year, 10, 31)] = "Halloween"
         self[date(year, 11, 10)] = f"Tom and Kelly's fake wedding anniversary. They've been fake together for {year-2014} years"
         self[date(year, 11, 12)] = f"Sabrina's Birthday. She is {year-1996} years old. Good work on surviving"
@@ -45,4 +46,3 @@ class SpecialDays(holidays.Canada):
         self[date(year, 12, 3)] = "DuckBot's Inception Day"
         self[date(year, 12, 5)] = f"Taras' Birthday. He's {year-1989} years old"
         self[date(year, 12, 15)] = f"Dave's Birthday. He is 29 years old for the {year-2020} in a row"
-        self[date(year, 10, 21)] = f"G-dawg's Birthday. He is a glorious {year-1989} years old!"
