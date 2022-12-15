@@ -1,6 +1,7 @@
+import discord
 from discord.ext import commands
 
-from duckbot.util.messages import try_delete
+from duckbot.util.messages import get_message_reference, try_delete
 
 from .aoe_phrases import taunts
 
@@ -10,9 +11,14 @@ class AgeOfEmpires(commands.Cog):
         self.bot = bot
 
     @commands.Cog.listener("on_message")
-    async def expand_taunt(self, message):
-        msg = message.content.strip()
-        if msg in taunts:
-            taunt = taunts[msg]
-            await message.channel.send(f"{message.author.mention} > {msg}: _{taunt}_")
+    async def expand_taunt(self, message: discord.Message):
+        content = message.content.strip()
+        if content in taunts:
+            taunt = taunts[content]
+            msg = f"{message.author.mention} > {content}: _{taunt}_"
+            reply = await get_message_reference(message)
+            if reply:
+                await reply.reply(msg)
+            else:
+                await message.channel.send(msg)
             await try_delete(message)

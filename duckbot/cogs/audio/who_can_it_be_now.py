@@ -1,66 +1,74 @@
 import asyncio
 from importlib.resources import path
+from typing import Optional
 
 from discord import FFmpegPCMAudio, PCMVolumeTransformer, VoiceClient
 from discord.ext import commands
 
+from duckbot.util.messages import try_delete
+
 
 class WhoCanItBeNow(commands.Cog):
-    def __init__(self, bot):
+    def __init__(self, bot: commands.Bot):
         self.bot = bot
         self.stream = asyncio.Event()
-        self.voice_client: VoiceClient = None
-        self.audio_task = None
+        self.voice_client: Optional[VoiceClient] = None
+        self.audio_task: Optional[asyncio.Task] = None
         self.streaming = False
 
-    def cog_unload(self):
+    def cog_unload(self) -> Optional[asyncio.Task]:
         if self.streaming:
-            return self.bot.loop.create_task(self.__stop())
+            return self.bot.loop.create_task(self.stop())
 
-    @commands.command("start")
-    async def start(self, context):
-        await self.__start(context)
+    @commands.hybrid_command(name="start", description='Start playing "music" in whatever voice channel you are currently in.')
+    async def start_command(self, context: commands.Context):
+        await self.start(context)
 
-    @start.before_invoke
-    async def connect_to_voice(self, context):
+    @start_command.before_invoke
+    async def connect_to_voice(self, context: commands.Context):
         if context.voice_client is None:
             if not hasattr(context.author, "voice"):
-                await context.send("Music can only be played in a discord server, not a private channel.")
+                await context.send("Music can only be played in a discord server, not a private channel.", delete_after=30)
             elif context.author.voice:
                 self.voice_client = await context.author.voice.channel.connect()
             else:
-                await context.send("Connect to a voice channel so I know where to `!start`.")
+                await context.send("Connect to a voice channel so I know where to `!start`.", delete_after=30)
                 raise commands.CommandError("`start` invoked when author not in voice channel")
         else:
             context.voice_client.stop()
 
-    async def __start(self, context):
+    async def start(self, context: commands.Context):
         """Starts the music loop if it is not already playing."""
+        await context.send(":musical_note: :saxophone:", delete_after=30)
         if not self.streaming:
             self.streaming = True
             self.audio_task = self.bot.loop.create_task(self.stream_audio())
 
     async def stream_audio(self):
         """The music loop. Connect to channel and stream. We await on `self.stream` to block on the song being played."""
-        while self.streaming:
+        play_count = 0
+        while self.streaming and play_count < 75:
             self.stream.clear()
             # need to load the song every time, it seems to keep internal state
             with path("resources", "who-can-it-be-now.mp3") as source:
                 song = PCMVolumeTransformer(FFmpegPCMAudio(source, options='-filter:a "volume=0.125"'))
             self.voice_client.play(song, after=self.trigger_next_song)
+            play_count += 1
             await asyncio.sleep(0)  # give up timeslice for `trigger_next_song`
             await self.stream.wait()
+        if self.streaming and not play_count < 75:
+            await self.stop()
 
     def trigger_next_song(self, error=None):
         self.stream.set()
         if error:
             raise commands.CommandError(str(error))
 
-    @commands.command("stop")
-    async def stop(self, context):
-        await self.__stop(context)
+    @commands.hybrid_command(name="stop", description='Stop playing "music" entirely.')
+    async def stop_command(self, context: commands.Context):
+        await self.stop(context)
 
-    async def __stop(self, context=None):
+    async def stop(self, context: Optional[commands.Context] = None):
         """Stops the music loop if it is playing."""
         if self.streaming:
             await self.voice_client.disconnect()
@@ -71,5 +79,12 @@ class WhoCanItBeNow(commands.Cog):
                 self.audio_task = None
             self.voice_client = None
             self.streaming = False
+            if context:
+                await context.send(":disappointed_relieved:", delete_after=30)
         elif context is not None:
-            await context.send("Brother, no :musical_note: :saxophone: is active.")
+            await context.send("Brother, no :musical_note: :saxophone: is active.", delete_after=30)
+
+    @start_command.after_invoke
+    @stop_command.after_invoke
+    async def delete_command_message(self, context: commands.Context):
+        await try_delete(context.message)

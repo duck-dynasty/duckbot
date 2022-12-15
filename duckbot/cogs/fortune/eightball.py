@@ -11,8 +11,11 @@ class EightBall(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.command(name="eightball", aliases=["8ball"])
-    async def eightball_command(self, context, *, question: str = None):
+    @commands.hybrid_command(name="eightball", aliases=["8ball"], description="Ask the magic 8 ball a question!")
+    async def eightball_command(self, context: commands.Context, *, question: str = None):
+        """
+        :param question: The question to ask the magic 8 ball.
+        """
         await self.eightball(context, question)
 
     async def eightball(self, context: commands.Context, question: str):

@@ -1,0 +1,27 @@
+name: Stale Issues/Pull Requests
+
+permissions:
+  issues: write
+  pull-requests: write
+
+on:
+  schedule:
+  - cron: '7 13 * * MON'
+  workflow_dispatch:
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/stale@v6
+      with:
+        only-labels: needs reply  # only consider items which are manually labelled 'needs reply'
+        labels-to-remove-when-unstale: needs reply
+        days-before-stale: -1  # default don't auto mark things as stale
+        days-before-close: -1  # default don't close things
+        stale-issue-label: stale
+        stale-pr-label: stale
+        days-before-pr-stale: 30  # pulls go stale after a month
+        days-before-pr-close: 30  # close stale pulls after another month
+        stale-pr-message: Yo dawg, get some traction on this or it'll be yeeted. Brother.
+        close-pr-message: YEET

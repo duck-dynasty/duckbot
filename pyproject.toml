@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools", "wheel", "nltk==3.7", "textblob==0.17.1"]
 build-backend = "setuptools.build_meta"
 
 [tool.black]
 line-length = 200
-target-version = ['py38']
+target-version = ["py38"]
 
 [tool.isort]
 profile = "black"
@@ -13,12 +13,8 @@ multi_line_output = 3
 [tool.pytest.ini_options]
 addopts = """\
     -ra \
-    --black \
     --flake8 \
-    --isort \
-    --cov=duckbot \
-    --cov-branch \
-    --cov-fail-under=85 \
-    --cov-report html --cov-report term-missing:skip-covered \
+    --mdformat \
     -n auto \
     --blockage"""
+asyncio_mode = "auto"
