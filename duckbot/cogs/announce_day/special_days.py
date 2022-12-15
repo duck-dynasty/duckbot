@@ -45,3 +45,4 @@ class SpecialDays(holidays.Canada):
         self[date(year, 12, 3)] = "DuckBot's Inception Day"
         self[date(year, 12, 5)] = f"Taras' Birthday. He's {year-1989} years old"
         self[date(year, 12, 15)] = f"Dave's Birthday. He is 29 years old for the {year-2020} in a row"
+        self[date(year, 10, 21)] = f"G-dawg's Birthday. He is a glorious {year-1989} years old!"
