@@ -23,22 +23,16 @@ runs:
   - name: Set up Python 3.8
     uses: actions/setup-python@v2
     with:
-      python-version: '3.8'
+      python-version: 3.8
+      cache: pip
+      cache-dependency-path: setup.py
 
   - name: Create path Output
     id: path
     shell: bash
     run: echo "::set-output name=path::${{ inputs.path }}"
 
-  - name: Set up Virtual Environment Cache
-    id: venv
-    uses: actions/cache@v2
-    with:
-      path: ${{ steps.path.outputs.path }}
-      key: ${{ env.pythonLocation }}-${{ inputs.extras }}-${{ hashFiles('setup.py', 'pyproject.toml') }}
-
   - name: Install Packages
-    if: steps.venv.outputs.cache-hit != 'true'
     shell: bash
     run: |
       python -m venv --clear ${{ steps.path.outputs.path }}
