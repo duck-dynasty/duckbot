@@ -17,7 +17,7 @@
 |        [`!roll`](#dice)        | rolls Dungeons and Dragons style dice              |
 |            `!coin`             | flips a coin. in real life                         |
 | [`!yolo`](#yolo-pull-requests) | list open pull requests in this repo               |
-|            `!help`             | gives a link to this wiki                          |
+|       `!help` or `!wiki`       | gives a link to this wiki                          |
 |            `!duck`             | gives a link to this repo                          |
 
 ## Day Announcements
