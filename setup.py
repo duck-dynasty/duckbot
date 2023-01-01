@@ -71,7 +71,7 @@ if __name__ == "__main__":
                 "pytest-xdist[psutil]==3.0.2",
                 "flake8==4.0.1",
                 "black==22.12.0",
-                "flake8-black==0.3.5",
+                "flake8-black==0.3.6",
                 "isort==5.11.4",
                 "flake8-isort==6.0.0",
                 "pep8-naming==0.13.2",
