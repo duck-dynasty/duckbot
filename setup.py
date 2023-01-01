@@ -87,7 +87,7 @@ if __name__ == "__main__":
                 "pytest-lazy-fixture==0.6.3",
             ],
             "cdk": [
-                "aws-cdk.core==1.181.1",
+                "aws-cdk.core==1.186.1",
                 "aws-cdk.aws-ec2==1.181.1",
                 "aws-cdk.aws-ecs==1.181.1",
                 "aws-cdk.aws-autoscaling==1.181.1",
