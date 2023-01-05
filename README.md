@@ -2,7 +2,7 @@
 
 [![GitHub License](https://img.shields.io/github/license/duck-dynasty/duckbot)](https://github.com/duck-dynasty/duckbot/blob/main/LICENSE)
 [![GitHub Issues](https://img.shields.io/github/issues/duck-dynasty/duckbot)](https://github.com/duck-dynasty/duckbot/issues)
-[![Build Status](https://img.shields.io/github/workflow/status/duck-dynasty/duckbot/DuckBot%20CI)](https://github.com/duck-dynasty/duckbot/actions/workflows/python-package.yml)
+[![Build Status](https://img.shields.io/github/actions/workflow/status/duck-dynasty/duckbot/python-package.yml?branch=main)](https://github.com/duck-dynasty/duckbot/actions/workflows/python-package.yml)
 [![codecov](https://codecov.io/gh/duck-dynasty/duckbot/branch/main/graph/badge.svg?token=FX4DT5MWBW)](https://codecov.io/gh/duck-dynasty/duckbot)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
