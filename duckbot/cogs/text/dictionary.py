@@ -17,7 +17,8 @@ class Dictionary(commands.Cog):
         """
         :param word: The word to define.
         """
-        await self.define(context, word)
+        async with context.typing():
+            await self.define(context, word)
 
     async def define(self, context: commands.Context, word: str):
         roots = self.get_root_words(word.lower()) or ["why"]
