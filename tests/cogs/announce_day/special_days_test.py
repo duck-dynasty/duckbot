@@ -3,8 +3,8 @@ from unittest import mock
 
 import pytest
 
-from duckbot.cogs.announce_day.datetime import timezone
 from duckbot.cogs.announce_day.special_days import SpecialDays
+from duckbot.util.datetime import timezone
 
 
 def test_populate_bro_tito_day(bot, guild, emoji):
