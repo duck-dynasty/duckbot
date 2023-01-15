@@ -29,7 +29,8 @@ class Wellness(commands.Cog):
                 self._badges[context.author.id].append(badge)
             await context.send(f"{context.message.author.display_name} has earned the badge for {badge}.")
         else:
-            await context.reply(f"One does not earn a badge for _{badge}_. " f"If you feel this should be a badge, we accept PRs, brother!", delete_after=30)
+            message = f"One does not earn a badge for _{badge}_. If you feel this should be a badge, we accept PRs, brother!"
+            await context.reply(message, delete_after=30)
 
     @commands.Cog.listener("on_message")
     async def react_with_badge(self, message):
