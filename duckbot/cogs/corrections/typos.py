@@ -15,7 +15,7 @@ class Typos(commands.Cog):
             if prev is not None:
                 c = self.correct(prev.content)
                 if c != prev.content:
-                    await prev.reply(f"> {c}\nThink I fixed it, {message.author.display_name}!")
+                    await prev.reply(f"> {c}\nI fixed it, {message.author.display_name}. :microphone: :wave:")
                 else:
                     await message.reply(f"There's no need for harsh words, {message.author.display_name}.")
 
