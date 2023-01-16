@@ -20,21 +20,17 @@
 |     [`!weather`](#weather)     | retrieve weather information                       |
 | [`!yolo`](#yolo-pull-requests) | list open pull requests in this repo               |
 
-
 ## Wolfram Alpha
 
 DuckBot gives out a few results to arbitrary queries to [wolfram alpha](https://www.wolframalpha.com/). The results from wolfram are pretty complex, DuckBot spews out a few results in a fairly dumb manner, and gives you a link for your query on wolfram if you want to dig further.
-
 
 ## Day Announcements
 
 Every day in the 7am hour, DuckBot will announce to the general channel the current day of the week. If the day is also a statutory holiday, or an otherwise special day, DuckBot will announce that at the same time. You can run this on demand using the `!day` command.
 
-
 ## Definitions
 
 DuckBot can define words, source data from the Oxford Dictionary. In the cases where a word has multiple possible root words, DuckBot will try to define all of them.
-
 
 ## Recipe Search
 
@@ -42,7 +38,6 @@ Do you crave a particular food but want an arbitrary recipe?
 
 - Run the `!recipe` command with an argument to search for a specific recipe with a random result.
 - Run the `!recipe` command with no argument to blindly return any recipe.
-
 
 ## Dice
 
@@ -52,11 +47,9 @@ DuckBot will roll Dungeons and Dragons style dice for you. See [dice syntax](htt
 > DuckBot: Rolls: 1d20 (3)\
 > Total: 3
 
-
 ## Music
 
 DuckBot plays everyone's favourite background noise inside whatever voice channel you're in. Use `!start` to summon the bot, and `!stop` to dismiss it. DuckBot only has so much stamina, and will stop playing music after about four hours.
-
 
 ## Weather
 
@@ -97,7 +90,6 @@ Here's an example usage:
 > 2: London, CA, geolocation = (42.983391, -81.23304)\
 > Human: !weather set london ca 2\
 > DuckBot: Location saved! London, CA, geolocation = (42.983391, -81.23304)
-> 
 
 ## Yolo Pull Requests
 
