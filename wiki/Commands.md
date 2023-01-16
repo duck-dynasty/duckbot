@@ -2,27 +2,39 @@
 
 |            Command             | Summary                                            |
 | :----------------------------: | -------------------------------------------------- |
+|            `!8ball`            | get a magic eight ball style fortune               |
+|            `!ascii`            | renders text as ascii art                          |
+|   [`!calc`](#wolfram-alpha)    | search for something on wolfram alpha              |
+|            `!coin`             | flips a coin  in real life                         |
 |  [`!day`](#day-announcements)  | announces the current day of the week              |
+|   [`!define`](#definitions)    | define a word                                      |
+|             `!dog`             | displays a random dog photo                        |
+|            `!duck`             | gives a link to this repo                          |
+|           `!fortune`           | get a random fortune told to you by a cow          |
+|       `!help` or `!wiki`       | gives a link to this wiki                          |
+|            `!lmgt`             | generates a google search link for the given query |
+|            `!mock`             | converts text into MoCkInG tExT                    |
 |  [`!recipe`](#recipe-search)   | search for a random recipe                         |
+|        [`!roll`](#dice)        | rolls Dungeons and Dragons style dice              |
 |  [`!start`, `!stop`](#music)   | start or stop playing music                        |
 |     [`!weather`](#weather)     | retrieve weather information                       |
-|   [`!calc`](#wolfram-alpha)    | search for something on wolfram alpha              |
-|   [`!define`](#definitions)    | define a word                                      |
-|            `!lmgt`             | generates a google search link for the given query |
-|            `!8ball`            | get a magic eight ball style fortune               |
-|           `!fortune`           | get a random fortune told to you by a cow          |
-|             `!dog`             | displays a random dog photo                        |
-|            `!ascii`            | renders text as ascii art                          |
-|            `!mock`             | converts text into MoCkInG tExT                    |
-|        [`!roll`](#dice)        | rolls Dungeons and Dragons style dice              |
-|            `!coin`             | flips a coin. in real life                         |
 | [`!yolo`](#yolo-pull-requests) | list open pull requests in this repo               |
-|       `!help` or `!wiki`       | gives a link to this wiki                          |
-|            `!duck`             | gives a link to this repo                          |
+
+
+## Wolfram Alpha
+
+DuckBot gives out a few results to arbitrary queries to [wolfram alpha](https://www.wolframalpha.com/). The results from wolfram are pretty complex, DuckBot spews out a few results in a fairly dumb manner, and gives you a link for your query on wolfram if you want to dig further.
+
 
 ## Day Announcements
 
 Every day in the 7am hour, DuckBot will announce to the general channel the current day of the week. If the day is also a statutory holiday, or an otherwise special day, DuckBot will announce that at the same time. You can run this on demand using the `!day` command.
+
+
+## Definitions
+
+DuckBot can define words, source data from the Oxford Dictionary. In the cases where a word has multiple possible root words, DuckBot will try to define all of them.
+
 
 ## Recipe Search
 
@@ -31,9 +43,20 @@ Do you crave a particular food but want an arbitrary recipe?
 - Run the `!recipe` command with an argument to search for a specific recipe with a random result.
 - Run the `!recipe` command with no argument to blindly return any recipe.
 
+
+## Dice
+
+DuckBot will roll Dungeons and Dragons style dice for you. See [dice syntax](https://d20.readthedocs.io/en/latest/start.html#dice-syntax) for the full list of what is possible.
+
+> Human: !roll 1d20\
+> DuckBot: Rolls: 1d20 (3)\
+> Total: 3
+
+
 ## Music
 
 DuckBot plays everyone's favourite background noise inside whatever voice channel you're in. Use `!start` to summon the bot, and `!stop` to dismiss it. DuckBot only has so much stamina, and will stop playing music after about four hours.
+
 
 ## Weather
 
@@ -74,22 +97,7 @@ Here's an example usage:
 > 2: London, CA, geolocation = (42.983391, -81.23304)\
 > Human: !weather set london ca 2\
 > DuckBot: Location saved! London, CA, geolocation = (42.983391, -81.23304)
-
-## Wolfram Alpha
-
-DuckBot gives out a few results to arbitrary queries to [wolfram alpha](https://www.wolframalpha.com/). The results from wolfram are pretty complex, DuckBot spews out a few results in a fairly dumb manner, and gives you a link for your query on wolfram if you want to dig further.
-
-## Definitions
-
-DuckBot can define words, source data from the Oxford Dictionary. In the cases where a word has multiple possible root words, DuckBot will try to define all of them.
-
-## Dice
-
-DuckBot will roll Dungeons and Dragons style dice for you. See [dice syntax](https://d20.readthedocs.io/en/latest/start.html#dice-syntax) for the full list of what is possible.
-
-> Human: !roll 1d20\
-> DuckBot: Rolls: 1d20 (3)\
-> Total: 3
+> 
 
 ## Yolo Pull Requests
 
