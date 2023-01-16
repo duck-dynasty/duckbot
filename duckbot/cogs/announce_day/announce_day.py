@@ -5,7 +5,8 @@ from discord import ChannelType
 from discord.ext import commands, tasks
 from discord.utils import get
 
-from .datetime import now
+from duckbot.util.datetime import now
+
 from .phrases import days, templates
 from .special_days import SpecialDays
 
