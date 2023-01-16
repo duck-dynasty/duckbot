@@ -19,7 +19,7 @@
 | [`!yolo`](#yolo-pull-requests) | list open pull requests in this repo               |
 |            `!help`             | gives a link to this wiki                          |
 |            `!duck`             | gives a link to this repo                          |
-|            `!shrug`            | ¯\_(ツ)\_/¯                                         |
+|            `!shrug`            | `¯\_(ツ)\_/¯`                                      |
 
 ## Day Announcements
 
