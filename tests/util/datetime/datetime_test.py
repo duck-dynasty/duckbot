@@ -3,7 +3,7 @@ from unittest import mock
 
 import pytz
 
-from duckbot.cogs.announce_day.datetime import now, timezone
+from duckbot.util.datetime import now, timezone
 
 
 def test_timezone_returns_us_eastern():
