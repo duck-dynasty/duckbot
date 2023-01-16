@@ -30,7 +30,7 @@ class Duck(commands.Cog):
     async def github(self, context):
         await context.send("https://github.com/duck-dynasty/duckbot")
 
-    @commands.command(name="help")
+    @commands.command(name="help", aliases=["wiki"])
     async def wiki_command(self, context):
         await self.wiki(context)
 

@@ -53,4 +53,4 @@ async def test_correct_typos_sends_correction(textblob, prev_message, bot, messa
     textblob.return_value.correct.return_value = TextBlob("hello")
     clazz = Typos(bot)
     await clazz.correct_typos(message)
-    prev_message.reply.assert_called_once_with(f"> hello\nThink I fixed it, {message.author.display_name}!")
+    prev_message.reply.assert_called_once_with(f"> hello\nI fixed it, {message.author.display_name}. :microphone: :wave:")

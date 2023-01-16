@@ -49,5 +49,5 @@ class SpecialDays(holidays.Canada):
         self[date(year, 11, 14)] = f"Male Kelly's birthday... Maybe... idk. He's around {year - 1989} years old now."
         self[date(year, 11, 1) + rd(weekday=FR(+4))] = "Black Friday. I hope I can get some new socks"
         self[date(year, 12, 2)] = f"Female Kelly's Birthday. She's {year-1989} years old"
-        self[date(year, 12, 3)] = f"DuckBot's Inception Day. I'm about {(now()-datetime(2020, 12, 3, 10, 39, tzinfo=timezone())).seconds}s old"
+        self[date(year, 12, 3)] = f"DuckBot's Inception Day. I'm about {(now()-datetime(2020, 12, 3, 10, 39, tzinfo=timezone())).total_seconds()}s old"
         self[date(year, 12, 5)] = f"Taras' Birthday. He's {year-1989} years old"
