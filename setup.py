@@ -48,7 +48,7 @@ if __name__ == "__main__":
         install_requires=[
             "discord.py[voice]==2.1.0",
             "beautifulsoup4==4.11.2",
-            "requests==2.28.1",
+            "requests==2.28.2",
             "pytz==2022.7.1",
             "timezonefinder==6.1.9",
             "holidays==0.19",
