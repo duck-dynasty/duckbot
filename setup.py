@@ -46,7 +46,7 @@ if __name__ == "__main__":
         packages=find_packages(),
         cmdclass={"develop": PostDevelop, "install": PostInstall},
         install_requires=[
-            "discord.py[voice]==2.1.0",
+            "discord.py[voice]==2.2.0",
             "beautifulsoup4==4.11.2",
             "requests==2.28.2",
             "pytz==2022.7.1",
@@ -54,21 +54,21 @@ if __name__ == "__main__":
             "holidays==0.20",
             "pyowm==3.3.0",  # openweather
             "psycopg2==2.9.5",
-            "SQLAlchemy==2.0.1",
+            "SQLAlchemy==2.0.4",
             "d20==1.1.2",
             "nltk==3.8.1",  # also in pyproject.toml, required for setup script above
             "textblob==0.17.1",  # also in pyproject.toml, required for setup script above
             "pyfiglet==0.8.post1",
-            "matplotlib==3.6.3",
+            "matplotlib==3.7.0",
             "PyGithub==1.58.0",
             "wolframalpha==5.0.0",
-            "yfinance==0.2.9",
+            "yfinance==0.2.12",
         ],
         extras_require={
             "dev": [
                 "pytest==7.2.1",
                 "pytest-asyncio==0.20.3",
-                "pytest-xdist[psutil]==3.1.0",
+                "pytest-xdist[psutil]==3.2.0",
                 "flake8==4.0.1",
                 "black==23.1.0",
                 "flake8-black==0.3.6",
@@ -95,7 +95,7 @@ if __name__ == "__main__":
                 "aws-cdk.aws-iam==1.194.0",
                 "aws-cdk.aws-logs==1.194.0",
                 "aws-cdk.aws-ssm==1.194.0",
-                "boto3==1.26.61",
+                "boto3==1.26.81",
             ],
         },
         entry_points={
