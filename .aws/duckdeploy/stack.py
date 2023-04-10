@@ -80,13 +80,14 @@ class DuckBotStack(core.Stack):
         )
         duckbot.add_link(postgres)
 
+        max_price = "0.0052"  # $0.0052 is t3.nano on-demand price
         launch_template = ec2.LaunchTemplate(
             self,
             "LaunchTemplate",
             block_devices=[ec2.BlockDevice(device_name="/dev/xvda", volume=ec2.BlockDeviceVolume.ebs(volume_size=8, volume_type=ec2.EbsDeviceVolumeType.GP3))],
             instance_type=ec2.InstanceType.of(instance_class=ec2.InstanceClass.T3, instance_size=ec2.InstanceSize.MICRO),
             spot_options=ec2.LaunchTemplateSpotOptions(
-                max_price=0.0052,  # $0.0052 is t3.nano on-demand price
+                max_price=float(max_price),
                 interruption_behavior=ec2.SpotInstanceInterruption.TERMINATE,  # also release ebs volumes
             ),
             cpu_credits=ec2.CpuCredits.STANDARD,
@@ -107,7 +108,18 @@ class DuckBotStack(core.Stack):
             min_capacity=0,
             max_capacity=1,
             desired_capacity=1,
-            launch_template=launch_template,
+            mixed_instances_policy=autoscaling.MixedInstancesPolicy(
+                launch_template=launch_template,
+                instances_distribution=autoscaling.InstancesDistribution(
+                    on_demand_percentage_above_base_capacity=0,  # forces all instances to be spot instances
+                    spot_max_price=max_price,
+                    spot_allocation_strategy=autoscaling.SpotAllocationStrategy.LOWEST_PRICE,
+                ),
+                launch_template_overrides=[
+                    autoscaling.LaunchTemplateOverrides(instance_type=ec2.InstanceType.of(instance_class=ec2.InstanceClass.T3, instance_size=ec2.InstanceSize.MICRO)),
+                    autoscaling.LaunchTemplateOverrides(instance_type=ec2.InstanceType.of(instance_class=ec2.InstanceClass.T2, instance_size=ec2.InstanceSize.MICRO)),
+                ],
+            ),
             new_instances_protected_from_scale_in=False,
             instance_monitoring=autoscaling.Monitoring.BASIC,
             vpc=vpc,
