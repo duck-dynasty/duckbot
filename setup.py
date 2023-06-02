@@ -46,7 +46,7 @@ if __name__ == "__main__":
         packages=find_packages(),
         cmdclass={"develop": PostDevelop, "install": PostInstall},
         install_requires=[
-            "discord.py[voice]==2.2.2",
+            "discord.py[voice]==2.2.3",
             "beautifulsoup4==4.12.2",
             "requests==2.31.0",
             "pytz==2023.3",
