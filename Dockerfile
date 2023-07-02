@@ -22,7 +22,7 @@ RUN apt-get update && apt-get -y install \
     ffmpeg \
     libpq-dev \
     libatlas-base-dev \
-    fortune-mod fortunes fortunes-off cowsay cowsay-off \
+    fortune-mod fortunes cowsay \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 ENV PATH "$PATH:/usr/games"
 ENV VIRTUAL_ENV "/opt/venv"
