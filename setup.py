@@ -62,7 +62,7 @@ if __name__ == "__main__":
             "matplotlib==3.7.2",
             "PyGithub==1.58.2",
             "wolframalpha==5.0.0",
-            "yfinance==0.2.22",
+            "yfinance==0.2.26",
         ],
         extras_require={
             "dev": [
