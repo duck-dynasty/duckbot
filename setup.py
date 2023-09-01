@@ -60,7 +60,7 @@ if __name__ == "__main__":
             "textblob==0.17.1",  # also in pyproject.toml, required for setup script above
             "pyfiglet==0.8.post1",
             "matplotlib==3.7.2",
-            "PyGithub==1.58.2",
+            "PyGithub==1.59.1",
             "wolframalpha==5.0.0",
             "yfinance==0.2.28",
         ],
