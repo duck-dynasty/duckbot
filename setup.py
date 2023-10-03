@@ -49,12 +49,12 @@ if __name__ == "__main__":
             "discord.py[voice]==2.3.2",
             "beautifulsoup4==4.12.2",
             "requests==2.31.0",
-            "pytz==2023.3",
+            "pytz==2023.3.post1",
             "timezonefinder==6.2.0",
             "holidays==0.23",
             "pyowm==3.3.0",  # openweather
-            "psycopg2==2.9.7",
-            "SQLAlchemy==2.0.20",
+            "psycopg2==2.9.8",
+            "SQLAlchemy==2.0.21",
             "d20==1.1.2",
             "nltk==3.8.1",  # also in pyproject.toml, required for setup script above
             "textblob==0.17.1",  # also in pyproject.toml, required for setup script above
@@ -66,14 +66,14 @@ if __name__ == "__main__":
         ],
         extras_require={
             "dev": [
-                "pytest==7.4.0",
+                "pytest==7.4.2",
                 "pytest-asyncio==0.21.1",
                 "pytest-xdist[psutil]==3.3.1",
                 "flake8==4.0.1",
-                "black==23.7.0",
+                "black==23.9.1",
                 "flake8-black==0.3.6",
                 "isort==5.12.0",
-                "flake8-isort==6.0.0",
+                "flake8-isort==6.1.0",
                 "pep8-naming==0.13.2",
                 "pytest-flake8-v2==1.2.3",
                 "mdformat==0.7.17",
@@ -82,7 +82,7 @@ if __name__ == "__main__":
                 "responses==0.23.3",
                 "pytest-blockage==0.2.4",
                 "pytest-sugar==0.9.7",
-                "pytest-icdiff==0.6",
+                "pytest-icdiff==0.8",
                 "pytest-cov==4.1.0",
                 "pytest-lazy-fixture==0.6.3",
             ],
@@ -95,7 +95,7 @@ if __name__ == "__main__":
                 "aws-cdk.aws-iam==1.204.0",
                 "aws-cdk.aws-logs==1.204.0",
                 "aws-cdk.aws-ssm==1.204.0",
-                "boto3==1.28.39",
+                "boto3==1.28.57",
             ],
         },
         entry_points={
