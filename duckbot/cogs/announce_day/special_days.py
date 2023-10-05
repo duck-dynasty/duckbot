@@ -2,25 +2,25 @@ import math
 from datetime import date, datetime
 
 import discord
-import holidays
 from dateutil.relativedelta import FR, SU
 from dateutil.relativedelta import relativedelta as rd
+from holidays.countries import CA
 
 from duckbot.util.datetime import now, timezone
 
 
-class SpecialDays(holidays.Canada):
+class SpecialDays(CA):
     """A list of holidays and other special days according to the bot.
     `holidays.Canada` only supports stat days, so also add in non-stat days.
     @see https://github.com/dr-prodigy/python-holidays/blob/master/holidays/countries/canada.py
     """
 
     def __init__(self, bot):
-        holidays.Canada.__init__(self)
+        CA.__init__(self)
         self.bot = bot
 
     def _populate(self, year):
-        holidays.Canada._populate(self, year)
+        CA._populate(self, year)
 
         tito = discord.utils.get(self.bot.emojis, guild__name="Friends Chat", name="tito")
 
