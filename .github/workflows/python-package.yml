@@ -12,7 +12,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up Python Environment
       id: venv
       uses: ./.github/actions/setup-python-venv
@@ -30,7 +30,7 @@ jobs:
   sanity:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Test Connection to Discord
       run: |
         docker-compose run --rm \
@@ -41,7 +41,7 @@ jobs:
   synthesize:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up CDK
       id: cdk
       uses: ./.github/actions/setup-aws-cdk
@@ -68,7 +68,7 @@ jobs:
     if: github.event_name == 'push' && github.repository == 'duck-dynasty/duckbot'
     concurrency: deploy
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Build and Push Docker Image
       id: image
       uses: ./.github/actions/build-push-docker-image
@@ -89,7 +89,7 @@ jobs:
       uses: ./.github/actions/setup-aws-cdk
 
     - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v3.0.1
+      uses: aws-actions/configure-aws-credentials@v4.0.1
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
