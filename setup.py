@@ -53,8 +53,8 @@ if __name__ == "__main__":
             "timezonefinder==6.2.0",
             "holidays==0.33",
             "pyowm==3.3.0",  # openweather
-            "psycopg2==2.9.8",
-            "SQLAlchemy==2.0.21",
+            "psycopg2==2.9.9",
+            "SQLAlchemy==2.0.22",
             "d20==1.1.2",
             "nltk==3.8.1",  # also in pyproject.toml, required for setup script above
             "textblob==0.17.1",  # also in pyproject.toml, required for setup script above
@@ -62,15 +62,15 @@ if __name__ == "__main__":
             "matplotlib==3.7.2",
             "PyGithub==2.1.1",
             "wolframalpha==5.0.0",
-            "yfinance==0.2.28",
+            "yfinance==0.2.31",
         ],
         extras_require={
             "dev": [
-                "pytest==7.4.2",
+                "pytest==7.4.3",
                 "pytest-asyncio==0.21.1",
                 "pytest-xdist[psutil]==3.3.1",
                 "flake8==4.0.1",
-                "black==23.9.1",
+                "black==23.10.1",
                 "flake8-black==0.3.6",
                 "isort==5.12.0",
                 "flake8-isort==6.1.0",
@@ -95,7 +95,7 @@ if __name__ == "__main__":
                 "aws-cdk.aws-iam==1.204.0",
                 "aws-cdk.aws-logs==1.204.0",
                 "aws-cdk.aws-ssm==1.204.0",
-                "boto3==1.28.57",
+                "boto3==1.28.75",
             ],
         },
         entry_points={
