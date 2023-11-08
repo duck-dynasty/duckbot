@@ -59,7 +59,7 @@ if __name__ == "__main__":
             "nltk==3.8.1",  # also in pyproject.toml, required for setup script above
             "textblob==0.17.1",  # also in pyproject.toml, required for setup script above
             "pyfiglet==0.8.post1",
-            "matplotlib==3.7.2",
+            "matplotlib==3.8.1",
             "PyGithub==2.1.1",
             "wolframalpha==5.0.0",
             "yfinance==0.2.31",
