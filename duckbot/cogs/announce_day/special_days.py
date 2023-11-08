@@ -44,7 +44,7 @@ class SpecialDays(CA):
         self[date(year, 9, 26)] = f"Tom's Birthday. He's {year-1990} years old. How he made it this far, we'll never know"
         self[date(year, 10, 7)] = f"Delta's Birthday. He's {year-2015} years old and is a good boy"
         self[date(year, 10, 9)] = "Leif Erikson Day. Hinga Dinga Durgen! https://tenor.com/view/viking-spongebob-squarepants-durgen-fall-down-hard-gif-7302846 "  # intentional trailing space for gif
-        self[date(year, 10, 21)] = "G-dawg's birthday. He didn't want us knowing his birthday, but here we are. The {year-1988} year old is mad"
+        self[date(year, 10, 21)] = f"G-dawg's birthday. He didn't want us knowing his birthday, but here we are. The {year-1988} year old is mad"
         self[date(year, 10, 31)] = "Halloween"
         self[date(year, 11, 10)] = f"Tom and Kelly's fake wedding anniversary. They've been fake together for {year-2014} years"
         self[date(year, 11, 12)] = f"Sabrina's Birthday. She is {year-1996} years old. Good work on surviving"
