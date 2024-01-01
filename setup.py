@@ -42,7 +42,7 @@ if __name__ == "__main__":
         name="duckbot",
         version="1.0",
         url="https://github.com/duck-dynasty/duckbot",
-        python_requires=">=3.11",
+        python_requires=">=3.10",
         packages=find_packages(),
         cmdclass={"develop": PostDevelop, "install": PostInstall},
         install_requires=[
