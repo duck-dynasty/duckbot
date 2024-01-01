@@ -5,7 +5,7 @@ import discord
 from duckbot.cogs.text import MockText
 
 
-@mock.patch("duckbot.cogs.text.mock_text.get_message_reference", return_value=None)
+@mock.patch("duckbot.util.messages.get_message_reference", return_value=None)
 async def test_mock_text_mocks_message_not_reply(get_message_reference, bot, context):
     clazz = MockText(bot)
     await clazz.mock_text(context, "some' message% asd")
@@ -13,7 +13,7 @@ async def test_mock_text_mocks_message_not_reply(get_message_reference, bot, con
     get_message_reference.assert_called_once_with(context.message)
 
 
-@mock.patch("duckbot.cogs.text.mock_text.get_message_reference")
+@mock.patch("duckbot.util.messages.get_message_reference")
 async def test_mock_text_mocks_message_reply(get_message_reference, bot, context, autospec):
     reply = autospec.of(discord.Message)
     get_message_reference.return_value = reply
@@ -23,7 +23,7 @@ async def test_mock_text_mocks_message_reply(get_message_reference, bot, context
     get_message_reference.assert_called_once_with(context.message)
 
 
-@mock.patch("duckbot.cogs.text.mock_text.get_message_reference", return_value=None)
+@mock.patch("duckbot.util.messages.get_message_reference", return_value=None)
 async def test_mock_text_no_message_not_reply(get_message_reference, bot, context):
     context.message.author.display_name = "bob"
     clazz = MockText(bot)
@@ -32,7 +32,7 @@ async def test_mock_text_no_message_not_reply(get_message_reference, bot, contex
     get_message_reference.assert_called_once_with(context.message)
 
 
-@mock.patch("duckbot.cogs.text.mock_text.get_message_reference")
+@mock.patch("duckbot.util.messages.get_message_reference")
 async def test_mock_text_no_message_reply(get_message_reference, bot, context, autospec):
     reply = autospec.of(discord.Message)
     get_message_reference.return_value = reply
