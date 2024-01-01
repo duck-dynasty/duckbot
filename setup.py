@@ -62,7 +62,7 @@ if __name__ == "__main__":
             "matplotlib==3.7.2",
             "PyGithub==2.1.1",
             "wolframalpha==5.0.0",
-            "yfinance==0.2.32",
+            "yfinance==0.2.33",
         ],
         extras_require={
             "dev": [
@@ -70,7 +70,7 @@ if __name__ == "__main__":
                 "pytest-asyncio==0.23.3",
                 "pytest-xdist[psutil]==3.5.0",
                 "flake8==4.0.1",
-                "black==23.11.0",
+                "black==23.12.1",
                 "flake8-black==0.3.6",
                 "isort==5.13.2",
                 "flake8-isort==6.1.1",
