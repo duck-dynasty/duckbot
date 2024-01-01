@@ -1,5 +1,5 @@
 # collect pip dependencies into a virtualenv, which we'll copy into the prod stage
-FROM python:3.8 as pip-dependencies
+FROM python:3.12 as pip-dependencies
 ENV VIRTUAL_ENV "/opt/venv"
 RUN python -m venv $VIRTUAL_ENV
 ENV PATH "$VIRTUAL_ENV/bin:$PATH"
@@ -13,7 +13,7 @@ COPY pyproject.toml .
 COPY setup.py .
 RUN pip install .
 
-FROM python:3.8-slim as prod
+FROM python:3.12-slim as prod
 # ffmpeg: for discord audio
 # libpq-dev: postgres client libraries
 # libatlas-base-dev: matplotlib dependencies

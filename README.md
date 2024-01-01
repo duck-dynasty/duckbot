@@ -15,10 +15,10 @@ https://user-images.githubusercontent.com/3149083/135654217-244d7457-9db9-4c30-a
 
 ## Development
 
-Before running DuckBot, you want to create a virtualenv to develop in. DuckBot runs on `python3.8`, so prefer to use that.
+Before running DuckBot, you want to create a virtualenv to develop in. DuckBot runs on `python3.12`, so prefer to use that.
 
 ```sh
-python3.8 -m venv --clear --prompt duckbot venv
+python3.12 -m venv --clear --prompt duckbot venv
 . venv/bin/activate
 pip install --upgrade pip setuptools wheel
 SETUPTOOLS_ENABLE_FEATURES="legacy-editable" pip install --editable .[dev]

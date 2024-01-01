@@ -7,7 +7,7 @@ from setuptools.command.install import install
 
 
 def run_code_formatters():
-    for tool in ["isort .", "black .", "mdformat ."]:
+    for tool in ["isort .", "black .", "mdformat .", "flake8 duckbot tests"]:
         print(f"running `{tool}`")
         subprocess.run(tool, shell=True)
 
@@ -42,7 +42,7 @@ if __name__ == "__main__":
         name="duckbot",
         version="1.0",
         url="https://github.com/duck-dynasty/duckbot",
-        python_requires=">=3.8",
+        python_requires=">=3.12",
         packages=find_packages(),
         cmdclass={"develop": PostDevelop, "install": PostInstall},
         install_requires=[
@@ -69,13 +69,13 @@ if __name__ == "__main__":
                 "pytest==7.4.4",
                 "pytest-asyncio==0.23.3",
                 "pytest-xdist[psutil]==3.5.0",
-                "flake8==4.0.1",
+                "flake8==6.1.0",
                 "black==23.12.1",
                 "flake8-black==0.3.6",
                 "isort==5.13.2",
                 "flake8-isort==6.1.1",
                 "pep8-naming==0.13.2",
-                "pytest-flake8-v2==1.2.3",
+                # "pytest-flake8-v2==1.2.3",
                 "mdformat==0.7.17",
                 "mdformat-gfm==0.3.5",
                 "mdformat-black==0.1.1",
