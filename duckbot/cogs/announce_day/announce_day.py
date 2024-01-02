@@ -5,7 +5,7 @@ from discord import ChannelType
 from discord.ext import commands, tasks
 from discord.utils import get
 
-from duckbot.util.datetime import now
+import duckbot.util.datetime
 
 from .phrases import days, templates
 from .special_days import SpecialDays
@@ -14,25 +14,27 @@ log = logging.getLogger(__name__)
 
 
 class AnnounceDay(commands.Cog):
-    def __init__(self, bot, dog_photos):
+    def __init__(self, bot, dog_photos, days=days, templates=templates):
         self.bot = bot
         self.dog_photos = dog_photos
         self.holidays = SpecialDays(bot)
+        self.days = days
+        self.templates = templates
         self.on_hour_loop.start()
 
     def cog_unload(self):
         self.on_hour_loop.cancel()
 
     def should_announce_day(self):
-        return now().hour == 7
+        return duckbot.util.datetime.now().hour == 7
 
     def get_message(self):
-        current_time = now()
+        current_time = duckbot.util.datetime.now()
         day = current_time.weekday()
-        today = random.choice(days[day]["names"])
-        tomorrow = random.choice(days[(day + 1) % 7]["names"])
-        yesterday = random.choice(days[(day + 6) % 7]["names"])  # +6 instead of -1 since modulo can be negative
-        message = random.choice(templates + days[day]["templates"]).format(today=today, tomorrow=tomorrow, yesterday=yesterday)
+        today = random.choice(self.days[day]["names"])
+        tomorrow = random.choice(self.days[(day + 1) % 7]["names"])
+        yesterday = random.choice(self.days[(day + 6) % 7]["names"])  # +6 instead of -1 since modulo can be negative
+        message = random.choice(self.templates + self.days[day]["templates"]).format(today=today, tomorrow=tomorrow, yesterday=yesterday)
         if current_time in self.holidays:
             specials = " and ".join(self.holidays.get_list(current_time))
             return message + "\n" + "It is also " + specials + "."
@@ -62,9 +64,9 @@ class AnnounceDay(commands.Cog):
             log.warning(e, exc_info=True)  # ignore failures for sending dog photo
 
     async def send_gif(self, channel):
-        day = now().weekday()
-        if days[day]["gifs"]:
-            await channel.send(random.choice(days[day]["gifs"]))
+        day = duckbot.util.datetime.now().weekday()
+        if self.days[day]["gifs"]:
+            await channel.send(random.choice(self.days[day]["gifs"]))
 
     @on_hour_loop.before_loop
     async def before_loop(self):

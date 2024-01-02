@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [tool.black]
 line-length = 200
-target-version = ["py38"]
+target-version = ["py310"]
 
 [tool.isort]
 profile = "black"
@@ -13,7 +13,6 @@ multi_line_output = 3
 [tool.pytest.ini_options]
 addopts = """\
     -ra \
-    --flake8 \
     --mdformat \
     -n auto \
     --blockage"""
