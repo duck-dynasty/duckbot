@@ -10,7 +10,7 @@ class HealthCheck(commands.Cog):
 
     @commands.Cog.listener("on_ready")
     async def start_health_check_tasks(self):
-        await asyncio.start_server(self.healthcheck, host="127.0.0.1", port=8008, loop=self.bot.loop)
+        await asyncio.start_server(self.healthcheck, host="127.0.0.1", port=8008)
 
     def healthcheck(self, reader, writer):
         if self.bot.user is None or not self.bot.is_ready() or self.bot.is_closed() or self.bot.latency > 1.0:
