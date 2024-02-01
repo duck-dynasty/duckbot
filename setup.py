@@ -67,7 +67,7 @@ if __name__ == "__main__":
         extras_require={
             "dev": [
                 "pytest==7.4.4",
-                "pytest-asyncio==0.23.3",
+                "pytest-asyncio==0.23.4",
                 "pytest-xdist[psutil]==3.5.0",
                 "flake8==6.1.0",
                 "black==24.1.1",
