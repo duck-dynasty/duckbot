@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools", "wheel", "nltk==3.8.1", "textblob=0.18.0.post0"]
+requires = ["setuptools", "wheel", "nltk==3.8.1", "textblob==0.18.0.post0"]
 build-backend = "setuptools.build_meta"
 
 [tool.black]
