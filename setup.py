@@ -57,7 +57,7 @@ if __name__ == "__main__":
             "SQLAlchemy==2.0.29",
             "d20==1.1.2",
             "nltk==3.8.1",  # also in pyproject.toml, required for setup script above
-            "textblob==0.17.1",  # also in pyproject.toml, required for setup script above
+            "textblob==0.18.0.post0",  # also in pyproject.toml, required for setup script above
             "pyfiglet==1.0.2",
             "matplotlib==3.8.4",
             "PyGithub==2.1.1",
