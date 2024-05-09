@@ -46,7 +46,7 @@ class Logging(commands.Cog):
     @commands.Cog.listener("on_command_error")
     async def log_command_exceptions(self, context: commands.Context, exception):
         name = context.cog.__module__ if context.cog else context.bot.__module__
-        trace = "".join(traceback.format_exception(etype=type(exception), value=exception, tb=exception.__traceback__))
+        trace = "".join(traceback.format_exception(exception, value=exception, tb=exception.__traceback__))
         logging.getLogger(name).error(f"{self.format_function(context.command.name, context.args, context.kwargs, context.message)}\n{trace}")
 
     async def log_event_exceptions(self, event: str, *args, **kwargs):
@@ -74,7 +74,7 @@ def loop_replacement(*args, **kwargs):
             bot_self = error_args[0]  # may be the same as exception, but is typically the `self` parameter in the method, ie the cog/bot instance
             exception = error_args[-1]
             name = "duckbot" if bot_self == exception else bot_self.__module__
-            trace = "".join(traceback.format_exception(etype=type(exception), value=exception, tb=exception.__traceback__))
+            trace = "".join(traceback.format_exception(exception, value=exception, tb=exception.__traceback__))
             logging.getLogger(name).error(f"{loop.coro.__name__}\n{trace}")
 
         return loop
