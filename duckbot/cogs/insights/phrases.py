@@ -13,4 +13,5 @@ responses = [
     ":exploding_head:",
     ":eggplant: :sweat_drops:",
     ":cricket:",
+    "So true.",
 ]
