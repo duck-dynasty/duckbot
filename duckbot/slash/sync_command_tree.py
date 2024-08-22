@@ -13,7 +13,7 @@ class SyncCommandTree(Cog):
 
     @Cog.listener("on_ready")
     async def sync_command_tree(self):
-        commands = [x.to_dict() for x in self.bot.tree.get_commands()]
+        commands = [x.to_dict(self.bot.tree) for x in self.bot.tree.get_commands()]
         log.info("registering global slash commands=%s", commands)
         await self.bot.tree.sync()
 
