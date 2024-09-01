@@ -63,6 +63,7 @@ if __name__ == "__main__":
             "PyGithub==2.1.1",
             "wolframalpha==5.1.3",
             "yfinance==0.2.41",
+            "mip==1.15.0",
         ],
         extras_require={
             "dev": [

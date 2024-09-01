@@ -3,6 +3,7 @@ from .coin_flip import CoinFlip
 from .dice import Dice
 from .discord_activity import DiscordActivity
 from .office_hours import OfficeHours
+from .satisfy import setup as satisfy_setup
 
 
 async def setup(bot):
@@ -11,3 +12,4 @@ async def setup(bot):
     await bot.add_cog(CoinFlip(bot))
     await bot.add_cog(DiscordActivity(bot))
     await bot.add_cog(OfficeHours(bot))
+    await satisfy_setup(bot)
