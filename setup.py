@@ -51,7 +51,7 @@ if __name__ == "__main__":
             "requests==2.32.3",
             "pytz==2024.1",
             "timezonefinder==6.5.2",
-            "holidays==0.53",
+            "holidays==0.55",
             "pyowm==3.3.0",  # openweather
             "psycopg2==2.9.9",
             "SQLAlchemy==2.0.31",
