@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from math import isclose
 from typing import List, Optional
 
 from .item import Item
@@ -13,14 +14,14 @@ class Rate:
     def tuple(self) -> tuple[Item, float]:
         return (self.item, self.rate)
 
-    def __add__(self, rhs: Rate | tuple[Item, float]) -> Rates:
-        return Rates([self.tuple(), rhs.tuple() if isinstance(rhs, Rate) else rhs])
+    def __eq__(self, rhs: object) -> bool:
+        return False if not isinstance(rhs, Rate) else self.item == rhs.item and isclose(self.rate, rhs.rate)
 
-    def __rshift__(self, output: Rate | tuple[Item, float] | Rates) -> tuple[Rates, Rates]:
-        if isinstance(output, Rates):
-            return (Rates([self.tuple()]), output)
-        else:
-            return (Rates([self.tuple()]), Rates([output.tuple() if isinstance(output, Rate) else output]))
+    def __add__(self, rhs: Rate) -> Rates:
+        return Rates([self, rhs])
+
+    def __rshift__(self, output: Rate | Rates) -> tuple[Rates, Rates]:
+        return (Rates([self]), output if isinstance(output, Rates) else Rates([output]))
 
     def __str__(self) -> str:
         return str(self.tuple())
@@ -30,8 +31,8 @@ class Rate:
 
 
 class Rates:
-    def __init__(self, rates: List[tuple[Item, float]] | dict[Item, float] = []):
-        self.rates = dict(rates)
+    def __init__(self, rates: List[Rate] | dict[Item, float] = []):
+        self.rates = dict(rates if isinstance(rates, dict) else [r.tuple() for r in rates])
 
     def items(self):
         return self.rates.items()
@@ -45,16 +46,16 @@ class Rates:
     def __bool__(self) -> bool:
         return bool(self.rates)
 
+    def __eq__(self, rhs: object) -> bool:
+        return False if not isinstance(rhs, Rates) else self.rates == rhs.rates
+
     def __add__(self, rate: Rate) -> Rates:
         x = self.rates.copy()
         x[rate.item] = rate.rate
         return Rates(x)
 
-    def __rshift__(self, output: Rate | tuple[Item, float] | Rates) -> tuple[Rates, Rates]:
-        if isinstance(output, Rates):
-            return (self, output)
-        else:
-            return (self, Rates([output.tuple() if isinstance(output, Rate) else output]))
+    def __rshift__(self, output: Rate | Rates) -> tuple[Rates, Rates]:
+        return (self, output if isinstance(output, Rates) else Rates([output]))
 
     def __str__(self) -> str:
         return str(self.rates)
