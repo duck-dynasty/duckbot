@@ -29,7 +29,7 @@ def optimize(factory: Factory) -> dict[Recipe, float]:
     for c in constraints.values():
         model.add_constr(c >= 0)
 
-    model.objective = zero + sum([c for i, c in constraints.items() if i in factory.maximize])
+    model.objective = sum([c for i, c in constraints.items() if i in factory.maximize])
     model.optimize()
 
     return dict((r, float(v.x)) for r, v in zip(factory.recipes, use_recipes) if v.x is not None and v.x > 0)

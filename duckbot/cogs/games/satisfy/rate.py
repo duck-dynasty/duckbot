@@ -42,6 +42,9 @@ class Rates:
     def get(self, key: Item, default: Optional[float]) -> Optional[float]:
         return self.rates.get(key, default)
 
+    def __bool__(self) -> bool:
+        return bool(self.rates)
+
     def __add__(self, rate: Rate) -> Rates:
         x = self.rates.copy()
         x[rate.item] = rate.rate
