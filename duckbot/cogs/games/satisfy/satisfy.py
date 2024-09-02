@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import List
 
 from discord import Interaction
 from discord.app_commands import Choice, MissingPermissions, check
@@ -7,11 +7,12 @@ from discord.ext.commands import Cog, Context, hybrid_group
 from .factory import Factory
 from .item import Item
 from .pretty import factory_embed, solution_embed
-from .recipe import all
+from .rate import Rates
+from .recipe import Recipe, all
 from .solver import optimize
 
 
-async def allowed(context: Union[Context, Interaction]):
+async def allowed(context: Context | Interaction):
     id = context.author.id if hasattr(context, "author") else context.user.id
     if id not in [368038054558171141, 776607982472921088, 375024417358479380]:
         raise MissingPermissions(["lul"])
@@ -24,8 +25,8 @@ class Satisfy(Cog):
         self.factory_cache = {}
 
     def factory(self, context: Context) -> Factory:
-        return self.factory_cache.get(context.author.id, Factory(inputs={}, targets={}, maximize=set(), recipes=all()))
-        # return self.factory_cache.get(context.author.id, Factory(inputs={Item.CrudeOil: 300, Item.Water: 1000}, targets={}, maximize=set([Item.Plastic]), recipes=all()))
+        return self.factory_cache.get(context.author.id, Factory(inputs=Rates(), targets=Rates(), maximize=set(), recipes=all()))
+        # return self.factory_cache.get(context.author.id, Factory(inputs=Item.CrudeOil * 300 + Item.Water * 1000, targets=Rates(), maximize=set([Item.Plastic]), recipes=all()))
 
     def save(self, context: Context, factory: Factory):
         self.factory_cache[context.author.id] = factory
@@ -54,7 +55,7 @@ class Satisfy(Cog):
     @check(allowed)
     async def add_input(self, context: Context, item: str, rate_per_minute: float):
         factory = self.factory(context)
-        factory.inputs = factory.inputs | dict([Item[item] * rate_per_minute])
+        factory.inputs = factory.inputs + Item[item] * rate_per_minute
         self.save(context, factory)
         await context.send(embed=factory_embed(factory), delete_after=10)
 
@@ -62,7 +63,7 @@ class Satisfy(Cog):
     @check(allowed)
     async def add_target(self, context: Context, item: str, rate_per_minute: float):
         factory = self.factory(context)
-        factory.targets = factory.targets | dict([Item[item] * rate_per_minute])
+        factory.targets = factory.targets + Item[item] * rate_per_minute
         self.save(context, factory)
         await context.send(embed=factory_embed(factory), delete_after=10)
 
