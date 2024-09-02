@@ -1,12 +1,13 @@
 from typing import List, Union
 
-from discord import Embed, Interaction
+from discord import Interaction
 from discord.app_commands import Choice, MissingPermissions, check
 from discord.ext.commands import Cog, Context, hybrid_group
 
 from .factory import Factory
 from .item import Item
-from .recipe import Recipe, all
+from .pretty import factory_embed, solution_embed
+from .recipe import all
 from .solver import optimize
 
 
@@ -33,7 +34,6 @@ class Satisfy(Cog):
         self.factory_cache.pop(context.author.id, None)
 
     # things left to do
-    #   clean up output; just dumping the Factory is ugly; final output is hard to read
     #   add the rest of the recipes/items
     #   create `recipe_bank`, `include_recipe`, `exclude_recipe` commands for recipe manipulation
     #   ensure solve is feasible; add raw item resource creation
@@ -48,7 +48,7 @@ class Satisfy(Cog):
     @check(allowed)
     async def reset(self, context: Context):
         self.clear(context)
-        await context.send(f"Factory for {context.author.display_name} cleared. Bitch.", delete_after=10)
+        await context.send(f":factory: :fire: Factory for {context.author.display_name} cleared. Bitch. :fire: :factory:", delete_after=10)
 
     @satisfy.command(name="input", description="Adds an input to the factory.")
     @check(allowed)
@@ -77,10 +77,13 @@ class Satisfy(Cog):
     @satisfy.command(name="solve", description="Runs the solver for the factory.")
     @check(allowed)
     async def solve(self, context: Context):
-        async with context.typing():
-            factory = self.factory(context)
-            solution = optimize(factory)
-            await context.send(embeds=[factory_embed(factory), solution_embed(solution)])
+        factory = self.factory(context)
+        if not factory.inputs or (not factory.targets and not factory.maximize):
+            await context.send("No.", delete_after=10)
+        else:
+            async with context.typing():
+                solution = optimize(factory)
+                await context.send(embeds=[factory_embed(factory), solution_embed(solution)])
 
     @add_input.autocomplete("item")
     @add_target.autocomplete("item")
@@ -98,45 +101,3 @@ class Satisfy(Cog):
     @add_maximize.error
     async def on_error(self, context: Context, error):
         await context.send(str(error), delete_after=10)
-
-
-def num_str(x: float) -> str:
-    return round(x, 4)
-
-
-def rate_str(rate: tuple[Item, float]) -> str:
-    return f"{num_str(rate[1])} {rate[0]}"
-
-
-def rates_str(rates: dict[Item, float]) -> str:
-    return " + ".join([rate_str(rate) for rate in rates.items()])
-
-
-def factory_embed(factory: Factory) -> Embed:
-    embed = Embed()
-
-    inputs = "\n".join([rate_str(rate) for rate in factory.inputs.items()]) if factory.inputs else "N/A"
-    embed.add_field(name="Inputs", value=inputs, inline=False)
-
-    target = "\n".join([rate_str(rate) for rate in factory.targets.items()]) if factory.targets else "N/A"
-    embed.add_field(name="Target", value=target, inline=False)
-
-    maxify = "\n".join([str(item) for item in factory.maximize]) if factory.maximize else "N/A"
-    embed.add_field(name="Maximize", value=maxify, inline=False)
-
-    return embed
-
-
-def solution_embed(solution: dict[Recipe, float]) -> Embed:
-    embed = Embed()
-
-    def intermediates(recipe: Recipe, num: float) -> str:
-        inputs = rates_str(dict((k, num * v) for k, v in recipe.inputs.items()))
-        output = rates_str(dict((k, num * v) for k, v in recipe.outputs.items()))
-        return f"{inputs} -> {output}"
-
-    for recipe, num in solution.items():
-        embed.add_field(name=recipe.name, value=f"{num_str(num)} {recipe.building}\n{intermediates(recipe, num)}", inline=False)
-
-    embed.set_footer(text="yo dawg, add a factory summary here")
-    return embed
