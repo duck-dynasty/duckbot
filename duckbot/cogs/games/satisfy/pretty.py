@@ -6,6 +6,7 @@ from discord import Embed
 
 from .factory import Factory
 from .item import Item
+from .rate import Rates
 from .recipe import Recipe
 
 
@@ -17,7 +18,7 @@ def rate_str(rate: tuple[Item, float]) -> str:
     return f"{num_str(rate[1])} {rate[0]}"
 
 
-def rates_str(rates: dict[Item, float]) -> str:
+def rates_str(rates: Rates) -> str:
     return " + ".join([rate_str(rate) for rate in rates.items()])
 
 
@@ -47,13 +48,13 @@ def solution_embed(solution: dict[Recipe, float]) -> Embed:
     return embed
 
 
-def inout_str(inputs: dict[Item, float], outputs: dict[Item, float], scale_factor: float = 1.0) -> str:
+def inout_str(inputs: dict[Item, float] | Rates, outputs: dict[Item, float] | Rates, scale_factor: float = 1.0) -> str:
     inputs = rates_str(scale_rates(inputs, scale_factor))
     output = rates_str(scale_rates(outputs, scale_factor))
     return f"{inputs} -> {output}"
 
 
-def scale_rates(rates: dict[Item, float], scale_factor: float) -> dict[Item, float]:
+def scale_rates(rates: dict[Item, float] | Rates, scale_factor: float) -> dict[Item, float]:
     return dict((k, scale_factor * v) for k, v in rates.items())
 
 
