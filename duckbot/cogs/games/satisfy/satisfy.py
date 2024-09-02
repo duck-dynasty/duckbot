@@ -8,7 +8,7 @@ from .factory import Factory
 from .item import Item
 from .pretty import factory_embed, solution_embed
 from .rate import Rates
-from .recipe import Recipe, all
+from .recipe import all
 from .solver import optimize
 
 
