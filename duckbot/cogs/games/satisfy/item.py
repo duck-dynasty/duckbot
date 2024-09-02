@@ -7,6 +7,7 @@ from enum import Enum, auto, unique
 class Form(Enum):
     Solid = auto()
     Fluid = auto()
+    Aux = auto()
 
 
 @unique
@@ -27,7 +28,8 @@ class Item(Enum):
     Plastic = (auto(), Form.Solid, 75)
     Rubber = (auto(), Form.Solid, 60)
 
-    AwesomeTicketPoints = (auto(), Form.Fluid, 0)
+    AwesomeTicketPoints = (auto(), Form.Aux, 0)
+    MwPower = (auto(), Form.Aux, 0)
 
     def _generate_next_value_(name, start, count, last_values):  # noqa: N805
         return name
@@ -36,11 +38,13 @@ class Item(Enum):
         self.form = form
         self.points = points
 
-    def __mul__(self, rhs: float) -> tuple[Item, float]:
-        return (self, rhs)
+    def __mul__(self, rhs: float):
+        from .rate import Rate
 
-    def __repr__(self):
-        return self.name
+        return Rate(self, rhs)
 
     def __str__(self):
         return self.name
+
+    def __repr__(self):
+        return str(self)

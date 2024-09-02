@@ -1,5 +1,4 @@
 from functools import reduce
-from typing import Union
 
 from mip import INF, MAXIMIZE, LinExpr, Model, Var
 
@@ -16,7 +15,7 @@ def optimize(factory: Factory) -> dict[Recipe, float]:
 
     use_recipes = [model.add_var(f"Recipe_{r.name}", lb=0, ub=INF) for r in factory.recipes]
 
-    def cost(recipe: Recipe, use: Union[Var, LinExpr]) -> dict[Item, LinExpr]:
+    def cost(recipe: Recipe, use: Var | LinExpr) -> dict[Item, LinExpr]:
         costs = dict((item, -use * rate) for item, rate in recipe.inputs.items())
         income = dict((item, use * rate) for item, rate in recipe.outputs.items())
         return costs, income
