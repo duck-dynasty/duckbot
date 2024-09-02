@@ -10,8 +10,9 @@ from .recipe import Recipe
 zero = LinExpr(const=0)
 
 
-def optimize(factory: Factory):
+def optimize(factory: Factory) -> dict[Recipe, float]:
     model = Model(sense=MAXIMIZE)
+    model.verbose = 0
 
     use_recipes = [model.add_var(f"Recipe_{r.name}", lb=0, ub=INF) for r in factory.recipes]
 
@@ -32,7 +33,7 @@ def optimize(factory: Factory):
     model.objective = zero + sum([c for i, c in constraints.items() if i in factory.maximize])
     model.optimize()
 
-    return dict((r, v.x) for r, v in zip(factory.recipes, use_recipes) if v.x is not None and v.x > 0)
+    return dict((r, float(v.x)) for r, v in zip(factory.recipes, use_recipes) if v.x is not None and v.x > 0)
 
 
 def sum_by_item(lhs: dict[Item, LinExpr], rhs: dict[Item, LinExpr]) -> dict[Item, LinExpr]:

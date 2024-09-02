@@ -7,7 +7,7 @@ from .recipe import Recipe
 
 @dataclass
 class Factory:
-    inputs: dict[Item, int]
+    inputs: dict[Item, float]
     recipes: List[Recipe]
-    targets: dict[Item, int]
+    targets: dict[Item, float]
     maximize: Set[Item]
