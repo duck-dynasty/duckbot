@@ -1,12 +1,12 @@
 from typing import List, Union
 
-from discord import Interaction
+from discord import Embed, Interaction
 from discord.app_commands import Choice, MissingPermissions, check
 from discord.ext.commands import Cog, Context, hybrid_group
 
 from .factory import Factory
 from .item import Item
-from .recipe import all
+from .recipe import Recipe, all
 from .solver import optimize
 
 
@@ -24,6 +24,7 @@ class Satisfy(Cog):
 
     def factory(self, context: Context) -> Factory:
         return self.factory_cache.get(context.author.id, Factory(inputs={}, targets={}, maximize=set(), recipes=all()))
+        # return self.factory_cache.get(context.author.id, Factory(inputs={Item.CrudeOil: 300, Item.Water: 1000}, targets={}, maximize=set([Item.Plastic]), recipes=all()))
 
     def save(self, context: Context, factory: Factory):
         self.factory_cache[context.author.id] = factory
@@ -55,7 +56,7 @@ class Satisfy(Cog):
         factory = self.factory(context)
         factory.inputs = factory.inputs | dict([Item[item] * rate_per_minute])
         self.save(context, factory)
-        await context.send(f"Added {item} to inputs. Current factory={factory}", delete_after=10)
+        await context.send(embed=factory_embed(factory), delete_after=10)
 
     @satisfy.command(name="output", description="Specifies a desired output for the factory.")
     @check(allowed)
@@ -63,7 +64,7 @@ class Satisfy(Cog):
         factory = self.factory(context)
         factory.targets = factory.targets | dict([Item[item] * rate_per_minute])
         self.save(context, factory)
-        await context.send(f"Added {item} to output targets. Current factory={factory}", delete_after=10)
+        await context.send(embed=factory_embed(factory), delete_after=10)
 
     @satisfy.command(name="maximize", description="Specify maximize output of desired item.")
     @check(allowed)
@@ -71,14 +72,15 @@ class Satisfy(Cog):
         factory = self.factory(context)
         factory.maximize.add(Item[item])
         self.save(context, factory)
-        await context.send(f"Added {item} to maximization targets. Current factory={factory}", delete_after=10)
+        await context.send(embed=factory_embed(factory), delete_after=10)
 
     @satisfy.command(name="solve", description="Runs the solver for the factory.")
     @check(allowed)
     async def solve(self, context: Context):
         async with context.typing():
-            result = optimize(self.factory(context))
-            await context.send(str(result))
+            factory = self.factory(context)
+            solution = optimize(factory)
+            await context.send(embeds=[factory_embed(factory), solution_embed(solution)])
 
     @add_input.autocomplete("item")
     @add_target.autocomplete("item")
@@ -96,3 +98,45 @@ class Satisfy(Cog):
     @add_maximize.error
     async def on_error(self, context: Context, error):
         await context.send(str(error), delete_after=10)
+
+
+def num_str(x: float) -> str:
+    return round(x, 4)
+
+
+def rate_str(rate: tuple[Item, float]) -> str:
+    return f"{num_str(rate[1])} {rate[0]}"
+
+
+def rates_str(rates: dict[Item, float]) -> str:
+    return " + ".join([rate_str(rate) for rate in rates.items()])
+
+
+def factory_embed(factory: Factory) -> Embed:
+    embed = Embed()
+
+    inputs = "\n".join([rate_str(rate) for rate in factory.inputs.items()]) if factory.inputs else "N/A"
+    embed.add_field(name="Inputs", value=inputs, inline=False)
+
+    target = "\n".join([rate_str(rate) for rate in factory.targets.items()]) if factory.targets else "N/A"
+    embed.add_field(name="Target", value=target, inline=False)
+
+    maxify = "\n".join([str(item) for item in factory.maximize]) if factory.maximize else "N/A"
+    embed.add_field(name="Maximize", value=maxify, inline=False)
+
+    return embed
+
+
+def solution_embed(solution: dict[Recipe, float]) -> Embed:
+    embed = Embed()
+
+    def intermediates(recipe: Recipe, num: float) -> str:
+        inputs = rates_str(dict((k, num * v) for k, v in recipe.inputs.items()))
+        output = rates_str(dict((k, num * v) for k, v in recipe.outputs.items()))
+        return f"{inputs} -> {output}"
+
+    for recipe, num in solution.items():
+        embed.add_field(name=recipe.name, value=f"{num_str(num)} {recipe.building}\n{intermediates(recipe, num)}", inline=False)
+
+    embed.set_footer(text="yo dawg, add a factory summary here")
+    return embed
