@@ -138,5 +138,5 @@ def solution_embed(solution: dict[Recipe, float]) -> Embed:
     for recipe, num in solution.items():
         embed.add_field(name=recipe.name, value=f"{num_str(num)} {recipe.building}\n{intermediates(recipe, num)}", inline=False)
 
-    embed.set_footer("yo dawg, add a factory summary here")
+    embed.set_footer(text="yo dawg, add a factory summary here")
     return embed
