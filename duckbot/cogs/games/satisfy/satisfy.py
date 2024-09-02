@@ -8,7 +8,7 @@ from .factory import Factory
 from .item import Item
 from .pretty import factory_embed, solution_embed
 from .rate import Rates
-from .recipe import all
+from .recipe import all, default
 from .solver import optimize
 
 
@@ -19,14 +19,27 @@ async def allowed(context: Context | Interaction):
     return True
 
 
+recipe_banks = {
+    "All": all(),
+    "Default": default(),
+}
+
+
 class Satisfy(Cog):
     def __init__(self, bot):
         self.bot = bot
         self.factory_cache = {}
+        self.item_names = [i.name for i in Item]
+        self.recipe_names = [r.name for r in all()]
 
     def factory(self, context: Context) -> Factory:
-        return self.factory_cache.get(context.author.id, Factory(inputs=Rates(), targets=Rates(), maximize=set(), recipes=all()))
-        # return self.factory_cache.get(context.author.id, Factory(inputs=Item.CrudeOil * 300 + Item.Water * 1000, targets=Rates(), maximize=set([Item.Plastic]), recipes=all()))
+        factory = Factory(inputs=Rates(), targets=Rates(), maximize=set(), recipes=all())
+        # factory = Factory(inputs=Item.CrudeOil * 300 + Item.Water * 1000, targets=Rates(), maximize=set([Item.Plastic]), recipes=all())
+        # monkeypatch fields for recipe manipulations
+        factory.recipe_bank = "All"
+        factory.include_recipes = set()
+        factory.exclude_recipes = set()
+        return self.factory_cache.get(context.author.id, factory)
 
     def save(self, context: Context, factory: Factory):
         self.factory_cache[context.author.id] = factory
@@ -36,8 +49,8 @@ class Satisfy(Cog):
 
     # things left to do
     #   add the rest of the recipes/items
-    #   create `recipe_bank`, `include_recipe`, `exclude_recipe` commands for recipe manipulation
-    #   ensure solve is feasible; add raw item resource creation
+    #   make solve prefer to not leave non-sinkable items
+    #   ensure solve is feasible; add raw item resource creation?
     #   save factories by name per user, instead of 1 factory per user?
     #   and like, tests, I guess
 
@@ -75,6 +88,31 @@ class Satisfy(Cog):
         self.save(context, factory)
         await context.send(embed=factory_embed(factory), delete_after=10)
 
+    @satisfy.group(name="recipe", description="Recipe related manipulations.")
+    async def recipe(self, context: Context):
+        pass
+
+    @recipe.command(name="bank", description="Select a recipe bank for the factory to use. Default is All.")
+    async def recipe_bank(self, context: Context, recipe_bank: str):
+        factory = self.factory(context)
+        factory.recipe_bank = recipe_bank
+        self.save(context, factory)
+        await context.send(embed=factory_embed(factory), delete_after=10)
+
+    @recipe.command(name="include", description="Forces a recipe to be available to the solver. Overrides `exclude`")
+    async def include_recipe(self, context: Context, recipe: str):
+        factory = self.factory(context)
+        factory.include_recipes.add(recipe)
+        self.save(context, factory)
+        await context.send(embed=factory_embed(factory), delete_after=10)
+
+    @recipe.command(name="exclude", description="Makes a recipe to be unavailable to the solver. Overridden by `include`")
+    async def exclude_recipe(self, context: Context, recipe: str):
+        factory = self.factory(context)
+        factory.exclude_recipes.add(recipe)
+        self.save(context, factory)
+        await context.send(embed=factory_embed(factory), delete_after=10)
+
     @satisfy.command(name="solve", description="Runs the solver for the factory.")
     @check(allowed)
     async def solve(self, context: Context):
@@ -83,6 +121,9 @@ class Satisfy(Cog):
             await context.send("No.", delete_after=10)
         else:
             async with context.typing():
+                recipes = [r for r in recipe_banks[factory.recipe_bank] if r.name not in factory.exclude_recipes]
+                names = [r.name for r in recipes]
+                factory.recipes = recipes + [r for r in all() if r.name in factory.include_recipes and r.name not in names]
                 solution = optimize(factory)
                 await context.send(embeds=[factory_embed(factory), solution_embed(solution)])
 
@@ -90,11 +131,16 @@ class Satisfy(Cog):
     @add_target.autocomplete("item")
     @add_maximize.autocomplete("item")
     async def items(self, interaction: Interaction, current: str) -> List[Choice[str]]:
-        if len(current) < 3:
-            return []
-        else:
-            items = [i.name for i in Item]
-            return [Choice(name=i, value=i) for i in items if current.lower() in i.lower()]
+        return choices(self.item_names, current)
+
+    @recipe_bank.autocomplete("recipe_bank")
+    async def recipe_banks(self, interaction: Interaction, current: str) -> List[Choice[str]]:
+        return choices(recipe_banks.keys(), current)
+
+    @include_recipe.autocomplete("recipe")
+    @exclude_recipe.autocomplete("recipe")
+    async def recipes(self, interaction: Interaction, current: str) -> List[Choice[str]]:
+        return choices(self.recipe_names, current)
 
     @reset.error
     @add_input.error
@@ -102,3 +148,10 @@ class Satisfy(Cog):
     @add_maximize.error
     async def on_error(self, context: Context, error):
         await context.send(str(error), delete_after=10)
+
+
+def choices(list: List[str], needle: str) -> List[Choice[str]]:
+    if len(needle) < 3:
+        return []
+    else:
+        return [Choice(name=i, value=i) for i in list if needle.lower() in i.lower()]
