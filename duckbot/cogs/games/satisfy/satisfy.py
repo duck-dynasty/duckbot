@@ -47,13 +47,6 @@ class Satisfy(Cog):
     def clear(self, context: Context):
         self.factory_cache.pop(context.author.id, None)
 
-    # things left to do
-    #   add the rest of the recipes/items
-    #   make solve prefer to not leave non-sinkable items
-    #   ensure solve is feasible; add raw item resource creation?
-    #   save factories by name per user, instead of 1 factory per user?
-    #   and like, tests, I guess
-
     @hybrid_group(name="satisfy", description="Satisfy yourself")
     async def satisfy(self, context: Context):
         pass
