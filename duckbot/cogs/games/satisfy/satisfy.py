@@ -135,7 +135,7 @@ class Satisfy(Cog):
 
     @recipe_bank.autocomplete("recipe_bank")
     async def recipe_banks(self, interaction: Interaction, current: str) -> List[Choice[str]]:
-        return choices(recipe_banks.keys(), current)
+        return choices(recipe_banks.keys(), current, threshold=0)
 
     @include_recipe.autocomplete("recipe")
     @exclude_recipe.autocomplete("recipe")
@@ -154,8 +154,8 @@ class Satisfy(Cog):
         await context.send(str(error), delete_after=10)
 
 
-def choices(list: List[str], needle: str) -> List[Choice[str]]:
-    if len(needle) < 3:
+def choices(list: List[str], needle: str, threshold: int = 3) -> List[Choice[str]]:
+    if len(needle) < threshold:
         return []
     else:
         return [Choice(name=i, value=i) for i in list if needle.lower() in i.lower()]
