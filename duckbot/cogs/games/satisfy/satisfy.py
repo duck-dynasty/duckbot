@@ -146,6 +146,10 @@ class Satisfy(Cog):
     @add_input.error
     @add_target.error
     @add_maximize.error
+    @recipe_bank.error
+    @include_recipe.error
+    @exclude_recipe.error
+    @solve.error
     async def on_error(self, context: Context, error):
         await context.send(str(error), delete_after=10)
 
