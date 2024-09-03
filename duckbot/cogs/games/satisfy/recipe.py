@@ -36,7 +36,7 @@ def all() -> List[Recipe]:
 
 
 def recipe(name: str, building: Building, inout: tuple[Rates, Rates]) -> Recipe:
-    return Recipe(name, building, inputs=inout[0].rates, outputs=inout[1].rates)
+    return Recipe(name, building, inputs=inout[0], outputs=inout[1])
 
 
 def smelt(name: str, inout: tuple[Rates, Rates]) -> Recipe:
