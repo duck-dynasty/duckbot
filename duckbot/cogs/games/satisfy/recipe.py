@@ -22,6 +22,8 @@ def default() -> List[Recipe]:
         smelt("IronIngot", Item.IronOre * 30 >> Item.IronIngot * 30),
         ctor("IronPlate", Item.IronIngot * 30 >> Item.IronPlate * 20),
         ctor("IronRod", Item.IronIngot * 30 >> Item.IronRod * 30),
+        refine("Plastic", Item.CrudeOil * 30 >> Item.Plastic * 20 + Item.HeavyOilResidue * 10),
+        refine("Rubber", Item.CrudeOil * 30 >> Item.Rubber * 20 + Item.HeavyOilResidue * 20),
     ]
 
 
