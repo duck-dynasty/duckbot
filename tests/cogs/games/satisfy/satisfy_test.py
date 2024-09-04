@@ -16,16 +16,12 @@ def clazz(bot) -> Satisfy:
 
 
 @pytest.fixture
-def empty_factory() -> Factory:
-    return Factory(Rates(), [], Rates(), set())
-
-
-@pytest.fixture
 def default_factory(clazz, context) -> Factory:
     return clazz.factory(context)
 
 
-async def test_reset_destroys_factory(clazz, context, empty_factory):
+async def test_reset_destroys_factory(clazz, context):
+    empty_factory = Factory(Rates(), [], Rates(), set())
     clazz.save(context, empty_factory)
     await clazz.reset.callback(clazz, context)
     assert clazz.factory_cache == {}
