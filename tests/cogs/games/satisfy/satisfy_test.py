@@ -85,7 +85,6 @@ async def test_solve_no_factory_rejects(clazz, context):
 
 
 async def test_solve_no_in_or_out(clazz, context, default_factory):
-    clazz.save(context, default_factory)
     await clazz.solve.callback(clazz, context)
     context.send.assert_called_once_with("No.", delete_after=10)
 
