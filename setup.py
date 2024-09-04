@@ -56,7 +56,7 @@ if __name__ == "__main__":
             "psycopg2==2.9.9",
             "SQLAlchemy==2.0.32",
             "d20==1.1.2",
-            "nltk==3.8.1",  # also in pyproject.toml, required for setup script above
+            "nltk==3.9.1",  # also in pyproject.toml, required for setup script above
             "textblob==0.18.0.post0",  # also in pyproject.toml, required for setup script above
             "pyfiglet==1.0.2",
             "matplotlib==3.9.2",
