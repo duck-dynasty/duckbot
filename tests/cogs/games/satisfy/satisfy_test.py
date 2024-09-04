@@ -1,10 +1,13 @@
+from copy import copy
+from unittest import mock
+
 import pytest
 
 from duckbot.cogs.games.satisfy import Satisfy
 from duckbot.cogs.games.satisfy.factory import Factory
 from duckbot.cogs.games.satisfy.item import Item
 from duckbot.cogs.games.satisfy.rate import Rates
-from duckbot.cogs.games.satisfy.recipe import all
+from duckbot.cogs.games.satisfy.recipe import all, default
 
 
 @pytest.fixture
@@ -18,8 +21,8 @@ def empty_factory() -> Factory:
 
 
 @pytest.fixture
-def default_factory() -> Factory:
-    return Factory(Rates(), all(), Rates(), set())
+def default_factory(clazz, context) -> Factory:
+    return clazz.factory(context)
 
 
 async def test_reset_destroys_factory(clazz, context, empty_factory):
@@ -85,7 +88,59 @@ async def test_solve_no_factory_rejects(clazz, context):
     context.send.assert_called_once_with("No.", delete_after=10)
 
 
-async def test_solve_no_target_or_max_rejects(clazz, context, default_factory):
+async def test_solve_no_in_or_out(clazz, context, default_factory):
     clazz.save(context, default_factory)
     await clazz.solve.callback(clazz, context)
     context.send.assert_called_once_with("No.", delete_after=10)
+
+
+@mock.patch("duckbot.cogs.games.satisfy.satisfy.optimize", return_value=dict())
+async def test_solve_all_defaults(opt, clazz, context, default_factory):
+    default_factory.inputs = Rates([Item.IronOre * 30])
+    default_factory.maximize = set([Item.IronOre])
+    expected = copy(default_factory)
+    expected.recipes = all()
+
+    clazz.save(context, default_factory)
+    await clazz.solve.callback(clazz, context)
+    opt.assert_called_once_with(expected)
+
+
+@mock.patch("duckbot.cogs.games.satisfy.satisfy.optimize", return_value=dict())
+async def test_solve_different_recipe_bank(opt, clazz, context, default_factory):
+    default_factory.inputs = Rates([Item.IronOre * 30])
+    default_factory.maximize = set([Item.IronOre])
+    default_factory.recipe_bank = "Default"
+    expected = copy(default_factory)
+    expected.recipes = default()
+
+    clazz.save(context, default_factory)
+    await clazz.solve.callback(clazz, context)
+    opt.assert_called_once_with(expected)
+
+
+@mock.patch("duckbot.cogs.games.satisfy.satisfy.optimize", return_value=dict())
+async def test_solve_recipe_includes(opt, clazz, context, default_factory):
+    default_factory.inputs = Rates([Item.IronOre * 30])
+    default_factory.maximize = set([Item.IronOre])
+    default_factory.recipe_bank = "Default"
+    default_factory.include_recipes = set(["DilutedPackagedFuel"])
+    expected = copy(default_factory)
+    expected.recipes = default() + [r for r in all() if r.name == "DilutedPackagedFuel"]
+
+    clazz.save(context, default_factory)
+    await clazz.solve.callback(clazz, context)
+    opt.assert_called_once_with(expected)
+
+
+@mock.patch("duckbot.cogs.games.satisfy.satisfy.optimize", return_value=dict())
+async def test_solve_recipe_excludes(opt, clazz, context, default_factory):
+    default_factory.inputs = Rates([Item.IronOre * 30])
+    default_factory.maximize = set([Item.IronOre])
+    default_factory.exclude_recipes = set([default_factory.recipes[0].name])
+    expected = copy(default_factory)
+    expected.recipes = all()[1:]
+
+    clazz.save(context, default_factory)
+    await clazz.solve.callback(clazz, context)
+    opt.assert_called_once_with(expected)
