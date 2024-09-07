@@ -14,6 +14,6 @@ multi_line_output = 3
 addopts = """\
     -ra \
     --mdformat \
-    -n auto \
+    -n auto --dist loadfile \
     --blockage"""
 asyncio_mode = "auto"
