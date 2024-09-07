@@ -38,14 +38,14 @@ def test_optimize_simple_factory_target_returns_recipe():
 def test_optimize_simple_factory_maximize_returns_recipe():
     factory = Factory(Item.IronOre * 30, all(), Rates(), set([Item.IronIngot]))
     recipe = recipe_by_name("IronIngot")
-    assert optimize(factory) == dict([(recipe, 1)])
+    assert optimize(factory) == dict([(recipe, approx(1))])
 
 
 def test_optimize_two_step_returns_chain():
     factory = Factory(Item.IronOre * 30, all(), Rates(), set([Item.IronPlate]))
     ignot = recipe_by_name("IronIngot")
     plate = recipe_by_name("IronPlate")
-    assert optimize(factory) == dict([(ignot, 1), (plate, 1)])
+    assert optimize(factory) == dict([(ignot, approx(1)), (plate, approx(1))])
 
 
 def test_optimize_recycled_bois_returns_chain():
