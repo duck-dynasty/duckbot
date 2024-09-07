@@ -43,6 +43,10 @@ def test_eq_equal(rate):
     assert to_rates(rate) == to_rates(rate)
 
 
+def test_eq_near_equal_rate(rate):
+    assert to_rates(rate) == to_rates((rate[0], rate[1] + 1e-10))
+
+
 def test_eq_different_item(rate):
     items = list(Item)
     rhs = (items[(items.index(rate[0]) + 1) % len(items)], rate[1])
@@ -55,12 +59,12 @@ def test_eq_different_rate(rate):
 
 def test_str_returns_dict_string(rate):
     rates = to_rates(rate)
-    assert str(rates) == str(rates.rates)
+    assert str(rates) == f"Rates({str(rates.rates)})"
 
 
 def test_repr_returns_dict_string(rate):
     rates = to_rates(rate)
-    assert repr(rates) == str(rates.rates)
+    assert repr(rates) == f"Rates({str(rates.rates)})"
 
 
 def test_add_returns_combined_rates(rate, another_rate):
