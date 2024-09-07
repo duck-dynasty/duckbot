@@ -1,97 +1,108 @@
 import itertools
 from functools import reduce
-from math import ceil
-from typing import List
+from typing import Callable, List
 
-from mip import CONTINUOUS, INF, INTEGER, MAXIMIZE, LinExpr, Model, Var
+from mip import INF, INTEGER, LinExpr, Model, Var, maximize, xsum
 
 from .factory import Factory
 from .item import Item
-from .recipe import Recipe
+from .recipe import ModifiedRecipe, Recipe
 
 zero = LinExpr(const=0)
 
 
-def optimize(factory: Factory) -> dict[Recipe, float]:
-    model = Model(sense=MAXIMIZE)
+def optimize(factory: Factory) -> dict[ModifiedRecipe, float]:
+    model = Model()
+    model.threads = -1
     model.verbose = 0
 
-    use_recipes = [model.add_var(lb=0, ub=INF) for _ in factory.recipes]
+    recipes = modify_recipes(factory.recipes, factory.power_shards, factory.sloops)
 
-    def cost(recipe: Recipe, use: Var | LinExpr) -> dict[Item, LinExpr]:
-        costs = dict((item, -use * rate) for item, rate in recipe.inputs.items())
-        income = dict((item, use * rate) for item, rate in recipe.outputs.items())
-        return costs, income
+    use_recipe = [model.add_var(name=r.name, lb=0, ub=factory.sloops / r.sloops if r.sloops > 0 else INF) for r in recipes]
 
-    recipe_costs = [sum_by_item(*cost(r, v)) for r, v in zip(factory.recipes, use_recipes)]
-    aggregation = reduce(sum_by_item, recipe_costs, dict())
+    amount_by_item = amount_by_item_expressions(factory, recipes, use_recipe)
+    items_must_be_non_negative(model, amount_by_item)
 
-    initial_conditions = sum_by_item(factory.inputs, dict((i, -r) for i, r in factory.targets.items()))
-    constraints = sum_by_item(initial_conditions, aggregation)
+    used_power_shards = power_shards_used(model, factory, recipes, use_recipe)
+    used_sloops = sloops_used(model, factory, recipes, use_recipe)
 
-    for c in constraints.values():
-        model.add_constr(c >= 0)
-
-    model.objective = sum([c for i, c in constraints.items() if i in factory.maximize])
-    model.optimize()
-
-    return dict((r, float(v.x)) for r, v in zip(factory.recipes, use_recipes) if v.x is not None and v.x > 0)
-
-
-def sum_by_item(lhs: dict[Item, LinExpr], rhs: dict[Item, LinExpr]) -> dict[Item, LinExpr]:
-    return dict((item, lhs.get(item, zero) + rhs.get(item, zero)) for item in Item if (item in lhs or item in rhs))
-
-
-def recipe_explosion_optimize(factory: Factory) -> dict[Recipe, float]:
-    model = Model(sense=MAXIMIZE)
-    model.threads = -1
-    # model.verbose = 0
-    recipes = recipe_explosion(factory.recipes, factory.power, factory.sloops)
-
-    use_recipe = [model.add_var(name=r.name, lb=0, ub=INF if r.name.endswith("#0#0") else factory.sloops, var_type=CONTINUOUS if r.name.endswith("#0#0") else INTEGER) for r in recipes]
-
-    def cost(recipe: Recipe, use: Var | LinExpr) -> dict[Item, LinExpr]:
-        costs = dict((item, -use * rate) for item, rate in recipe.inputs.items())
-        income = dict((item, use * rate) for item, rate in recipe.outputs.items())
-        return costs, income
-
-    recipe_costs = [sum_by_item(*cost(r, v)) for r, v in zip(recipes, use_recipe)]
-    aggregation = reduce(sum_by_item, recipe_costs, dict())
-    initial_conditions = sum_by_item(factory.inputs, dict((i, -r) for i, r in factory.targets.items()))
-    amount_by_item = sum_by_item(initial_conditions, aggregation)
-
-    for c in amount_by_item.values():
-        model.add_constr(c >= 0)
-
-    used_shards = sum([int(r.name.split("#")[1]) * v for r, v in zip(recipes, use_recipe)])
-    used_sloops = sum([int(r.name.split("#")[2]) * v for r, v in zip(recipes, use_recipe)])
-    model.add_constr(used_shards <= factory.power)
-    model.add_constr(used_sloops <= factory.sloops)
-
-    maximize_items = sum([c for i, c in amount_by_item.items() if i in factory.maximize])
-    model.objective = 10000 * maximize_items - 3 * used_shards - 10 * used_sloops
+    maximize_items = xsum([amount for i, amount in amount_by_item.items() if i in factory.maximize])
+    model.objective = maximize(
+        10000 * maximize_items  # prioritize maximizing requested items
+        - 3 * used_power_shards  # minimize power shard usage
+        - 10 * used_sloops  # minimize sloop usage
+        - xsum(use_recipe)  # minimize recipe usage
+    )
     model.optimize()
 
     return dict((r, float(v.x)) for r, v in zip(recipes, use_recipe) if v.x is not None and v.x > 0)
 
 
-def recipe_explosion(recipes: List[Recipe], max_shards: int, max_sloops: int) -> List[Recipe]:
-    def scale(recipe: Recipe, shards: int, sloops: int) -> Recipe:
-        shard_scale = 1.0 + shards * 0.5 if recipe.building.max_shards > 0 else 1.0
-        sloop_scale = 1.0 + float(sloops) / recipe.building.max_sloop if recipe.building.max_sloop > 0 else 1.0
-        return Recipe(f"{recipe.name}#{shards}#{sloops}", recipe.building, recipe.inputs * shard_scale, recipe.outputs * shard_scale * sloop_scale)
-
-    non_sloopers = [scale(recipe, 0, 0) for recipe in recipes if recipe.building.max_sloop <= 0]
-    zero_sloop = [scale(recipe, 0, 0) for recipe in recipes if recipe.building.max_sloop > 0]
+def modify_recipes(recipes: List[Recipe], max_shards: int, max_sloops: int) -> List[ModifiedRecipe]:
+    non_sloopers = [ModifiedRecipe(recipe, 0, 0) for recipe in recipes if recipe.building.max_sloop <= 0]
+    zero_sloop = [ModifiedRecipe(recipe, 0, 0) for recipe in recipes if recipe.building.max_sloop > 0]
     nonzero_sloop = [
-        scale(recipe, power, sloops)
+        ModifiedRecipe(recipe, power, sloops)
         for recipe in recipes
         for power, sloops in itertools.product(range(0, min(max_shards, recipe.building.max_shards) + 1), range(1, min(max_sloops, recipe.building.max_sloop) + 1))
     ]
     return non_sloopers + zero_sloop + nonzero_sloop
 
 
-def building_track_optimize(factory: Factory) -> dict[Recipe, float]:
-    model = Model(sense=MAXIMIZE)
+def amount_by_item_expressions(factory: Factory, recipes: List[ModifiedRecipe], use_recipe: List[Var]) -> dict[Item, LinExpr]:
+    """Sums up all items produced and consumed by the factory based on the number of recipes used in the model.
+    The inputs to the factory are a constant positive modify to the number of items available, and the factory
+    targets are negative modifiers. Eg, for a IronOre >> IronPlate factory,
+    TotalIronOre = IronOreInput - x1*30*RecipeIronIngot - other recipes...
+    TotalIronIngot = 0 + x1*30*RecipeIronIngot - x2*30*RecipeIronPlate + other recipes...
+    TotalIronPlate = -TargetIronPlate + x2*20*RecipeIronPlate + other recipes...
+    """
 
-    return dict()
+    def cost(recipe: ModifiedRecipe, use: Var | LinExpr) -> dict[Item, LinExpr]:
+        costs = dict((item, -use * rate) for item, rate in recipe.inputs.items())
+        income = dict((item, use * rate) for item, rate in recipe.outputs.items())
+        return costs, income
+
+    recipe_costs = [sum_by_item(*cost(r, v)) for r, v in zip(recipes, use_recipe)]
+    initial_conditions = sum_by_item(factory.inputs, dict((i, -r) for i, r in factory.targets.items()))
+    return reduce(sum_by_item, recipe_costs, initial_conditions)
+
+
+def sum_by_item(lhs: dict[Item, LinExpr], rhs: dict[Item, LinExpr]) -> dict[Item, LinExpr]:
+    return dict((item, lhs.get(item, zero) + rhs.get(item, zero)) for item in Item if (item in lhs or item in rhs))
+
+
+def items_must_be_non_negative(model: Model, amount_by_item: dict[Item, LinExpr]):
+    for amount in amount_by_item.values():
+        model.add_constr(amount >= 0)
+
+
+def power_shards_used(model: Model, factory: Factory, recipes: List[ModifiedRecipe], use_recipe: List[Var]) -> LinExpr:
+    return limited_item_used(model, "power", factory.power_shards, recipes, use_recipe, lambda r: r.power_shards)
+
+
+def sloops_used(model: Model, factory: Factory, recipes: List[ModifiedRecipe], use_recipe: List[Var]) -> LinExpr:
+    return limited_item_used(model, "sloop", factory.sloops, recipes, use_recipe, lambda r: r.sloops)
+
+
+def limited_item_used(model: Model, item: str, limit: int, recipes: List[ModifiedRecipe], use_recipe: List[Var], amount_recipe_uses: Callable[[ModifiedRecipe], int]) -> LinExpr:
+    """Power shards and sloopers are a limited, indivisible item that can be put into machines. This sums up the
+    number of shards or sloops used based on recipe usage. The number of items used is `ceil(num_recipe)`,
+    and the total of those must be constrainted by the amount available to the factory."""
+    item_cost = [
+        (
+            r,
+            v,
+            model.add_var(name=f"{v.name}#{item}", var_type=INTEGER),
+        )
+        for r, v in zip(recipes, use_recipe)
+        if r.sloops > 0
+    ]
+
+    for _, v, p in item_cost:
+        model.add_constr(p >= v)
+        model.add_constr(p <= v + 1 - 0.00001)  # v <= p < v+1, ie, p = ceil(v)
+
+    total_used_item = xsum([amount_recipe_uses(r) * p for r, _, p in item_cost])
+    model.add_constr(total_used_item <= limit)
+    return total_used_item

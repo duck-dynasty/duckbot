@@ -7,7 +7,7 @@ from discord import Embed
 from .factory import Factory
 from .item import Item
 from .rate import Rates
-from .recipe import Recipe
+from .recipe import ModifiedRecipe, Recipe
 
 
 def num_str(x: float) -> str:
@@ -25,8 +25,10 @@ def rates_str(rates: Rates) -> str:
 def factory_embed(factory: Factory) -> Embed:
     embed = Embed()
 
-    inputs = "\n".join([rate_str(rate) for rate in factory.inputs.items()]) if factory.inputs else "N/A"
-    embed.add_field(name="Inputs", value=inputs)
+    power_shards = [] if factory.power_shards <= 0 else [f"{factory.power_shards} **Power Shard**"]
+    sloops = [] if factory.sloops <= 0 else [f"{factory.sloops} **Somersloop**"]
+    inputs = "\n".join([rate_str(rate) for rate in factory.inputs.items()] + power_shards + sloops)
+    embed.add_field(name="Inputs", value=inputs if inputs else "N/A")
 
     target = "\n".join([rate_str(rate) for rate in factory.targets.items()]) if factory.targets else "N/A"
     embed.add_field(name="Target", value=target)
@@ -41,11 +43,11 @@ def factory_embed(factory: Factory) -> Embed:
     return embed
 
 
-def solution_embed(solution: dict[Recipe, float]) -> Embed:
+def solution_embed(solution: dict[ModifiedRecipe, float]) -> Embed:
     embed = Embed()
 
     for recipe, num in solution.items():
-        embed.add_field(name=recipe.name, value=f"{num_str(num)} {recipe.building}\n{inout_str(recipe.inputs, recipe.outputs, num)}", inline=False)
+        embed.add_field(name=recipe.original_recipe.name, value=f"{num_str(num)} {recipe.building}\n{inout_str(recipe.inputs, recipe.outputs, num)}", inline=False)
 
     summary = solution_summary(solution)
     embed.set_footer(text=f"{inout_str(summary.inputs, summary.outputs)}")

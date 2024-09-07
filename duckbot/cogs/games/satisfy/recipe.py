@@ -17,6 +17,40 @@ class Recipe:
         return hash(self.name)
 
 
+@dataclass
+class ModifiedRecipe:
+    original_recipe: Recipe
+    power_shards: int
+    sloops: int
+
+    def __hash__(self):
+        return hash(self.name)
+
+    @property
+    def name(self) -> str:
+        return f"{self.original_recipe.name}#{self.power_shards}#{self.sloops}"
+
+    @property
+    def building(self) -> str:
+        return self.original_recipe.building
+
+    @property
+    def inputs(self) -> str:
+        return self.original_recipe.inputs * self.shard_scale
+
+    @property
+    def outputs(self) -> str:
+        return self.original_recipe.outputs * self.shard_scale * self.sloop_scale
+
+    @property
+    def shard_scale(self) -> float:
+        return 1.0 + self.power_shards * 0.5 if self.building.max_shards > 0 else 1.0
+
+    @property
+    def sloop_scale(self) -> float:
+        return 1.0 + self.sloops / self.building.max_sloop if self.building.max_sloop > 0 else 1.0
+
+
 def default() -> List[Recipe]:
     return [
         smelt("IronIngot", Item.IronOre * 30 >> Item.IronIngot * 30),
