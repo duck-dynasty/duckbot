@@ -25,9 +25,7 @@ class Rates:
         if not isinstance(rhs, Rates) or set(self.rates.keys()) != set(rhs.rates.keys()):
             return False
         else:
-            return all([
-                abs(l - rhs.rates[i]) < 1e-6 for i, l in self.items()
-            ])
+            return all([abs(l - rhs.rates[i]) < 1e-6 for i, l in self.items()])
 
     def __add__(self, rates: Rates) -> Rates:
         return Rates(self.rates | rates.rates)
