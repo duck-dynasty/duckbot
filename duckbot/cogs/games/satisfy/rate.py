@@ -57,6 +57,9 @@ class Rates:
     def __rshift__(self, output: Rate | Rates) -> tuple[Rates, Rates]:
         return (self, output if isinstance(output, Rates) else Rates([output]))
 
+    def __mul__(self, scale_factor: float) -> Rates:
+        return Rates(dict((i, r * scale_factor) for i, r in self.items()))
+
     def __str__(self) -> str:
         return str(self.rates)
 

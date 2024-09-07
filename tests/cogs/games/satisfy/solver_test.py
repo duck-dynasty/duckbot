@@ -3,7 +3,7 @@ from pytest import approx
 from duckbot.cogs.games.satisfy.factory import Factory
 from duckbot.cogs.games.satisfy.item import Item
 from duckbot.cogs.games.satisfy.rate import Rates
-from duckbot.cogs.games.satisfy.recipe import Recipe, all
+from duckbot.cogs.games.satisfy.recipe import ModifiedRecipe, all
 from duckbot.cogs.games.satisfy.solver import optimize
 
 
@@ -62,5 +62,5 @@ def test_optimize_recycled_bois_returns_chain():
     )
 
 
-def recipe_by_name(name: str) -> Recipe:
-    return next(r for r in all() if r.name == name)
+def recipe_by_name(name: str) -> ModifiedRecipe:
+    return ModifiedRecipe(next(r for r in all() if r.name == name), 0, 0)

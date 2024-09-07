@@ -33,8 +33,8 @@ class Satisfy(Cog):
         self.recipe_names = [r.name for r in all()]
 
     def factory(self, context: Context) -> Factory:
-        factory = Factory(inputs=Rates(), targets=Rates(), maximize=set(), recipes=all())
-        # factory = Factory(inputs=Item.CrudeOil * 300 + Item.Water * 1000, targets=Rates(), maximize=set([Item.Plastic]), recipes=all())
+        factory = Factory(inputs=Rates(), targets=Rates(), maximize=set(), recipes=all(), power_shards=0, sloops=0)
+        # factory = Factory(inputs=Item.CrudeOil * 300 + Item.Water * 1000, targets=Rates(), maximize=set([Item.Plastic]), recipes=all(), power_shards=0, sloops=0)
         # monkeypatch fields for recipe manipulations
         factory.recipe_bank = "All"
         factory.include_recipes = set()

@@ -12,3 +12,5 @@ class Factory:
     recipes: List[Recipe]
     targets: Rates
     maximize: Set[Item]
+    power_shards: int = 0
+    sloops: int = 0
