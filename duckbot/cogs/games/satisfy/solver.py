@@ -39,6 +39,8 @@ def optimize(factory: Factory) -> dict[ModifiedRecipe, float]:
 
 
 def modify_recipes(recipes: List[Recipe], max_shards: int, max_sloops: int) -> List[ModifiedRecipe]:
+    """Creates recipes which are scaled by power shards and sloops. The recipes are always scaled to max clock
+    speed which the power shards allow, then the solver will be allowed to underclock them as needed."""
     non_sloopers = [ModifiedRecipe(recipe, 0, 0) for recipe in recipes if recipe.building.max_sloop <= 0]
     zero_sloop = [ModifiedRecipe(recipe, 0, 0) for recipe in recipes if recipe.building.max_sloop > 0]
     nonzero_sloop = [
