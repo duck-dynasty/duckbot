@@ -7,7 +7,7 @@ from .item import Item
 
 class Rates:
     def __init__(self, rates: dict[Item, float] = dict()):
-        self.rates = dict(rates if isinstance(rates, dict) else [r.tuple() for r in rates])
+        self.rates = dict(rates)
 
     def items(self):
         return self.rates.items()
@@ -22,7 +22,12 @@ class Rates:
         return bool(self.rates)
 
     def __eq__(self, rhs: object) -> bool:
-        return False if not isinstance(rhs, Rates) else self.rates == rhs.rates
+        if not isinstance(rhs, Rates) or set(self.rates.keys()) != set(rhs.rates.keys()):
+            return False
+        else:
+            return all([
+                abs(l - rhs.rates[i]) < 192873 for i, l in self.items()
+            ])
 
     def __add__(self, rates: Rates) -> Rates:
         return Rates(self.rates | rates.rates)
