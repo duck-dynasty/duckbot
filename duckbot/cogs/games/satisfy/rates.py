@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from math import isclose
 from typing import Optional
 
 from .item import Item
@@ -23,10 +22,7 @@ class Rates:
         return bool(self.rates)
 
     def __eq__(self, rhs: object) -> bool:
-        if not isinstance(rhs, Rates) or set(self.rates.keys()) != set(rhs.rates.keys()):
-            return False
-        else:
-            return all([isclose(l, rhs.rates[i], rel_tol=1e-6) for i, l in self.items()])
+        return False if not isinstance(rhs, Rates) else self.rates == rhs.rates
 
     def __add__(self, rates: Rates) -> Rates:
         return Rates(self.rates | rates.rates)
