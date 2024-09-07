@@ -7,7 +7,7 @@ from discord.ext.commands import Cog, Context, hybrid_group
 from .factory import Factory
 from .item import Item
 from .pretty import factory_embed, solution_embed
-from .rate import Rates
+from .rates import Rates
 from .recipe import all, default
 from .solver import optimize
 
