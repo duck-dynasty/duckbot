@@ -26,7 +26,7 @@ class Rates:
             return False
         else:
             return all([
-                abs(l - rhs.rates[i]) < 192873 for i, l in self.items()
+                abs(l - rhs.rates[i]) < 1e-6 for i, l in self.items()
             ])
 
     def __add__(self, rates: Rates) -> Rates:
