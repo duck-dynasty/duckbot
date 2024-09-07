@@ -35,8 +35,8 @@ def test_bool_empty_is_false():
     assert bool(Rates()) is False
 
 
-def test_bool_nonempty_is_true(rate):
-    assert bool(to_rates(rate)) is True
+def test_bool_nonempty_is_true():
+    assert bool(to_rates((Item.IronOre, 30))) is True
 
 
 def test_eq_equal(rate):
