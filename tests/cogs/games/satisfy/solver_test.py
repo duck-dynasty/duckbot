@@ -47,7 +47,7 @@ def test_optimize_simple_sloop_target_returns_recipe():
     assert optimize(factory) == dict([(recipe, approx(1))])
 
 
-def test_optimize_simple_factory_maximize_returns_recipe():
+def test_optimize_simple_sloop_maximize_returns_recipe():
     factory = Factory(Item.IronOre * 30, all(), Rates(), set([Item.IronIngot]), sloops=1)
     recipe = recipe_by_name("IronIngot", sloops=1)
     assert optimize(factory) == dict([(recipe, approx(1))])
