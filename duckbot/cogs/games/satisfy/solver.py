@@ -1,5 +1,6 @@
 import itertools
 from functools import reduce
+from math import isclose
 from typing import Callable, List
 
 from mip import INF, INTEGER, LinExpr, Model, Var, maximize, xsum
@@ -35,7 +36,7 @@ def optimize(factory: Factory) -> dict[ModifiedRecipe, float]:
     )
     model.optimize()
 
-    return dict((r, float(v.x)) for r, v in zip(recipes, use_recipe) if v.x is not None and v.x > 0)
+    return dict((r, round(float(v.x), 4)) for r, v in zip(recipes, use_recipe) if v.x is not None and v.x > 0 and not isclose(float(v), 0, abs_tol=1e-4))
 
 
 def modify_recipes(recipes: List[Recipe], max_shards: int, max_sloops: int) -> List[ModifiedRecipe]:
