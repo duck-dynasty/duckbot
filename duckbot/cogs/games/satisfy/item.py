@@ -31,6 +31,9 @@ class Item(Enum):
     AwesomeTicketPoints = (auto(), Form.Aux, 0)
     MwPower = (auto(), Form.Aux, 0)
 
+    PowerShard = (auto(), Form.Solid, 0)
+    Somersloop = (auto(), Form.Solid, 0)
+
     def _generate_next_value_(name, start, count, last_values):  # noqa: N805
         return name
 

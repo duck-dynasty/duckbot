@@ -31,15 +31,15 @@ class ModifiedRecipe:
         return f"{self.original_recipe.name}#{self.power_shards}#{self.sloops}"
 
     @property
-    def building(self) -> str:
+    def building(self) -> Building:
         return self.original_recipe.building
 
     @property
-    def inputs(self) -> str:
+    def inputs(self) -> Rates:
         return self.original_recipe.inputs * self.shard_scale
 
     @property
-    def outputs(self) -> str:
+    def outputs(self) -> Rates:
         return self.original_recipe.outputs * self.shard_scale * self.sloop_scale
 
     @property
