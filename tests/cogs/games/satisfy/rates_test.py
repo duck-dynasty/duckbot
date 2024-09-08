@@ -43,6 +43,10 @@ def test_eq_equal(rate):
     assert to_rates(rate) == to_rates(rate)
 
 
+def test_eq_close_rate(rate):
+    assert to_rates(rate) == to_rates((rate[0], rate[1] + 1e-12))
+
+
 def test_eq_different_item(rate):
     items = list(Item)
     rhs = (items[(items.index(rate[0]) + 1) % len(items)], rate[1])
