@@ -39,9 +39,9 @@ class Item(Enum):
         self.points = points
 
     def __mul__(self, rhs: float):
-        from .rate import Rate
+        from .rates import Rates
 
-        return Rate(self, rhs)
+        return Rates({self: rhs})
 
     def __str__(self):
         return self.name

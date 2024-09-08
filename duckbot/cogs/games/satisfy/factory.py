@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import List, Set
 
 from .item import Item
-from .rate import Rates
+from .rates import Rates
 from .recipe import Recipe
 
 

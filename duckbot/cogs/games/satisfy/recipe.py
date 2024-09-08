@@ -3,7 +3,7 @@ from typing import List
 
 from .building import Building
 from .item import Form, Item
-from .rate import Rate, Rates
+from .rates import Rates
 
 
 @dataclass
@@ -109,7 +109,7 @@ def sink(item: Item) -> Recipe:
     return recipe(f"Sink{item}", Building.AwesomeSink, item * 1 >> Item.AwesomeTicketPoints * item.points)
 
 
-def bioburn(name: str, input: Rate) -> Recipe:
+def bioburn(name: str, input: Rates) -> Recipe:
     return recipe(name, Building.BiomassBurner, input >> Item.MwPower * 30)
 
 

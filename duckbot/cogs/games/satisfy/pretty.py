@@ -6,7 +6,7 @@ from discord import Embed
 
 from .factory import Factory
 from .item import Item
-from .rate import Rates
+from .rates import Rates
 from .recipe import ModifiedRecipe, Recipe
 
 
