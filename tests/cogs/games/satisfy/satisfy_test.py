@@ -58,6 +58,18 @@ async def test_add_maximize_stores_maximizer(clazz, context, default_factory):
     assert clazz.factory(context) == default_factory
 
 
+async def test_add_booster_power_shard(clazz, context, default_factory):
+    await clazz.add_booster.callback(clazz, context, str(Item.PowerShard), 10)
+    default_factory.power_shards = 10
+    assert clazz.factory(context) == default_factory
+
+
+async def test_add_booster_sloops(clazz, context, default_factory):
+    await clazz.add_booster.callback(clazz, context, str(Item.Somersloop), 10)
+    default_factory.sloops = 10
+    assert clazz.factory(context) == default_factory
+
+
 async def test_recipe_bank_stores_bank(clazz, context):
     await clazz.recipe_bank.callback(clazz, context, "Default")
     assert clazz.factory(context).recipe_bank == "Default"
