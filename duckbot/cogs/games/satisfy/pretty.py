@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from functools import reduce
-from math import ceil, isclose
+from math import ceil
 
 from discord import Embed
 
@@ -10,12 +10,8 @@ from .rates import Rates
 from .recipe import ModifiedRecipe
 
 
-def num_str(x: float) -> str:
-    return round(x, 4)
-
-
 def rate_str(rate: tuple[Item, float]) -> str:
-    return f"{num_str(rate[1])} {rate[0]}"
+    return f"{rate[1]} {rate[0]}"
 
 
 def rates_str(rates: Rates) -> str:
@@ -61,7 +57,7 @@ def solution_embed(solution: dict[ModifiedRecipe, float]) -> Embed:
             name = f"{name} {'+' if ' @ ' in name else '@'} {recipe.sloop_scale}x"
             building = f"{building} {'+' if ' with ' in building else 'with'} {recipe.sloops} Somersloop{plrl(recipe.sloops)}"
 
-        embed.add_field(name=name, value=f"{num_str(num)} {building}\n{inout_str(recipe.inputs, recipe.outputs, num)}", inline=False)
+        embed.add_field(name=name, value=f"{num} {building}\n{inout_str(recipe.inputs, recipe.outputs, num)}", inline=False)
 
     summary = solution_summary(solution)
     footer = inout_str(summary.inputs, summary.outputs)
@@ -93,8 +89,8 @@ def solution_summary(solution: dict[ModifiedRecipe, float]) -> SolutionSummary:
     outputs = reduce(sum_by_item, [r.outputs * v for r, v in solution.items()], dict())
     totals = sum_by_item(inputs, outputs)
     return SolutionSummary(
-        inputs=Rates(dict((k, -v) for k, v in totals.items() if v < 0 and not isclose(v, 0, abs_tol=1e-4))),
-        outputs=Rates(dict((k, v) for k, v in totals.items() if v > 0 and not isclose(v, 0, abs_tol=1e-4))),
+        inputs=Rates(dict((k, -v) for k, v in totals.items() if v < 0)),
+        outputs=Rates(dict((k, v) for k, v in totals.items() if v > 0)),
         total_shards=sum([ceil(n * r.power_shards) for r, n in solution.items()]),
         total_sloops=sum([ceil(n * r.sloops) for r, n in solution.items()]),
     )
