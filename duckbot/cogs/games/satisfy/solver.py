@@ -6,7 +6,7 @@ from typing import Callable, List
 from mip import INF, INTEGER, LinExpr, Model, Var, maximize, xsum
 
 from .factory import Factory
-from .item import Item
+from .item import Item, sinkable
 from .recipe import ModifiedRecipe, Recipe
 
 zero = LinExpr(const=0)
@@ -28,11 +28,13 @@ def optimize(factory: Factory) -> dict[ModifiedRecipe, float]:
     used_sloops = sloops_used(model, factory, recipes, use_recipe)
 
     maximize_items = xsum([amount for i, amount in amount_by_item.items() if i in factory.maximize])
+    unsinkable_excess = xsum([amount for i, amount in amount_by_item.items() if not sinkable(i)])
     model.objective = maximize(
-        10000 * maximize_items  # prioritize maximizing requested items
-        - 3 * used_power_shards  # minimize power shard usage
-        - 10 * used_sloops  # minimize sloop usage
-        - xsum(use_recipe)  # minimize recipe usage
+        10000 * maximize_items  # prioritize maximizing requested items above all
+        - 100 * unsinkable_excess  # get rid of fluid products if possible
+        - 5 * used_power_shards  # minimize power shard usage; they are only eventually cheap
+        - 100 * used_sloops  # minimize sloop usage; they ain't cheap
+        - xsum(use_recipe)  # minimize recipe usage; ie prefer simpler layouts when otherwise equal
     )
     model.optimize()
 

@@ -27,6 +27,7 @@ class Item(Enum):
     PackagedWater = (auto(), Form.Solid, 130)
     Plastic = (auto(), Form.Solid, 75)
     Rubber = (auto(), Form.Solid, 60)
+    PetroleumCoke = (auto(), Form.Solid, 20)
 
     AwesomeTicketPoints = (auto(), Form.Aux, 0)
     MwPower = (auto(), Form.Aux, 0)
@@ -51,3 +52,7 @@ class Item(Enum):
 
     def __repr__(self):
         return str(self)
+
+
+def sinkable(item: Item) -> bool:
+    return item.form == Form.Solid and item.points > 0

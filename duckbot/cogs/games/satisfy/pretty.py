@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from functools import reduce
-from math import ceil
+from math import ceil, isclose
 
 from discord import Embed
 
@@ -11,7 +11,7 @@ from .recipe import ModifiedRecipe
 
 
 def rate_str(rate: tuple[Item, float]) -> str:
-    return f"{rate[1]} {rate[0]}"
+    return f"{round(rate[1], 4)} {rate[0]}"
 
 
 def rates_str(rates: Rates) -> str:
@@ -97,4 +97,5 @@ def solution_summary(solution: dict[ModifiedRecipe, float]) -> SolutionSummary:
 
 
 def sum_by_item(lhs: Rates | dict[Item, float], rhs: Rates | dict[Item, float]) -> dict[Item, float]:
-    return dict((item, lhs.get(item, 0) + rhs.get(item, 0)) for item in Item if (item in lhs or item in rhs))
+    sum = [(item, lhs.get(item, 0) + rhs.get(item, 0)) for item in Item if (item in lhs or item in rhs)]
+    return dict((i, s) for i, s in sum if not isclose(s, 0))
