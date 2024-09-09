@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import List
 
 from .building import Building
-from .item import Form, Item
+from .item import Item, sinkable
 from .rates import Rates
 
 
@@ -58,11 +58,12 @@ def default() -> List[Recipe]:
         ctor("IronRod", Item.IronIngot * 30 >> Item.IronRod * 30),
         refine("Plastic", Item.CrudeOil * 30 >> Item.Plastic * 20 + Item.HeavyOilResidue * 10),
         refine("Rubber", Item.CrudeOil * 30 >> Item.Rubber * 20 + Item.HeavyOilResidue * 20),
+        refine("PetroleumCoke", Item.HeavyOilResidue * 40 >> Item.PetroleumCoke * 120),
     ]
 
 
 def awesome_sink() -> List[Recipe]:
-    return [sink(item) for item in Item if item.form == Form.Solid and item.points > 0]
+    return [sink(item) for item in Item if sinkable(item)]
 
 
 def all() -> List[Recipe]:
