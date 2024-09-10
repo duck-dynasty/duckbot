@@ -1,9 +1,9 @@
 import itertools
 from functools import reduce
 from math import isclose
-from typing import Callable, List
+from typing import Callable, List, Optional
 
-from mip import INF, INTEGER, LinExpr, Model, Var, maximize, xsum
+from mip import INF, INTEGER, LinExpr, Model, OptimizationStatus, Var, maximize, xsum
 
 from .factory import Factory
 from .item import Item, sinkable
@@ -11,8 +11,14 @@ from .recipe import ModifiedRecipe, Recipe
 
 zero = LinExpr(const=0)
 
+good_enough = [
+    OptimizationStatus.FEASIBLE,  # not optimal but /shrug
+    OptimizationStatus.OPTIMAL,  # yoooo
+    OptimizationStatus.UNBOUNDED,  # objective value is infinite
+]
 
-def optimize(factory: Factory) -> dict[ModifiedRecipe, float]:
+
+def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
     model = Model()
     model.threads = -1
     model.verbose = 0
@@ -36,9 +42,9 @@ def optimize(factory: Factory) -> dict[ModifiedRecipe, float]:
         - 100 * used_sloops  # minimize sloop usage; they ain't cheap
         - xsum(use_recipe)  # minimize recipe usage; ie prefer simpler layouts when otherwise equal
     )
-    model.optimize()
+    result = model.optimize()
 
-    return dict((r, round(float(v.x), 4)) for r, v in zip(recipes, use_recipe) if v.x is not None and v.x > 0 and not isclose(float(v), 0, abs_tol=1e-4))
+    return dict((r, round(float(v.x), 4)) for r, v in zip(recipes, use_recipe) if v.x is not None and v.x > 0 and not isclose(float(v), 0, abs_tol=1e-4)) if result in good_enough else None
 
 
 def modify_recipes(recipes: List[Recipe], max_shards: int, max_sloops: int) -> List[ModifiedRecipe]:

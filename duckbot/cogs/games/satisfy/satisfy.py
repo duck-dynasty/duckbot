@@ -141,7 +141,10 @@ class Satisfy(Cog):
                 names = [r.name for r in recipes]
                 factory.recipes = recipes + [r for r in all() if r.name in factory.include_recipes and r.name not in names]
                 solution = optimize(factory)
-                await context.send(embeds=[factory_embed(factory), solution_embed(solution)])
+                if solution is None:
+                    await context.send("Why do you hate possible?", delete_after=10)
+                else:
+                    await context.send(embeds=[factory_embed(factory), solution_embed(solution)])
 
     @add_input.autocomplete("item")
     @add_target.autocomplete("item")
