@@ -28,9 +28,9 @@ def test_optimize_trivial_factory_returns_empty():
     assert optimize(factory(input=rates, target=rates)) == dict()
 
 
-def test_optimize_infeasible_returns_empty():
+def test_optimize_infeasible_returns_none():
     factory = Factory(Item.IronOre * 30, all(), Item.IronIngot * 31, set())
-    assert optimize(factory) == dict()
+    assert optimize(factory) is None
 
 
 def test_optimize_simple_factory_target_returns_recipe():
