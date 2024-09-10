@@ -60,6 +60,11 @@ class Satisfy(Cog):
         self.clear(context)
         await context.send(f":factory: :fire: Factory for {context.author.display_name} cleared. Bitch. :fire: :factory:", delete_after=10)
 
+    @satisfy.command(name="state", description="Displays the current factory.")
+    @check(allowed)
+    async def factory_state(self, context: Context):
+        await context.send(embed=factory_embed(self.factory(context)), delete_after=60)
+
     @satisfy.command(name="input", description="Adds an input to the factory.")
     @check(allowed)
     async def add_input(self, context: Context, item: str, rate_per_minute: float):

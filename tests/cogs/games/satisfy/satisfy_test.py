@@ -28,6 +28,11 @@ async def test_reset_destroys_factory(clazz, context):
     context.send.assert_called_once_with(f":factory: :fire: Factory for {context.author.display_name} cleared. Bitch. :fire: :factory:", delete_after=10)
 
 
+async def test_factory_state_sends_something_i_guess(clazz, context):
+    await clazz.factory_state.callback(clazz, context)
+    context.send.assert_called_once()
+
+
 async def test_add_input_stores_input_rate(clazz, context, default_factory):
     await clazz.add_input.callback(clazz, context, str(Item.IronOre), 30)
     default_factory.inputs = Item.IronOre * 30
