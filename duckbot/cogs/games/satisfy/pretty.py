@@ -10,8 +10,12 @@ from .rates import Rates
 from .recipe import ModifiedRecipe
 
 
+def rnd(num: float) -> float:
+    return round(num, 4)
+
+
 def rate_str(rate: tuple[Item, float]) -> str:
-    return f"{round(rate[1], 4)} {rate[0]}"
+    return f"{rnd(rate[1])} {rate[0]}"
 
 
 def rates_str(rates: Rates) -> str:
@@ -57,7 +61,7 @@ def solution_embed(solution: dict[ModifiedRecipe, float]) -> Embed:
             name = f"{name} {'+' if ' @ ' in name else '@'} {recipe.sloop_scale}x"
             building = f"{building} {'+' if ' with ' in building else 'with'} {recipe.sloops} Somersloop{plrl(recipe.sloops)}"
 
-        embed.add_field(name=name, value=f"{num} {building}\n{inout_str(recipe.inputs, recipe.outputs, num)}", inline=False)
+        embed.add_field(name=name, value=f"{rnd(num)} {building}\n{inout_str(recipe.inputs, recipe.outputs, num)}", inline=False)
 
     summary = solution_summary(solution)
     footer = inout_str(summary.inputs, summary.outputs)
