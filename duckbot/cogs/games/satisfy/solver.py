@@ -38,13 +38,13 @@ def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
     model.objective = maximize(
         10000 * maximize_items  # prioritize maximizing requested items above all
         - 100 * unsinkable_excess  # get rid of fluid products if possible
-        - 5 * used_power_shards  # minimize power shard usage; they are only eventually cheap
+        - 10 * used_power_shards  # minimize power shard usage; they are only eventually cheap
         - 100 * used_sloops  # minimize sloop usage; they ain't cheap
         - xsum(use_recipe)  # minimize recipe usage; ie prefer simpler layouts when otherwise equal
     )
     result = model.optimize()
 
-    return dict((r, round(float(v.x), 4)) for r, v in zip(recipes, use_recipe) if v.x is not None and v.x > 0 and not isclose(float(v), 0, abs_tol=1e-4)) if result in good_enough else None
+    return dict((r, float(v.x)) for r, v in zip(recipes, use_recipe) if v.x is not None and v.x > 0 and not isclose(float(v), 0, abs_tol=1e-4)) if result in good_enough else None
 
 
 def modify_recipes(recipes: List[Recipe], max_shards: int, max_sloops: int) -> List[ModifiedRecipe]:
