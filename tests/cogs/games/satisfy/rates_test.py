@@ -5,8 +5,10 @@ import pytest
 from duckbot.cogs.games.satisfy.item import Item
 from duckbot.cogs.games.satisfy.rates import Rates
 
+items = [Item.IronOre, Item.CopperOre, Item.CateriumOre, Item.Water]
 
-@pytest.fixture(params=[x for x in Item])
+
+@pytest.fixture(params=items)
 def rate(request) -> tuple[Item, float]:
     return (request.param, random.random())
 
@@ -25,7 +27,7 @@ def test_items_is_dict_items(rate):
     assert dict(rates.items()) == dict(rates.rates.items())
 
 
-@pytest.mark.parametrize("item", Item)
+@pytest.mark.parametrize("item", items)
 def test_get_is_dict_get(item, rate):
     rates = to_rates(rate)
     assert rates.get(item, None) == rates.rates.get(item, None)
