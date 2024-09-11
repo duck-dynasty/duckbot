@@ -44,7 +44,7 @@ def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
     )
     result = model.optimize()
 
-    return dict((r, round(float(v.x), 4)) for r, v in zip(recipes, use_recipe) if v.x is not None and v.x > 0 and not isclose(float(v), 0, abs_tol=1e-4)) if result in good_enough else None
+    return dict((r, float(v.x)) for r, v in zip(recipes, use_recipe) if v.x is not None and v.x > 0 and not isclose(float(v), 0, abs_tol=1e-4)) if result in good_enough else None
 
 
 def modify_recipes(recipes: List[Recipe], max_shards: int, max_sloops: int) -> List[ModifiedRecipe]:
