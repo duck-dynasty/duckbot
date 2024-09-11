@@ -38,7 +38,7 @@ def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
     model.objective = maximize(
         10000 * maximize_items  # prioritize maximizing requested items above all
         - 100 * unsinkable_excess  # get rid of fluid products if possible
-        - 5 * used_power_shards  # minimize power shard usage; they are only eventually cheap
+        - 10 * used_power_shards  # minimize power shard usage; they are only eventually cheap
         - 100 * used_sloops  # minimize sloop usage; they ain't cheap
         - xsum(use_recipe)  # minimize recipe usage; ie prefer simpler layouts when otherwise equal
     )
