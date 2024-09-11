@@ -9,6 +9,7 @@ from .item import Item
 from .rates import Rates
 from .recipe import ModifiedRecipe
 
+
 def rnd(num: float) -> float:
     return round(num, 4)
 
