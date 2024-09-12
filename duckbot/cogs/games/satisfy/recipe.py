@@ -102,6 +102,16 @@ def default() -> List[Recipe]:
         accel(Item.Diamonds, Item.Coal * 600 >> Item.Diamonds * 30),
         assy(Item.ElectromagneticControlRod, Item.Stator * 6 + Item.AiLimiter * 4 >> Item.ElectromagneticControlRod * 4),
         ctor(Item.EmptyCanister, Item.Plastic * 30 >> Item.EmptyCanister * 60),
+        ctor(Item.EmptyFluidTank, Item.AluminumIngot * 60 >> Item.EmptyFluidTank * 60),
+        assy(Item.EncasedIndustrialBeam, Item.SteelBeam * 18 + Item.Concrete * 36 >> Item.EncasedIndustrialBeam * 6),
+        assy(Item.EncasedPlutoniumCell, Item.PlutoniumPellet * 10 + Item.Concrete * 20 >> Item.EncasedPlutoniumCell * 5),
+        blend(Item.EncasedUraniumCell, Item.Uranium * 50 + Item.Concrete * 15 + Item.SulfuricAcid * 40 >> Item.EncasedUraniumCell * 25 + Item.SulfuricAcid * 10),
+        Recipe(str(Item.ExcitedPhotonicMatter), Building.Converter, inputs=Rates(), outputs=Item.ExcitedPhotonicMatter * 200),
+        manu(Item.ExplosiveRebar, Item.IronRebar * 10 + Item.SmokelessPowder * 10 + Item.SteelPipe * 10 >> Item.ExplosiveRebar * 5),
+        assy(Item.Fabric, Item.Mycelia * 15 + Item.Biomass * 75 >> Item.Fabric * 15),
+        convert("FicsiteIngot#Iron", Item.ReanimatedSam * 40 + Item.IronIngot * 240 >> Item.FicsiteIngot * 10),
+        convert("FicsiteIngot#Aluminum", Item.ReanimatedSam * 60 + Item.AluminumIngot * 120 >> Item.FicsiteIngot * 30),
+        convert("FicsiteIngot#Caterium", Item.ReanimatedSam * 40 + Item.CateriumIngot * 60 >> Item.FicsiteIngot * 15),
     ]
 
 
