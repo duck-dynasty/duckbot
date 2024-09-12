@@ -130,6 +130,11 @@ def default() -> List[Recipe]:
         ctor(Item.IronPlate, Item.IronIngot * 30 >> Item.IronPlate * 20),
         ctor(Item.IronRebar, Item.IronRod * 15 >> Item.IronRebar * 15),
         ctor(Item.IronRod, Item.IronIngot * 15 >> Item.IronRod * 15),
+        refine(Item.LiquidBiofuel, Item.SolidBiofuel * 90 + Item.Water * 45 >> Item.LiquidBiofuel * 60),
+        assy(Item.MagneticFieldGenerator, Item.VersatileFramework * 2.5 + Item.ElectromagneticControlRod * 1 >> Item.MagneticFieldGenerator * 1),
+        manu(Item.ModularEngine, Item.Motor * 2 + Item.Rubber * 15 + Item.SmartPlating * 2 >> Item.ModularEngine * 1),
+        assy(Item.ModularFrame, Item.ReinforcedIronPlate * 3 + Item.IronRod * 12 >> Item.ModularFrame * 2),
+        assy(Item.Motor, Item.Rotor * 10 + Item.Stator * 10 >> Item.Motor * 5),
     ]
 
 
@@ -145,6 +150,8 @@ def packager() -> List[Recipe]:
         uncan(Item.HeavyOilResidue, Item.PackagedHeavyOilResidue * 20 >> Item.HeavyOilResidue * 20),
         tank(Item.PackagedIonizedFuel, Item.IonizedFuel * 80 >> Item.PackagedIonizedFuel * 40),
         untank(Item.IonizedFuel, Item.PackagedIonizedFuel * 40 >> Item.IonizedFuel * 80),
+        can(Item.PackagedLiquidBiofuel, Item.LiquidBiofuel * 40 >> Item.PackagedLiquidBiofuel * 40),
+        uncan(Item.LiquidBiofuel, Item.PackagedLiquidBiofuel * 60 >> Item.LiquidBiofuel * 60),
     ]
 
 
@@ -159,6 +166,7 @@ def converter() -> List[Recipe]:
         convert("CopperOre#Quartz", Item.ReanimatedSam * 10 + Item.RawQuartz * 100 >> Item.CopperOre * 120),
         convert("CopperOre#Sulfur", Item.ReanimatedSam * 10 + Item.Sulfur * 120 >> Item.CopperOre * 120),
         convert("IronOre#Limestone", Item.ReanimatedSam * 10 + Item.Limestone * 240 >> Item.IronOre * 120),
+        convert("Limestone#Sulfur", Item.ReanimatedSam * 10 + Item.Sulfur * 20 >> Item.Limestone * 120),
     ]
 
 
