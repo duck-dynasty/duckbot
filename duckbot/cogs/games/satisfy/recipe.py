@@ -95,6 +95,13 @@ def default() -> List[Recipe]:
         blend(Item.CoolingSystem, Item.HeatSink * 12 + Item.Rubber * 12 + Item.Water * 30 + Item.NitrogenGas * 150 >> Item.CoolingSystem * 6),
         smelt(Item.CopperIngot, Item.CopperOre * 30 >> Item.CopperIngot * 30),
         ctor(Item.CopperPowder, Item.CopperIngot * 300 >> Item.CopperPowder * 50),
+        ctor(Item.CopperSheet, Item.CopperIngot * 20 >> Item.CopperSheet * 10),
+        manu(Item.CrystalOscillator, Item.QuartzCrystal * 18 + Item.Cable * 14 + Item.ReinforcedIronPlate * 2.5 >> Item.CrystalOscillator * 1),
+        accel(Item.DarkMatterCrystal, Item.Diamonds * 30 + Item.DarkMatterResidue * 150 >> Item.DarkMatterCrystal * 30),
+        convert(Item.DarkMatterResidue, Item.ReanimatedSam * 50 >> Item.DarkMatterResidue * 100),
+        accel(Item.Diamonds, Item.Coal * 600 >> Item.Diamonds * 30),
+        assy(Item.ElectromagneticControlRod, Item.Stator * 6 + Item.AiLimiter * 4 >> Item.ElectromagneticControlRod * 4),
+        ctor(Item.EmptyCanister, Item.Plastic * 30 >> Item.EmptyCanister * 60),
     ]
 
 
@@ -102,6 +109,8 @@ def packager() -> List[Recipe]:
     return [
         can(Item.PackagedAluminaSolution, Item.AluminaSolution * 120 >> Item.PackagedAluminaSolution * 120),
         uncan(Item.AluminaSolution, Item.PackagedAluminaSolution * 120 >> Item.AluminaSolution * 120),
+        can(Item.PackagedOil, Item.CrudeOil * 30 >> Item.PackagedOil * 30),
+        uncan(Item.CrudeOil, Item.PackagedOil * 60 >> Item.CrudeOil * 60),
     ]
 
 
