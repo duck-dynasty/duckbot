@@ -112,6 +112,14 @@ def default() -> List[Recipe]:
         convert("FicsiteIngot#Iron", Item.ReanimatedSam * 40 + Item.IronIngot * 240 >> Item.FicsiteIngot * 10),
         convert("FicsiteIngot#Aluminum", Item.ReanimatedSam * 60 + Item.AluminumIngot * 120 >> Item.FicsiteIngot * 30),
         convert("FicsiteIngot#Caterium", Item.ReanimatedSam * 40 + Item.CateriumIngot * 60 >> Item.FicsiteIngot * 15),
+        ctor(Item.FicsiteTrigon, Item.FicsiteIngot * 10 >> Item.FicsiteTrigon * 30),
+        accel(Item.Ficsonium, Item.PlutoniumWaste * 10 + Item.SingularityCell * 10 + Item.DarkMatterResidue * 200 >> Item.Ficsonium * 10),
+        encode(Item.FicsoniumFuelRod, Item.Ficsonium * 5 + Item.ElectromagneticControlRod * 5 + Item.FicsiteTrigon * 100 + Item.ExcitedPhotonicMatter * 50 >> Item.FicsoniumFuelRod * 2.5 + Item.DarkMatterResidue * 50),
+        refine(Item.Fuel, Item.CrudeOil * 60 >> Item.Fuel * 40 + Item.PolymerResin * 30),
+        refine("ResidualFuel", Item.HeavyOilResidue * 60 >> Item.Fuel * 40),
+        blend(Item.FusedModularFrame, Item.HeavyModularFrame * 1.5 + Item.AluminumCasing * 75 + Item.NitrogenGas * 37.5 >> Item.FusedModularFrame * 1.5),
+        manu(Item.GasFilter, Item.Fabric * 15 + Item.Coal * 30 + Item.IronPlate * 15 >> Item.GasFilter * 7.5),
+        assy(Item.GasNobelisk, Item.Nobelisk * 5 + Item.Biomass * 50 >> Item.GasNobelisk),
     ]
 
 
@@ -121,6 +129,8 @@ def packager() -> List[Recipe]:
         uncan(Item.AluminaSolution, Item.PackagedAluminaSolution * 120 >> Item.AluminaSolution * 120),
         can(Item.PackagedOil, Item.CrudeOil * 30 >> Item.PackagedOil * 30),
         uncan(Item.CrudeOil, Item.PackagedOil * 60 >> Item.CrudeOil * 60),
+        can(Item.PackagedFuel, Item.Fuel * 40 >> Item.PackagedFuel * 40),
+        uncan(Item.Fuel, Item.PackagedFuel * 60 >> Item.Fuel * 60),
     ]
 
 
