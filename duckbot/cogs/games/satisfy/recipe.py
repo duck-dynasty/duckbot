@@ -53,9 +53,7 @@ class ModifiedRecipe:
 
 def default() -> List[Recipe]:
     return [
-        refine("Plastic", Item.CrudeOil * 30 >> Item.Plastic * 20 + Item.HeavyOilResidue * 10),
         refine("Rubber", Item.CrudeOil * 30 >> Item.Rubber * 20 + Item.HeavyOilResidue * 20),
-        refine("PetroleumCoke", Item.HeavyOilResidue * 40 >> Item.PetroleumCoke * 120),
         manu(Item.AdaptiveControlUnit, Item.AutomatedWiring * 5 + Item.CircuitBoard * 5 + Item.HeavyModularFrame * 1 + Item.Computer * 2 >> Item.AdaptiveControlUnit * 1),
         encode(
             Item.AiExpensionServer,
@@ -144,6 +142,11 @@ def default() -> List[Recipe]:
         blend(Item.NonFissileUranium, Item.UraniumWaste * 37.5 + Item.Silica * 25 + Item.NitricAcid * 15 + Item.SulfuricAcid * 15 >> Item.NonFissileUranium * 50 + Item.Water * 15),
         accel(Item.NuclearPasta, Item.CopperPowder * 100 + Item.PressureConversionCube * 0.5 >> Item.NuclearPasta * 0.5),
         manu(Item.NukeNobelisk, Item.Nobelisk * 2.5 + Item.EncasedUraniumCell * 10 + Item.SmokelessPowder * 5 + Item.AiLimiter * 3 >> Item.NukeNobelisk * 0.5),
+        refine(Item.PetroleumCoke, Item.HeavyOilResidue * 40 >> Item.PetroleumCoke * 120),
+        refine(Item.Plastic, Item.CrudeOil * 30 >> Item.Plastic * 20 + Item.HeavyOilResidue * 10),
+        refine("ResidualPlastic", Item.PolymerResin * 60 + Item.Water * 20 >> Item.Plastic * 20),
+        manu(Item.PlutoniumFuelRod, Item.EncasedPlutoniumCell * 7.5 + Item.SteelBeam * 4.5 + Item.ElectromagneticControlRod * 1.5 + Item.HeatSink * 2.5 >> Item.PlutoniumFuelRod * 0.25),
+        accel(Item.PlutoniumPellet, Item.NonFissileUranium * 100 + Item.UraniumWaste * 25 >> Item.PlutoniumPellet * 30),
     ]
 
 
