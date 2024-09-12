@@ -171,6 +171,28 @@ def default() -> List[Recipe]:
         manu(Item.SingularityCell, Item.NuclearPasta * 1 + Item.DarkMatterCrystal * 20 + Item.IronPlate * 100 + Item.Concrete * 200 >> Item.SingularityCell * 10),
         assy(Item.SmartPlating, Item.ReinforcedIronPlate * 2 + Item.Rotor * 2 >> Item.SmartPlating * 2),
         refine(Item.SmokelessPowder, Item.BlackPowder * 20 + Item.HeavyOilResidue * 10 >> Item.SmokelessPowder * 20),
+        ctor(Item.SolidBiofuel, Item.Biomass * 120 >> Item.SolidBiofuel * 60),
+        assy(Item.Stator, Item.SteelPipe * 15 + Item.Wire * 40 >> Item.Stator * 5),
+        ctor(Item.SteelBeam, Item.SteelIngot * 60 >> Item.SteelBeam * 15),
+        foundry(Item.SteelIngot, Item.IronOre * 45 + Item.Coal * 45 >> Item.SteelIngot * 45),
+        ctor(Item.SteelPipe, Item.SteelIngot * 30 >> Item.SteelPipe * 20),
+        assy(Item.StunRebar, Item.IronRebar * 10 + Item.Quickwire * 50 >> Item.StunRebar * 10),
+        refine(Item.SulfuricAcid, Item.Sulfur * 50 + Item.Water * 50 >> Item.SulfuricAcid * 50),
+        manu(Item.Supercomputer, Item.Computer * 7.5 + Item.AiLimiter * 3.75 + Item.HighSpeedConnector * 5.625 + Item.Plastic * 52.5 >> Item.Supercomputer * 1.875),
+        encode(
+            Item.SuperpositionOscillator,
+            Item.DarkMatterCrystal * 30 + Item.CrystalOscillator * 5 + Item.AlcladAluminumSheet * 45 + Item.ExcitedPhotonicMatter * 125
+            >> Item.SuperpositionOscillator * 5 + Item.DarkMatterResidue * 125,
+        ),
+        manu(Item.ThermalPropulsionRocket, Item.ModularEngine * 2.5 + Item.TurboMotor * 1 + Item.CoolingSystem * 3 + Item.FusedModularFrame * 1 >> Item.ThermalPropulsionRocket * 1),
+        convert(Item.TimeCrystal, Item.Diamonds * 12 >> Item.TimeCrystal * 6),
+        manu(Item.TurboMotor, Item.CoolingSystem * 7.5 + Item.RadioControlUnit * 3.75 + Item.Motor * 7.5 + Item.Rubber * 45 >> Item.TurboMotor * 1.875),
+        manu("TurboRifleAmmo#Manufacturer", Item.RifleAmmo * 120 + Item.AluminumCasing * 15 + Item.PackagedTurbofuel * 15 >> Item.TurboRifleAmmo * 250),
+        blend("TurboRifleAmmo#Blender", Item.RifleAmmo * 120 + Item.AluminumCasing * 15 + Item.Turbofuel * 15 >> Item.TurboRifleAmmo * 250),
+        refine(Item.Turbofuel, Item.Fuel * 22.5 + Item.CompactedCoal * 15 >> Item.Turbofuel * 18.75),
+        manu(Item.UraniumFuelRod, Item.EncasedUraniumCell * 20 + Item.EncasedIndustrialBeam * 1.2 + Item.ElectromagneticControlRod * 2 >> Item.UraniumFuelRod * 0.4),
+        assy(Item.VersatileFramework, Item.ModularFrame * 2.5 + Item.SteelBeam * 30 >> Item.VersatileFramework * 5),
+        ctor(Item.Wire, Item.CopperIngot * 15 >> Item.Wire * 30),
     ]
 
 
@@ -194,6 +216,12 @@ def packager() -> List[Recipe]:
         untank(Item.NitrogenGas, Item.PackagedNitrogenGas * 60 >> Item.NitrogenGas * 240),
         tank(Item.PackagedRocketFuel, Item.RocketFuel * 120 >> Item.PackagedRocketFuel * 60),
         untank(Item.RocketFuel, Item.PackagedRocketFuel * 60 >> Item.RocketFuel * 120),
+        can(Item.PackagedSulfuricAcid, Item.SulfuricAcid * 40 >> Item.PackagedSulfuricAcid * 40),
+        uncan(Item.SulfuricAcid, Item.PackagedSulfuricAcid * 60 >> Item.SulfuricAcid * 60),
+        can(Item.PackagedTurbofuel, Item.Turbofuel * 20 >> Item.PackagedTurbofuel * 20),
+        uncan(Item.Turbofuel, Item.PackagedTurbofuel * 20 >> Item.Turbofuel * 20),
+        can(Item.PackagedWater, Item.Water * 60 >> Item.PackagedWater * 60),
+        uncan(Item.Water, Item.PackagedWater * 120 >> Item.Water * 120),
     ]
 
 
@@ -213,12 +241,31 @@ def converter() -> List[Recipe]:
         convert("NitrogenGas#Caterium", Item.ReanimatedSam * 10 + Item.CateriumOre * 120 >> Item.NitrogenGas * 120),
         convert("RawQuartz#Bauxite", Item.ReanimatedSam * 10 + Item.Bauxite * 100 >> Item.RawQuartz * 120),
         convert("RawQuartz#Coal", Item.ReanimatedSam * 10 + Item.Coal * 240 >> Item.RawQuartz * 120),
+        convert("Sulfur#Coal", Item.ReanimatedSam * 10 + Item.Coal * 200 >> Item.Sulfur * 120),
+        convert("Sulfur#Iron", Item.ReanimatedSam * 10 + Item.IronOre * 300 >> Item.Sulfur * 120),
+        convert("Uranium#Bauxite", Item.ReanimatedSam * 10 + Item.Bauxite * 480 >> Item.Uranium * 120),
     ]
 
 
 def power() -> List[Recipe]:
     return [
+        bioburn(Item.Leaves, Item.Leaves * 120),
+        bioburn(Item.Wood, Item.Wood * 18),
+        bioburn(Item.Mycelia, Item.Mycelia * 90),
+        bioburn(Item.Biomass, Item.Biomass * 10),
+        bioburn(Item.SolidBiofuel, Item.SolidBiofuel * 4),
+        bioburn(Item.PackagedLiquidBiofuel, Item.PackagedLiquidBiofuel * 2.4),
+        coal(Item.Coal, Item.Coal * 15),
+        coal(Item.CompactedCoal, Item.CompactedCoal * 7.14286),
+        coal(Item.PetroleumCoke, Item.PetroleumCoke * 25),
+        fuel(Item.Fuel, Item.Fuel * 20),
+        fuel(Item.Turbofuel, Item.Turbofuel * 7.5),
+        fuel(Item.LiquidBiofuel, Item.LiquidBiofuel * 20),
+        fuel(Item.RocketFuel, Item.RocketFuel * 4.16667),
+        fuel(Item.IonizedFuel, Item.IonizedFuel * 3),
         nuke(Item.PlutoniumFuelRod, Item.PlutoniumFuelRod * 0.1 >> Item.PlutoniumWaste * 1),
+        nuke(Item.UraniumFuelRod, Item.UraniumFuelRod * 0.2 >> Item.UraniumWaste * 10),
+        nuke(Item.FicsoniumFuelRod, Item.FicsoniumFuelRod * 1 >> Rates()),
     ]
 
 
@@ -227,7 +274,7 @@ def awesome_sink() -> List[Recipe]:
 
 
 def all() -> List[Recipe]:
-    return default() + recycled() + awesome_sink()
+    return default() + packager() + converter() + recycled() + awesome_sink()
 
 
 def recipe(name: str | Item, building: Building, inout: tuple[Rates, Rates]) -> Recipe:
@@ -295,11 +342,19 @@ def sink(item: Item) -> Recipe:
 
 
 def bioburn(name: str | Item, input: Rates) -> Recipe:
-    return recipe(name, Building.BiomassBurner, input >> Item.MwPower * 30)
+    return recipe(f"BiomassBurner#{name}", Building.BiomassBurner, input >> Item.MwPower * 30)
+
+
+def coal(name: str | Item, input: Rates) -> Recipe:
+    return recipe(f"CoalGenerator#{name}", Building.CoalGenerator, input + Item.Water * 45 >> Item.MwPower * 75)
+
+
+def fuel(name: str | Item, input: Rates) -> Recipe:
+    return recipe(f"FuelGenerator#{name}", Building.FuelGenerator, input >> Item.MwPower * 250)
 
 
 def nuke(name: str | Item, inout: tuple[Rates, Rates]) -> Recipe:
-    return recipe(name, Building.NuclearPowerPlant, inout[0] >> inout[1] + Item.MwPower * 2500)
+    return recipe(f"NuclearPowerPlant#{name}", Building.NuclearPowerPlant, inout[0] + Item.Water * 240 >> inout[1] + Item.MwPower * 2500)
 
 
 def recycled() -> List[Recipe]:
@@ -307,9 +362,5 @@ def recycled() -> List[Recipe]:
         refine("HeavyOilResidue", Item.CrudeOil * 30 >> Item.HeavyOilResidue * 40 + Item.PolymerResin * 20),
         refine("RecycledPlastic", Item.Rubber * 30 + Item.Fuel * 30 >> Item.Plastic * 60),
         refine("RecycledRubber", Item.Plastic * 30 + Item.Fuel * 30 >> Item.Rubber * 60),
-        refine("ResidualPlastic", Item.PolymerResin * 60 + Item.Water * 20 >> Item.Plastic * 20),
-        refine("ResidualRubber", Item.PolymerResin * 40 + Item.Water * 40 >> Item.Rubber * 20),
         refine("DilutedPackagedFuel", Item.HeavyOilResidue * 30 + Item.PackagedWater * 60 >> Item.PackagedFuel * 60),
-        can(Item.PackagedWater, Item.Water * 60 >> Item.PackagedWater * 60),
-        uncan(Item.Fuel, Item.PackagedFuel * 60 >> Item.Fuel * 60),
     ]
