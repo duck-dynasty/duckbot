@@ -53,9 +53,6 @@ class ModifiedRecipe:
 
 def default() -> List[Recipe]:
     return [
-        smelt("IronIngot", Item.IronOre * 30 >> Item.IronIngot * 30),
-        ctor("IronPlate", Item.IronIngot * 30 >> Item.IronPlate * 20),
-        ctor("IronRod", Item.IronIngot * 30 >> Item.IronRod * 30),
         refine("Plastic", Item.CrudeOil * 30 >> Item.Plastic * 20 + Item.HeavyOilResidue * 10),
         refine("Rubber", Item.CrudeOil * 30 >> Item.Rubber * 20 + Item.HeavyOilResidue * 20),
         refine("PetroleumCoke", Item.HeavyOilResidue * 40 >> Item.PetroleumCoke * 120),
@@ -127,6 +124,12 @@ def default() -> List[Recipe]:
         manu(Item.HeavyModularFrame, Item.ModularFrame * 10 + Item.SteelPipe * 40 + Item.EncasedIndustrialBeam * 10 + Item.Screw * 240 >> Item.HeavyModularFrame * 2),
         manu(Item.HighSpeedConnector, Item.Quickwire * 210 + Item.Cable * 37.5 + Item.CircuitBoard * 3.75 >> Item.HighSpeedConnector * 3.75),
         assy(Item.HomingRifleAmmo, Item.RifleAmmo * 50 + Item.HighSpeedConnector * 2.5 >> Item.HomingRifleAmmo * 25),
+        manu(Item.IodineInfusedFilter, Item.GasFilter * 3.75 + Item.Quickwire * 30 + Item.AluminumCasing * 3.75 >> Item.IodineInfusedFilter * 3.75),
+        refine(Item.IonizedFuel, Item.RocketFuel * 40 + Item.PowerShard * 2.5 >> Item.IonizedFuel * 40 + Item.CompactedCoal * 5),
+        smelt(Item.IronIngot, Item.IronOre * 30 >> Item.IronIngot * 30),
+        ctor(Item.IronPlate, Item.IronIngot * 30 >> Item.IronPlate * 20),
+        ctor(Item.IronRebar, Item.IronRod * 15 >> Item.IronRebar * 15),
+        ctor(Item.IronRod, Item.IronIngot * 15 >> Item.IronRod * 15),
     ]
 
 
@@ -140,6 +143,8 @@ def packager() -> List[Recipe]:
         uncan(Item.Fuel, Item.PackagedFuel * 60 >> Item.Fuel * 60),
         can(Item.PackagedHeavyOilResidue, Item.HeavyOilResidue * 30 >> Item.PackagedHeavyOilResidue * 30),
         uncan(Item.HeavyOilResidue, Item.PackagedHeavyOilResidue * 20 >> Item.HeavyOilResidue * 20),
+        tank(Item.PackagedIonizedFuel, Item.IonizedFuel * 80 >> Item.PackagedIonizedFuel * 40),
+        untank(Item.IonizedFuel, Item.PackagedIonizedFuel * 40 >> Item.IonizedFuel * 80),
     ]
 
 
@@ -153,6 +158,7 @@ def converter() -> List[Recipe]:
         convert("Coal#Limestone", Item.ReanimatedSam * 10 + Item.Limestone * 360 >> Item.Coal * 120),
         convert("CopperOre#Quartz", Item.ReanimatedSam * 10 + Item.RawQuartz * 100 >> Item.CopperOre * 120),
         convert("CopperOre#Sulfur", Item.ReanimatedSam * 10 + Item.Sulfur * 120 >> Item.CopperOre * 120),
+        convert("IronOre#Limestone", Item.ReanimatedSam * 10 + Item.Limestone * 240 >> Item.IronOre * 120),
     ]
 
 
