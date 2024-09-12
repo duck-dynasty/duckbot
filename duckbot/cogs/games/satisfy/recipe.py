@@ -135,6 +135,15 @@ def default() -> List[Recipe]:
         manu(Item.ModularEngine, Item.Motor * 2 + Item.Rubber * 15 + Item.SmartPlating * 2 >> Item.ModularEngine * 1),
         assy(Item.ModularFrame, Item.ReinforcedIronPlate * 3 + Item.IronRod * 12 >> Item.ModularFrame * 2),
         assy(Item.Motor, Item.Rotor * 10 + Item.Stator * 10 >> Item.Motor * 5),
+        encode(
+            Item.NeuralQuantumProcessor,
+            Item.TimeCrystal * 15 + Item.Supercomputer * 3 + Item.FicsiteTrigon * 45 + Item.ExcitedPhotonicMatter * 75 >> Item.NeuralQuantumProcessor * 3 + Item.DarkMatterResidue * 75,
+        ),
+        blend(Item.NitricAcid, Item.NitrogenGas * 120 + Item.Water * 30 + Item.IronPlate * 10 >> Item.NitricAcid * 30),
+        assy(Item.Nobelisk, Item.BlackPowder * 20 + Item.SteelPipe * 20 >> Item.Nobelisk * 10),
+        blend(Item.NonFissileUranium, Item.UraniumWaste * 37.5 + Item.Silica * 25 + Item.NitricAcid * 15 + Item.SulfuricAcid * 15 >> Item.NonFissileUranium * 50 + Item.Water * 15),
+        accel(Item.NuclearPasta, Item.CopperPowder * 100 + Item.PressureConversionCube * 0.5 >> Item.NuclearPasta * 0.5),
+        manu(Item.NukeNobelisk, Item.Nobelisk * 2.5 + Item.EncasedUraniumCell * 10 + Item.SmokelessPowder * 5 + Item.AiLimiter * 3 >> Item.NukeNobelisk * 0.5),
     ]
 
 
@@ -152,6 +161,10 @@ def packager() -> List[Recipe]:
         untank(Item.IonizedFuel, Item.PackagedIonizedFuel * 40 >> Item.IonizedFuel * 80),
         can(Item.PackagedLiquidBiofuel, Item.LiquidBiofuel * 40 >> Item.PackagedLiquidBiofuel * 40),
         uncan(Item.LiquidBiofuel, Item.PackagedLiquidBiofuel * 60 >> Item.LiquidBiofuel * 60),
+        tank(Item.PackagedNitricAcid, Item.NitricAcid * 30 >> Item.PackagedNitricAcid * 30),
+        untank(Item.NitricAcid, Item.PackagedNitricAcid * 30 >> Item.NitricAcid * 30),
+        tank(Item.PackagedNitrogenGas, Item.NitrogenGas * 240 >> Item.PackagedNitrogenGas * 60),
+        untank(Item.NitrogenGas, Item.PackagedNitrogenGas * 60 >> Item.NitrogenGas * 240),
     ]
 
 
@@ -167,6 +180,8 @@ def converter() -> List[Recipe]:
         convert("CopperOre#Sulfur", Item.ReanimatedSam * 10 + Item.Sulfur * 120 >> Item.CopperOre * 120),
         convert("IronOre#Limestone", Item.ReanimatedSam * 10 + Item.Limestone * 240 >> Item.IronOre * 120),
         convert("Limestone#Sulfur", Item.ReanimatedSam * 10 + Item.Sulfur * 20 >> Item.Limestone * 120),
+        convert("NitrogenGas#Bauxite", Item.ReanimatedSam * 10 + Item.Bauxite * 100 >> Item.NitrogenGas * 120),
+        convert("NitrogenGas#Caterium", Item.ReanimatedSam * 10 + Item.Caterium * 120 >> Item.NitrogenGas * 120),
     ]
 
 
