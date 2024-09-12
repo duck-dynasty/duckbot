@@ -114,7 +114,10 @@ def default() -> List[Recipe]:
         convert("FicsiteIngot#Caterium", Item.ReanimatedSam * 40 + Item.CateriumIngot * 60 >> Item.FicsiteIngot * 15),
         ctor(Item.FicsiteTrigon, Item.FicsiteIngot * 10 >> Item.FicsiteTrigon * 30),
         accel(Item.Ficsonium, Item.PlutoniumWaste * 10 + Item.SingularityCell * 10 + Item.DarkMatterResidue * 200 >> Item.Ficsonium * 10),
-        encode(Item.FicsoniumFuelRod, Item.Ficsonium * 5 + Item.ElectromagneticControlRod * 5 + Item.FicsiteTrigon * 100 + Item.ExcitedPhotonicMatter * 50 >> Item.FicsoniumFuelRod * 2.5 + Item.DarkMatterResidue * 50),
+        encode(
+            Item.FicsoniumFuelRod,
+            Item.Ficsonium * 5 + Item.ElectromagneticControlRod * 5 + Item.FicsiteTrigon * 100 + Item.ExcitedPhotonicMatter * 50 >> Item.FicsoniumFuelRod * 2.5 + Item.DarkMatterResidue * 50,
+        ),
         refine(Item.Fuel, Item.CrudeOil * 60 >> Item.Fuel * 40 + Item.PolymerResin * 30),
         refine("ResidualFuel", Item.HeavyOilResidue * 60 >> Item.Fuel * 40),
         blend(Item.FusedModularFrame, Item.HeavyModularFrame * 1.5 + Item.AluminumCasing * 75 + Item.NitrogenGas * 37.5 >> Item.FusedModularFrame * 1.5),
