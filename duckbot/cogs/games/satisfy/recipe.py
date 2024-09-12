@@ -101,7 +101,7 @@ def default() -> List[Recipe]:
         assy(Item.EncasedIndustrialBeam, Item.SteelBeam * 18 + Item.Concrete * 36 >> Item.EncasedIndustrialBeam * 6),
         assy(Item.EncasedPlutoniumCell, Item.PlutoniumPellet * 10 + Item.Concrete * 20 >> Item.EncasedPlutoniumCell * 5),
         blend(Item.EncasedUraniumCell, Item.Uranium * 50 + Item.Concrete * 15 + Item.SulfuricAcid * 40 >> Item.EncasedUraniumCell * 25 + Item.SulfuricAcid * 10),
-        Recipe(str(Item.ExcitedPhotonicMatter), Building.Converter, inputs=Rates(), outputs=Item.ExcitedPhotonicMatter * 200),
+        convert(Item.ExcitedPhotonicMatter, Rates() >> Item.ExcitedPhotonicMatter * 200),
         manu(Item.ExplosiveRebar, Item.IronRebar * 10 + Item.SmokelessPowder * 10 + Item.SteelPipe * 10 >> Item.ExplosiveRebar * 5),
         assy(Item.Fabric, Item.Mycelia * 15 + Item.Biomass * 75 >> Item.Fabric * 15),
         convert("FicsiteIngot#Iron", Item.ReanimatedSam * 40 + Item.IronIngot * 240 >> Item.FicsiteIngot * 10),
@@ -147,6 +147,16 @@ def default() -> List[Recipe]:
         refine("ResidualPlastic", Item.PolymerResin * 60 + Item.Water * 20 >> Item.Plastic * 20),
         manu(Item.PlutoniumFuelRod, Item.EncasedPlutoniumCell * 7.5 + Item.SteelBeam * 4.5 + Item.ElectromagneticControlRod * 1.5 + Item.HeatSink * 2.5 >> Item.PlutoniumFuelRod * 0.25),
         accel(Item.PlutoniumPellet, Item.NonFissileUranium * 100 + Item.UraniumWaste * 25 >> Item.PlutoniumPellet * 30),
+        ctor("PowerShard#BlueSlug", Item.BluePowerSlug * 7.5 >> Item.PowerShard * 7.5),
+        ctor("PowerShard#YellowSlug", Item.YellowPowerSlug * 5 >> Item.PowerShard * 10),
+        ctor("PowerShard#PurpleSlug", Item.PurplePowerSlug * 2.5 >> Item.PowerShard * 12.5),
+        encode(
+            "SyntheticPowerShard", Item.TimeCrystal * 10 + Item.DarkMatterCrystal * 10 + Item.QuartzCrystal * 60 + Item.ExcitedPhotonicMatter * 60 >> Item.PowerShard * 5 + Item.DarkMatterResidue * 60
+        ),
+        assy(Item.PressureConversionCube, Item.FusedModularFrame * 1 + Item.RadioControlUnit * 2 >> Item.PressureConversionCube * 1),
+        assy(Item.PulseNobelisk, Item.Nobelisk * 5 + Item.CrystalOscillator * 1 >> Item.PulseNobelisk * 5),
+        ctor(Item.QuartzCrystal, Item.RawQuartz * 37.5 >> Item.QuartzCrystal * 22.5),
+        ctor(Item.Quickwire, Item.CateriumIngot * 12 >> Item.Quickwire * 60),
     ]
 
 
@@ -185,6 +195,12 @@ def converter() -> List[Recipe]:
         convert("Limestone#Sulfur", Item.ReanimatedSam * 10 + Item.Sulfur * 20 >> Item.Limestone * 120),
         convert("NitrogenGas#Bauxite", Item.ReanimatedSam * 10 + Item.Bauxite * 100 >> Item.NitrogenGas * 120),
         convert("NitrogenGas#Caterium", Item.ReanimatedSam * 10 + Item.Caterium * 120 >> Item.NitrogenGas * 120),
+    ]
+
+
+def power() -> List[Recipe]:
+    return [
+        nuke(Item.PlutoniumFuelRod, Item.PlutoniumFuelRod * 0.1 >> Item.PlutoniumWaste * 1),
     ]
 
 
@@ -260,8 +276,12 @@ def sink(item: Item) -> Recipe:
     return recipe(f"Sink{item}", Building.AwesomeSink, item * 1 >> Item.AwesomeTicketPoints * item.points)
 
 
-def bioburn(name: str, input: Rates) -> Recipe:
+def bioburn(name: str | Item, input: Rates) -> Recipe:
     return recipe(name, Building.BiomassBurner, input >> Item.MwPower * 30)
+
+
+def nuke(name: str | Item, inout: tuple[Rates, Rates]) -> Recipe:
+    return recipe(name, Building.NuclearPowerPlant, inout[0] >> inout[1] + Item.MwPower * 2500)
 
 
 def recycled() -> List[Recipe]:
