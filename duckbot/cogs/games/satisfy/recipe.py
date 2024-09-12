@@ -123,6 +123,10 @@ def default() -> List[Recipe]:
         blend(Item.FusedModularFrame, Item.HeavyModularFrame * 1.5 + Item.AluminumCasing * 75 + Item.NitrogenGas * 37.5 >> Item.FusedModularFrame * 1.5),
         manu(Item.GasFilter, Item.Fabric * 15 + Item.Coal * 30 + Item.IronPlate * 15 >> Item.GasFilter * 7.5),
         assy(Item.GasNobelisk, Item.Nobelisk * 5 + Item.Biomass * 50 >> Item.GasNobelisk),
+        assy(Item.HeatSink, Item.AlcladAluminumSheet * 37.5 + Item.CopperSheet * 22.5 >> Item.HeatSink * 7.5),
+        manu(Item.HeavyModularFrame, Item.ModularFrame * 10 + Item.SteelPipe * 40 + Item.EncasedIndustrialBeam * 10 + Item.Screw * 240 >> Item.HeavyModularFrame * 2),
+        manu(Item.HighSpeedConnector, Item.Quickwire * 210 + Item.Cable * 37.5 + Item.CircuitBoard * 3.75 >> Item.HighSpeedConnector * 3.75),
+        assy(Item.HomingRifleAmmo, Item.RifleAmmo * 50 + Item.HighSpeedConnector * 2.5 >> Item.HomingRifleAmmo * 25),
     ]
 
 
@@ -134,6 +138,8 @@ def packager() -> List[Recipe]:
         uncan(Item.CrudeOil, Item.PackagedOil * 60 >> Item.CrudeOil * 60),
         can(Item.PackagedFuel, Item.Fuel * 40 >> Item.PackagedFuel * 40),
         uncan(Item.Fuel, Item.PackagedFuel * 60 >> Item.Fuel * 60),
+        can(Item.PackagedHeavyOilResidue, Item.HeavyOilResidue * 30 >> Item.PackagedHeavyOilResidue * 30),
+        uncan(Item.HeavyOilResidue, Item.PackagedHeavyOilResidue * 20 >> Item.HeavyOilResidue * 20),
     ]
 
 
