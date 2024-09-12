@@ -157,6 +157,12 @@ def default() -> List[Recipe]:
         assy(Item.PulseNobelisk, Item.Nobelisk * 5 + Item.CrystalOscillator * 1 >> Item.PulseNobelisk * 5),
         ctor(Item.QuartzCrystal, Item.RawQuartz * 37.5 >> Item.QuartzCrystal * 22.5),
         ctor(Item.Quickwire, Item.CateriumIngot * 12 >> Item.Quickwire * 60),
+        manu(Item.RadioControlUnit, Item.AluminumCasing * 40 + Item.CrystalOscillator * 1.25 + Item.Computer * 2.5 >> Item.RadioControlUnit * 2.5),
+        ctor(Item.ReanimatedSam, Item.Sam * 120 >> Item.ReanimatedSam * 30),
+        assy(Item.ReinforcedIronPlate, Item.IronPlate * 30 + Item.Screw * 60 >> Item.ReinforcedIronPlate * 5),
+        assy(Item.RifleAmmo, Item.CopperSheet * 15 + Item.SmokelessPowder * 10 >> Item.RifleAmmo * 75),
+        blend(Item.RocketFuel, Item.Turbofuel * 60 + Item.NitricAcid * 10 >> Item.RocketFuel * 100 + Item.CompactedCoal * 10),
+        assy(Item.Rotor, Item.IronRod * 20 + Item.Screw * 100 >> Item.Rotor * 4),
     ]
 
 
@@ -178,6 +184,8 @@ def packager() -> List[Recipe]:
         untank(Item.NitricAcid, Item.PackagedNitricAcid * 30 >> Item.NitricAcid * 30),
         tank(Item.PackagedNitrogenGas, Item.NitrogenGas * 240 >> Item.PackagedNitrogenGas * 60),
         untank(Item.NitrogenGas, Item.PackagedNitrogenGas * 60 >> Item.NitrogenGas * 240),
+        tank(Item.PackagedRocketFuel, Item.RocketFuel * 120 >> Item.PackagedRocketFuel * 60),
+        untank(Item.RocketFuel, Item.PackagedRocketFuel * 60 >> Item.RocketFuel * 120),
     ]
 
 
@@ -194,7 +202,9 @@ def converter() -> List[Recipe]:
         convert("IronOre#Limestone", Item.ReanimatedSam * 10 + Item.Limestone * 240 >> Item.IronOre * 120),
         convert("Limestone#Sulfur", Item.ReanimatedSam * 10 + Item.Sulfur * 20 >> Item.Limestone * 120),
         convert("NitrogenGas#Bauxite", Item.ReanimatedSam * 10 + Item.Bauxite * 100 >> Item.NitrogenGas * 120),
-        convert("NitrogenGas#Caterium", Item.ReanimatedSam * 10 + Item.Caterium * 120 >> Item.NitrogenGas * 120),
+        convert("NitrogenGas#Caterium", Item.ReanimatedSam * 10 + Item.CateriumOre * 120 >> Item.NitrogenGas * 120),
+        convert("RawQuartz#Bauxite", Item.ReanimatedSam * 10 + Item.Bauxite * 100 >> Item.RawQuartz * 120),
+        convert("RawQuartz#Coal", Item.ReanimatedSam * 10 + Item.Coal * 240 >> Item.RawQuartz * 120),
     ]
 
 
