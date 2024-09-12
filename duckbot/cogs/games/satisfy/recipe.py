@@ -53,7 +53,6 @@ class ModifiedRecipe:
 
 def default() -> List[Recipe]:
     return [
-        refine("Rubber", Item.CrudeOil * 30 >> Item.Rubber * 20 + Item.HeavyOilResidue * 20),
         manu(Item.AdaptiveControlUnit, Item.AutomatedWiring * 5 + Item.CircuitBoard * 5 + Item.HeavyModularFrame * 1 + Item.Computer * 2 >> Item.AdaptiveControlUnit * 1),
         encode(
             Item.AiExpensionServer,
@@ -163,6 +162,15 @@ def default() -> List[Recipe]:
         assy(Item.RifleAmmo, Item.CopperSheet * 15 + Item.SmokelessPowder * 10 >> Item.RifleAmmo * 75),
         blend(Item.RocketFuel, Item.Turbofuel * 60 + Item.NitricAcid * 10 >> Item.RocketFuel * 100 + Item.CompactedCoal * 10),
         assy(Item.Rotor, Item.IronRod * 20 + Item.Screw * 100 >> Item.Rotor * 4),
+        refine(Item.Rubber, Item.CrudeOil * 30 >> Item.Rubber * 20 + Item.HeavyOilResidue * 20),
+        refine("ResidualRubber", Item.PolymerResin * 40 + Item.Water * 40 >> Item.Rubber * 20),
+        manu(Item.SamFluctuator, Item.ReanimatedSam * 60 + Item.Wire * 50 + Item.SteelPipe * 30 >> Item.SamFluctuator * 10),
+        ctor(Item.Screw, Item.IronRod * 10 >> Item.Screw * 40),
+        assy(Item.ShatterRebar, Item.IronRebar * 10 + Item.QuartzCrystal * 15 >> Item.ShatterRebar * 5),
+        ctor(Item.Silica, Item.RawQuartz * 22.5 >> Item.Silica * 37.5),
+        manu(Item.SingularityCell, Item.NuclearPasta * 1 + Item.DarkMatterCrystal * 20 + Item.IronPlate * 100 + Item.Concrete * 200 >> Item.SingularityCell * 10),
+        assy(Item.SmartPlating, Item.ReinforcedIronPlate * 2 + Item.Rotor * 2 >> Item.SmartPlating * 2),
+        refine(Item.SmokelessPowder, Item.BlackPowder * 20 + Item.HeavyOilResidue * 10 >> Item.SmokelessPowder * 20),
     ]
 
 
