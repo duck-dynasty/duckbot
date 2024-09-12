@@ -164,11 +164,19 @@ def refine(name: str | Item, inout: tuple[Rates, Rates]) -> Recipe:
 
 
 def can(packaged: Item, inout: tuple[Rates, Rates]) -> Recipe:
-    return recipe(packaged, Building.Packager, inout[0] + Item.EmptyCanister * list(inout[0].rates.values())[0] >> inout[1])
+    return recipe(packaged, Building.Packager, inout[0] + Item.EmptyCanister * list(inout[1].rates.values())[0] >> inout[1])
 
 
 def uncan(unpacked: Item, inout: tuple[Rates, Rates]) -> Recipe:
-    return recipe(f"Unpackage{unpacked}", Building.Packager, inout[0] >> inout[1] + Item.EmptyCanister * list(inout[1].rates.values())[0])
+    return recipe(f"Unpackage{unpacked}", Building.Packager, inout[0] >> inout[1] + Item.EmptyCanister * list(inout[0].rates.values())[0])
+
+
+def tank(packaged: Item, inout: tuple[Rates, Rates]) -> Recipe:
+    return recipe(packaged, Building.Packager, inout[0] + Item.EmptyFluidTank * list(inout[1].rates.values())[0] >> inout[1])
+
+
+def untank(unpacked: Item, inout: tuple[Rates, Rates]) -> Recipe:
+    return recipe(f"Unpackage{unpacked}", Building.Packager, inout[0] >> inout[1] + Item.EmptyFluidTank * list(inout[0].rates.values())[0])
 
 
 def blend(name: str | Item, inout: tuple[Rates, Rates]) -> Recipe:
