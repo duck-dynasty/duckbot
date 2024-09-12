@@ -269,6 +269,26 @@ def power() -> List[Recipe]:
     ]
 
 
+def alternates() -> List[Recipe]:
+    return [
+        assy("PlasticAiLimiter", Item.Quickwire * 120 + Item.Plastic * 28 >> Item.AiLimiter * 8),
+        refine("SloppyAlumina", Item.Bauxite * 200 + Item.Water * 200 >> Item.AluminaSolution * 240),
+        assy("AlcladCasing", Item.AluminumIngot * 150 + Item.CopperIngot * 75 >> Item.AluminumCasing * 112.5),
+        smelt("PureAluminumIngot", Item.AluminumScrap * 60 >> Item.AluminumIngot * 30),
+        refine("ElectrodeAluminumScrap", Item.AluminaSolution * 180 + Item.PetroleumCoke * 60 >> Item.AluminumScrap * 300 + Item.Water * 105),
+        blend("InstantScrap", Item.Bauxite * 150 + Item.Coal * 100 + Item.SulfuricAcid * 50 + Item.Water * 60 >> Item.AluminumScrap * 300 + Item.Water * 50),
+        manu("AutomatedSpeedWiring", Item.Stator * 3.75 + Item.Wire * 75 + Item.HighSpeedConnector * 1.875 >> Item.AutomatedWiring * 7.5),
+        manu("ClassicBattery", Item.Sulfur * 45 + Item.AlcladAluminumSheet * 52.5 + Item.Plastic * 80 + Item.Wire * 90 >> Item.Battery * 30),
+        assy("FineBlackPowder", Item.Sulfur * 7.5 + Item.CompactedCoal * 15 >> Item.BlackPowder * 45),
+        refine("CoatedCable", Item.Wire * 37.5 + Item.HeavyOilResidue * 15 >> Item.Cable * 67.5),
+        assy("QuickwireCable", Item.Quickwire * 7.5 + Item.Rubber * 5 >> Item.Cable * 27.5),
+        assy("InsulatedCable", Item.Wire * 45 + Item.Rubber * 30 >> Item.Cable * 100),
+        refine("PureCateriumIngot", Item.CateriumOre * 24 + Item.Water * 24 >> Item.CateriumIngot * 12),
+        foundry("TemperedCateriumIngot", Item.CateriumOre * 45 + Item.PetroleumCoke * 15 >> Item.CateriumIngot * 22.5),
+        refine("LeachedCateriumIngot", Item.CateriumOre * 54 + Item.SulfuricAcid * 30 >> Item.CateriumIngot * 36),
+    ]
+
+
 def awesome_sink() -> List[Recipe]:
     return [sink(item) for item in Item if sinkable(item)]
 
