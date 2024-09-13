@@ -102,4 +102,4 @@ def solution_summary(solution: dict[ModifiedRecipe, float]) -> SolutionSummary:
 
 def sum_by_item(lhs: Rates | dict[Item, float], rhs: Rates | dict[Item, float]) -> dict[Item, float]:
     sum = [(item, lhs.get(item, 0) + rhs.get(item, 0)) for item in Item if (item in lhs or item in rhs)]
-    return dict((i, s) for i, s in sum if not isclose(s, 0))
+    return dict((i, s) for i, s in sum if not isclose(s, 0, abs_tol=1e-4))
