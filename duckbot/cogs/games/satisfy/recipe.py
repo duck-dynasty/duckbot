@@ -52,6 +52,14 @@ class ModifiedRecipe:
 
 
 def default() -> List[Recipe]:
+    return regular() + packager() + power() + awesome_sink()
+
+
+def all() -> List[Recipe]:
+    return default() + converter() + alternates()
+
+
+def regular() -> List[Recipe]:
     return [
         manu(Item.AdaptiveControlUnit, Item.AutomatedWiring * 5 + Item.CircuitBoard * 5 + Item.HeavyModularFrame * 1 + Item.Computer * 2 >> Item.AdaptiveControlUnit * 1),
         encode(
@@ -386,10 +394,6 @@ def alternates() -> List[Recipe]:
 
 def awesome_sink() -> List[Recipe]:
     return [sink(item) for item in Item if sinkable(item)]
-
-
-def all() -> List[Recipe]:
-    return default() + packager() + converter() + alternates() + awesome_sink()
 
 
 def recipe(name: str | Item, building: Building, inout: tuple[Rates, Rates]) -> Recipe:
