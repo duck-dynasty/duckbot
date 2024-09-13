@@ -2,12 +2,13 @@ import itertools
 from functools import reduce
 from math import isclose
 from typing import Callable, List, Optional
+import sys
 
 from mip import INF, INTEGER, LinExpr, Model, OptimizationStatus, Var, maximize, xsum
 
 from .factory import Factory
 from .item import Item, sinkable
-from .recipe import ModifiedRecipe, Recipe
+from .recipe import ModifiedRecipe, Recipe, raw
 
 zero = LinExpr(const=0)
 
@@ -17,13 +18,28 @@ good_enough = [
     OptimizationStatus.UNBOUNDED,  # objective value is infinite
 ]
 
+map_limits = {
+    Item.Bauxite: 12_300,
+    Item.CateriumOre: 15_000,
+    Item.Coal: 42_300,
+    Item.CopperOre: 36_900,
+    Item.CrudeOil: 12_600,
+    Item.IronOre: 92_100,
+    Item.Limestone: 69_900,
+    Item.NitrogenGas: 12_000,
+    Item.RawQuartz: 13_500,
+    Item.Sam: 10_200,
+    Item.Sulfur: 10_800,
+    Item.Uranium: 2_100,
+    Item.Water: sys.maxsize,
+}
 
 def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
     model = Model()
     model.threads = -1
     model.verbose = 0
 
-    recipes = modify_recipes(factory.recipes, factory.power_shards, factory.sloops)
+    recipes = modify_recipes(factory.recipes + raw(), factory.power_shards, factory.sloops)
 
     use_recipe = [model.add_var(name=r.name, lb=0, ub=factory.sloops / r.sloops if r.sloops > 0 else INF) for r in recipes]
 
@@ -69,7 +85,7 @@ def amount_by_item_expressions(factory: Factory, recipes: List[ModifiedRecipe], 
     TotalIronPlate = -TargetIronPlate + x2*20*RecipeIronPlate + other recipes...
     """
 
-    def cost(recipe: ModifiedRecipe, use: Var | LinExpr) -> dict[Item, LinExpr]:
+    def cost(recipe: ModifiedRecipe, use: Var | LinExpr):
         costs = dict((item, -use * rate) for item, rate in recipe.inputs.items())
         income = dict((item, use * rate) for item, rate in recipe.outputs.items())
         return costs, income

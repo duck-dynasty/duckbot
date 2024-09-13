@@ -145,7 +145,7 @@ class Satisfy(Cog):
     @check(allowed)
     async def solve(self, context: Context):
         factory = self.factory(context)
-        if not factory.inputs or (not factory.targets and not factory.maximize):
+        if not factory.targets and not factory.maximize:
             await context.send("No.", delete_after=10)
         else:
             async with context.typing():
