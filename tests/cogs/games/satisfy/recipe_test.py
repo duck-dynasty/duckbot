@@ -3,13 +3,18 @@ import pytest
 from duckbot.cogs.games.satisfy.building import Building
 from duckbot.cogs.games.satisfy.item import Item
 from duckbot.cogs.games.satisfy.rates import Rates
-from duckbot.cogs.games.satisfy.recipe import Recipe, can, tank, uncan, untank
+from duckbot.cogs.games.satisfy.recipe import Recipe, all, can, tank, uncan, untank
 
 
 @pytest.mark.parametrize("name", ["", "name", "another example"])
 @pytest.mark.parametrize("building", Building)
 def test_hash_is_name(name: str, building: Building):
     assert hash(Recipe(name, building, Rates(), Rates())) == hash(name)
+
+
+def test_recipes_have_unique_names():
+    names = [r.name for r in all()]
+    assert len(set(names)) == len(names)
 
 
 def test_can_adds_empty_canister_inputs():

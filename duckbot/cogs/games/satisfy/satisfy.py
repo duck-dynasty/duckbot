@@ -8,7 +8,7 @@ from .factory import Factory
 from .item import Item
 from .pretty import factory_embed, solution_embed
 from .rates import Rates
-from .recipe import all, default
+from .recipe import all, converter, default
 from .solver import optimize
 
 
@@ -23,7 +23,19 @@ item_names = [i.name for i in Item]
 boost_item_names = [Item.PowerShard.name, Item.Somersloop.name]
 recipe_banks = {
     "All": all(),
+    "All without Conversions": [r for r in all() if r.name not in [x.name for x in converter()]],
     "Default": default(),
+    "Default with Conversions": default() + converter(),
+    "Multiplayer": default() + [r for r in all() if r.name in []],
+    "Clandestine": default()
+    + [
+        r
+        for r in all()
+        if r.name
+        in [
+            "IronWire",
+        ]
+    ],
 }
 recipe_names = [r.name for r in all()]
 
