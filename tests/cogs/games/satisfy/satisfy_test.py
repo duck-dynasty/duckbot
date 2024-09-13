@@ -111,7 +111,7 @@ async def test_solve_all_defaults(opt, clazz, context, default_factory):
     default_factory.inputs = Item.IronOre * 30
     default_factory.maximize = set([Item.IronOre])
     expected = copy(default_factory)
-    expected.recipes = all()
+    expected.recipes = default()
 
     clazz.save(context, default_factory)
     await clazz.solve.callback(clazz, context)
@@ -151,7 +151,7 @@ async def test_solve_recipe_excludes(opt, clazz, context, default_factory):
     default_factory.maximize = set([Item.IronOre])
     default_factory.exclude_recipes = set([default_factory.recipes[0].name])
     expected = copy(default_factory)
-    expected.recipes = all()[1:]
+    expected.recipes = default()[1:]
 
     clazz.save(context, default_factory)
     await clazz.solve.callback(clazz, context)
