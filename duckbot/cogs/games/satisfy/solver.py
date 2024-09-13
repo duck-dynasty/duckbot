@@ -1,14 +1,14 @@
 import itertools
+import sys
 from functools import reduce
 from math import isclose
 from typing import Callable, List, Optional
-import sys
 
 from mip import INF, INTEGER, LinExpr, Model, OptimizationStatus, Var, maximize, xsum
 
 from .factory import Factory
 from .item import Item, sinkable
-from .recipe import ModifiedRecipe, Recipe, raw
+from .recipe import ModifiedRecipe, Recipe
 
 zero = LinExpr(const=0)
 
@@ -34,25 +34,28 @@ map_limits = {
     Item.Water: sys.maxsize,
 }
 
+
 def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
     model = Model()
     model.threads = -1
     model.verbose = 0
 
-    recipes = modify_recipes(factory.recipes + raw(), factory.power_shards, factory.sloops)
+    recipes = modify_recipes(factory.recipes, factory.power_shards, factory.sloops)
 
     use_recipe = [model.add_var(name=r.name, lb=0, ub=factory.sloops / r.sloops if r.sloops > 0 else INF) for r in recipes]
+    generate_raw = {i: next((x for x in use_recipe if x.name == str(i)), 0) for i in map_limits.keys()}
 
     amount_by_item = amount_by_item_expressions(factory, recipes, use_recipe)
     items_must_be_non_negative(model, amount_by_item)
 
+    maximize_items = xsum([amount for i, amount in amount_by_item.items() if i in factory.maximize])
+    raw_usage = xsum([amount / map_limits[i] for i, amount in generate_raw.items()])
+    unsinkable_excess = xsum([amount for i, amount in amount_by_item.items() if not sinkable(i)])
     used_power_shards = power_shards_used(model, factory, recipes, use_recipe)
     used_sloops = sloops_used(model, factory, recipes, use_recipe)
-
-    maximize_items = xsum([amount for i, amount in amount_by_item.items() if i in factory.maximize])
-    unsinkable_excess = xsum([amount for i, amount in amount_by_item.items() if not sinkable(i)])
     model.objective = maximize(
         10000 * maximize_items  # prioritize maximizing requested items above all
+        - 1000 * raw_usage  # minimize raw material usage, weighted by map availability
         - 100 * unsinkable_excess  # get rid of fluid products if possible
         - 10 * used_power_shards  # minimize power shard usage; they are only eventually cheap
         - 100 * used_sloops  # minimize sloop usage; they ain't cheap

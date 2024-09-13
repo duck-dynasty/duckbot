@@ -52,7 +52,7 @@ class ModifiedRecipe:
 
 
 def default() -> List[Recipe]:
-    return regular() + packager() + power() + awesome_sink()
+    return regular() + packager() + power() + awesome_sink() + raw()
 
 
 def all() -> List[Recipe]:
@@ -395,6 +395,7 @@ def alternates() -> List[Recipe]:
 def awesome_sink() -> List[Recipe]:
     return [sink(item) for item in Item if sinkable(item)]
 
+
 def raw() -> List[Recipe]:
     return [
         recipe(Item.Bauxite, Building.Miner, Rates() >> Item.Bauxite * 1),
@@ -411,6 +412,7 @@ def raw() -> List[Recipe]:
         recipe(Item.Uranium, Building.Miner, Rates() >> Item.Uranium * 1),
         recipe(Item.Water, Building.WaterExtractor, Rates() >> Item.Water * 1),
     ]
+
 
 def recipe(name: str | Item, building: Building, inout: tuple[Rates, Rates]) -> Recipe:
     return Recipe(str(name), building, inputs=inout[0], outputs=inout[1])
