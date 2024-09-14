@@ -195,7 +195,13 @@ class Satisfy(Cog):
 
 
 def choices(pool: List[str], needle: str, threshold: int = 3) -> List[Choice[str]]:
+    def match(needle: str, haystack: str) -> bool:
+        import builtins
+
+        it = iter(haystack)
+        return builtins.all(any(next_letter == ch for next_letter in it) for ch in needle)
+
     if len(needle) < threshold:
         return []
     else:
-        return [Choice(name=i, value=i) for i in pool if needle.lower() in i.lower()]
+        return [Choice(name=i, value=i) for i in pool if match(needle.lower(), i.lower())]
