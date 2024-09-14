@@ -398,19 +398,19 @@ def awesome_sink() -> List[Recipe]:
 
 def raw() -> List[Recipe]:
     return [
-        recipe(Item.Bauxite, Building.Miner, Rates() >> Item.Bauxite * 1),
-        recipe(Item.CateriumOre, Building.Miner, Rates() >> Item.CateriumOre * 1),
-        recipe(Item.Coal, Building.Miner, Rates() >> Item.Coal * 1),
-        recipe(Item.CopperOre, Building.Miner, Rates() >> Item.CopperOre * 1),
-        recipe(Item.CrudeOil, Building.OilExtractor, Rates() >> Item.CrudeOil * 1),
-        recipe(Item.IronOre, Building.Miner, Rates() >> Item.IronOre * 1),
-        recipe(Item.Limestone, Building.Miner, Rates() >> Item.Limestone * 1),
-        recipe(Item.NitrogenGas, Building.ResourceWell, Rates() >> Item.NitrogenGas * 1),
-        recipe(Item.RawQuartz, Building.Miner, Rates() >> Item.RawQuartz * 1),
-        recipe(Item.Sam, Building.Miner, Rates() >> Item.Sam * 1),
-        recipe(Item.Sulfur, Building.Miner, Rates() >> Item.Sulfur * 1),
-        recipe(Item.Uranium, Building.Miner, Rates() >> Item.Uranium * 1),
-        recipe(Item.Water, Building.WaterExtractor, Rates() >> Item.Water * 1),
+        recipe(Item.Bauxite, Building.Miner, Rates() >> Item.Bauxite * 60),
+        recipe(Item.CateriumOre, Building.Miner, Rates() >> Item.CateriumOre * 60),
+        recipe(Item.Coal, Building.Miner, Rates() >> Item.Coal * 60),
+        recipe(Item.CopperOre, Building.Miner, Rates() >> Item.CopperOre * 60),
+        recipe(Item.CrudeOil, Building.OilExtractor, Rates() >> Item.CrudeOil * 120),
+        recipe(Item.IronOre, Building.Miner, Rates() >> Item.IronOre * 60),
+        recipe(Item.Limestone, Building.Miner, Rates() >> Item.Limestone * 60),
+        recipe(Item.NitrogenGas, Building.ResourceWell, Rates() >> Item.NitrogenGas * 60),
+        recipe(Item.RawQuartz, Building.Miner, Rates() >> Item.RawQuartz * 60),
+        recipe(Item.Sam, Building.Miner, Rates() >> Item.Sam * 60),
+        recipe(Item.Sulfur, Building.Miner, Rates() >> Item.Sulfur * 60),
+        recipe(Item.Uranium, Building.Miner, Rates() >> Item.Uranium * 60),
+        recipe(Item.Water, Building.WaterExtractor, Rates() >> Item.Water * 120),
     ]
 
 

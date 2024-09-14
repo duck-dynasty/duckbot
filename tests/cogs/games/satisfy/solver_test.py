@@ -62,7 +62,7 @@ def test_optimize_create_resources_returns_target():
     f = factory(input=Rates(), target=Item.IronIngot * 30, recipes=default())
     ore = recipe_by_name("IronOre")
     ingot = recipe_by_name("IronIngot")
-    assert optimize(f) == dict([(ore, approx(30)), (ingot, approx(1))])
+    assert optimize(f) == dict([(ore, approx(0.5)), (ingot, approx(1))])
 
 
 def test_optimize_two_step_returns_chain():
@@ -101,7 +101,7 @@ def test_optimize_fluid_excess_is_made_sinkable():
 
 
 def test_optimize_recycled_bois_returns_chain():
-    f = factory(input=Item.Water * 90 + Item.CrudeOil * 27, target=Item.Plastic * 81, recipes=[r for r in all() if r.name != "DilutedFuel"])
+    f = factory(input=Item.Water * 90 + Item.CrudeOil * 27, target=Item.Plastic * 81, recipes=[r for r in all_no_raw if r.name != "DilutedFuel"])
     goo = recipe_by_name("HeavyOilResidue")
     dilute = recipe_by_name("DilutedPackagedFuel")
     wudder = recipe_by_name("PackagedWater")
