@@ -55,7 +55,7 @@ class Satisfy(Cog):
         # factory = Factory(inputs=Item.CrudeOil * 30, targets=Item.Plastic * 20, maximize=set(), recipes=all(), power_shards=0, sloops=0)
         # factory = Factory(inputs=Item.IronOre * 30, targets=Rates(), maximize=set([Item.IronPlate]), recipes=all(), power_shards=0, sloops=10)
         # monkeypatch fields for recipe manipulations
-        factory.recipe_bank = "All"
+        factory.recipe_bank = "Default"
         factory.include_recipes = set()
         factory.exclude_recipes = set()
         return self.factory_cache.get(context.author.id, factory)
