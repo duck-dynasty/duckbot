@@ -1,5 +1,7 @@
 from typing import Set
 
+import pytest
+
 from duckbot.cogs.games.satisfy.factory import Factory
 from duckbot.cogs.games.satisfy.item import Item
 from duckbot.cogs.games.satisfy.rates import Rates
@@ -11,9 +13,7 @@ default_no_raw = [r for r in default() if r.name not in [x.name for x in raw()]]
 
 
 def approx(x):
-    from pytest import approx as pyapprox
-
-    return pyapprox(x, abs=1e-4)
+    return pytest.approx(x, abs=1e-4)
 
 
 def factory(*, input: Rates, target: Rates = Rates(), maximize: Set[Item] = set(), recipes=all_no_raw, power_shards: int = 0, sloops: int = 0):
