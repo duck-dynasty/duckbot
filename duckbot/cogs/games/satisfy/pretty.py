@@ -7,7 +7,7 @@ from discord import Embed
 from .factory import Factory
 from .item import Item
 from .rates import Rates
-from .recipe import ModifiedRecipe
+from .recipe import ModifiedRecipe, raw
 
 
 def rnd(num: float) -> float:
@@ -91,7 +91,8 @@ class SolutionSummary:
 def solution_summary(solution: dict[ModifiedRecipe, float]) -> SolutionSummary:
     inputs = reduce(sum_by_item, [r.inputs * -v for r, v in solution.items()], dict())
     outputs = reduce(sum_by_item, [r.outputs * v for r, v in solution.items()], dict())
-    totals = sum_by_item(inputs, outputs)
+    creation = {i: -n for i, n in outputs.items() if i in [Item[x.name] for x in raw()]}
+    totals = sum_by_item(sum_by_item(inputs, creation), outputs)
     return SolutionSummary(
         inputs=Rates(dict((k, -v) for k, v in totals.items() if v < 0)),
         outputs=Rates(dict((k, v) for k, v in totals.items() if v > 0)),
