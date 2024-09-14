@@ -33,6 +33,7 @@ def owm(o, city_id, weather_manager):
 def weather(bot, owm, db):
     clazz = Weather(bot, db)
     clazz._owm = owm
+    clazz.one_call = mock.MagicMock()
     return clazz
 
 
@@ -52,7 +53,7 @@ def test_owm_returns_cached_instance(weather, owm):
 
 
 async def test_weather_get_failure(weather, owm, context):
-    owm.weather_manager.side_effect = Exception("ded")
+    weather.one_call.side_effect = Exception("ded")
     with pytest.raises(Exception):
         await weather.weather(context, "city", None, None)
     context.send.assert_called_once_with("Iunno. Figure it out.\nded")
