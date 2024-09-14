@@ -3,10 +3,11 @@ from typing import Set
 from duckbot.cogs.games.satisfy.factory import Factory
 from duckbot.cogs.games.satisfy.item import Item
 from duckbot.cogs.games.satisfy.rates import Rates
-from duckbot.cogs.games.satisfy.recipe import ModifiedRecipe, all, default
+from duckbot.cogs.games.satisfy.recipe import ModifiedRecipe, all, default, raw
 from duckbot.cogs.games.satisfy.solver import optimize
 
-all_recipes = all()
+all_no_raw = [r for r in all() if r.name not in [x.name for x in raw()]]
+default_no_raw = [r for r in default() if r.name not in [x.name for x in raw()]]
 
 
 def approx(x):
@@ -16,7 +17,7 @@ def approx(x):
 
 
 def factory(input: Rates, target: Rates = Rates(), maximize: Set[Item] = set(), power_shards: int = 0, sloops: int = 0):
-    return Factory(inputs=input, targets=target, maximize=maximize, power_shards=power_shards, sloops=sloops, recipes=all_recipes)
+    return Factory(inputs=input, targets=target, maximize=maximize, power_shards=power_shards, sloops=sloops, recipes=all_no_raw)
 
 
 def test_optimize_empty_factory_returns_empty():
@@ -29,7 +30,7 @@ def test_optimize_trivial_factory_returns_empty():
 
 
 def test_optimize_infeasible_returns_none():
-    factory = Factory(Item.IronOre * 30, all(), Item.IronIngot * 31, set())
+    factory = Factory(Item.IronOre * 30, all_no_raw, Item.IronIngot * 31, set())
     assert optimize(factory) is None
 
 
@@ -40,46 +41,46 @@ def test_optimize_simple_factory_target_returns_recipe():
 
 
 def test_optimize_simple_factory_maximize_returns_recipe():
-    factory = Factory(Item.IronOre * 30, default(), Rates(), set([Item.IronIngot]))
+    factory = Factory(Item.IronOre * 30, default_no_raw, Rates(), set([Item.IronIngot]))
     recipe = recipe_by_name("IronIngot")
     assert optimize(factory) == dict([(recipe, approx(1))])
 
 
 def test_optimize_simple_sloop_target_returns_recipe():
-    factory = Factory(Item.IronOre * 30, default(), Item.IronIngot * 60, set(), sloops=1)
+    factory = Factory(Item.IronOre * 30, default_no_raw, Item.IronIngot * 60, set(), sloops=1)
     recipe = recipe_by_name("IronIngot", sloops=1)
     assert optimize(factory) == dict([(recipe, approx(1))])
 
 
 def test_optimize_simple_sloop_maximize_returns_recipe():
-    factory = Factory(Item.IronOre * 30, default(), Rates(), set([Item.IronIngot]), sloops=1)
+    factory = Factory(Item.IronOre * 30, default_no_raw, Rates(), set([Item.IronIngot]), sloops=1)
     recipe = recipe_by_name("IronIngot", sloops=1)
     assert optimize(factory) == dict([(recipe, approx(1))])
 
 
 def test_optimize_two_step_returns_chain():
-    factory = Factory(Item.IronOre * 30, default(), Rates(), set([Item.IronPlate]))
+    factory = Factory(Item.IronOre * 30, default_no_raw, Rates(), set([Item.IronPlate]))
     ignot = recipe_by_name("IronIngot")
     plate = recipe_by_name("IronPlate")
     assert optimize(factory) == dict([(ignot, approx(1)), (plate, approx(1))])
 
 
 def test_optimize_two_step_single_sloop_returns_chain():
-    factory = Factory(Item.IronOre * 30, default(), Rates(), set([Item.IronPlate]), sloops=1)
+    factory = Factory(Item.IronOre * 30, default_no_raw, Rates(), set([Item.IronPlate]), sloops=1)
     ignot = recipe_by_name("IronIngot")
     plate = recipe_by_name("IronPlate", sloops=1)
     assert optimize(factory) == dict([(ignot, approx(1)), (plate, approx(1))])
 
 
 def test_optimize_two_step_many_sloop_returns_chain():
-    factory = Factory(Item.IronOre * 30, default(), Rates(), set([Item.IronPlate]), sloops=10)
+    factory = Factory(Item.IronOre * 30, default_no_raw, Rates(), set([Item.IronPlate]), sloops=10)
     ignot = recipe_by_name("IronIngot", sloops=1)
     plate = recipe_by_name("IronPlate", sloops=1)
     assert optimize(factory) == dict([(ignot, approx(1)), (plate, approx(2))])
 
 
 def test_optimize_two_step_many_sloop_and_power_shards_returns_chain():
-    factory = Factory(Item.IronOre * 30, default(), Rates(), set([Item.IronPlate]), sloops=10, power_shards=10)
+    factory = Factory(Item.IronOre * 30, default_no_raw, Rates(), set([Item.IronPlate]), sloops=10, power_shards=10)
     ignot = recipe_by_name("IronIngot", sloops=1)
     plate = recipe_by_name("IronPlate", sloops=1, power_shards=2)
     assert optimize(factory) == dict([(ignot, approx(1)), (plate, approx(1))])
@@ -115,4 +116,4 @@ def test_optimize_recycled_bois_returns_chain():
 
 
 def recipe_by_name(name: str, power_shards: int = 0, sloops: int = 0) -> ModifiedRecipe:
-    return ModifiedRecipe(next(r for r in all_recipes if r.name == name), power_shards, sloops)
+    return ModifiedRecipe(next(r for r in all_no_raw if r.name == name), power_shards, sloops)
