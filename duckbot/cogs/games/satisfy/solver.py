@@ -1,4 +1,5 @@
 import itertools
+import sys
 from functools import reduce
 from math import isclose
 from typing import Callable, List, Optional
@@ -17,6 +18,22 @@ good_enough = [
     OptimizationStatus.UNBOUNDED,  # objective value is infinite
 ]
 
+map_limits = {
+    Item.Bauxite: 12_300,
+    Item.CateriumOre: 15_000,
+    Item.Coal: 42_300,
+    Item.CopperOre: 36_900,
+    Item.CrudeOil: 12_600,
+    Item.IronOre: 92_100,
+    Item.Limestone: 69_900,
+    Item.NitrogenGas: 12_000,
+    Item.RawQuartz: 13_500,
+    Item.Sam: 10_200,
+    Item.Sulfur: 10_800,
+    Item.Uranium: 2_100,
+    Item.Water: sys.maxsize,
+}
+
 
 def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
     model = Model()
@@ -26,17 +43,19 @@ def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
     recipes = modify_recipes(factory.recipes, factory.power_shards, factory.sloops)
 
     use_recipe = [model.add_var(name=r.name, lb=0, ub=factory.sloops / r.sloops if r.sloops > 0 else INF) for r in recipes]
+    generate_raw = {i: next((x for x in use_recipe if x.name == str(i)), 0) for i in map_limits.keys()}
 
     amount_by_item = amount_by_item_expressions(factory, recipes, use_recipe)
     items_must_be_non_negative(model, amount_by_item)
 
+    maximize_items = xsum([amount for i, amount in amount_by_item.items() if i in factory.maximize])
+    raw_usage = xsum([amount / map_limits[i] for i, amount in generate_raw.items()])
+    unsinkable_excess = xsum([amount for i, amount in amount_by_item.items() if not sinkable(i)])
     used_power_shards = power_shards_used(model, factory, recipes, use_recipe)
     used_sloops = sloops_used(model, factory, recipes, use_recipe)
-
-    maximize_items = xsum([amount for i, amount in amount_by_item.items() if i in factory.maximize])
-    unsinkable_excess = xsum([amount for i, amount in amount_by_item.items() if not sinkable(i)])
     model.objective = maximize(
         10000 * maximize_items  # prioritize maximizing requested items above all
+        - 1000 * raw_usage  # minimize raw material usage, weighted by map availability
         - 100 * unsinkable_excess  # get rid of fluid products if possible
         - 10 * used_power_shards  # minimize power shard usage; they are only eventually cheap
         - 100 * used_sloops  # minimize sloop usage; they ain't cheap
@@ -69,7 +88,7 @@ def amount_by_item_expressions(factory: Factory, recipes: List[ModifiedRecipe], 
     TotalIronPlate = -TargetIronPlate + x2*20*RecipeIronPlate + other recipes...
     """
 
-    def cost(recipe: ModifiedRecipe, use: Var | LinExpr) -> dict[Item, LinExpr]:
+    def cost(recipe: ModifiedRecipe, use: Var | LinExpr):
         costs = dict((item, -use * rate) for item, rate in recipe.inputs.items())
         income = dict((item, use * rate) for item, rate in recipe.outputs.items())
         return costs, income

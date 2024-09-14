@@ -52,7 +52,7 @@ class ModifiedRecipe:
 
 
 def default() -> List[Recipe]:
-    return regular() + packager() + power() + awesome_sink()
+    return regular() + packager() + power() + awesome_sink() + raw()
 
 
 def all() -> List[Recipe]:
@@ -394,6 +394,24 @@ def alternates() -> List[Recipe]:
 
 def awesome_sink() -> List[Recipe]:
     return [sink(item) for item in Item if sinkable(item)]
+
+
+def raw() -> List[Recipe]:
+    return [
+        recipe(Item.Bauxite, Building.Miner, Rates() >> Item.Bauxite * 60),
+        recipe(Item.CateriumOre, Building.Miner, Rates() >> Item.CateriumOre * 60),
+        recipe(Item.Coal, Building.Miner, Rates() >> Item.Coal * 60),
+        recipe(Item.CopperOre, Building.Miner, Rates() >> Item.CopperOre * 60),
+        recipe(Item.CrudeOil, Building.OilExtractor, Rates() >> Item.CrudeOil * 120),
+        recipe(Item.IronOre, Building.Miner, Rates() >> Item.IronOre * 60),
+        recipe(Item.Limestone, Building.Miner, Rates() >> Item.Limestone * 60),
+        recipe(Item.NitrogenGas, Building.ResourceWell, Rates() >> Item.NitrogenGas * 60),
+        recipe(Item.RawQuartz, Building.Miner, Rates() >> Item.RawQuartz * 60),
+        recipe(Item.Sam, Building.Miner, Rates() >> Item.Sam * 60),
+        recipe(Item.Sulfur, Building.Miner, Rates() >> Item.Sulfur * 60),
+        recipe(Item.Uranium, Building.Miner, Rates() >> Item.Uranium * 60),
+        recipe(Item.Water, Building.WaterExtractor, Rates() >> Item.Water * 120),
+    ]
 
 
 def recipe(name: str | Item, building: Building, inout: tuple[Rates, Rates]) -> Recipe:
