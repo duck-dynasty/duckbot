@@ -70,6 +70,10 @@ def regular() -> List[Recipe]:
         assy(Item.AiLimiter, Item.CopperSheet * 25 + Item.Quickwire * 100 >> Item.AiLimiter * 5),
         assy(Item.AlcladAluminumSheet, Item.AluminumIngot * 30 + Item.CopperIngot * 10 >> Item.AlcladAluminumSheet * 30),
         ctor(Item.AlienDnaCapsule, Item.AlienProtein * 10 >> Item.AlienDnaCapsule * 10),
+        encode(
+            Item.AlienPowerMatrix,
+            Item.SamFluctuator * 12.5 + Item.PowerShard * 7.5 + Item.SuperpositionOscillator * 7.5 + Item.ExcitedPhotonicMatter * 60 >> Item.AlienPowerMatrix * 2.5 + Item.DarkMatterResidue * 60,
+        ),
         ctor("HogProtein", Item.HogRemains * 20 >> Item.AlienProtein * 20),
         ctor("SpitterProtein", Item.SpitterRemains * 20 >> Item.AlienProtein * 20),
         ctor("StingerProtein", Item.StingerRemains * 20 >> Item.AlienProtein * 20),

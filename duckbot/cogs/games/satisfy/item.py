@@ -17,6 +17,7 @@ class Item(Enum):
     AiLimiter = (auto(), Form.Solid, 920)
     AlcladAluminumSheet = (auto(), Form.Solid, 266)
     AlienDnaCapsule = (auto(), Form.Solid, 0)
+    AlienPowerMatrix = (auto(), Form.Solid, 210)
     AlienProtein = (auto(), Form.Solid, 0)
     AluminaSolution = (auto(), Form.Fluid, 0)
     AluminumCasing = (auto(), Form.Solid, 393)
