@@ -149,9 +149,7 @@ class Satisfy(Cog):
     @check(allowed)
     async def solve(self, context: Context):
         factory = self.factory(context)
-        if not factory.targets and not factory.maximize:
-            await context.send("No.", delete_after=10)
-        else:
+        if factory.targets or (factory.inputs and factory.maximize):
             async with context.typing():
                 recipes = [r for r in recipe_banks[factory.recipe_bank] if r.name not in factory.exclude_recipes]
                 names = [r.name for r in recipes]
@@ -161,6 +159,8 @@ class Satisfy(Cog):
                     await context.send("Why do you hate possible?", delete_after=10)
                 else:
                     await context.send(embeds=[factory_embed(factory), solution_embed(solution)])
+        else:
+            await context.send("No.", delete_after=10)
 
     @add_input.autocomplete("item")
     @add_target.autocomplete("item")
