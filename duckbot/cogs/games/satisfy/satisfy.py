@@ -38,6 +38,7 @@ recipe_banks = {
         if r.name
         in [
             "IronWire",
+            "EncasedIndustrialPipe",
         ]
     ],
 }
