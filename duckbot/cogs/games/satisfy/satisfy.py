@@ -13,7 +13,6 @@ from .solver import optimize
 
 
 async def allowed(context: Context | Interaction):
-    return True
     id = context.author.id if hasattr(context, "author") else context.user.id
     if id not in [368038054558171141, 776607982472921088, 375024417358479380]:
         raise MissingPermissions(["lul"])
