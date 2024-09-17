@@ -13,6 +13,7 @@ from .solver import optimize
 
 
 async def allowed(context: Context | Interaction):
+    return True
     id = context.author.id if hasattr(context, "author") else context.user.id
     if id not in [368038054558171141, 776607982472921088, 375024417358479380]:
         raise MissingPermissions(["lul"])
@@ -31,7 +32,7 @@ recipe_banks = {
     "Default + Conversions - RawSupply": [r for r in default() + converter() if r.name not in [x.name for x in raw()]],
     "Default - RawSupply": [r for r in default() if r.name not in [x.name for x in raw()]],
     "Multiplayer": default() + [r for r in all() if r.name in []],
-    "Clandestine": default()
+    "Clandestine": [r for r in default() if r.name not in [x.name for x in raw()]]
     + [
         r
         for r in all()
@@ -39,6 +40,16 @@ recipe_banks = {
         in [
             "IronWire",
             "EncasedIndustrialPipe",
+            "StitchedIronPlate",
+            "WetConcrete",
+            "AutomatedMiner",
+            "SteelScrew",
+            "CastScrew",
+            "SolidSteelIngot",
+            "SteamedCopperSheet",
+            "SteelRotor",
+            "IronAlloyIngot",
+            "MoldedBeam",
         ]
     ],
 }
