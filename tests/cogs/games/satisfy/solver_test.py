@@ -65,6 +65,42 @@ def test_optimize_create_resources_returns_target():
     assert optimize(f) == dict([(ore, approx(0.5)), (ingot, approx(1))])
 
 
+def test_optimize_create_resources_minimal_inputs_used():
+    f = factory(input=Rates(), target=Item.ReinforcedIronPlate * 5.625, recipes=default_no_raw + [r for r in all() if r.name in ["IronOre", "IronWire", "StitchedIronPlate"]])
+    ore = recipe_by_name("IronOre")
+    ingot = recipe_by_name("IronIngot")
+    wire = recipe_by_name("IronWire")
+    plate = recipe_by_name("IronPlate")
+    super_plate = recipe_by_name("StitchedIronPlate")
+    assert optimize(f) == dict(
+        [
+            (ore, approx(48.958 / 60.0)),
+            (ingot, approx(48.958 / 30.0)),
+            (wire, approx(1.0 + 2.0 / 3.0)),
+            (plate, approx(18.75 / 20.0)),
+            (super_plate, approx(1)),
+        ]
+    )
+
+
+def test_optimize_maximize_oversupplied_minimizes_inputs_used():
+    f = factory(input=Item.Coal * 120 + Item.IronOre * 120 + Item.Limestone * 270, maximize=set([Item.EncasedIndustrialBeam]), recipes=all_no_raw)
+    ingot = recipe_by_name("IronIngot")
+    steel = recipe_by_name("SolidSteelIngot")
+    concrete = recipe_by_name("Concrete")
+    pipe = recipe_by_name("SteelPipe")
+    butter = recipe_by_name("EncasedIndustrialPipe")
+    assert optimize(f) == dict(
+        [
+            (concrete, approx(6)),
+            (ingot, approx(3.6)),
+            (pipe, approx(5.4)),
+            (butter, approx(4.5)),
+            (steel, approx(2.7)),
+        ]
+    )
+
+
 def test_optimize_two_step_returns_chain():
     f = factory(input=Item.IronOre * 30, maximize=set([Item.IronPlate]), recipes=default_no_raw)
     ignot = recipe_by_name("IronIngot")

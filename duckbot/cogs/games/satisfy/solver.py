@@ -43,23 +43,26 @@ def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
     recipes = modify_recipes(factory.recipes, factory.power_shards, factory.sloops)
 
     use_recipe = [model.add_var(name=r.name, lb=0, ub=factory.sloops / r.sloops if r.sloops > 0 else INF) for r in recipes]
-    generate_raw = {i: next((x for x in use_recipe if x.name == str(i)), 0) for i in map_limits.keys()}
+    generate_raw = {i: next((x for r, x in zip(recipes, use_recipe) if r.original_recipe.name == str(i)), 0) for i in map_limits.keys()}
+    can_generate = set(i for i in map_limits.keys() if str(i) in [r.original_recipe.name for r in recipes])
 
     amount_by_item = amount_by_item_expressions(factory, recipes, use_recipe)
     items_must_be_non_negative(model, amount_by_item)
 
     maximize_items = xsum([amount for i, amount in amount_by_item.items() if i in factory.maximize])
+    input_remaining = xsum([amount for i, amount in amount_by_item.items() if i in factory.inputs and i not in can_generate])
     raw_usage = xsum([amount / map_limits[i] for i, amount in generate_raw.items()])
     unsinkable_excess = xsum([amount for i, amount in amount_by_item.items() if not sinkable(i)])
     used_power_shards = power_shards_used(model, factory, recipes, use_recipe)
     used_sloops = sloops_used(model, factory, recipes, use_recipe)
     model.objective = maximize(
         10000 * maximize_items  # prioritize maximizing requested items above all
-        - 1000 * raw_usage  # minimize raw material usage, weighted by map availability
-        - 100 * unsinkable_excess  # get rid of fluid products if possible
-        - 10 * used_power_shards  # minimize power shard usage; they are only eventually cheap
+        + 100 * input_remaining  # maximize the amount of remaining factory inputs
+        - 100 * raw_usage  # minimize raw material usage, weighted by map availability
+        - 30 * unsinkable_excess  # get rid of fluid products if possible
+        - 5 * used_power_shards  # minimize power shard usage; they are only eventually cheap
         - 100 * used_sloops  # minimize sloop usage; they ain't cheap
-        - xsum(use_recipe)  # minimize recipe usage; ie prefer simpler layouts when otherwise equal
+        - 0.1 * xsum(use_recipe)  # minimize recipe usage; ie prefer simpler layouts when otherwise equal
     )
     result = model.optimize()
 

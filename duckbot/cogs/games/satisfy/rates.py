@@ -16,6 +16,9 @@ class Rates:
     def __iter__(self):
         return self.rates.__iter__()
 
+    def __contains__(self, key):
+        return key in self.rates
+
     def get(self, key: Item, default: Optional[float]) -> Optional[float]:
         return self.rates.get(key, default)
 
