@@ -1,7 +1,7 @@
 from typing import List
 
 from discord import Interaction
-from discord.app_commands import Choice, MissingPermissions, check
+from discord.app_commands import Choice
 from discord.ext.commands import Cog, Context, hybrid_group
 
 from .factory import Factory
@@ -10,14 +10,6 @@ from .pretty import factory_embed, solution_embed
 from .rates import Rates
 from .recipe import all, converter, default, raw
 from .solver import optimize
-
-
-async def allowed(context: Context | Interaction):
-    id = context.author.id if hasattr(context, "author") else context.user.id
-    if id not in [368038054558171141, 776607982472921088, 375024417358479380]:
-        raise MissingPermissions(["lul"])
-    return True
-
 
 item_names = [i.name for i in Item]
 boost_item_names = [Item.PowerShard.name, Item.Somersloop.name]
@@ -82,18 +74,15 @@ class Satisfy(Cog):
         pass
 
     @satisfy.command(name="reset", description="Clears factory inputs built so far.")
-    @check(allowed)
     async def reset(self, context: Context):
         self.clear(context)
         await context.send(f":factory: :fire: Factory for {context.author.display_name} cleared. Bitch. :fire: :factory:", delete_after=10)
 
     @satisfy.command(name="state", description="Displays the current factory.")
-    @check(allowed)
     async def factory_state(self, context: Context):
         await context.send(embed=factory_embed(self.factory(context)), delete_after=60)
 
     @satisfy.command(name="input", description="Adds an input to the factory.")
-    @check(allowed)
     async def add_input(self, context: Context, item: str, rate_per_minute: float):
         factory = self.factory(context)
         factory.inputs = factory.inputs + Item[item] * rate_per_minute
@@ -101,7 +90,6 @@ class Satisfy(Cog):
         await context.send(embed=factory_embed(factory), delete_after=10)
 
     @satisfy.command(name="output", description="Specifies a desired output for the factory.")
-    @check(allowed)
     async def add_target(self, context: Context, item: str, rate_per_minute: float):
         factory = self.factory(context)
         factory.targets = factory.targets + Item[item] * rate_per_minute
@@ -109,7 +97,6 @@ class Satisfy(Cog):
         await context.send(embed=factory_embed(factory), delete_after=10)
 
     @satisfy.command(name="maximize", description="Specify maximize output of desired item.")
-    @check(allowed)
     async def add_maximize(self, context: Context, item: str):
         factory = self.factory(context)
         factory.maximize.add(Item[item])
@@ -117,7 +104,6 @@ class Satisfy(Cog):
         await context.send(embed=factory_embed(factory), delete_after=10)
 
     @satisfy.command(name="booster", description="Specify how many of a booster item is available to use.")
-    @check(allowed)
     async def add_booster(self, context: Context, boost_item: str, amount: int):
         factory = self.factory(context)
         item = Item[boost_item]
@@ -133,7 +119,6 @@ class Satisfy(Cog):
         pass
 
     @recipe.command(name="bank", description="Select a recipe bank for the factory to use. Default is All.")
-    @check(allowed)
     async def recipe_bank(self, context: Context, recipe_bank: str):
         factory = self.factory(context)
         factory.recipe_bank = recipe_bank
@@ -141,7 +126,6 @@ class Satisfy(Cog):
         await context.send(embed=factory_embed(factory), delete_after=10)
 
     @recipe.command(name="include", description="Forces a recipe to be available to the solver. Overrides `exclude`")
-    @check(allowed)
     async def include_recipe(self, context: Context, recipe: str):
         factory = self.factory(context)
         factory.include_recipes.add(recipe)
@@ -149,7 +133,6 @@ class Satisfy(Cog):
         await context.send(embed=factory_embed(factory), delete_after=10)
 
     @recipe.command(name="exclude", description="Makes a recipe to be unavailable to the solver. Overridden by `include`")
-    @check(allowed)
     async def exclude_recipe(self, context: Context, recipe: str):
         factory = self.factory(context)
         factory.exclude_recipes.add(recipe)
@@ -157,7 +140,6 @@ class Satisfy(Cog):
         await context.send(embed=factory_embed(factory), delete_after=10)
 
     @satisfy.command(name="solve", description="Runs the solver for the factory.")
-    @check(allowed)
     async def solve(self, context: Context):
         factory = self.factory(context)
         if factory.targets or (factory.inputs and factory.maximize):
