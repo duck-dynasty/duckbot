@@ -33,6 +33,12 @@ def test_get_is_dict_get(item, rate):
     assert rates.get(item, None) == rates.rates.get(item, None)
 
 
+@pytest.mark.parametrize("item", items)
+def test_contains_is_dict_contains(item, rate):
+    rates = to_rates(rate)
+    assert (item in rates) == (item in rates.rates)
+
+
 def test_bool_empty_is_false():
     assert bool(Rates()) is False
 

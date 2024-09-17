@@ -363,7 +363,7 @@ def alternates() -> List[Recipe]:
         manu("RadioControlSystem", Item.CrystalOscillator * 1.5 + Item.CircuitBoard * 15 + Item.AluminumCasing * 90 + Item.Rubber * 45 >> Item.RadioControlUnit * 4.5),
         manu("RadioConnectionUnit", Item.HeatSink * 15 + Item.HighSpeedConnector * 7.5 + Item.QuartzCrystal * 45 >> Item.RadioControlUnit * 3.75),
         assy("AdheredIronPlate", Item.IronPlate * 11.25 + Item.Rubber * 3.75 >> Item.ReinforcedIronPlate * 3.75),
-        assy("StitchedIronPlate", Item.IronPlate * 18.75 + Item.Wire * 37.6 >> Item.ReinforcedIronPlate * 5.625),
+        assy("StitchedIronPlate", Item.IronPlate * 18.75 + Item.Wire * 37.5 >> Item.ReinforcedIronPlate * 5.625),
         assy("BoltedIronPlate", Item.IronPlate * 90 + Item.Screw * 250 >> Item.ReinforcedIronPlate * 15),
         blend("NitroRocketFuel", Item.Fuel * 120 + Item.NitrogenGas * 90 + Item.Sulfur * 120 + Item.Coal * 60 >> Item.RocketFuel * 180 + Item.CompactedCoal * 30),
         assy("CopperRotor", Item.CopperSheet * 22.5 + Item.Screw * 195 >> Item.Rotor * 11.25),
