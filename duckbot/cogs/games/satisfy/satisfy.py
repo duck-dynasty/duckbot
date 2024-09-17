@@ -31,7 +31,7 @@ recipe_banks = {
     "Default + Conversions - RawSupply": [r for r in default() + converter() if r.name not in [x.name for x in raw()]],
     "Default - RawSupply": [r for r in default() if r.name not in [x.name for x in raw()]],
     "Multiplayer": default() + [r for r in all() if r.name in []],
-    "Clandestine": default()
+    "Clandestine": [r for r in default() if r.name not in [x.name for x in raw()]]
     + [
         r
         for r in all()
@@ -39,6 +39,16 @@ recipe_banks = {
         in [
             "IronWire",
             "EncasedIndustrialPipe",
+            "StitchedIronPlate",
+            "WetConcrete",
+            "AutomatedMiner",
+            "SteelScrew",
+            "CastScrew",
+            "SolidSteelIngot",
+            "SteamedCopperSheet",
+            "SteelRotor",
+            "IronAlloyIngot",
+            "MoldedBeam",
         ]
     ],
 }
