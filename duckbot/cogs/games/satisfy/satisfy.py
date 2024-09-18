@@ -20,10 +20,10 @@ recipe_banks = {
     "All - Conversions - RawSupply": [r for r in all() if r.name not in [x.name for x in converter() + raw()]],
     "Default": default(),
     "Default + Conversions": default() + converter(),
-    "Default + Conversions - RawSupply": [r for r in default() + converter() if r.name not in [x.name for x in raw()]],
-    "Default - RawSupply": [r for r in default() if r.name not in [x.name for x in raw()]],
+    "Default + RawSupply": default() + raw(),
+    "Default + Conversions + RawSupply": default() + converter() + raw(),
     "Multiplayer": default() + [r for r in all() if r.name in []],
-    "Clandestine": [r for r in default() if r.name not in [x.name for x in raw()]]
+    "Clandestine": default()
     + [
         r
         for r in all()

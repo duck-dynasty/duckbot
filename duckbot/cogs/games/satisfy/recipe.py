@@ -52,11 +52,11 @@ class ModifiedRecipe:
 
 
 def default() -> List[Recipe]:
-    return regular() + packager() + power() + awesome_sink() + raw()
+    return regular() + packager() + power() + awesome_sink()
 
 
 def all() -> List[Recipe]:
-    return default() + converter() + alternates()
+    return default() + converter() + alternates() + raw()
 
 
 def regular() -> List[Recipe]:
