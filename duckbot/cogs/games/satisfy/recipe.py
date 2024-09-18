@@ -365,7 +365,7 @@ def alternates() -> List[Recipe]:
         assy("AdheredIronPlate", Item.IronPlate * 11.25 + Item.Rubber * 3.75 >> Item.ReinforcedIronPlate * 3.75),
         assy("StitchedIronPlate", Item.IronPlate * 18.75 + Item.Wire * 37.5 >> Item.ReinforcedIronPlate * 5.625),
         assy("BoltedIronPlate", Item.IronPlate * 90 + Item.Screw * 250 >> Item.ReinforcedIronPlate * 15),
-        blend("NitroRocketFuel", Item.Fuel * 120 + Item.NitrogenGas * 90 + Item.Sulfur * 120 + Item.Coal * 60 >> Item.RocketFuel * 180 + Item.CompactedCoal * 30),
+        blend("NitroRocketFuel", Item.Fuel * 100 + Item.NitrogenGas * 75 + Item.Sulfur * 100 + Item.Coal * 50 >> Item.RocketFuel * 150 + Item.CompactedCoal * 25),
         assy("CopperRotor", Item.CopperSheet * 22.5 + Item.Screw * 195 >> Item.Rotor * 11.25),
         assy("SteelRotor", Item.SteelPipe * 10 + Item.Wire * 30 >> Item.Rotor * 5),
         refine("RecycledRubber", Item.Plastic * 30 + Item.Fuel * 30 >> Item.Rubber * 60),
