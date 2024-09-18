@@ -10,6 +10,7 @@ from duckbot.cogs.games.satisfy.solver import optimize
 
 all_no_raw = [r for r in all() if r.name not in [x.name for x in raw()]]
 default_no_raw = [r for r in default() if r.name not in [x.name for x in raw()]]
+default_with_raw = default() + raw()
 
 
 def approx(x):
@@ -35,7 +36,7 @@ def test_optimize_infeasible_returns_none():
 
 
 def test_optimize_simple_factory_target_returns_recipe():
-    f = factory(input=Item.IronOre * 30, target=Item.IronIngot * 30, recipes=default())
+    f = factory(input=Item.IronOre * 30, target=Item.IronIngot * 30, recipes=default_with_raw)
     recipe = recipe_by_name("IronIngot")
     assert optimize(f) == dict([(recipe, approx(1))])
 
@@ -59,7 +60,7 @@ def test_optimize_simple_sloop_maximize_returns_recipe():
 
 
 def test_optimize_create_resources_returns_target():
-    f = factory(input=Rates(), target=Item.IronIngot * 30, recipes=default())
+    f = factory(input=Rates(), target=Item.IronIngot * 30, recipes=default_with_raw)
     ore = recipe_by_name("IronOre")
     ingot = recipe_by_name("IronIngot")
     assert optimize(f) == dict([(ore, approx(0.5)), (ingot, approx(1))])
@@ -130,7 +131,7 @@ def test_optimize_two_step_many_sloop_and_power_shards_returns_chain():
 
 
 def test_optimize_fluid_excess_is_made_sinkable():
-    f = factory(input=Item.CrudeOil * 30, target=Item.Plastic * 20, recipes=default())
+    f = factory(input=Item.CrudeOil * 30, target=Item.Plastic * 20, recipes=default_with_raw)
     plastic = recipe_by_name("Plastic")
     coke = recipe_by_name("PetroleumCoke")
     assert optimize(f) == dict([(plastic, approx(1)), (coke, approx(0.25))])
