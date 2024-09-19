@@ -25,7 +25,7 @@ async def test_reset_destroys_factory(clazz, context):
     clazz.save(context, empty_factory)
     await clazz.reset.callback(clazz, context)
     assert clazz.factory_cache == {}
-    context.send.assert_called_once_with(f":factory: :fire: Factory for {context.author.display_name} cleared. Bitch. :fire: :factory:", delete_after=10)
+    context.send.assert_called_once_with(f":factory: :fire: Factory for {context.author.display_name} cleared. Bitch. :fire: :factory:", delete_after=60)
 
 
 async def test_factory_state_sends_something_i_guess(clazz, context):
@@ -98,12 +98,12 @@ async def test_exclude_recipe_adds_include(clazz, context):
 
 async def test_solve_no_factory_rejects(clazz, context):
     await clazz.solve.callback(clazz, context)
-    context.send.assert_called_once_with("No.", delete_after=10)
+    context.send.assert_called_once_with("No.", delete_after=60)
 
 
 async def test_solve_no_in_or_out(clazz, context, default_factory):
     await clazz.solve.callback(clazz, context)
-    context.send.assert_called_once_with("No.", delete_after=10)
+    context.send.assert_called_once_with("No.", delete_after=60)
 
 
 @mock.patch("duckbot.cogs.games.satisfy.satisfy.optimize", return_value=dict())

@@ -76,32 +76,32 @@ class Satisfy(Cog):
     @satisfy.command(name="reset", description="Clears factory inputs built so far.")
     async def reset(self, context: Context):
         self.clear(context)
-        await context.send(f":factory: :fire: Factory for {context.author.display_name} cleared. Bitch. :fire: :factory:", delete_after=10)
+        await context.send(f":factory: :fire: Factory for {context.author.display_name} cleared. Bitch. :fire: :factory:", delete_after=60)
 
     @satisfy.command(name="state", description="Displays the current factory.")
     async def factory_state(self, context: Context):
-        await context.send(embed=factory_embed(self.factory(context)), delete_after=60)
+        await context.send(embed=factory_embed(self.factory(context)), delete_after=1800)
 
     @satisfy.command(name="input", description="Adds an input to the factory.")
     async def add_input(self, context: Context, item: str, rate_per_minute: float):
         factory = self.factory(context)
         factory.inputs = factory.inputs + Item[item] * rate_per_minute
         self.save(context, factory)
-        await context.send(embed=factory_embed(factory), delete_after=10)
+        await context.send(embed=factory_embed(factory), delete_after=60)
 
     @satisfy.command(name="output", description="Specifies a desired output for the factory.")
     async def add_target(self, context: Context, item: str, rate_per_minute: float):
         factory = self.factory(context)
         factory.targets = factory.targets + Item[item] * rate_per_minute
         self.save(context, factory)
-        await context.send(embed=factory_embed(factory), delete_after=10)
+        await context.send(embed=factory_embed(factory), delete_after=60)
 
     @satisfy.command(name="maximize", description="Specify maximize output of desired item.")
     async def add_maximize(self, context: Context, item: str):
         factory = self.factory(context)
         factory.maximize.add(Item[item])
         self.save(context, factory)
-        await context.send(embed=factory_embed(factory), delete_after=10)
+        await context.send(embed=factory_embed(factory), delete_after=60)
 
     @satisfy.command(name="booster", description="Specify how many of a booster item is available to use.")
     async def add_booster(self, context: Context, boost_item: str, amount: int):
@@ -112,7 +112,7 @@ class Satisfy(Cog):
         elif item == Item.Somersloop:
             factory.sloops = amount
         self.save(context, factory)
-        await context.send(embed=factory_embed(factory), delete_after=10)
+        await context.send(embed=factory_embed(factory), delete_after=60)
 
     @satisfy.group(name="recipe", description="Recipe related manipulations.")
     async def recipe(self, context: Context):
@@ -123,21 +123,21 @@ class Satisfy(Cog):
         factory = self.factory(context)
         factory.recipe_bank = recipe_bank
         self.save(context, factory)
-        await context.send(embed=factory_embed(factory), delete_after=10)
+        await context.send(embed=factory_embed(factory), delete_after=60)
 
     @recipe.command(name="include", description="Forces a recipe to be available to the solver. Overrides `exclude`")
     async def include_recipe(self, context: Context, recipe: str):
         factory = self.factory(context)
         factory.include_recipes.add(recipe)
         self.save(context, factory)
-        await context.send(embed=factory_embed(factory), delete_after=10)
+        await context.send(embed=factory_embed(factory), delete_after=60)
 
     @recipe.command(name="exclude", description="Makes a recipe to be unavailable to the solver. Overridden by `include`")
     async def exclude_recipe(self, context: Context, recipe: str):
         factory = self.factory(context)
         factory.exclude_recipes.add(recipe)
         self.save(context, factory)
-        await context.send(embed=factory_embed(factory), delete_after=10)
+        await context.send(embed=factory_embed(factory), delete_after=60)
 
     @satisfy.command(name="solve", description="Runs the solver for the factory.")
     async def solve(self, context: Context):
@@ -149,11 +149,11 @@ class Satisfy(Cog):
                 factory.recipes = recipes + [r for r in all() if r.name in factory.include_recipes and r.name not in names]
                 solution = optimize(factory)
                 if solution is None:
-                    await context.send("Why do you hate possible?", delete_after=10)
+                    await context.send("Why do you hate possible?", delete_after=60)
                 else:
                     await context.send(embeds=[factory_embed(factory), solution_embed(solution)])
         else:
-            await context.send("No.", delete_after=10)
+            await context.send("No.", delete_after=60)
 
     @add_input.autocomplete("item")
     @add_target.autocomplete("item")
@@ -184,7 +184,7 @@ class Satisfy(Cog):
     @exclude_recipe.error
     @solve.error
     async def on_error(self, context: Context, error):
-        await context.send(str(error), delete_after=10)
+        await context.send(str(error), delete_after=60)
 
 
 def choices(pool: List[str], needle: str, threshold: int = 3) -> List[Choice[str]]:
