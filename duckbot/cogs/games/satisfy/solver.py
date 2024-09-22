@@ -68,7 +68,16 @@ def weight_by_item() -> dict[Item, float]:
     return weights
 
 
-item_weights = weight_by_item()
+def _weights():
+    item_weights = weight_by_item()
+    max_weight = max(item_weights.values())
+    min_weight = min(v for v in item_weights.values() if not isclose(v, 0, abs_tol=1e-6))
+    scale_factor = max_weight * 10
+    scaled = {i: scale_factor * v for i, v in weight_by_item().items()}
+    return scaled, scale_factor * max_weight, scale_factor * min_weight
+
+
+item_weights, max_weight, min_weight = _weights()
 
 
 def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
@@ -85,25 +94,21 @@ def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
     amount_by_item = amount_by_item_expressions(factory, recipes, use_recipe)
     items_must_be_non_negative(model, amount_by_item)
 
-    item_weights = weight_by_item()
-    max_weight = max(item_weights.values())
-    min_weight = min(v for v in item_weights.values() if not isclose(v, 0, abs_tol=1e-6))
-
-    maximize_items = xsum([amount * max_weight * 2 for i, amount in amount_by_item.items() if i in factory.maximize])
+    maximize_items = xsum([amount * max_weight for i, amount in amount_by_item.items() if i in factory.maximize])
     input_remaining = xsum([amount * item_weights[i] for i, amount in amount_by_item.items() if i in factory.inputs and i not in can_generate])
     raw_usage = xsum([amount * item_weights[i] for i, amount in generate_raw.items()])
     unsinkable_excess = xsum([amount * item_weights[i] for i, amount in amount_by_item.items() if not sinkable(i)])
-    used_power_shards = min_weight * 10 * power_shards_used(model, factory, recipes, use_recipe)
+    used_power_shards = item_weights[Item.Somersloop] / 100 * power_shards_used(model, factory, recipes, use_recipe)
     used_sloops = item_weights[Item.Somersloop] * sloops_used(model, factory, recipes, use_recipe)
-    recipes_used = min_weight / 2.0 * xsum(use_recipe)
+    recipes_used = xsum(use_recipe)
     model.objective = maximize(
-        maximize_items  # prioritize maximizing requested items above all
-        + input_remaining  # maximize the amount of remaining factory inputs
-        - raw_usage  # minimize raw material usage, weighted by map availability
-        - unsinkable_excess  # get rid of fluid products if possible
-        - used_power_shards  # minimize power shard usage; they are only eventually cheap
-        - used_sloops  # minimize sloop usage; they ain't cheap
-        - recipes_used  # minimize recipe usage; ie prefer simpler layouts when otherwise equal
+        100 * maximize_items  # prioritize maximizing requested items above all
+        + 10 * input_remaining  # maximize the amount of remaining factory inputs
+        - 10 * raw_usage  # minimize raw material usage, weighted by map availability
+        - 3 * unsinkable_excess  # get rid of fluid products if possible
+        - 0.5 * used_power_shards  # minimize power shard usage; they are only eventually cheap
+        - 10 * used_sloops  # minimize sloop usage; they ain't cheap
+        - min_weight * 0.1 * recipes_used  # minimize recipe usage; ie prefer simpler layouts when otherwise equal
     )
     result = model.optimize()
 
