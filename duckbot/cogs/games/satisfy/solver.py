@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import itertools
 import sys
 from functools import reduce
@@ -8,9 +10,8 @@ from mip import INF, INTEGER, LinExpr, Model, OptimizationStatus, Var, maximize,
 
 from .factory import Factory
 from .item import Item, sinkable
+from .rates import Rates
 from .recipe import ModifiedRecipe, Recipe
-
-zero = LinExpr(const=0)
 
 good_enough = [
     OptimizationStatus.FEASIBLE,  # not optimal but /shrug
@@ -32,7 +33,42 @@ map_limits = {
     Item.Sulfur: 10_800,
     Item.Uranium: 2_100,
     Item.Water: sys.maxsize,
+    Item.Somersloop: 106,
 }
+
+
+def weight_by_item() -> dict[Item, float]:
+    from .recipe import all as all_recipes
+    from .recipe import default
+
+    def unit_inputs(item: Item, recipe: Recipe) -> Rates:
+        return recipe.inputs * (1.0 / recipe.outputs.get(item, 1.0))
+
+    inputs_by_item = {i: next((unit_inputs(i, r) for r in default() if r.name == str(i)), Rates()) for i in Item}
+    inputs_by_item[Item.FicsiteIngot] = next(unit_inputs(Item.FicsiteIngot, r) for r in default() if r.name == "FicsiteIngot#Iron")
+    inputs_by_item[Item.PowerShard] = next(unit_inputs(Item.PowerShard, r) for r in default() if r.name == "SyntheticPowerShard")
+    inputs_by_item[Item.TurboRifleAmmo] = next(unit_inputs(Item.TurboRifleAmmo, r) for r in default() if r.name == f"{Item.TurboRifleAmmo}#Blender")
+    inputs_by_item[Item.UraniumWaste] = next(unit_inputs(Item.UraniumWaste, r) for r in default() if r.name == f"NuclearPowerPlant#{Item.UraniumFuelRod}")
+    inputs_by_item[Item.PlutoniumWaste] = next(unit_inputs(Item.PlutoniumWaste, r) for r in default() if r.name == f"NuclearPowerPlant#{Item.PlutoniumFuelRod}")
+    inputs_by_item[Item.HeavyOilResidue] = next(unit_inputs(Item.HeavyOilResidue, r) for r in all_recipes() if r.name == str(Item.HeavyOilResidue))
+    inputs_by_item[Item.PolymerResin] = next(unit_inputs(Item.PolymerResin, r) for r in all_recipes() if r.name == str(Item.PolymerResin))
+    inputs_by_item[Item.Fabric] = next(unit_inputs(Item.Fabric, r) for r in all_recipes() if r.name == "PolyesterFabric")
+    inputs_by_item[Item.PortableMiner] = next(unit_inputs(Item.PortableMiner, r) for r in all_recipes() if r.name == "AutomatedMiner")
+
+    weights = {i: 1.0 / total for i, total in map_limits.items()}
+    adjusted = True
+    while adjusted:
+        adjusted = False
+        for item in Item:
+            if item not in weights:
+                if all(i in weights for i, _ in inputs_by_item[item].items()):
+                    weights[item] = sum(r * weights[i] for i, r in inputs_by_item[item].items())
+                    adjusted = True
+
+    return weights
+
+
+item_weights = weight_by_item()
 
 
 def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
@@ -49,24 +85,29 @@ def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
     amount_by_item = amount_by_item_expressions(factory, recipes, use_recipe)
     items_must_be_non_negative(model, amount_by_item)
 
-    maximize_items = xsum([amount for i, amount in amount_by_item.items() if i in factory.maximize])
-    input_remaining = xsum([amount for i, amount in amount_by_item.items() if i in factory.inputs and i not in can_generate])
-    raw_usage = xsum([amount / map_limits[i] for i, amount in generate_raw.items()])
-    unsinkable_excess = xsum([amount for i, amount in amount_by_item.items() if not sinkable(i)])
-    used_power_shards = power_shards_used(model, factory, recipes, use_recipe)
-    used_sloops = sloops_used(model, factory, recipes, use_recipe)
+    item_weights = weight_by_item()
+    max_weight = max(item_weights.values())
+    min_weight = min(v for v in item_weights.values() if not isclose(v, 0, abs_tol=1e-6))
+
+    maximize_items = xsum([amount * max_weight * 2 for i, amount in amount_by_item.items() if i in factory.maximize])
+    input_remaining = xsum([amount * item_weights[i] for i, amount in amount_by_item.items() if i in factory.inputs and i not in can_generate])
+    raw_usage = xsum([amount * item_weights[i] for i, amount in generate_raw.items()])
+    unsinkable_excess = xsum([amount * item_weights[i] for i, amount in amount_by_item.items() if not sinkable(i)])
+    used_power_shards = min_weight * 10 * power_shards_used(model, factory, recipes, use_recipe)
+    used_sloops = item_weights[Item.Somersloop] * sloops_used(model, factory, recipes, use_recipe)
+    recipes_used = min_weight / 2.0 * xsum(use_recipe)
     model.objective = maximize(
-        10000 * maximize_items  # prioritize maximizing requested items above all
-        + 100 * input_remaining  # maximize the amount of remaining factory inputs
-        - 100 * raw_usage  # minimize raw material usage, weighted by map availability
-        - 30 * unsinkable_excess  # get rid of fluid products if possible
-        - 5 * used_power_shards  # minimize power shard usage; they are only eventually cheap
-        - 100 * used_sloops  # minimize sloop usage; they ain't cheap
-        - 0.1 * xsum(use_recipe)  # minimize recipe usage; ie prefer simpler layouts when otherwise equal
+        maximize_items  # prioritize maximizing requested items above all
+        + input_remaining  # maximize the amount of remaining factory inputs
+        - raw_usage  # minimize raw material usage, weighted by map availability
+        - unsinkable_excess  # get rid of fluid products if possible
+        - used_power_shards  # minimize power shard usage; they are only eventually cheap
+        - used_sloops  # minimize sloop usage; they ain't cheap
+        - recipes_used  # minimize recipe usage; ie prefer simpler layouts when otherwise equal
     )
     result = model.optimize()
 
-    return dict((r, float(v.x)) for r, v in zip(recipes, use_recipe) if v.x is not None and v.x > 0 and not isclose(float(v), 0, abs_tol=1e-4)) if result in good_enough else None
+    return {r: float(v.x) for r, v in zip(recipes, use_recipe) if v.x is not None and v.x > 0 and not isclose(float(v), 0, abs_tol=1e-4)} if result in good_enough else None
 
 
 def modify_recipes(recipes: List[Recipe], max_shards: int, max_sloops: int) -> List[ModifiedRecipe]:
@@ -102,7 +143,7 @@ def amount_by_item_expressions(factory: Factory, recipes: List[ModifiedRecipe], 
 
 
 def sum_by_item(lhs: dict[Item, LinExpr], rhs: dict[Item, LinExpr]) -> dict[Item, LinExpr]:
-    return dict((item, lhs.get(item, zero) + rhs.get(item, zero)) for item in Item if (item in lhs or item in rhs))
+    return {item: lhs.get(item, LinExpr(const=0)) + rhs.get(item, LinExpr(const=0)) for item in Item if (item in lhs or item in rhs)}
 
 
 def items_must_be_non_negative(model: Model, amount_by_item: dict[Item, LinExpr]):
