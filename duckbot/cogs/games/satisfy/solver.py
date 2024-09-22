@@ -1,5 +1,3 @@
-from __future__ import annotations
-
 import itertools
 import sys
 from functools import reduce
@@ -72,7 +70,7 @@ def _weights():
     item_weights = weight_by_item()
     max_weight = max(item_weights.values())
     min_weight = min(v for v in item_weights.values() if not isclose(v, 0, abs_tol=1e-6))
-    scale_factor = max_weight * 10
+    scale_factor = 1.0 / max_weight * 10
     scaled = {i: scale_factor * v for i, v in weight_by_item().items()}
     return scaled, scale_factor * max_weight, scale_factor * min_weight
 
