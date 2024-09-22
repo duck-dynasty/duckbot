@@ -43,6 +43,7 @@ def weight_by_item() -> dict[Item, float]:
         return recipe.inputs * (1.0 / recipe.outputs.get(item, 1.0))
 
     inputs_by_item = {i: next((unit_inputs(i, r) for r in default() if r.name == str(i)), Rates()) for i in Item}
+    # manually add items which would have no recipe otherwise
     inputs_by_item[Item.FicsiteIngot] = next(unit_inputs(Item.FicsiteIngot, r) for r in default() if r.name == "FicsiteIngot#Iron")
     inputs_by_item[Item.PowerShard] = next(unit_inputs(Item.PowerShard, r) for r in default() if r.name == "SyntheticPowerShard")
     inputs_by_item[Item.TurboRifleAmmo] = next(unit_inputs(Item.TurboRifleAmmo, r) for r in default() if r.name == f"{Item.TurboRifleAmmo}#Blender")
