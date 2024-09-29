@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 from functools import reduce
 from math import ceil, isclose
+from typing import List
 
 from discord import Embed
 
@@ -43,13 +44,15 @@ def factory_embed(factory: Factory) -> Embed:
     return embed
 
 
-def solution_embed(solution: dict[ModifiedRecipe, float]) -> Embed:
-    embed = Embed()
-
+def solution_embed(solution: dict[ModifiedRecipe, float]) -> List[Embed]:
     def plrl(val: float) -> str:
         return "s" if val > 1 else ""
 
+    embeds: List[Embed] = [Embed()]
     for recipe, num in sorted(solution.items(), key=lambda kv: (kv[0].name, kv[0].sloops, kv[0].power_shards)):
+        if len(embeds[-1].fields) >= 25:
+            embeds.append(Embed())
+
         name = recipe.original_recipe.name
         building = recipe.building.name
 
@@ -61,7 +64,7 @@ def solution_embed(solution: dict[ModifiedRecipe, float]) -> Embed:
             name = f"{name} {'+' if ' @ ' in name else '@'} {recipe.sloop_scale}x"
             building = f"{building} {'+' if ' with ' in building else 'with'} {recipe.sloops} Somersloop{plrl(recipe.sloops)}"
 
-        embed.add_field(name=name, value=f"{rnd(num)} {building}\n{inout_str(recipe.inputs, recipe.outputs, num)}", inline=False)
+        embeds[-1].add_field(name=name, value=f"{rnd(num)} {building}\n{inout_str(recipe.inputs, recipe.outputs, num)}", inline=False)
 
     summary = solution_summary(solution)
     footer = inout_str(summary.inputs, summary.outputs)
@@ -70,8 +73,8 @@ def solution_embed(solution: dict[ModifiedRecipe, float]) -> Embed:
         sloops = f"{summary.total_sloops} Somersloop{plrl(summary.total_sloops)}"
         joiner = " + " if summary.total_shards > 0 and summary.total_sloops > 0 else ""
         footer = f"{footer}\n{shards if summary.total_shards > 0 else ''}{joiner}{sloops if summary.total_sloops > 0 else ''}"
-    embed.set_footer(text=footer)
-    return embed
+    embeds[-1].set_footer(text=footer)
+    return embeds
 
 
 def inout_str(inputs: Rates, outputs: Rates, scale_factor: float = 1.0) -> str:
