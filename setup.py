@@ -49,12 +49,12 @@ if __name__ == "__main__":
             "discord.py[voice]==2.4.0",
             "beautifulsoup4==4.12.3",
             "requests==2.32.3",
-            "pytz==2024.1",
-            "timezonefinder==6.5.2",
-            "holidays==0.55",
+            "pytz==2024.2",
+            "timezonefinder==6.5.3",
+            "holidays==0.57",
             "pyowm==3.3.0",  # openweather
             "psycopg2==2.9.9",
-            "SQLAlchemy==2.0.32",
+            "SQLAlchemy==2.0.35",
             "d20==1.1.2",
             "nltk==3.9.1",  # also in pyproject.toml, required for setup script above
             "textblob==0.18.0.post0",  # also in pyproject.toml, required for setup script above
@@ -62,7 +62,7 @@ if __name__ == "__main__":
             "matplotlib==3.9.2",
             "PyGithub==2.1.1",
             "wolframalpha==5.1.3",
-            "yfinance==0.2.43",
+            "yfinance==0.2.44",
             "mip==1.15.0",
         ],
         extras_require={
@@ -95,7 +95,7 @@ if __name__ == "__main__":
                 "aws-cdk.aws-iam==1.204.0",
                 "aws-cdk.aws-logs==1.204.0",
                 "aws-cdk.aws-ssm==1.204.0",
-                "boto3==1.35.10",
+                "boto3==1.35.30",
             ],
         },
         entry_points={
