@@ -22,7 +22,31 @@ recipe_banks = {
     "Default + Conversions": default() + converter(),
     "Default + RawSupply": default() + raw(),
     "Default + Conversions + RawSupply": default() + converter() + raw(),
-    "Multiplayer": default() + [r for r in all() if r.name in []],
+    "Multiplayer": default()
+    + [
+        r
+        for r in all()
+        if r.name
+        in [
+            "PureIronIngot",
+            "StitchedIronPlate",
+            "IronWire",
+            "WetConcrete",
+            "Charcoal",
+            "PolyesterFabric",
+            "SteeledFrame",
+            "Biocoal",
+            "SolidSteelIngot",
+            "IronPipe",
+            "MoldedSteelPipe",
+            "EncasedIndustrialPipe",
+            "RecycledRubber",
+            "HeavyOilResidue",
+            "RecycledPlastic",
+            "PackagedDilutedFuel",
+            "HeavyEncasedFrame",
+        ]
+    ],
     "Clandestine": default()
     + [
         r
