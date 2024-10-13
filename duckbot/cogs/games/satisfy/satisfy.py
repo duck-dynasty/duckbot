@@ -64,6 +64,8 @@ recipe_banks = {
             "BoltedIronPlate",
             "SteamedCopperSheet",
             "IronAlloyIngot",
+            "AdheredIronPlate",
+            "PlasticSmartPlating",
         ]
     ],
     "Clandestine": default()
