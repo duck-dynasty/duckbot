@@ -45,6 +45,8 @@ recipe_banks = {
             "RecycledPlastic",
             "PackagedDilutedFuel",
             "HeavyEncasedFrame",
+            "AdheredIronPlate",
+            "PlasticSmartPlating",
         ]
     ],
     "Clandestine": default()
