@@ -131,7 +131,7 @@ class Item(Enum):
     PlutoniumFuelRod = (auto(), Form.Solid, 153_184)
     PlutoniumPellet = (auto(), Form.Solid, 0)
     PlutoniumWaste = (auto(), Form.Solid, 0)
-    PolymerResin = (auto(), Form.Solid, 1_01228)
+    PolymerResin = (auto(), Form.Solid, 12)
     PortableMiner = (auto(), Form.Solid, 56)
     PowerShard = (auto(), Form.Solid, 0)
     PressureConversionCube = (auto(), Form.Solid, 255_088)
