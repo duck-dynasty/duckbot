@@ -84,6 +84,9 @@ recipe_banks = {
             "SteelRod",
             "SteelCastPlate",
             "InsulatedCrystalOscillator",
+            "CheapSilica",
+            "FineConcrete",
+            "CompactedSteelIngot",
         ]
     ],
     "Clandestine": default()
