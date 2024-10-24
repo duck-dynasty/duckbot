@@ -87,6 +87,10 @@ recipe_banks = {
             "CheapSilica",
             "FineConcrete",
             "CompactedSteelIngot",
+            "QuickwireCable",
+            "RigorMotor",
+            "InsulatedCable",
+            "CoatedIronCanister",
         ]
     ],
     "Clandestine": default()
