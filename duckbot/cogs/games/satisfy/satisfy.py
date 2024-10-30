@@ -91,6 +91,17 @@ recipe_banks = {
             "RigorMotor",
             "InsulatedCable",
             "CoatedIronCanister",
+            "SloppyAlumina",
+            "PureAluminumIngot",
+            "ElectrodeAluminumScrap",
+            "AlcladCasing",
+            "AluminumBeam",
+            "AluminumRod",
+            "SteelCanister",
+            "TurboHeavyFuel",
+            "TemperedCopperIngot",
+            "FusedQuartzCrystal",
+            "CoatedCable",
         ]
     ],
     "Clandestine": default()
