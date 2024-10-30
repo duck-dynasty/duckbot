@@ -17,6 +17,7 @@
 |  [`!recipe`](#recipe-search)   | search for a random recipe                         |
 |        [`!roll`](#dice)        | rolls Dungeons and Dragons style dice              |
 |  [`!start`, `!stop`](#music)   | start or stop playing music                        |
+|       [`!truth`](#truth)       | fact checks a message when used in a reply         |
 |     [`!weather`](#weather)     | retrieve weather information                       |
 | [`!yolo`](#yolo-pull-requests) | list open pull requests in this repo               |
 
@@ -50,6 +51,16 @@ DuckBot will roll Dungeons and Dragons style dice for you. See [dice syntax](htt
 ## Music
 
 DuckBot plays everyone's favourite background noise inside whatever voice channel you're in. Use `!start` to summon the bot, and `!stop` to dismiss it. DuckBot only has so much stamina, and will stop playing music after about four hours.
+
+## Truth
+
+DuckBot will use the power of AI to analyze claims in a referenced message and provides a formatted response indicating whether claims are confirmed, disputed, or unverified. Fact-checks are done by using Claude AI (via Anthropic's API).
+
+Usage Instructions:
+
+1. Find a message in Discord that you want to fact-check
+1. Reply to that message with the command `!truth`
+1. DuckBot will respond with a formatted analysis of any factual claims found in the original message
 
 ## Weather
 

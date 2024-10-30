@@ -53,6 +53,7 @@ BOT_GITHUB_TOKEN=somesecrettoken
 WOLFRAM_ALPHA_TOKEN=broitssecret
 OXFORD_DICTIONARY_ID=icanttellyou
 OXFORD_DICTIONARY_KEY=itsasecret
+ANTHROPIC_API_KEY=itsasecret
 ```
 
 - Discord tokens available from [Discord Developer](https://discord.com/developers/applications)
@@ -60,6 +61,7 @@ OXFORD_DICTIONARY_KEY=itsasecret
 - The github token is a [personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
 - The wolfram alpha token is available from their [api page](https://products.wolframalpha.com/api/)
 - The oxford dictionary tokens are available from their [developer page](https://developer.oxforddictionaries.com/)
+- The Anthropic token can be generated for your personal account in the [settings page](https://console.anthropic.com/settings/keys)
 
 You only _need_ the discord token. DuckBot will still function without the others, but features that use the tokens won't work. With your tokens available, you can jam them into your shell environment, so you can run DuckBot. You may want to put this into your bashrc for convenience.
 

@@ -12,6 +12,7 @@ services:
       WOLFRAM_ALPHA_TOKEN: ${WOLFRAM_ALPHA_TOKEN}
       OXFORD_DICTIONARY_ID: ${OXFORD_DICTIONARY_ID}
       OXFORD_DICTIONARY_KEY: ${OXFORD_DICTIONARY_KEY}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY}
     healthcheck:
       test: [CMD, python, -m, duckbot.health]
       interval: 30s
