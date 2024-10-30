@@ -57,9 +57,10 @@ DuckBot plays everyone's favourite background noise inside whatever voice channe
 DuckBot will use the power of AI to analyze claims in a referenced message and provides a formatted response indicating whether claims are confirmed, disputed, or unverified. Fact-checks are done by using Claude AI (via Anthropic's API).
 
 Usage Instructions:
+
 1. Find a message in Discord that you want to fact-check
-2. Reply to that message with the command `!truth`
-3. DuckBot will respond with a formatted analysis of any factual claims found in the original message
+1. Reply to that message with the command `!truth`
+1. DuckBot will respond with a formatted analysis of any factual claims found in the original message
 
 ## Weather
 
