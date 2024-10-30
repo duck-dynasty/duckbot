@@ -4,6 +4,8 @@ import anthropic
 import discord
 from discord.ext import commands
 
+from duckbot.util.messages import get_message_reference, try_delete
+
 TRUTH_PROMPT = """Objective: Fact-check the following message from {user_name} on our Discord server and format the response for Discord.
 
 Input: "{user_message}"
@@ -53,12 +55,12 @@ class Truth(commands.Cog):
 
     @commands.command(name="truth")
     async def truth(self, ctx: commands.Context):
-        message = ctx.message
-        if message.reference:
-            referenced_message = await message.channel.fetch_message(message.reference.message_id)
+        referenced_message = await get_message_reference(ctx.message)
+        if referenced_message:
             async with ctx.typing():
                 fact_checked_response = await self.fact_check(referenced_message)
-                await message.reply(fact_checked_response)
+                await referenced_message.reply(fact_checked_response)
+                await try_delete(ctx.message)
         else:
             await ctx.send("⚠️ Please use this command as a reply to the message you want to fact-check. For example:\n`Reply to a message → !truth`")
 

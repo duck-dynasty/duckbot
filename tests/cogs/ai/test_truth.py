@@ -48,6 +48,17 @@ def message():
     return mock.Mock(content="This is a message.")
 
 
+@pytest.fixture(autouse=True)
+async def mock_get_message_reference():
+    async def mock_ref(message):
+        if message.reference:
+            return await message.channel.fetch_message(message.reference.message_id)
+        return None
+
+    with mock.patch("duckbot.util.messages.get_message_reference", side_effect=mock_ref):
+        yield
+
+
 def test_create_client(bot, monkeypatch):
     monkeypatch.setenv("ANTHROPIC_API_KEY", "fake_key")
     clazz = Truth(bot)
@@ -78,12 +89,16 @@ async def test_truth_no_reference(truth, ctx):
 
 
 async def test_truth_with_reference(truth, ctx):
+    # Setup referenced message
     referenced_message = mock.MagicMock(spec=discord.Message)
     referenced_message.content = "Test content"
     referenced_message.author.display_name = "TestUser"
-    ctx.message.reference = mock.MagicMock()
-    ctx.message.reference.message_id = 123
-    ctx.message.channel.fetch_message.return_value = referenced_message
-    await truth.truth.callback(truth, ctx)
-    ctx.message.channel.fetch_message.assert_called_once_with(123)
-    ctx.message.reply.assert_called_once_with("Fact-checked response.")
+    referenced_message.reply = mock.AsyncMock()
+
+    # Mock get_message_reference directly with the referenced message
+    with mock.patch("duckbot.cogs.ai.truth.get_message_reference", new=mock.AsyncMock(return_value=referenced_message)):
+        await truth.truth.callback(truth, ctx)
+
+    # Verify only that the referenced message got the reply
+    referenced_message.reply.assert_called_once_with("Fact-checked response.")
+    ctx.message.delete.assert_called()
