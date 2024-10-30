@@ -14,6 +14,7 @@ SECRETS = [
     Secret(environment_name="WOLFRAM_ALPHA_TOKEN", parameter_name="/duckbot/token/wolfram-alpha"),
     Secret(environment_name="OXFORD_DICTIONARY_ID", parameter_name="/duckbot/token/oxford-dictionary/id"),
     Secret(environment_name="OXFORD_DICTIONARY_KEY", parameter_name="/duckbot/token/oxford-dictionary/key"),
+    Secret(environment_name="ANTHROPIC_API_KEY", parameter_name="/duckbot/token/anthropic-api/key"),
 ]
 
 

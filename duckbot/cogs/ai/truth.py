@@ -1,11 +1,10 @@
-import discord
+import os
+
 import anthropic
+import discord
 from discord.ext import commands
 
-CLIENT = anthropic.Anthropic(
-    api_key="mu key",
-)
-PROMPT = """Objective: Fact-check the following message from {user_name} on our Discord server and format the response for Discord.
+TRUTH_PROMPT = """Objective: Fact-check the following message from {user_name} on our Discord server and format the response for Discord.
 
 Input: "{user_message}"
 
@@ -44,38 +43,30 @@ Remember: Stick to verifiable facts only. If uncertain, state that the informati
 class Truth(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self._ai_client = None
+
+    @property
+    def ai_client(self):
+        if self._ai_client is None:
+            self._ai_client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+        return self._ai_client
 
     @commands.command(name="truth")
     async def truth(self, ctx: commands.Context):
         message = ctx.message
         if message.reference:
-            try:
-                referenced_message = await message.channel.fetch_message(message.reference.message_id)
-            except (discord.errors.NotFound, discord.errors.Forbidden):
-                await ctx.send("I can't find the TRUTH if you don't give me the message to fact-check.")
-                return
-            fact_checked_response = self.fact_check(referenced_message)
-            await message.reply(fact_checked_response)
+            referenced_message = await message.channel.fetch_message(message.reference.message_id)
+            async with ctx.typing():
+                fact_checked_response = await self.fact_check(referenced_message)
+                await message.reply(fact_checked_response)
         else:
             await ctx.send("⚠️ Please use this command as a reply to the message you want to fact-check. For example:\n`Reply to a message → !truth`")
 
-    def fact_check(self, message: discord.Message) -> str:
-        content = message.content
-        prompt = PROMPT.format(user_name=message.author.display_name, user_message=content)
-        message = CLIENT.messages.create(
-        model="claude-3-5-sonnet-20240620",
-        max_tokens=1000,
-        temperature=0,
-        messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": prompt
-                        }
-                    ]
-                }
-            ]
-        )
-        return message.content[0].text
+    async def fact_check(self, message: discord.Message) -> str:
+        try:
+            content = message.content
+            prompt = TRUTH_PROMPT.format(user_name=message.author.display_name, user_message=content)
+            message = self.ai_client.messages.create(model="claude-3-5-sonnet-20240620", max_tokens=1000, temperature=0, messages=[{"role": "user", "content": [{"type": "text", "text": prompt}]}])
+            return message.content[0].text
+        except Exception as e:
+            return f"The robot uprising has been postponed due to the following error: {e}"
