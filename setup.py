@@ -84,7 +84,7 @@ if __name__ == "__main__":
                 "pytest-blockage==0.2.4",
                 "pytest-sugar==1.0.0",
                 "pytest-icdiff==0.9",
-                "pytest-cov==5.0.0",
+                "pytest-cov==6.0.0",
                 "pytest-lazy-fixture==0.6.3",
             ],
             "cdk": [
