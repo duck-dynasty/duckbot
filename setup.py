@@ -62,7 +62,7 @@ if __name__ == "__main__":
             "matplotlib==3.9.2",
             "PyGithub==2.1.1",
             "wolframalpha==5.1.3",
-            "yfinance==0.2.44",
+            "yfinance==0.2.48",
             "mip==1.15.0",
             "anthropic==0.36.2",  # sdk for llm
         ],
