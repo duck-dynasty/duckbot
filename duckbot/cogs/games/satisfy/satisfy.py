@@ -102,6 +102,7 @@ recipe_banks = {
             "TemperedCopperIngot",
             "FusedQuartzCrystal",
             "CoatedCable",
+            "HeavyFlexibleFrame",
         ]
     ],
     "Clandestine": default()
