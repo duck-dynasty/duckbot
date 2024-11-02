@@ -149,6 +149,12 @@ recipe_banks = {
             "PlasticSmartPlating",
             "CheapSilica",
             "AutomatedSpeedWiring",
+            "SloppyAlumina",
+            "PureAluminumIngot",
+            "ElectrodeAluminumScrap",
+            "SiliconCircuitBoard",
+            "AlcladCasing",
+            "RadioControlSystem",
         ]
     ],
 }
