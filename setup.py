@@ -50,11 +50,11 @@ if __name__ == "__main__":
             "beautifulsoup4==4.12.3",
             "requests==2.32.3",
             "pytz==2024.2",
-            "timezonefinder==6.5.3",
-            "holidays==0.57",
+            "timezonefinder==6.5.4",
+            "holidays==0.59",
             "pyowm==3.3.0",  # openweather
-            "psycopg2==2.9.9",
-            "SQLAlchemy==2.0.35",
+            "psycopg2==2.9.10",
+            "SQLAlchemy==2.0.36",
             "d20==1.1.2",
             "nltk==3.9.1",  # also in pyproject.toml, required for setup script above
             "textblob==0.18.0.post0",  # also in pyproject.toml, required for setup script above
@@ -62,9 +62,9 @@ if __name__ == "__main__":
             "matplotlib==3.9.2",
             "PyGithub==2.1.1",
             "wolframalpha==5.1.3",
-            "yfinance==0.2.44",
+            "yfinance==0.2.48",
             "mip==1.15.0",
-            "anthropic==0.36.2",  # sdk for llm
+            "anthropic==0.37.1",  # sdk for llm
         ],
         extras_require={
             "dev": [
@@ -72,19 +72,19 @@ if __name__ == "__main__":
                 "pytest-asyncio==0.23.8",
                 "pytest-xdist[psutil]==3.6.1",
                 "flake8==7.1.1",
-                "black==24.8.0",
+                "black==24.10.0",
                 "flake8-black==0.3.6",
                 "isort==5.13.2",
                 "flake8-isort==6.1.1",
                 "pep8-naming==0.14.1",
-                "mdformat==0.7.17",
-                "mdformat-gfm==0.3.6",
+                "mdformat==0.7.18",
+                "mdformat-gfm==0.3.7",
                 "mdformat-black==0.1.1",
                 "responses==0.25.3",
                 "pytest-blockage==0.2.4",
                 "pytest-sugar==1.0.0",
                 "pytest-icdiff==0.9",
-                "pytest-cov==5.0.0",
+                "pytest-cov==6.0.0",
                 "pytest-lazy-fixture==0.6.3",
             ],
             "cdk": [
@@ -96,7 +96,7 @@ if __name__ == "__main__":
                 "aws-cdk.aws-iam==1.204.0",
                 "aws-cdk.aws-logs==1.204.0",
                 "aws-cdk.aws-ssm==1.204.0",
-                "boto3==1.35.30",
+                "boto3==1.35.53",
             ],
         },
         entry_points={
