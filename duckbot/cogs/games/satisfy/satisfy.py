@@ -102,6 +102,7 @@ recipe_banks = {
             "TemperedCopperIngot",
             "FusedQuartzCrystal",
             "CoatedCable",
+            "HeavyFlexibleFrame",
             "DilutedFuel",
             "ClassicBattery",
             "InstantScrap",
@@ -156,6 +157,12 @@ recipe_banks = {
             "PlasticSmartPlating",
             "CheapSilica",
             "AutomatedSpeedWiring",
+            "SloppyAlumina",
+            "PureAluminumIngot",
+            "ElectrodeAluminumScrap",
+            "SiliconCircuitBoard",
+            "AlcladCasing",
+            "RadioControlSystem",
         ]
     ],
 }
