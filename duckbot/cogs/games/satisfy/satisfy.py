@@ -102,6 +102,14 @@ recipe_banks = {
             "TemperedCopperIngot",
             "FusedQuartzCrystal",
             "CoatedCable",
+            "DilutedFuel",
+            "ClassicBattery",
+            "InstantScrap",
+            "TurboBlendFuel",
+            "RadioControlSystem",
+            "LeachedCateriumIngot",
+            "LeachedIronIngot",
+            "LeachedCopperIngot",
         ]
     ],
     "Clandestine": default()
