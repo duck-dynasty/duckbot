@@ -113,7 +113,6 @@ def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
     used_power_shards = item_weights[Item.Somersloop] / 100 * power_shards_used(model, factory, recipes, use_recipe)
     used_sloops = item_weights[Item.Somersloop] * sloops_used(model, factory, recipes, use_recipe)
     recipes_used = xsum(use_recipe)
-
     model.objective = maximize(
         100 * maximize_items  # prioritize maximizing requested items above all
         + 10 * input_remaining  # maximize the amount of remaining factory inputs
