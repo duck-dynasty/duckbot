@@ -98,6 +98,12 @@ def test_optimize_create_resources_with_inputs_minimizes_inputs_used():
     )
 
 
+def test_optimize_create_resources_with_inputs_issue_995():
+    f = factory(input=Item.CrystalOscillator * 1, target=Item.RadioControlUnit * 3, recipes=all())
+    crystal = recipe_by_name("InsulatedCrystalOscillator")
+    assert optimize(f)[crystal] == approx(0.2667)  # makes 0.5 extra only
+
+
 def test_optimize_maximize_oversupplied_minimizes_inputs_used():
     f = factory(input=Item.Coal * 120 + Item.IronOre * 120 + Item.Limestone * 270, maximize=set([Item.EncasedIndustrialBeam]), recipes=all_no_raw)
     ingot = recipe_by_name("IronIngot")

@@ -64,6 +64,9 @@ def weight_by_item() -> dict[Item, float]:
                     weights[item] = sum(r * weights[i] for i, r in inputs_by_item[item].items())
                     adjusted = True
 
+    max_weight = max(weights.values())
+    weights[Item.MwPower] = max_weight
+    weights[Item.AwesomeTicketPoints] = max_weight
     return weights
 
 
@@ -105,6 +108,7 @@ def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
     maximize_items = xsum([amount * max_weight for i, amount in amount_by_item.items() if i in factory.maximize])
     input_remaining = xsum([amount * item_weights[i] for i, amount in amount_by_item.items() if i in factory.inputs and i not in can_generate])
     raw_usage = xsum([amount * item_weights[i] for i, amount in generate_raw.items()])
+    excess_target = xsum([(amount - factory.targets.get(i, 0)) * item_weights[i] for i, amount in amount_by_item.items()])
     unsinkable_excess = xsum([amount * item_weights[i] for i, amount in amount_by_item.items() if not sinkable(i)])
     used_power_shards = item_weights[Item.Somersloop] / 100 * power_shards_used(model, factory, recipes, use_recipe)
     used_sloops = item_weights[Item.Somersloop] * sloops_used(model, factory, recipes, use_recipe)
@@ -114,6 +118,7 @@ def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
         100 * maximize_items  # prioritize maximizing requested items above all
         + 10 * input_remaining  # maximize the amount of remaining factory inputs
         - 10 * raw_usage  # minimize raw material usage, weighted by map availability
+        - 5 * excess_target  # minimize creation of extra products
         - 3 * unsinkable_excess  # get rid of fluid products if possible
         - 0.5 * used_power_shards  # minimize power shard usage; they are only eventually cheap
         - 10 * used_sloops  # minimize sloop usage; they ain't cheap
