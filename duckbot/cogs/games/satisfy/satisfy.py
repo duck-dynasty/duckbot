@@ -111,6 +111,7 @@ recipe_banks = {
             "LeachedCateriumIngot",
             "LeachedIronIngot",
             "LeachedCopperIngot",
+            "CompactedCoal",
         ]
     ],
     "Clandestine": default()
@@ -187,6 +188,8 @@ recipe_banks = {
             "CompactedSteelIngot",
             "CoatedCable",
             "FineBlackPowder",
+            "CompactedCoal",
+            "PolyesterFabric",
         ]
     ],
 }
