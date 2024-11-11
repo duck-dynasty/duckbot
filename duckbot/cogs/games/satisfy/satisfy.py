@@ -200,7 +200,6 @@ class Satisfy(Cog):
 
     def factory(self, context: Context) -> Factory:
         factory = Factory(inputs=Rates(), targets=Rates(), maximize=set(), recipes=all(), power_shards=0, sloops=0)
-        factory = Factory(inputs=Item.Coal * 120 + Item.IronOre * 120 + Item.Limestone * 270, targets=Rates(), maximize=set([Item.EncasedIndustrialBeam]), recipes=all(), power_shards=0, sloops=0)
         # monkeypatch fields for recipe manipulations
         factory.recipe_bank = "Default"
         factory.include_recipes = set()
