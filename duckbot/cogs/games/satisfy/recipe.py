@@ -303,7 +303,7 @@ def alternates() -> List[Recipe]:
         assy("SiliconCircuitBoard", Item.CopperSheet * 27.5 + Item.Silica * 27.5 >> Item.CircuitBoard * 12.5),
         ctor("Charcoal", Item.Wood * 15 >> Item.Coal * 150),
         ctor("Biocoal", Item.Biomass * 37.5 >> Item.Coal * 45),
-        assy("CompactedCoal", Item.Coal * 25 + Item.Sulfur * 25 >> Item.CompactedCoal * 25),
+        assy(Item.CompactedCoal, Item.Coal * 25 + Item.Sulfur * 25 >> Item.CompactedCoal * 25),
         assy("CrystalComputer", Item.CircuitBoard * 5 + Item.CrystalOscillator * 1.66667 >> Item.Computer * 3.33333),
         manu("CateriumComputer", Item.CircuitBoard * 15 + Item.Quickwire * 52.5 + Item.Rubber * 22.5 >> Item.Computer * 3.75),
         refine("WetConcrete", Item.Limestone * 120 + Item.Water * 100 >> Item.Concrete * 80),
