@@ -151,6 +151,24 @@ def test_optimize_fluid_excess_is_made_sinkable():
     assert optimize(f) == dict([(plastic, approx(1)), (coke, approx(0.25))])
 
 
+def test_optimize_raw_resources_are_bound_by_map_limits():
+    f = factory(input=Rates(), maximize=set([Item.IronOre]), recipes=all())
+    ore = recipe_by_name("IronOre")
+    lime = recipe_by_name("Limestone")
+    sam = recipe_by_name("Sam")
+    reanimate = recipe_by_name("ReanimatedSam")
+    convert = recipe_by_name("IronOre#Limestone")
+    assert optimize(f) == dict(
+        [
+            (ore, approx(92_100.0 / 60.0)),
+            (lime, approx(61_200.0 / 60.0)),
+            (sam, approx(10_200.0 / 60.0)),
+            (reanimate, approx(85)),
+            (convert, approx(255)),
+        ]
+    )
+
+
 def test_optimize_recycled_bois_returns_chain():
     f = factory(input=Item.Water * 90 + Item.CrudeOil * 27, target=Item.Plastic * 81, recipes=[r for r in all_no_raw if r.name != "DilutedFuel"])
     goo = recipe_by_name("HeavyOilResidue")
