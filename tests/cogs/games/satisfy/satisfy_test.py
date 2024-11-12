@@ -55,11 +55,11 @@ async def test_add_target_stores_output_rate(clazz, context, default_factory):
 
 async def test_add_maximize_stores_maximizer(clazz, context, default_factory):
     await clazz.add_maximize.callback(clazz, context, str(Item.IronOre))
-    default_factory.maximize = set([Item.IronOre])
+    default_factory.maximize = {Item.IronOre}
     assert clazz.factory(context) == default_factory
 
     await clazz.add_maximize.callback(clazz, context, str(Item.IronIngot))
-    default_factory.maximize = set([Item.IronOre, Item.IronIngot])
+    default_factory.maximize = {Item.IronOre, Item.IronIngot}
     assert clazz.factory(context) == default_factory
 
 
@@ -82,18 +82,32 @@ async def test_recipe_bank_stores_bank(clazz, context):
 
 async def test_include_recipe_adds_include(clazz, context):
     await clazz.include_recipe.callback(clazz, context, str(Item.IronOre))
-    assert clazz.factory(context).include_recipes == set(["IronOre"])
+    assert clazz.factory(context).include_recipes == {"IronOre"}
 
     await clazz.include_recipe.callback(clazz, context, str(Item.IronIngot))
-    assert clazz.factory(context).include_recipes == set(["IronOre", "IronIngot"])
+    assert clazz.factory(context).include_recipes == {"IronOre", "IronIngot"}
+
+
+async def test_include_recipe_removes_exclusion(clazz, context):
+    await clazz.exclude_recipe.callback(clazz, context, str(Item.IronOre))
+    await clazz.include_recipe.callback(clazz, context, str(Item.IronOre))
+    assert clazz.factory(context).include_recipes == set()
+    assert clazz.factory(context).exclude_recipes == set()
 
 
 async def test_exclude_recipe_adds_include(clazz, context):
     await clazz.exclude_recipe.callback(clazz, context, str(Item.IronOre))
-    assert clazz.factory(context).exclude_recipes == set(["IronOre"])
+    assert clazz.factory(context).exclude_recipes == {"IronOre"}
 
     await clazz.exclude_recipe.callback(clazz, context, str(Item.IronIngot))
-    assert clazz.factory(context).exclude_recipes == set(["IronOre", "IronIngot"])
+    assert clazz.factory(context).exclude_recipes == {"IronOre", "IronIngot"}
+
+
+async def test_exclude_recipe_removes_inclusion(clazz, context):
+    await clazz.include_recipe.callback(clazz, context, str(Item.IronOre))
+    await clazz.exclude_recipe.callback(clazz, context, str(Item.IronOre))
+    assert clazz.factory(context).exclude_recipes == set()
+    assert clazz.factory(context).include_recipes == set()
 
 
 async def test_solve_no_factory_rejects(clazz, context):
@@ -109,7 +123,7 @@ async def test_solve_no_in_or_out(clazz, context, default_factory):
 @mock.patch("duckbot.cogs.games.satisfy.satisfy.optimize", return_value=dict())
 async def test_solve_all_defaults(opt, clazz, context, default_factory):
     default_factory.inputs = Item.IronOre * 30
-    default_factory.maximize = set([Item.IronOre])
+    default_factory.maximize = {Item.IronOre}
     expected = copy(default_factory)
     expected.recipes = default()
 
@@ -121,7 +135,7 @@ async def test_solve_all_defaults(opt, clazz, context, default_factory):
 @mock.patch("duckbot.cogs.games.satisfy.satisfy.optimize", return_value=dict())
 async def test_solve_different_recipe_bank(opt, clazz, context, default_factory):
     default_factory.inputs = Item.IronOre * 30
-    default_factory.maximize = set([Item.IronOre])
+    default_factory.maximize = {Item.IronOre}
     default_factory.recipe_bank = "Default"
     expected = copy(default_factory)
     expected.recipes = default()
@@ -134,9 +148,9 @@ async def test_solve_different_recipe_bank(opt, clazz, context, default_factory)
 @mock.patch("duckbot.cogs.games.satisfy.satisfy.optimize", return_value=dict())
 async def test_solve_recipe_includes(opt, clazz, context, default_factory):
     default_factory.inputs = Item.IronOre * 30
-    default_factory.maximize = set([Item.IronOre])
+    default_factory.maximize = {Item.IronOre}
     default_factory.recipe_bank = "Default"
-    default_factory.include_recipes = set(["DilutedPackagedFuel"])
+    default_factory.include_recipes = {"DilutedPackagedFuel"}
     expected = copy(default_factory)
     expected.recipes = default() + [r for r in all() if r.name == "DilutedPackagedFuel"]
 
@@ -148,8 +162,8 @@ async def test_solve_recipe_includes(opt, clazz, context, default_factory):
 @mock.patch("duckbot.cogs.games.satisfy.satisfy.optimize", return_value=dict())
 async def test_solve_recipe_excludes(opt, clazz, context, default_factory):
     default_factory.inputs = Item.IronOre * 30
-    default_factory.maximize = set([Item.IronOre])
-    default_factory.exclude_recipes = set([default_factory.recipes[0].name])
+    default_factory.maximize = {Item.IronOre}
+    default_factory.exclude_recipes = {default_factory.recipes[0].name}
     expected = copy(default_factory)
     expected.recipes = default()[1:]
 

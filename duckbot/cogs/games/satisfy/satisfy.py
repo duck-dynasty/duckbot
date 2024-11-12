@@ -271,17 +271,23 @@ class Satisfy(Cog):
         self.save(context, factory)
         await context.send(embed=factory_embed(factory), delete_after=60)
 
-    @recipe.command(name="include", description="Forces a recipe to be available to the solver. Overrides `exclude`")
+    @recipe.command(name="include", description="Forces a recipe to be available to the solver. Undoes /satisfy recipe exclude")
     async def include_recipe(self, context: Context, recipe: str):
         factory = self.factory(context)
-        factory.include_recipes.add(recipe)
+        if recipe in factory.exclude_recipes:
+            factory.exclude_recipes.remove(recipe)
+        else:
+            factory.include_recipes.add(recipe)
         self.save(context, factory)
         await context.send(embed=factory_embed(factory), delete_after=60)
 
-    @recipe.command(name="exclude", description="Makes a recipe to be unavailable to the solver. Overridden by `include`")
+    @recipe.command(name="exclude", description="Makes a recipe to be unavailable to the solver. Undoes /satisfy recipe include")
     async def exclude_recipe(self, context: Context, recipe: str):
         factory = self.factory(context)
-        factory.exclude_recipes.add(recipe)
+        if recipe in factory.include_recipes:
+            factory.include_recipes.remove(recipe)
+        else:
+            factory.exclude_recipes.add(recipe)
         self.save(context, factory)
         await context.send(embed=factory_embed(factory), delete_after=60)
 
