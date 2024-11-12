@@ -146,7 +146,13 @@ Power and awesome points are also modeled as items, and are selectable anywhere 
 /satisfy state
 ```
 
-DuckBot will display the factory state on every command, but the message get deleted after a minute. This command keeps the factory state up for five minutes instead. Note that `/satisfy solve` messages are not deleted.
+DuckBot will display the factory state on every command, but the message gets deleted after a minute. This command keeps the factory state up for five minutes instead. Note that `/satisfy solve` messages are not deleted and also include the factory state.
+
+```
+/satisfy reset
+```
+
+Destroys your factory state. Default state is no inputs or outputs, no recipe includes or excludes, and the default set of recipes in the game selected.
 
 ```
 /satisfy input   item rate
@@ -173,6 +179,8 @@ Tells the solver to maximize output of the given item. Should only be used when 
 
 Maximization occurs by item weights, so it will _not_ behave as you expect when multiple items are maximized. The solver will pick the item with the better rate to weight ratio. It is recommended to maximize a single item only.
 
+There's no way to remove a maximize item, a full reset of the factory is required.
+
 ```
 /satisfy booster   item amount
 ```
@@ -183,7 +191,12 @@ Make power shards or somersloops available to use in the factory. Note that powe
 /satisfy recipe bank   name
 ```
 
-Changes the recipe bank. For the love of god, use slash commands for this one. Recipe bank names are available in autocomplete.
+Changes the recipe bank. For the love of god, use slash commands for this one. Recipe bank names are available in autocomplete. Some recipe banks include,
+
+* Default: only default in game recipes, no raw supply or conversion recipes
+* All: all available recipes, includes raw supply and conversions
+* _RawSupply_ modifier: the set of raw supply recipes
+* _Conversions_ modifier: the set of raw resource conversion recipes, does not include other recipes in the Converter
 
 ```
 /satisfy recipe include   name
