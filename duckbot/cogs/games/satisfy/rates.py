@@ -22,6 +22,11 @@ class Rates:
     def get(self, key: Item, default: Optional[float]) -> Optional[float]:
         return self.rates.get(key, default)
 
+    def singleton_rate(self) -> float:
+        if len(self.rates) != 1:
+            raise AssertionError(f"{self} is not a singleton")
+        return next(x for x in self.items())[1]
+
     def __bool__(self) -> bool:
         return bool(self.rates)
 
