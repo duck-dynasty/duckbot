@@ -17,6 +17,9 @@ https://user-images.githubusercontent.com/3149083/135654217-244d7457-9db9-4c30-a
 
 Before running DuckBot, you want to create a virtualenv to develop in. DuckBot runs on `python3.10`, so prefer to use that.
 
+
+
+
 ```sh
 python3.10 -m venv --clear --prompt duckbot venv
 . venv/bin/activate
