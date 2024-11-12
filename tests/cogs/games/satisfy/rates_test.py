@@ -39,6 +39,20 @@ def test_contains_is_dict_contains(item, rate):
     assert (item in rates) == (item in rates.rates)
 
 
+def test_singleton_rate_empty_throws_error():
+    with pytest.raises(AssertionError):
+        Rates({}).singleton_rate()
+
+
+def test_singleton_rate_singleton_returns_rate(rate):
+    assert to_rates(rate).singleton_rate() == rate[1]
+
+
+def test_singleton_rate_not_singleton_throws_error():
+    with pytest.raises(AssertionError):
+        Rates({Item.AdaptiveControlUnit: 1, Item.AiExpensionServer: 1}).singleton_rate()
+
+
 def test_bool_empty_is_false():
     assert bool(Rates()) is False
 

@@ -84,6 +84,26 @@ def test_optimize_create_resources_minimal_inputs_used():
     )
 
 
+def test_optimize_create_resources_with_inputs_minimizes_inputs_used():
+    f = factory(input=Item.IronIngot * 30, target=Item.IronPlate * 40, recipes=default_with_raw)
+    ore = recipe_by_name(Item.IronOre)
+    ingot = recipe_by_name(Item.IronIngot)
+    plate = recipe_by_name(Item.IronPlate)
+    assert optimize(f) == dict(
+        [
+            (ore, approx(30.0 / 60.0)),
+            (ingot, approx(1.0)),
+            (plate, approx(2.0)),
+        ]
+    )
+
+
+def test_optimize_create_resources_with_inputs_issue_995():
+    f = factory(input=Item.CrystalOscillator * 1, target=Item.RadioControlUnit * 3, recipes=all())
+    crystal = recipe_by_name("InsulatedCrystalOscillator")
+    assert optimize(f)[crystal] == approx(0.2667)  # makes 0.5 extra only
+
+
 def test_optimize_maximize_oversupplied_minimizes_inputs_used():
     f = factory(input=Item.Coal * 120 + Item.IronOre * 120 + Item.Limestone * 270, maximize=set([Item.EncasedIndustrialBeam]), recipes=all_no_raw)
     ingot = recipe_by_name("IronIngot")
@@ -137,6 +157,24 @@ def test_optimize_fluid_excess_is_made_sinkable():
     assert optimize(f) == dict([(plastic, approx(1)), (coke, approx(0.25))])
 
 
+def test_optimize_raw_resources_are_bound_by_map_limits():
+    f = factory(input=Rates(), maximize=set([Item.IronOre]), recipes=all())
+    ore = recipe_by_name("IronOre")
+    lime = recipe_by_name("Limestone")
+    sam = recipe_by_name("Sam")
+    reanimate = recipe_by_name("ReanimatedSam")
+    convert = recipe_by_name("IronOre#Limestone")
+    assert optimize(f) == dict(
+        [
+            (ore, approx(92_100.0 / 60.0)),
+            (lime, approx(61_200.0 / 60.0)),
+            (sam, approx(10_200.0 / 60.0)),
+            (reanimate, approx(85)),
+            (convert, approx(255)),
+        ]
+    )
+
+
 def test_optimize_recycled_bois_returns_chain():
     f = factory(input=Item.Water * 90 + Item.CrudeOil * 27, target=Item.Plastic * 81, recipes=[r for r in all_no_raw if r.name != "DilutedFuel"])
     goo = recipe_by_name("HeavyOilResidue")
@@ -159,8 +197,8 @@ def test_optimize_recycled_bois_returns_chain():
     )
 
 
-def recipe_by_name(name: str, power_shards: int = 0, sloops: int = 0) -> ModifiedRecipe:
-    return ModifiedRecipe(next(r for r in all() if r.name == name), power_shards, sloops)
+def recipe_by_name(name: str | Item, power_shards: int = 0, sloops: int = 0) -> ModifiedRecipe:
+    return ModifiedRecipe(next(r for r in all() if r.name == str(name)), power_shards, sloops)
 
 
 def test_weights_by_item():

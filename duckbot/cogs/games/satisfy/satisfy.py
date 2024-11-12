@@ -203,9 +203,6 @@ class Satisfy(Cog):
 
     def factory(self, context: Context) -> Factory:
         factory = Factory(inputs=Rates(), targets=Rates(), maximize=set(), recipes=all(), power_shards=0, sloops=0)
-        # factory = Factory(inputs=Item.CrudeOil * 300 + Item.Water * 10000, targets=Rates(), maximize=set([Item.Plastic]), recipes=all(), power_shards=0, sloops=10)
-        # factory = Factory(inputs=Item.CrudeOil * 30, targets=Item.Plastic * 20, maximize=set(), recipes=all(), power_shards=0, sloops=0)
-        # factory = Factory(inputs=Item.IronOre * 30, targets=Rates(), maximize=set([Item.IronPlate]), recipes=all(), power_shards=0, sloops=10)
         # monkeypatch fields for recipe manipulations
         factory.recipe_bank = "Default"
         factory.include_recipes = set()
@@ -274,17 +271,23 @@ class Satisfy(Cog):
         self.save(context, factory)
         await context.send(embed=factory_embed(factory), delete_after=60)
 
-    @recipe.command(name="include", description="Forces a recipe to be available to the solver. Overrides `exclude`")
+    @recipe.command(name="include", description="Forces a recipe to be available to the solver. Undoes /satisfy recipe exclude")
     async def include_recipe(self, context: Context, recipe: str):
         factory = self.factory(context)
-        factory.include_recipes.add(recipe)
+        if recipe in factory.exclude_recipes:
+            factory.exclude_recipes.remove(recipe)
+        else:
+            factory.include_recipes.add(recipe)
         self.save(context, factory)
         await context.send(embed=factory_embed(factory), delete_after=60)
 
-    @recipe.command(name="exclude", description="Makes a recipe to be unavailable to the solver. Overridden by `include`")
+    @recipe.command(name="exclude", description="Makes a recipe to be unavailable to the solver. Undoes /satisfy recipe include")
     async def exclude_recipe(self, context: Context, recipe: str):
         factory = self.factory(context)
-        factory.exclude_recipes.add(recipe)
+        if recipe in factory.include_recipes:
+            factory.include_recipes.remove(recipe)
+        else:
+            factory.exclude_recipes.add(recipe)
         self.save(context, factory)
         await context.send(embed=factory_embed(factory), delete_after=60)
 
