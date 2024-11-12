@@ -209,6 +209,8 @@ Runs the dang ol' solver. Outputs are structured like,
 > {amount of machine}\
 > {total input/output of recipe}
 
+Recipes will appear in alphabetical order, not in any other logical grouping.
+
 Note that values like "12.34 constructor" does not mean you need to build 13 constructors precisely with one at 34%. Rather, any number of buildings can be made, so long as they equal the throughput of 12.34 constructors. So, it could be 5 fully overclocked ones, for example.
 
 Slooped up machines are depicted in the recipe name. It will be something like _Recipe @ 250% + 2.0x_. The `%` is the clock rate, while `x` is the sloop production multiplier. This is also described in the amount of machines line.
