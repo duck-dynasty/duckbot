@@ -68,7 +68,7 @@ jobs:
     if: ${{ always() }}
     steps:
     - run: exit 1
-      if: ${{ failure() }}
+      if: ${{ contains(needs.*.result, 'failure') }}
     - run: echo all checks passed
 
   deploy:
