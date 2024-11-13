@@ -193,10 +193,10 @@ Make power shards or somersloops available to use in the factory. Note that powe
 
 Changes the recipe bank. For the love of god, use slash commands for this one. Recipe bank names are available in autocomplete. Some recipe banks include,
 
-* Default: only default in game recipes, no raw supply or conversion recipes
-* All: all available recipes, includes raw supply and conversions
-* _RawSupply_ modifier: the set of raw supply recipes
-* _Conversions_ modifier: the set of raw resource conversion recipes, does not include other recipes in the Converter
+- Default: only default in game recipes, no raw supply or conversion recipes
+- All: all available recipes, includes raw supply and conversions
+- _RawSupply_ modifier: the set of raw supply recipes
+- _Conversions_ modifier: the set of raw resource conversion recipes, does not include other recipes in the Converter
 
 ```
 /satisfy recipe include   name

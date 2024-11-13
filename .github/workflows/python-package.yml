@@ -65,7 +65,10 @@ jobs:
     - sanity
     - synthesize
     runs-on: ubuntu-latest
+    if: ${{ always() }}
     steps:
+    - run: exit 1
+      if: ${{ contains(needs.*.result, 'failure') }}
     - run: echo all checks passed
 
   deploy:
