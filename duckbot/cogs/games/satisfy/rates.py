@@ -13,6 +13,9 @@ class Rates:
     def items(self):
         return self.rates.items()
 
+    def keys(self):
+        return self.rates.keys()
+
     def __iter__(self):
         return self.rates.__iter__()
 

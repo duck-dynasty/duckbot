@@ -22,6 +22,12 @@ def test_mul_returns_rates(item: Item):
     assert item * n == Rates(dict([(item, n)]))
 
 
+@pytest.mark.parametrize("item", Item)
+def test_lt_alphabetical_order_by_name(item: Item):
+    rhs = random.choice([x for x in Item])
+    assert (item < rhs) == (item.name < rhs.name)
+
+
 @pytest.mark.parametrize("item", [i for i in Item if i.form != Form.Solid])
 def test_sinkable_nonsolid_returns_false(item: Item):
     assert sinkable(item) is False

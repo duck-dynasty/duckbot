@@ -1,5 +1,4 @@
 import itertools
-import sys
 from functools import reduce
 from math import isclose
 from typing import Callable, List, Optional
@@ -10,6 +9,7 @@ from .factory import Factory
 from .item import Item, sinkable
 from .rates import Rates
 from .recipe import ModifiedRecipe, Recipe
+from .weights import map_limits, minmax_weights
 
 good_enough = [
     OptimizationStatus.FEASIBLE,  # not optimal but /shrug
@@ -17,69 +17,8 @@ good_enough = [
     OptimizationStatus.UNBOUNDED,  # objective value is infinite
 ]
 
-map_limits = {
-    Item.Bauxite: 12_300,
-    Item.CateriumOre: 15_000,
-    Item.Coal: 42_300,
-    Item.CopperOre: 36_900,
-    Item.CrudeOil: 12_600,
-    Item.IronOre: 92_100,
-    Item.Limestone: 69_900,
-    Item.NitrogenGas: 12_000,
-    Item.RawQuartz: 13_500,
-    Item.Sam: 10_200,
-    Item.Sulfur: 10_800,
-    Item.Uranium: 2_100,
-    Item.Water: sys.maxsize,
-    Item.Somersloop: 106,
-}
 
-
-def weight_by_item() -> dict[Item, float]:
-    from .recipe import all as all_recipes
-    from .recipe import default
-
-    def unit_inputs(item: Item, recipe: Recipe) -> Rates:
-        return recipe.inputs * (1.0 / recipe.outputs.get(item, 1.0))
-
-    inputs_by_item = {i: next((unit_inputs(i, r) for r in default() if r.name == str(i)), Rates()) for i in Item}
-    # manually add items which would have no recipe otherwise
-    inputs_by_item[Item.FicsiteIngot] = next(unit_inputs(Item.FicsiteIngot, r) for r in default() if r.name == "FicsiteIngot#Iron")
-    inputs_by_item[Item.PowerShard] = next(unit_inputs(Item.PowerShard, r) for r in default() if r.name == "SyntheticPowerShard")
-    inputs_by_item[Item.TurboRifleAmmo] = next(unit_inputs(Item.TurboRifleAmmo, r) for r in default() if r.name == f"{Item.TurboRifleAmmo}#Blender")
-    inputs_by_item[Item.UraniumWaste] = next(unit_inputs(Item.UraniumWaste, r) for r in default() if r.name == f"NuclearPowerPlant#{Item.UraniumFuelRod}")
-    inputs_by_item[Item.PlutoniumWaste] = next(unit_inputs(Item.PlutoniumWaste, r) for r in default() if r.name == f"NuclearPowerPlant#{Item.PlutoniumFuelRod}")
-    inputs_by_item[Item.HeavyOilResidue] = next(unit_inputs(Item.HeavyOilResidue, r) for r in all_recipes() if r.name == str(Item.HeavyOilResidue))
-    inputs_by_item[Item.PolymerResin] = next(unit_inputs(Item.PolymerResin, r) for r in all_recipes() if r.name == str(Item.PolymerResin))
-    inputs_by_item[Item.Fabric] = next(unit_inputs(Item.Fabric, r) for r in all_recipes() if r.name == "PolyesterFabric")
-    inputs_by_item[Item.PortableMiner] = next(unit_inputs(Item.PortableMiner, r) for r in all_recipes() if r.name == "AutomatedMiner")
-
-    weights = {i: 1.0 / total for i, total in map_limits.items()}
-    adjusted = True
-    while adjusted:
-        adjusted = False
-        for item in Item:
-            if item not in weights:
-                if all(i in weights for i, _ in inputs_by_item[item].items()):
-                    weights[item] = sum(r * weights[i] for i, r in inputs_by_item[item].items())
-                    adjusted = True
-
-    max_weight = max(weights.values())
-    weights[Item.MwPower] = max_weight
-    weights[Item.AwesomeTicketPoints] = max_weight
-    return weights
-
-
-def _weights():
-    item_weights = weight_by_item()
-    max_weight = max(item_weights.values())
-    min_weight = min(v for v in item_weights.values() if not isclose(v, 0, abs_tol=1e-6))
-    scale_factor = 1.0 / max_weight * 10
-    scaled = {i: scale_factor * v for i, v in weight_by_item().items()}
-    return scaled, scale_factor * max_weight, scale_factor * min_weight
-
-
-item_weights, max_weight, min_weight = _weights()
+item_weights, max_weight, min_weight = minmax_weights()
 
 
 def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
