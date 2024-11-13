@@ -202,6 +202,9 @@ class Item(Enum):
 
         return Rates({self: rhs})
 
+    def __lt__(self, rhs):
+        return self.name < rhs.name
+
     def __str__(self):
         return self.name
 

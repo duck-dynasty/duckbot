@@ -27,6 +27,11 @@ def test_items_is_dict_items(rate):
     assert dict(rates.items()) == dict(rates.rates.items())
 
 
+def test_keys_is_dict_keys(rate):
+    rates = to_rates(rate)
+    assert set(rates.keys()) == set(rates.rates.keys())
+
+
 @pytest.mark.parametrize("item", items)
 def test_get_is_dict_get(item, rate):
     rates = to_rates(rate)

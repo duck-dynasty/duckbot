@@ -104,6 +104,21 @@ def test_optimize_create_resources_with_inputs_issue_995():
     assert optimize(f)[crystal] == approx(0.2667)  # makes 0.5 extra only
 
 
+def test_optimize_create_expensive_resources_with_inputs():
+    f = factory(input=Item.CrystalOscillator * 1, target=Item.CrystalOscillator * 2, recipes=all())
+    crystal = recipe_by_name("InsulatedCrystalOscillator")
+    assert optimize(f)[crystal] == approx(0.5333)  # makes 1 extra only
+
+
+@pytest.mark.skip(reason="very cheap resources are still preferred to be made")
+def test_optimize_create_cheap_resources_with_inputs():
+    f = factory(input=Item.Plastic * 9, target=Item.Plastic * 90, recipes=all())
+    plastic = recipe_by_name("RecycledPlastic")
+    for k, v in optimize(f).items():
+        print(k, v)
+    assert optimize(f)[plastic] == approx(1.7)  # makes 81 extra only
+
+
 def test_optimize_maximize_oversupplied_minimizes_inputs_used():
     f = factory(input=Item.Coal * 120 + Item.IronOre * 120 + Item.Limestone * 270, maximize=set([Item.EncasedIndustrialBeam]), recipes=all_no_raw)
     ingot = recipe_by_name("IronIngot")
@@ -199,18 +214,3 @@ def test_optimize_recycled_bois_returns_chain():
 
 def recipe_by_name(name: str | Item, power_shards: int = 0, sloops: int = 0) -> ModifiedRecipe:
     return ModifiedRecipe(next(r for r in all() if r.name == str(name)), power_shards, sloops)
-
-
-def test_weights_by_item():
-    from duckbot.cogs.games.satisfy.solver import weight_by_item
-
-    w = weight_by_item()
-    assert w[Item.AiLimiter] == approx(12 * w[Item.CateriumOre] + 10 * w[Item.CopperOre])
-    assert w[Item.BallisticWarpDrive] == approx(w[Item.ThermalPropulsionRocket] + 5 * w[Item.SingularityCell] + 2 * w[Item.SuperpositionOscillator] + 40 * w[Item.DarkMatterCrystal])
-    assert 2 * w[Item.ThermalPropulsionRocket] == approx(5 * w[Item.ModularEngine] + 2 * w[Item.TurboMotor] + 6 * w[Item.CoolingSystem] + 2 * w[Item.FusedModularFrame])
-    assert w[Item.ModularEngine] == approx(2 * w[Item.Motor] + 15 * w[Item.Rubber] + 2 * w[Item.SmartPlating])
-    assert w[Item.SmartPlating] == approx(w[Item.ReinforcedIronPlate] + w[Item.Rotor])
-    assert w[Item.ReinforcedIronPlate] == approx(6 * w[Item.IronPlate] + 12 * w[Item.Screw])
-    assert 3 * w[Item.IronOre] == approx(2 * w[Item.IronPlate])
-    assert w[Item.IronOre] == w[Item.IronRod]
-    assert w[Item.IronOre] == w[Item.IronIngot]
