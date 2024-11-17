@@ -479,7 +479,7 @@ def encode(name: str | Item, inout: tuple[Rates, Rates]) -> Recipe:
 
 
 def sink(item: Item) -> Recipe:
-    return recipe(f"Sink{item}", Building.AwesomeSink, item * 1 >> Item.AwesomeTicketPoints * item.points)
+    return recipe(f"Sink#{item}", Building.AwesomeSink, item * 1 >> Item.AwesomeTicketPoints * item.points)
 
 
 def bioburn(name: str | Item, input: Rates) -> Recipe:
