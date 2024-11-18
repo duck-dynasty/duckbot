@@ -3,6 +3,9 @@ from enum import Enum, auto, unique
 
 @unique
 class Building(Enum):
+    def _generate_next_value_(name, start, count, last_values):  # noqa: N805
+        return name
+
     AlienPowerAugmenter = (auto(), 0, 0)
     Assembler = (auto(), 3, 2)
     AwesomeSink = (auto(), 0, 0)
@@ -27,9 +30,6 @@ class Building(Enum):
     ResourceWell = (auto(), 3, 0)
     Smelter = (auto(), 3, 1)
     WaterExtractor = (auto(), 3, 0)
-
-    def _generate_next_value_(name, start, count, last_values):  # noqa: N805
-        return name
 
     def __init__(self, value, max_shards, max_sloop: int):
         self.max_shards = max_shards

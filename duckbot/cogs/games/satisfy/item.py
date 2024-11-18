@@ -12,6 +12,9 @@ class Form(Enum):
 
 @unique
 class Item(Enum):
+    def _generate_next_value_(name, start, count, last_values):  # noqa: N805
+        return name
+
     AdaptiveControlUnit = (auto(), Form.Solid, 76_368)
     AiExpensionServer = (auto(), Form.Solid, 597_652)
     AiLimiter = (auto(), Form.Solid, 920)
@@ -189,9 +192,6 @@ class Item(Enum):
 
     AwesomeTicketPoints = (auto(), Form.Aux, 0)
     MwPower = (auto(), Form.Aux, 0)
-
-    def _generate_next_value_(name, start, count, last_values):  # noqa: N805
-        return name
 
     def __init__(self, value, form: Form, points: int):
         self.form = form
