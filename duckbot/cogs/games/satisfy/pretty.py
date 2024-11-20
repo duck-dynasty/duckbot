@@ -5,6 +5,8 @@ from typing import List
 
 from discord import Embed
 
+from duckbot.util.embeds import MAX_FIELDS
+
 from .factory import Factory
 from .item import Item
 from .rates import Rates
@@ -50,7 +52,7 @@ def solution_embed(solution: dict[ModifiedRecipe, float]) -> List[Embed]:
 
     embeds: List[Embed] = [Embed()]
     for recipe, num in sorted(solution.items(), key=lambda kv: (kv[0].name, kv[0].sloops, kv[0].power_shards)):
-        if len(embeds[-1].fields) >= 25:
+        if len(embeds[-1].fields) >= MAX_FIELDS:
             embeds.append(Embed())
 
         name = recipe.original_recipe.name
