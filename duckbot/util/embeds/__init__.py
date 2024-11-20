@@ -23,6 +23,6 @@ def group_by_max_length(embeds: List[Embed]) -> List[List[Embed]]:
             total += length
             group.append(embed)
         else:
-            total = 0
             groups.append(group)
+            total, group = 0, [embed]
     return groups + [group] if group else groups
