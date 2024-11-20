@@ -303,7 +303,13 @@ class Satisfy(Cog):
                 if solution is None:
                     await context.send("Why do you hate possible?", delete_after=60)
                 else:
-                    await context.send(embeds=[factory_embed(factory)] + solution_embed(solution))
+                    f = factory_embed(factory)
+                    embeds = solution_embed(solution)
+                    try:
+                        await context.send(embeds=[f] + embeds)
+                    except:
+                        for e in ([f] + embeds):
+                            await context.send(embed=e)
         else:
             await context.send("No.", delete_after=60)
 
