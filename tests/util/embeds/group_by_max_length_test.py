@@ -16,8 +16,8 @@ def test_embed_length(length):
 @pytest.mark.parametrize(
     "lengths, expected_indexes",
     [
-        ([], []),
-        ([1], [[0]]),
+        ([], []),  # empty
+        ([1], [[0]]),  # trivial singleton
         ([2000, 2000], [[0, 1]]),  # fits in single message
         ([3000, 2999], [[0, 1]]),  # just fits in single message
         ([3000, 3000], [[0], [1]]),  # equal to max; separates
