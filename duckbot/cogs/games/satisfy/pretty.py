@@ -92,10 +92,10 @@ class SolutionSummary:
 
 
 def solution_summary(solution: dict[ModifiedRecipe, float]) -> SolutionSummary:
+    raw_creation = [r.name for r in raw()]
     inputs = reduce(sum_by_item, [r.inputs * -v for r, v in solution.items()], dict())
-    outputs = reduce(sum_by_item, [r.outputs * v for r, v in solution.items()], dict())
-    creation = {i: -n for i, n in outputs.items() if i in [Item[x.name] for x in raw()]}
-    totals = sum_by_item(sum_by_item(inputs, creation), outputs)
+    outputs = reduce(sum_by_item, [r.outputs * v for r, v in solution.items() if r.original_recipe.name not in raw_creation], dict())
+    totals = sum_by_item(inputs, outputs)
     return SolutionSummary(
         inputs=Rates(dict((k, -v) for k, v in totals.items() if v < 0)),
         outputs=Rates(dict((k, v) for k, v in totals.items() if v > 0)),
