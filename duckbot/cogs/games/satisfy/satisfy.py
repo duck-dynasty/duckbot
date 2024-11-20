@@ -4,6 +4,8 @@ from discord import Interaction
 from discord.app_commands import Choice
 from discord.ext.commands import Cog, Context, hybrid_group
 
+from duckbot.util.embeds import group_by_max_length
+
 from .factory import Factory
 from .item import Item
 from .pretty import factory_embed, solution_embed
@@ -303,7 +305,8 @@ class Satisfy(Cog):
                 if solution is None:
                     await context.send("Why do you hate possible?", delete_after=60)
                 else:
-                    await context.send(embeds=[factory_embed(factory)] + solution_embed(solution))
+                    for embeds in group_by_max_length([factory_embed(factory)] + solution_embed(solution)):
+                        await context.send(embeds=embeds)
         else:
             await context.send("No.", delete_after=60)
 
