@@ -19,7 +19,7 @@ def group_by_max_length(embeds: List[Embed]) -> List[List[Embed]]:
     total, group, groups = 0, [], []
     for embed in embeds:
         length = len(embed)
-        if total + length < MAX_EMBED_LENGTH:
+        if total + length < MAX_EMBED_LENGTH * 9 / 10:  # give some breather room; length calc seems to be off
             total += length
             group.append(embed)
         else:

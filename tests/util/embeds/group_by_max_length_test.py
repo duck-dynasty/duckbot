@@ -32,3 +32,9 @@ def test_multiple_does_not_fit_in_single_message_returns_groups():
     e1 = embed(4000)
     e2 = embed(4000)
     assert group_by_max_length([e1, e2]) == [[e1], [e2]]
+
+
+def test_multiple_just_fits_in_single_message_returns_smaller_groups():
+    e1 = embed(2999)
+    e2 = embed(2999)
+    assert group_by_max_length([e1, e2]) == [[e1], [e2]]
