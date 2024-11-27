@@ -114,6 +114,11 @@ recipe_banks = {
             "LeachedIronIngot",
             "LeachedCopperIngot",
             "CompactedCoal",
+            "UraniumFuelUnit",
+            "InfusedUraniumCell",
+            "SuperStateComputer",
+            "ElectromagneticConnectionRod",
+            "ElectricMotor",
         ]
     ],
     "Clandestine": default()
