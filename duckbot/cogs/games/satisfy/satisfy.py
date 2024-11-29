@@ -119,6 +119,8 @@ recipe_banks = {
             "SuperStateComputer",
             "ElectromagneticConnectionRod",
             "ElectricMotor",
+            "QuartzPurification",
+            "DistilledSilica",
         ]
     ],
     "Clandestine": default()
