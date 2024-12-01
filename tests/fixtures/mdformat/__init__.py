@@ -49,7 +49,7 @@ class MdFormatItem(pytest.Item):
     def runtest(self):
         with open(str(self.fspath)) as file:
             md = file.read()
-        formatted = mdformat.text(md)
+        formatted = mdformat.text(md, extensions={"gfm", "tables"}, codeformatters={"python"})
         assert md == formatted
         mtimes = getattr(self.config, "_mdformat_mtimes", {})
         mtimes[str(self.fspath)] = self._mdformat_mtime
