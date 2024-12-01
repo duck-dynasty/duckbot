@@ -77,7 +77,7 @@ if __name__ == "__main__":
                 "isort==5.13.2",
                 "flake8-isort==6.1.1",
                 "pep8-naming==0.14.1",
-                "mdformat==0.7.18",
+                "mdformat==0.7.19",
                 "mdformat-gfm==0.3.7",
                 "mdformat-black==0.1.1",
                 "responses==0.25.3",
