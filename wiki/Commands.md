@@ -5,7 +5,7 @@
 |            `!8ball`            | get a magic eight ball style fortune               |
 |            `!ascii`            | renders text as ascii art                          |
 |   [`!calc`](#wolfram-alpha)    | search for something on wolfram alpha              |
-|            `!coin`             | flips a coin  in real life                         |
+|            `!coin`             | flips a coin in real life                          |
 |  [`!day`](#day-announcements)  | announces the current day of the week              |
 |   [`!define`](#definitions)    | define a word                                      |
 |             `!dog`             | displays a random dog photo                        |
