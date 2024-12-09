@@ -103,7 +103,7 @@ Make sure you also update the [`docker-compose`](docker-compose.yml) file, and t
 ### Note About Secrets and Deployments
 
 CDK is just python code at the end of the day, we take advantage of that to make sure the deployment process actually creates the secrets that DuckBot would use in prod.
-In  [`app.py`](.aws/app.py), there's logic which creates the secrets via API calls, taking the value from the current environment. Those same secrets are passed to the stack, which are used to inject the secrets into the duckbot container.
+In [`app.py`](.aws/app.py), there's logic which creates the secrets via API calls, taking the value from the current environment. Those same secrets are passed to the stack, which are used to inject the secrets into the duckbot container.
 
 Actually saving the secrets is disabled by default, but is enabled for the GitHub actions deploy step. Writing secrets can be enabled by passing `--context write_secrets=true` to a `cdk` command.
 

@@ -124,6 +124,8 @@ recipe_banks = {
             "OcSupercomputer",
             "RadioConnectionUnit",
             "TurboElectricMotor",
+            "QuartzPurification",
+            "DistilledSilica",
         ]
     ],
     "Clandestine": default()
