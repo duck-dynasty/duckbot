@@ -119,6 +119,11 @@ recipe_banks = {
             "SuperStateComputer",
             "ElectromagneticConnectionRod",
             "ElectricMotor",
+            "CoolingDevice",
+            "HeatExchanger",
+            "OcSupercomputer",
+            "RadioConnectionUnit",
+            "TurboElectricMotor",
             "QuartzPurification",
             "DistilledSilica",
         ]
