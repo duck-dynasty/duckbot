@@ -126,6 +126,9 @@ recipe_banks = {
             "TurboElectricMotor",
             "QuartzPurification",
             "DistilledSilica",
+            "NitroRocketFuel",
+            "PlutoniumFuelUnit",
+            "HeatFusedFrame",
         ]
     ],
     "Clandestine": default()
