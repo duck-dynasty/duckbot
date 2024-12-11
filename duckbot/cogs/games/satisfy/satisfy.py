@@ -129,6 +129,9 @@ recipe_banks = {
             "NitroRocketFuel",
             "PlutoniumFuelUnit",
             "HeatFusedFrame",
+            "FertileUranium",
+            "TurboPressureMotor",
+            "InstantPlutoniumCell",
         ]
     ],
     "Clandestine": default()
