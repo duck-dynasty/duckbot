@@ -290,7 +290,7 @@ def alternates() -> List[Recipe]:
         refine("ElectrodeAluminumScrap", Item.AluminaSolution * 180 + Item.PetroleumCoke * 60 >> Item.AluminumScrap * 300 + Item.Water * 105),
         blend("InstantScrap", Item.Bauxite * 150 + Item.Coal * 100 + Item.SulfuricAcid * 50 + Item.Water * 60 >> Item.AluminumScrap * 300 + Item.Water * 50),
         manu("AutomatedSpeedWiring", Item.Stator * 3.75 + Item.Wire * 75 + Item.HighSpeedConnector * 1.875 >> Item.AutomatedWiring * 7.5),
-        manu("ClassicBattery", Item.Sulfur * 45 + Item.AlcladAluminumSheet * 52.5 + Item.Plastic * 80 + Item.Wire * 90 >> Item.Battery * 30),
+        manu("ClassicBattery", Item.Sulfur * 45 + Item.AlcladAluminumSheet * 52.5 + Item.Plastic * 60 + Item.Wire * 90 >> Item.Battery * 30),
         assy("FineBlackPowder", Item.Sulfur * 7.5 + Item.CompactedCoal * 15 >> Item.BlackPowder * 45),
         refine("CoatedCable", Item.Wire * 37.5 + Item.HeavyOilResidue * 15 >> Item.Cable * 67.5),
         assy("QuickwireCable", Item.Quickwire * 7.5 + Item.Rubber * 5 >> Item.Cable * 27.5),
