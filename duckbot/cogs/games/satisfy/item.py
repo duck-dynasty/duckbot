@@ -16,7 +16,7 @@ class Item(Enum):
         return name
 
     AdaptiveControlUnit = (auto(), Form.Solid, 76_368)
-    AiExpensionServer = (auto(), Form.Solid, 597_652)
+    AiExpansionServer = (auto(), Form.Solid, 597_652)
     AiLimiter = (auto(), Form.Solid, 920)
     AlcladAluminumSheet = (auto(), Form.Solid, 266)
     AlienDnaCapsule = (auto(), Form.Solid, 0)

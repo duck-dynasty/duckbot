@@ -55,7 +55,7 @@ def test_singleton_rate_singleton_returns_rate(rate):
 
 def test_singleton_rate_not_singleton_throws_error():
     with pytest.raises(AssertionError):
-        Rates({Item.AdaptiveControlUnit: 1, Item.AiExpensionServer: 1}).singleton_rate()
+        Rates({Item.AdaptiveControlUnit: 1, Item.AiExpansionServer: 1}).singleton_rate()
 
 
 def test_bool_empty_is_false():
