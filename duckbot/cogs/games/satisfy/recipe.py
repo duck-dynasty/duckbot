@@ -63,9 +63,9 @@ def regular() -> List[Recipe]:
     return [
         manu(Item.AdaptiveControlUnit, Item.AutomatedWiring * 5 + Item.CircuitBoard * 5 + Item.HeavyModularFrame * 1 + Item.Computer * 2 >> Item.AdaptiveControlUnit * 1),
         encode(
-            Item.AiExpensionServer,
+            Item.AiExpansionServer,
             Item.MagneticFieldGenerator * 4 + Item.NeuralQuantumProcessor * 4 + Item.SuperpositionOscillator * 4 + Item.ExcitedPhotonicMatter * 100
-            >> Item.AiExpensionServer * 4 + Item.DarkMatterResidue * 100,
+            >> Item.AiExpansionServer * 4 + Item.DarkMatterResidue * 100,
         ),
         assy(Item.AiLimiter, Item.CopperSheet * 25 + Item.Quickwire * 100 >> Item.AiLimiter * 5),
         assy(Item.AlcladAluminumSheet, Item.AluminumIngot * 30 + Item.CopperIngot * 10 >> Item.AlcladAluminumSheet * 30),
