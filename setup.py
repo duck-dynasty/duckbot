@@ -50,7 +50,7 @@ if __name__ == "__main__":
             "beautifulsoup4==4.12.3",
             "requests==2.32.3",
             "pytz==2024.2",
-            "timezonefinder==6.5.5",
+            "timezonefinder==6.5.7",
             "holidays==0.61",
             "pyowm==3.3.0",  # openweather
             "psycopg2==2.9.10",
