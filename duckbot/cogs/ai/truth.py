@@ -1,3 +1,4 @@
+import datetime
 import os
 
 import anthropic
@@ -7,6 +8,8 @@ from discord.ext import commands
 from duckbot.util.messages import get_message_reference, try_delete
 
 TRUTH_PROMPT = """Objective: Fact-check the following message from {user_name} on our Discord server and format the response for Discord.
+
+For context, today's date is {date}.
 
 Input: "{user_message}"
 
@@ -67,7 +70,7 @@ class Truth(commands.Cog):
     async def fact_check(self, message: discord.Message) -> str:
         try:
             content = message.content
-            prompt = TRUTH_PROMPT.format(user_name=message.author.display_name, user_message=content)
+            prompt = TRUTH_PROMPT.format(user_name=message.author.display_name, user_message=content, date=datetime.datetime.now().strftime("%B %d, %Y"))
             message = self.ai_client.messages.create(model="claude-3-5-sonnet-20240620", max_tokens=1000, temperature=0, messages=[{"role": "user", "content": [{"type": "text", "text": prompt}]}])
             return message.content[0].text
         except Exception as e:
