@@ -88,7 +88,7 @@ async def test_include_recipe_adds_include_no_boost(clazz, context):
     assert clazz.factory(context).include_recipes == {r.name for r in sloop([r for r in all() if r.name in ["IronOre", "IronIngot"]])}
 
 
-async def test_include_recipe_adds_boosted_include(clazz, context):
+async def test_include_recipe_adds_include_with_boost(clazz, context):
     await clazz.include_recipe.callback(clazz, context, str(Item.IronIngot), 3, 1)
     assert clazz.factory(context).include_recipes == {r.name for r in sloop(all()) if r.original_recipe.name == "IronIngot" and r.sloops == 1 and r.power_shards == 3}
 

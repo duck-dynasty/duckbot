@@ -87,7 +87,7 @@ class Satisfy(Cog):
     async def recipe(self, context: Context):
         pass
 
-    @recipe.command(name="bank", description="Select a recipe bank for the factory to use. Default is... default.")
+    @recipe.command(name="bank", description="Select a recipe bank for the factory to use. Default is... Default.")
     async def recipe_bank(self, context: Context, recipe_bank: str):
         factory = self.factory(context)
         factory.recipe_bank = recipe_bank
