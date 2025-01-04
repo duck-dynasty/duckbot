@@ -7,7 +7,7 @@ from duckbot.cogs.games.satisfy import Satisfy
 from duckbot.cogs.games.satisfy.factory import Factory
 from duckbot.cogs.games.satisfy.item import Item
 from duckbot.cogs.games.satisfy.rates import Rates
-from duckbot.cogs.games.satisfy.recipe import all, default
+from duckbot.cogs.games.satisfy.recipe import all, as_slooped, default
 
 
 @pytest.fixture
@@ -80,12 +80,24 @@ async def test_recipe_bank_stores_bank(clazz, context):
     assert clazz.factory(context).recipe_bank == "Default"
 
 
-async def test_include_recipe_adds_include(clazz, context):
+async def test_include_recipe_adds_include_no_boost(clazz, context):
     await clazz.include_recipe.callback(clazz, context, str(Item.IronOre))
-    assert clazz.factory(context).include_recipes == {"IronOre"}
+    assert clazz.factory(context).include_recipes == {r.name for r in sloop([r for r in all() if r.name in ["IronOre"]])}
 
     await clazz.include_recipe.callback(clazz, context, str(Item.IronIngot))
-    assert clazz.factory(context).include_recipes == {"IronOre", "IronIngot"}
+    assert clazz.factory(context).include_recipes == {r.name for r in sloop([r for r in all() if r.name in ["IronOre", "IronIngot"]])}
+
+
+async def test_include_recipe_adds_boosted_include(clazz, context):
+    await clazz.include_recipe.callback(clazz, context, str(Item.IronIngot), 3, 1)
+    assert clazz.factory(context).include_recipes == {r.name for r in sloop(all()) if r.original_recipe.name == "IronIngot" and r.sloops == 1 and r.power_shards == 3}
+
+    await clazz.include_recipe.callback(clazz, context, str(Item.CopperIngot), 2, 0)
+    assert clazz.factory(context).include_recipes == {
+        r.name
+        for r in sloop(all())
+        if (r.original_recipe.name == "IronIngot" and r.sloops == 1 and r.power_shards == 3) or (r.original_recipe.name == "CopperIngot" and r.sloops == 0 and r.power_shards == 2)
+    }
 
 
 async def test_include_recipe_removes_exclusion(clazz, context):
@@ -95,17 +107,31 @@ async def test_include_recipe_removes_exclusion(clazz, context):
     assert clazz.factory(context).exclude_recipes == set()
 
 
-async def test_exclude_recipe_adds_include(clazz, context):
+async def test_include_recipe_removes_boosted_exclusion(clazz, context):
+    await clazz.exclude_recipe.callback(clazz, context, str(Item.IronIngot), 3, 1)
+    await clazz.include_recipe.callback(clazz, context, str(Item.IronIngot))
+    assert clazz.factory(context).include_recipes == set()
+    assert clazz.factory(context).exclude_recipes == set()
+
+
+async def test_exclude_recipe_adds_exclude_no_boost(clazz, context):
     await clazz.exclude_recipe.callback(clazz, context, str(Item.IronOre))
-    assert clazz.factory(context).exclude_recipes == {"IronOre"}
+    assert clazz.factory(context).exclude_recipes == {r.name for r in sloop([r for r in all() if r.name in ["IronOre"]])}
 
     await clazz.exclude_recipe.callback(clazz, context, str(Item.IronIngot))
-    assert clazz.factory(context).exclude_recipes == {"IronOre", "IronIngot"}
+    assert clazz.factory(context).exclude_recipes == {r.name for r in sloop([r for r in all() if r.name in ["IronOre", "IronIngot"]])}
 
 
 async def test_exclude_recipe_removes_inclusion(clazz, context):
     await clazz.include_recipe.callback(clazz, context, str(Item.IronOre))
     await clazz.exclude_recipe.callback(clazz, context, str(Item.IronOre))
+    assert clazz.factory(context).exclude_recipes == set()
+    assert clazz.factory(context).include_recipes == set()
+
+
+async def test_exclude_recipe_removes_boosted_inclusion(clazz, context):
+    await clazz.include_recipe.callback(clazz, context, str(Item.IronIngot), 3, 1)
+    await clazz.exclude_recipe.callback(clazz, context, str(Item.IronIngot))
     assert clazz.factory(context).exclude_recipes == set()
     assert clazz.factory(context).include_recipes == set()
 
@@ -125,7 +151,7 @@ async def test_solve_all_defaults(opt, clazz, context, default_factory):
     default_factory.inputs = Item.IronOre * 30
     default_factory.maximize = {Item.IronOre}
     expected = copy(default_factory)
-    expected.recipes = default()
+    expected.recipes = sloop(default())
 
     clazz.save(context, default_factory)
     await clazz.solve.callback(clazz, context)
@@ -136,9 +162,9 @@ async def test_solve_all_defaults(opt, clazz, context, default_factory):
 async def test_solve_different_recipe_bank(opt, clazz, context, default_factory):
     default_factory.inputs = Item.IronOre * 30
     default_factory.maximize = {Item.IronOre}
-    default_factory.recipe_bank = "Default"
+    default_factory.recipe_bank = "All"
     expected = copy(default_factory)
-    expected.recipes = default()
+    expected.recipes = sloop(all())
 
     clazz.save(context, default_factory)
     await clazz.solve.callback(clazz, context)
@@ -150,9 +176,9 @@ async def test_solve_recipe_includes(opt, clazz, context, default_factory):
     default_factory.inputs = Item.IronOre * 30
     default_factory.maximize = {Item.IronOre}
     default_factory.recipe_bank = "Default"
-    default_factory.include_recipes = {"DilutedPackagedFuel"}
+    default_factory.include_recipes = {x.name for r in all() for x in as_slooped(r) if r.name == "DilutedPackagedFuel"}
     expected = copy(default_factory)
-    expected.recipes = default() + [r for r in all() if r.name == "DilutedPackagedFuel"]
+    expected.recipes = sloop(default() + [r for r in all() if r.name == "DilutedPackagedFuel"])
 
     clazz.save(context, default_factory)
     await clazz.solve.callback(clazz, context)
@@ -163,10 +189,14 @@ async def test_solve_recipe_includes(opt, clazz, context, default_factory):
 async def test_solve_recipe_excludes(opt, clazz, context, default_factory):
     default_factory.inputs = Item.IronOre * 30
     default_factory.maximize = {Item.IronOre}
-    default_factory.exclude_recipes = {default_factory.recipes[0].name}
+    default_factory.exclude_recipes = {x.name for r in default() for x in as_slooped(r)} - {x.name for r in default() for x in as_slooped(r) if r.name == "IronIngot"}
     expected = copy(default_factory)
-    expected.recipes = default()[1:]
+    expected.recipes = sloop([r for r in default() if r.name == "IronIngot"])
 
     clazz.save(context, default_factory)
     await clazz.solve.callback(clazz, context)
     opt.assert_called_once_with(expected)
+
+
+def sloop(recipes):
+    return {x for r in recipes for x in as_slooped(r)}

@@ -1,15 +1,15 @@
 from dataclasses import dataclass
-from typing import List, Set
+from typing import Set
 
 from .item import Item
 from .rates import Rates
-from .recipe import Recipe
+from .recipe import ModifiedRecipe
 
 
 @dataclass
 class Factory:
     inputs: Rates
-    recipes: List[Recipe]
+    recipes: Set[ModifiedRecipe]
     targets: Rates
     maximize: Set[Item]
     power_shards: int = 0

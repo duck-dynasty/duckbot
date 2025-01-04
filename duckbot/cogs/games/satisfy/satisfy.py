@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from discord import Interaction
 from discord.app_commands import Choice
@@ -10,101 +10,13 @@ from .factory import Factory
 from .item import Item
 from .pretty import factory_embed, solution_embed
 from .rates import Rates
-from .recipe import all, converter, default, raw
+from .recipe import all, as_slooped
+from .recipe_banks import recipe_banks
 from .solver import optimize
 
 item_names = [i.name for i in Item]
 boost_item_names = [Item.PowerShard.name, Item.Somersloop.name]
-recipe_banks = {
-    "All": all(),
-    "All - Conversions": [r for r in all() if r.name not in [x.name for x in converter()]],
-    "All - RawSupply": [r for r in all() if r.name not in [x.name for x in raw()]],
-    "All - Conversions - RawSupply": [r for r in all() if r.name not in [x.name for x in converter() + raw()]],
-    "Default": default(),
-    "Default + Conversions": default() + converter(),
-    "Default + RawSupply": default() + raw(),
-    "Default + Conversions + RawSupply": default() + converter() + raw(),
-    "Multiplayer": [r for r in all() if r.name not in [x.name for x in converter() + raw()]],
-    "Clandestine": default()
-    + [
-        r
-        for r in all()
-        if r.name
-        in [
-            "IronWire",
-            "EncasedIndustrialPipe",
-            "StitchedIronPlate",
-            "WetConcrete",
-            "AutomatedMiner",
-            "SteelScrew",
-            "CastScrew",
-            "SolidSteelIngot",
-            "SteamedCopperSheet",
-            "SteelRotor",
-            "IronAlloyIngot",
-            "MoldedBeam",
-            "IronPipe",
-            "DilutedPackagedFuel",
-            "HeavyEncasedFrame",
-            "RecycledPlastic",
-            "HeavyOilResidue",
-            "RecycledRubber",
-            "PureCopperIngot",
-            "FusedQuickwire",
-            "CateriumCircuitBoard",
-            "CrystalComputer",
-            "InsulatedCrystalOscillator",
-            "PureCateriumIngot",
-            "PlasticAiLimiter",
-            "CokeSteelIngot",
-            "PolymerResin",
-            "MoldedSteelPipe",
-            "TemperedCateriumIngot",
-            "FineConcrete",
-            "CopperAlloyIngot",
-            "SteelRod",
-            "SteeledFrame",
-            "BoltedIronPlate",
-            "FlexibleFramework",
-            "PlasticSmartPlating",
-            "CheapSilica",
-            "AutomatedSpeedWiring",
-            "SloppyAlumina",
-            "PureAluminumIngot",
-            "ElectrodeAluminumScrap",
-            "SiliconCircuitBoard",
-            "AlcladCasing",
-            "RadioControlSystem",
-            "DilutedFuel",
-            "BasicIronIngot",
-            "CateriumComputer",
-            "ClassicBattery",
-            "PureIronIngot",
-            "TurboBlendFuel",
-            "TemperedCopperIngot",
-            "FusedWire",
-            "PureQuartzCrystal",
-            "InstantScrap",
-            "ElectrodeCircuitBoard",
-            "SiliconHighSpeedConnector",
-            "AluminumBeam",
-            "CateriumWire",
-            "BoltedFrame",
-            "LeachedCateriumIngot",
-            "HeavyFlexibleFrame",
-            "AdheredIronPlate",
-            "QuickwireCable",
-            "AluminumRod",
-            "InsulatedCable",
-            "CompactedSteelIngot",
-            "CoatedCable",
-            "FineBlackPowder",
-            "CompactedCoal",
-            "PolyesterFabric",
-        ]
-    ],
-}
-recipe_names = [r.name for r in all()]
+recipes_by_name = {r.name: r for r in all()}
 
 
 class Satisfy(Cog):
@@ -113,7 +25,7 @@ class Satisfy(Cog):
         self.factory_cache = {}
 
     def factory(self, context: Context) -> Factory:
-        factory = Factory(inputs=Rates(), targets=Rates(), maximize=set(), recipes=all(), power_shards=0, sloops=0)
+        factory = Factory(inputs=Rates(), targets=Rates(), maximize=set(), recipes=set(), power_shards=0, sloops=0)
         # monkeypatch fields for recipe manipulations
         factory.recipe_bank = "Default"
         factory.include_recipes = set()
@@ -175,7 +87,7 @@ class Satisfy(Cog):
     async def recipe(self, context: Context):
         pass
 
-    @recipe.command(name="bank", description="Select a recipe bank for the factory to use. Default is All.")
+    @recipe.command(name="bank", description="Select a recipe bank for the factory to use. Default is... default.")
     async def recipe_bank(self, context: Context, recipe_bank: str):
         factory = self.factory(context)
         factory.recipe_bank = recipe_bank
@@ -183,22 +95,32 @@ class Satisfy(Cog):
         await context.send(embed=factory_embed(factory), delete_after=60)
 
     @recipe.command(name="include", description="Forces a recipe to be available to the solver. Undoes /satisfy recipe exclude")
-    async def include_recipe(self, context: Context, recipe: str):
+    async def include_recipe(self, context: Context, recipe: str, power_shards: Optional[int] = None, sloops: Optional[int] = None):
+        if (power_shards is not None and sloops is None) or (power_shards is None and sloops is not None):
+            raise ValueError("Both power shards and sloops must be specified, or neither.")
         factory = self.factory(context)
-        if recipe in factory.exclude_recipes:
-            factory.exclude_recipes.remove(recipe)
+        r = recipes_by_name[recipe]
+        slooped = as_slooped(r)
+        to_include = [r.name for r in slooped] if power_shards is None and sloops is None else [r.name for r in slooped if r.power_shards == power_shards and r.sloops == sloops]
+        if any(i in factory.exclude_recipes for i in to_include):
+            factory.exclude_recipes = factory.exclude_recipes - set(to_include)
         else:
-            factory.include_recipes.add(recipe)
+            factory.include_recipes = factory.include_recipes | set(to_include)
         self.save(context, factory)
         await context.send(embed=factory_embed(factory), delete_after=60)
 
     @recipe.command(name="exclude", description="Makes a recipe to be unavailable to the solver. Undoes /satisfy recipe include")
-    async def exclude_recipe(self, context: Context, recipe: str):
+    async def exclude_recipe(self, context: Context, recipe: str, power_shards: Optional[int] = None, sloops: Optional[int] = None):
+        if (power_shards is not None and sloops is None) or (power_shards is None and sloops is not None):
+            raise ValueError("Both power shards and sloops must be specified, or neither.")
         factory = self.factory(context)
-        if recipe in factory.include_recipes:
-            factory.include_recipes.remove(recipe)
+        r = recipes_by_name[recipe]
+        slooped = as_slooped(r)
+        to_exclude = [r.name for r in slooped] if power_shards is None and sloops is None else [r.name for r in slooped if r.power_shards == power_shards and r.sloops == sloops]
+        if any(i in factory.include_recipes for i in to_exclude):
+            factory.include_recipes = factory.include_recipes - set(to_exclude)
         else:
-            factory.exclude_recipes.add(recipe)
+            factory.exclude_recipes = factory.exclude_recipes | set(to_exclude)
         self.save(context, factory)
         await context.send(embed=factory_embed(factory), delete_after=60)
 
@@ -207,9 +129,10 @@ class Satisfy(Cog):
         factory = self.factory(context)
         if factory.targets or (factory.inputs and factory.maximize):
             async with context.typing():
-                recipes = [r for r in recipe_banks[factory.recipe_bank] if r.name not in factory.exclude_recipes]
-                names = [r.name for r in recipes]
-                factory.recipes = recipes + [r for r in all() if r.name in factory.include_recipes and r.name not in names]
+                bank = [x for r in recipe_banks[factory.recipe_bank] for x in as_slooped(r)]
+                recipes = [r for r in bank if r.name not in factory.exclude_recipes]
+                includes = [x for r in all() for x in as_slooped(r) if x.name in factory.include_recipes]
+                factory.recipes = {r for r in (recipes + includes)}
                 solution = optimize(factory)
                 if solution is None:
                     await context.send("Why do you hate possible?", delete_after=60)
@@ -236,7 +159,7 @@ class Satisfy(Cog):
     @include_recipe.autocomplete("recipe")
     @exclude_recipe.autocomplete("recipe")
     async def recipes(self, interaction: Interaction, current: str) -> List[Choice[str]]:
-        return choices(recipe_names, current)
+        return choices(recipes_by_name.keys(), current)
 
     @reset.error
     @add_input.error
@@ -261,4 +184,4 @@ def choices(pool: List[str], needle: str, threshold: int = 3) -> List[Choice[str
     if len(needle) < threshold:
         return []
     else:
-        return [Choice(name=i, value=i) for i in pool if match(needle.lower(), i.lower())]
+        return [Choice(name=i, value=i) for i in pool if match(needle.lower(), i.lower())][:25]
