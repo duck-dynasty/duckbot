@@ -51,6 +51,12 @@ class ModifiedRecipe:
         return 1.0 + self.sloops / self.building.max_sloop if self.building.max_sloop > 0 else 1.0
 
 
+def as_slooped(recipe: Recipe) -> List[ModifiedRecipe]:
+    original = ModifiedRecipe(recipe, power_shards=0, sloops=0)
+    slooped = [ModifiedRecipe(recipe, power_shards, sloops) for power_shards in range(0, recipe.building.max_shards + 1) for sloops in range(1, recipe.building.max_sloop + 1)]
+    return [original] + slooped
+
+
 def default() -> List[Recipe]:
     return regular() + packager() + power() + awesome_sink()
 

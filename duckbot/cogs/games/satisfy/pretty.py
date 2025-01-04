@@ -39,9 +39,12 @@ def factory_embed(factory: Factory) -> Embed:
     maxify = "\n".join([str(item) for item in factory.maximize]) if factory.maximize else "N/A"
     embed.add_field(name="Maximize", value=maxify)
 
+    def group_recipes(names):
+        return sorted(list({n.split("#")[0] for n in names}))
+
     embed.add_field(name="Recipe Bank", value=factory.recipe_bank)
-    embed.add_field(name="Recipe Includes", value="\n".join(factory.include_recipes) if factory.include_recipes else "N/A")
-    embed.add_field(name="Recipe Excludes", value="\n".join(factory.exclude_recipes) if factory.exclude_recipes else "N/A")
+    embed.add_field(name="Recipe Includes", value="\n".join(group_recipes(factory.include_recipes)) if factory.include_recipes else "N/A")
+    embed.add_field(name="Recipe Excludes", value="\n".join(group_recipes(factory.exclude_recipes)) if factory.exclude_recipes else "N/A")
 
     return embed
 

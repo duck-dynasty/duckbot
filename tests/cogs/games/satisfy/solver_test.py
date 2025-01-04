@@ -5,7 +5,13 @@ import pytest
 from duckbot.cogs.games.satisfy.factory import Factory
 from duckbot.cogs.games.satisfy.item import Item
 from duckbot.cogs.games.satisfy.rates import Rates
-from duckbot.cogs.games.satisfy.recipe import ModifiedRecipe, all, default, raw
+from duckbot.cogs.games.satisfy.recipe import (
+    ModifiedRecipe,
+    all,
+    as_slooped,
+    default,
+    raw,
+)
 from duckbot.cogs.games.satisfy.solver import optimize
 
 all_no_raw = [r for r in all() if r.name not in [x.name for x in raw()]]
@@ -18,7 +24,7 @@ def approx(x):
 
 
 def factory(*, input: Rates, target: Rates = Rates(), maximize: Set[Item] = set(), recipes=all_no_raw, power_shards: int = 0, sloops: int = 0):
-    return Factory(inputs=input, targets=target, maximize=maximize, power_shards=power_shards, sloops=sloops, recipes=recipes)
+    return Factory(inputs=input, targets=target, maximize=maximize, power_shards=power_shards, sloops=sloops, recipes=[x for r in recipes for x in as_slooped(r)])
 
 
 def test_optimize_empty_factory_returns_empty():
