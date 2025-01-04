@@ -85,7 +85,6 @@ if __name__ == "__main__":
                 "pytest-sugar==1.0.0",
                 "pytest-icdiff==0.9",
                 "pytest-cov==6.0.0",
-                "pytest-lazy-fixture==0.6.3",
             ],
             "cdk": [
                 "aws-cdk.core==1.204.0",
