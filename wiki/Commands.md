@@ -217,6 +217,14 @@ Note: alternatively, undoes `/satisfy recipe include` for the recipe. In that ca
 Power shards and sloops amount can also be specified to exclude a specific boosted recipe. If neither is provided, all boosted variants of the recipe are excluded. Note that this can lead to some confusing factory states (with a recipe being both included and excluded) since boosted recipes are not distinguished from the base recipe. Basically, deal with it.
 
 ```
+/satisfy recipe limit   name limit [power_shards sloops]
+```
+
+Makes it so the solver cannot use more than `limit` instances of a given recipe. Note that if the recipe is not available (not in the bank, or explicitly excluded), then this limit will have no effect.
+
+Power shards and sloops amount can also be specified to limit usage of a specific boosted recipe. If neither is provided, all boosted variants of the recipe are limited.
+
+```
 /satisfy solve
 ```
 
