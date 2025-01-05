@@ -114,12 +114,30 @@ async def test_include_recipe_removes_boosted_exclusion(clazz, context):
     assert clazz.factory(context).exclude_recipes == set()
 
 
+@pytest.mark.parametrize("shards,sloops", [(None, 0), (0, None)])
+async def test_include_recipe_invalid_args(clazz, context, shards, sloops):
+    with pytest.raises(ValueError):
+        await clazz.include_recipe.callback(clazz, context, str(Item.IronIngot), shards, sloops)
+
+
 async def test_exclude_recipe_adds_exclude_no_boost(clazz, context):
     await clazz.exclude_recipe.callback(clazz, context, str(Item.IronOre))
     assert clazz.factory(context).exclude_recipes == {r.name for r in sloop([r for r in all() if r.name in ["IronOre"]])}
 
     await clazz.exclude_recipe.callback(clazz, context, str(Item.IronIngot))
     assert clazz.factory(context).exclude_recipes == {r.name for r in sloop([r for r in all() if r.name in ["IronOre", "IronIngot"]])}
+
+
+async def test_exclude_recipe_adds_include_with_boost(clazz, context):
+    await clazz.exclude_recipe.callback(clazz, context, str(Item.IronIngot), 3, 1)
+    assert clazz.factory(context).exclude_recipes == {r.name for r in sloop(all()) if r.original_recipe.name == "IronIngot" and r.sloops == 1 and r.power_shards == 3}
+
+    await clazz.exclude_recipe.callback(clazz, context, str(Item.CopperIngot), 2, 0)
+    assert clazz.factory(context).exclude_recipes == {
+        r.name
+        for r in sloop(all())
+        if (r.original_recipe.name == "IronIngot" and r.sloops == 1 and r.power_shards == 3) or (r.original_recipe.name == "CopperIngot" and r.sloops == 0 and r.power_shards == 2)
+    }
 
 
 async def test_exclude_recipe_removes_inclusion(clazz, context):
@@ -134,6 +152,46 @@ async def test_exclude_recipe_removes_boosted_inclusion(clazz, context):
     await clazz.exclude_recipe.callback(clazz, context, str(Item.IronIngot))
     assert clazz.factory(context).exclude_recipes == set()
     assert clazz.factory(context).include_recipes == set()
+
+
+@pytest.mark.parametrize("shards,sloops", [(None, 0), (0, None)])
+async def test_exclude_recipe_invalid_args(clazz, context, shards, sloops):
+    with pytest.raises(ValueError):
+        await clazz.exclude_recipe.callback(clazz, context, str(Item.IronIngot), shards, sloops)
+
+
+async def test_limit_recipe_adds_limit_no_boost(clazz, context, default_factory):
+    await clazz.limit_recipe.callback(clazz, context, str(Item.IronOre), 30)
+    assert clazz.factory(context).limits == {x: 30 for x in sloop([r for r in all() if r.name in ["IronOre"]])}
+
+    await clazz.limit_recipe.callback(clazz, context, str(Item.IronIngot), 30)
+    assert clazz.factory(context).limits == {x: 30 for x in sloop([r for r in all() if r.name in ["IronOre", "IronIngot"]])}
+
+
+async def test_limit_recipe_adds_include_with_boost(clazz, context):
+    await clazz.limit_recipe.callback(clazz, context, str(Item.IronIngot), 30, 3, 1)
+    assert clazz.factory(context).limits == {r: 30 for r in sloop(all()) if r.original_recipe.name == "IronIngot" and r.sloops == 1 and r.power_shards == 3}
+
+    await clazz.limit_recipe.callback(clazz, context, str(Item.CopperIngot), 30, 2, 0)
+    assert clazz.factory(context).limits == {
+        r: 30
+        for r in sloop(all())
+        if (r.original_recipe.name == "IronIngot" and r.sloops == 1 and r.power_shards == 3) or (r.original_recipe.name == "CopperIngot" and r.sloops == 0 and r.power_shards == 2)
+    }
+
+
+async def test_limit_recipe_adds_limit_with_boost(clazz, context, default_factory):
+    await clazz.limit_recipe.callback(clazz, context, str(Item.IronOre), 30)
+    assert clazz.factory(context).limits == {x: 30 for x in sloop([r for r in all() if r.name in ["IronOre"]])}
+
+    await clazz.limit_recipe.callback(clazz, context, str(Item.IronIngot), 30)
+    assert clazz.factory(context).limits == {x: 30 for x in sloop([r for r in all() if r.name in ["IronOre", "IronIngot"]])}
+
+
+@pytest.mark.parametrize("shards,sloops", [(None, 0), (0, None)])
+async def test_limit_recipe_invalid_args(clazz, context, shards, sloops):
+    with pytest.raises(ValueError):
+        await clazz.limit_recipe.callback(clazz, context, str(Item.IronIngot), 30, shards, sloops)
 
 
 async def test_solve_no_factory_rejects(clazz, context):

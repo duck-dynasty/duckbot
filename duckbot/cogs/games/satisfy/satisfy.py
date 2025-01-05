@@ -9,7 +9,6 @@ from duckbot.util.embeds import group_by_max_length
 from .factory import Factory
 from .item import Item
 from .pretty import factory_embed, solution_embed
-from .rates import Rates
 from .recipe import all, as_slooped
 from .recipe_banks import recipe_banks
 from .solver import optimize
@@ -25,7 +24,7 @@ class Satisfy(Cog):
         self.factory_cache = {}
 
     def factory(self, context: Context) -> Factory:
-        factory = Factory(inputs=Rates(), targets=Rates(), maximize=set(), recipes=set(), power_shards=0, sloops=0)
+        factory = Factory()
         # monkeypatch fields for recipe manipulations
         factory.recipe_bank = "Default"
         factory.include_recipes = set()
@@ -99,9 +98,7 @@ class Satisfy(Cog):
         if (power_shards is not None and sloops is None) or (power_shards is None and sloops is not None):
             raise ValueError("Both power shards and sloops must be specified, or neither.")
         factory = self.factory(context)
-        r = recipes_by_name[recipe]
-        slooped = as_slooped(r)
-        to_include = [r.name for r in slooped] if power_shards is None and sloops is None else [r.name for r in slooped if r.power_shards == power_shards and r.sloops == sloops]
+        to_include = [r.name for r in recipes_matching(recipe, power_shards, sloops)]
         if any(i in factory.exclude_recipes for i in to_include):
             factory.exclude_recipes = factory.exclude_recipes - set(to_include)
         else:
@@ -114,13 +111,21 @@ class Satisfy(Cog):
         if (power_shards is not None and sloops is None) or (power_shards is None and sloops is not None):
             raise ValueError("Both power shards and sloops must be specified, or neither.")
         factory = self.factory(context)
-        r = recipes_by_name[recipe]
-        slooped = as_slooped(r)
-        to_exclude = [r.name for r in slooped] if power_shards is None and sloops is None else [r.name for r in slooped if r.power_shards == power_shards and r.sloops == sloops]
+        to_exclude = [r.name for r in recipes_matching(recipe, power_shards, sloops)]
         if any(i in factory.include_recipes for i in to_exclude):
             factory.include_recipes = factory.include_recipes - set(to_exclude)
         else:
             factory.exclude_recipes = factory.exclude_recipes | set(to_exclude)
+        self.save(context, factory)
+        await context.send(embed=factory_embed(factory), delete_after=60)
+
+    @recipe.command(name="limit", description="Limits the number of times a recipe can be used.")
+    async def limit_recipe(self, context: Context, recipe: str, limit: float, power_shards: Optional[int] = None, sloops: Optional[int] = None):
+        if (power_shards is not None and sloops is None) or (power_shards is None and sloops is not None):
+            raise ValueError("Both power shards and sloops must be specified, or neither.")
+        factory = self.factory(context)
+        for r in recipes_matching(recipe, power_shards, sloops):
+            factory.limits[r] = limit
         self.save(context, factory)
         await context.send(embed=factory_embed(factory), delete_after=60)
 
@@ -158,8 +163,23 @@ class Satisfy(Cog):
 
     @include_recipe.autocomplete("recipe")
     @exclude_recipe.autocomplete("recipe")
+    @limit_recipe.autocomplete("recipe")
     async def recipes(self, interaction: Interaction, current: str) -> List[Choice[str]]:
         return choices(recipes_by_name.keys(), current)
+
+    @include_recipe.autocomplete("power_shards")
+    @exclude_recipe.autocomplete("power_shards")
+    @limit_recipe.autocomplete("power_shards")
+    async def power_shards(self, interaction: Interaction, current: str) -> List[Choice[str]]:
+        r = recipes_by_name[interaction.namespace.recipe]
+        return [Choice(name=str(p), value=str(p)) for p in range(r.building.max_shards + 1)]
+
+    @include_recipe.autocomplete("sloops")
+    @exclude_recipe.autocomplete("sloops")
+    @limit_recipe.autocomplete("sloops")
+    async def sloops(self, interaction: Interaction, current: str) -> List[Choice[str]]:
+        r = recipes_by_name[interaction.namespace.recipe]
+        return [Choice(name=str(s), value=str(s)) for s in range(r.building.max_sloop + 1)]
 
     @reset.error
     @add_input.error
@@ -169,9 +189,16 @@ class Satisfy(Cog):
     @recipe_bank.error
     @include_recipe.error
     @exclude_recipe.error
+    @limit_recipe.error
     @solve.error
     async def on_error(self, context: Context, error):
         await context.send(str(error), delete_after=60)
+
+
+def recipes_matching(recipe_name: str, power_shards: Optional[int], sloops: Optional[int]) -> List[str]:
+    r = recipes_by_name[recipe_name]
+    slooped = as_slooped(r)
+    return slooped if power_shards is None and sloops is None else [r for r in slooped if r.power_shards == power_shards and r.sloops == sloops]
 
 
 def choices(pool: List[str], needle: str, threshold: int = 3) -> List[Choice[str]]:

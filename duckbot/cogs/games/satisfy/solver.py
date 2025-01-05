@@ -28,13 +28,16 @@ def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
     recipes = limit_recipes(factory.recipes, factory.power_shards, factory.sloops)
 
     def upper_bound(recipe: ModifiedRecipe):
-        if recipe.sloops > 0:
-            return factory.sloops / recipe.sloops
-        item, rate = next(x for x in recipe.outputs.items())
-        if recipe.inputs == Rates() and item in map_limits:
-            return (map_limits[item] - factory.inputs.get(item, 0)) / rate
-        else:
-            return INF
+        def regular_limit():
+            if recipe.sloops > 0:
+                return factory.sloops / recipe.sloops
+            item, rate = next(x for x in recipe.outputs.items())
+            if recipe.inputs == Rates() and item in map_limits:
+                return (map_limits[item] - factory.inputs.get(item, 0)) / rate
+            else:
+                return INF
+
+        return min(regular_limit(), factory.limits.get(recipe, INF))
 
     use_recipe = [model.add_var(name=r.name, lb=0, ub=upper_bound(r)) for r in recipes]
     generate_raw = {i: next((x * r.outputs.singleton_rate() for r, x in zip(recipes, use_recipe) if r.original_recipe.name == str(i)), 0) for i in map_limits.keys()}
