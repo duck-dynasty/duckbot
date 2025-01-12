@@ -42,7 +42,6 @@ def factory_embed(factory: Factory) -> Embed:
     def group_recipes(names, limits={}):
         limits = {r.name: v for r, v in limits.items()}
         names = names | {n for n in limits.keys()}
-        print(limits)
         return sorted(list({n.split("#")[0] + (f" <= {rnd(limits.get(n))}" if n in limits else "") for n in names}))
 
     embed.add_field(name="Recipe Bank", value=factory.recipe_bank)
