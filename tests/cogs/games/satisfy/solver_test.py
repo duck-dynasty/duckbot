@@ -5,7 +5,13 @@ import pytest
 from duckbot.cogs.games.satisfy.factory import Factory
 from duckbot.cogs.games.satisfy.item import Item
 from duckbot.cogs.games.satisfy.rates import Rates
-from duckbot.cogs.games.satisfy.recipe import ModifiedRecipe, all, default, raw
+from duckbot.cogs.games.satisfy.recipe import (
+    ModifiedRecipe,
+    all,
+    as_slooped,
+    default,
+    raw,
+)
 from duckbot.cogs.games.satisfy.solver import optimize
 
 all_no_raw = [r for r in all() if r.name not in [x.name for x in raw()]]
@@ -17,8 +23,8 @@ def approx(x):
     return pytest.approx(x, abs=1e-4)
 
 
-def factory(*, input: Rates, target: Rates = Rates(), maximize: Set[Item] = set(), recipes=all_no_raw, power_shards: int = 0, sloops: int = 0):
-    return Factory(inputs=input, targets=target, maximize=maximize, power_shards=power_shards, sloops=sloops, recipes=recipes)
+def factory(*, input: Rates, target: Rates = Rates(), maximize: Set[Item] = set(), recipes=all_no_raw, limits={}, power_shards: int = 0, sloops: int = 0):
+    return Factory(inputs=input, targets=target, maximize=maximize, power_shards=power_shards, sloops=sloops, recipes=[x for r in recipes for x in as_slooped(r)], limits=limits)
 
 
 def test_optimize_empty_factory_returns_empty():
@@ -57,6 +63,21 @@ def test_optimize_simple_sloop_maximize_returns_recipe():
     f = factory(input=Item.IronOre * 30, maximize=set([Item.IronIngot]), sloops=1, recipes=default_no_raw)
     recipe = recipe_by_name("IronIngot", sloops=1)
     assert optimize(f) == dict([(recipe, approx(1))])
+
+
+def test_optimize_limit_recipe():
+    f = factory(input=Item.IronOre * 30 + Item.Water * 1000, maximize=set([Item.IronIngot]), recipes=all_no_raw, limits={recipe_by_name("PureIronIngot"): 0.5})
+    pure = recipe_by_name("PureIronIngot")
+    smelt = recipe_by_name("IronIngot")
+    assert optimize(f) == dict([(pure, approx(0.5)), (smelt, approx(0.41666))])
+
+
+def test_optimize_limit_boosted_recipe():
+    f = factory(input=Item.IronOre * 30 + Item.Water * 1000, maximize=set([Item.IronIngot]), recipes=default_no_raw, limits={recipe_by_name("PureIronIngot", 1, 2): 0.5}, power_shards=10, sloops=2)
+    pure = recipe_by_name("PureIronIngot")
+    pure_slooped = recipe_by_name("PureIronIngot", 1, 2)
+    f.recipes = f.recipes + [pure, pure_slooped]  # exclude other pure irons so it's forced to use unslooped
+    assert optimize(f) == dict([(pure_slooped, approx(0.5)), (pure, approx(3.75 / 35))])
 
 
 def test_optimize_create_resources_returns_target():

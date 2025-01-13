@@ -1,4 +1,3 @@
-import itertools
 from functools import reduce
 from math import isclose
 from typing import Callable, List, Optional
@@ -8,7 +7,7 @@ from mip import INF, INTEGER, LinExpr, Model, OptimizationStatus, Var, maximize,
 from .factory import Factory
 from .item import Item, sinkable
 from .rates import Rates
-from .recipe import ModifiedRecipe, Recipe
+from .recipe import ModifiedRecipe
 from .weights import map_limits, minmax_weights
 
 good_enough = [
@@ -26,16 +25,19 @@ def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
     model.threads = -1
     model.verbose = 0
 
-    recipes = modify_recipes(factory.recipes, factory.power_shards, factory.sloops)
+    recipes = limit_recipes(factory.recipes, factory.power_shards, factory.sloops)
 
     def upper_bound(recipe: ModifiedRecipe):
-        if recipe.sloops > 0:
-            return factory.sloops / recipe.sloops
-        item, rate = next(x for x in recipe.outputs.items())
-        if recipe.inputs == Rates() and item in map_limits:
-            return (map_limits[item] - factory.inputs.get(item, 0)) / rate
-        else:
-            return INF
+        def regular_limit():
+            if recipe.sloops > 0:
+                return factory.sloops / recipe.sloops
+            item, rate = next(x for x in recipe.outputs.items())
+            if recipe.inputs == Rates() and item in map_limits:
+                return (map_limits[item] - factory.inputs.get(item, 0)) / rate
+            else:
+                return INF
+
+        return min(regular_limit(), factory.limits.get(recipe, INF))
 
     use_recipe = [model.add_var(name=r.name, lb=0, ub=upper_bound(r)) for r in recipes]
     generate_raw = {i: next((x * r.outputs.singleton_rate() for r, x in zip(recipes, use_recipe) if r.original_recipe.name == str(i)), 0) for i in map_limits.keys()}
@@ -67,17 +69,10 @@ def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
     return {r: float(v.x) for r, v in zip(recipes, use_recipe) if v.x is not None and v.x > 0 and not isclose(float(v), 0, abs_tol=1e-4)} if result in good_enough else None
 
 
-def modify_recipes(recipes: List[Recipe], max_shards: int, max_sloops: int) -> List[ModifiedRecipe]:
+def limit_recipes(recipes: List[ModifiedRecipe], max_shards: int, max_sloops: int) -> List[ModifiedRecipe]:
     """Creates recipes which are scaled by power shards and sloops. The recipes are always scaled to max clock
     speed which the power shards allow, then the solver will be allowed to underclock them as needed."""
-    non_sloopers = [ModifiedRecipe(recipe, 0, 0) for recipe in recipes if recipe.building.max_sloop <= 0]
-    zero_sloop = [ModifiedRecipe(recipe, 0, 0) for recipe in recipes if recipe.building.max_sloop > 0]
-    nonzero_sloop = [
-        ModifiedRecipe(recipe, power, sloops)
-        for recipe in recipes
-        for power, sloops in itertools.product(range(0, min(max_shards, recipe.building.max_shards) + 1), range(1, min(max_sloops, recipe.building.max_sloop) + 1))
-    ]
-    return non_sloopers + zero_sloop + nonzero_sloop
+    return [r for r in recipes if r.power_shards <= max_shards if r.sloops <= max_sloops]
 
 
 def amount_by_item_expressions(factory: Factory, recipes: List[ModifiedRecipe], use_recipe: List[Var]) -> dict[Item, LinExpr]:

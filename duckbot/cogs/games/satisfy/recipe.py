@@ -51,6 +51,12 @@ class ModifiedRecipe:
         return 1.0 + self.sloops / self.building.max_sloop if self.building.max_sloop > 0 else 1.0
 
 
+def as_slooped(recipe: Recipe) -> List[ModifiedRecipe]:
+    original = ModifiedRecipe(recipe, power_shards=0, sloops=0)
+    slooped = [ModifiedRecipe(recipe, power_shards, sloops) for power_shards in range(0, recipe.building.max_shards + 1) for sloops in range(1, recipe.building.max_sloop + 1)]
+    return [original] + slooped
+
+
 def default() -> List[Recipe]:
     return regular() + packager() + power() + awesome_sink()
 
@@ -308,7 +314,7 @@ def alternates() -> List[Recipe]:
         manu("CateriumComputer", Item.CircuitBoard * 15 + Item.Quickwire * 52.5 + Item.Rubber * 22.5 >> Item.Computer * 3.75),
         refine("WetConcrete", Item.Limestone * 120 + Item.Water * 100 >> Item.Concrete * 80),
         assy("RubberConcrete", Item.Limestone * 100 + Item.Rubber * 20 >> Item.Concrete * 90),
-        assy("FineConcrete", Item.Silica * 15 + Item.Limestone * 60 >> Item.Concrete * 60),
+        assy("FineConcrete", Item.Silica * 15 + Item.Limestone * 60 >> Item.Concrete * 50),
         blend("CoolingDevice", Item.HeatSink * 10 + Item.Motor * 2.5 + Item.NitrogenGas * 60 >> Item.CoolingSystem * 5),
         refine("PureCopperIngot", Item.CopperOre * 15 + Item.Water * 10 >> Item.CopperIngot * 37.5),
         foundry("CopperAlloyIngot", Item.CopperOre * 50 + Item.IronOre * 50 >> Item.CopperIngot * 100),

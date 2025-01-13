@@ -29,3 +29,8 @@ def test_choices_substring_case_different_returns_matches(substr):
 def test_choices_same_characters_in_same_order_returns_matches(substr):
     pool = ["substr", "nope"]
     assert choices(pool, substr, threshold=0) == [choice("substr")]
+
+
+def test_choices_returns_at_most_25_elements():
+    pool = [f"string-{x}" for x in range(50)]
+    assert len(choices(pool, "string", threshold=0)) == 25

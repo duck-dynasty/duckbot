@@ -199,18 +199,30 @@ Changes the recipe bank. For the love of god, use slash commands for this one. R
 - _Conversions_ modifier: the set of raw resource conversion recipes, does not include other recipes in the Converter
 
 ```
-/satisfy recipe include   name
+/satisfy recipe include   name [power_shards sloops]
 ```
 
 Makes a recipe available to the solver even if it is not in the recipe bank.\
 Note: alternatively, undoes `/satisfy recipe exclude` for the recipe. In that case, the recipe may not be available to the solver unless it is in the recipe bank.
 
+Power shards and sloops amount can also be specified to include a specific boosted recipe. If neither is provided, all boosted variants of the recipe are included. Note that this can lead to some confusing factory states (with a recipe being both included and excluded) since boosted recipes are not distinguished from the base recipe. Basically, deal with it.
+
 ```
-/satisfy recipe exclude   name
+/satisfy recipe exclude   name [power_shards sloops]
 ```
 
 Makes a recipe unavailable to the solver even if it is in the recipe bank.\
 Note: alternatively, undoes `/satisfy recipe include` for the recipe. In that case, the recipe may still be available to the solver unless it is not in the recipe bank.
+
+Power shards and sloops amount can also be specified to exclude a specific boosted recipe. If neither is provided, all boosted variants of the recipe are excluded. Note that this can lead to some confusing factory states (with a recipe being both included and excluded) since boosted recipes are not distinguished from the base recipe. Basically, deal with it.
+
+```
+/satisfy recipe limit   name limit [power_shards sloops]
+```
+
+Makes it so the solver cannot use more than `limit` instances of a given recipe. Note that if the recipe is not available (not in the bank, or explicitly excluded), then this limit will have no effect.
+
+Power shards and sloops amount can also be specified to limit usage of a specific boosted recipe. If neither is provided, all boosted variants of the recipe are limited.
 
 ```
 /satisfy solve

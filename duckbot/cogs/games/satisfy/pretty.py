@@ -39,9 +39,14 @@ def factory_embed(factory: Factory) -> Embed:
     maxify = "\n".join([str(item) for item in factory.maximize]) if factory.maximize else "N/A"
     embed.add_field(name="Maximize", value=maxify)
 
+    def group_recipes(names, limits={}):
+        limits = {r.name: v for r, v in limits.items()}
+        names = names | {n for n in limits.keys()}
+        return sorted(list({n.split("#")[0] + (f" <= {rnd(limits.get(n))}" if n in limits else "") for n in names}))
+
     embed.add_field(name="Recipe Bank", value=factory.recipe_bank)
-    embed.add_field(name="Recipe Includes", value="\n".join(factory.include_recipes) if factory.include_recipes else "N/A")
-    embed.add_field(name="Recipe Excludes", value="\n".join(factory.exclude_recipes) if factory.exclude_recipes else "N/A")
+    embed.add_field(name="Recipe Includes", value="\n".join(group_recipes(factory.include_recipes)) if factory.include_recipes else "N/A")
+    embed.add_field(name="Recipe Excludes", value="\n".join(group_recipes(factory.exclude_recipes, factory.limits)) if factory.exclude_recipes or factory.limits else "N/A")
 
     return embed
 
@@ -101,8 +106,8 @@ def solution_summary(solution: dict[ModifiedRecipe, float]) -> SolutionSummary:
     return SolutionSummary(
         inputs=Rates(dict((k, -v) for k, v in totals.items() if v < 0)),
         outputs=Rates(dict((k, v) for k, v in totals.items() if v > 0)),
-        total_shards=sum([ceil(n * r.power_shards) for r, n in solution.items()]),
-        total_sloops=sum([ceil(n * r.sloops) for r, n in solution.items()]),
+        total_shards=sum([ceil(n) * r.power_shards for r, n in solution.items()]),
+        total_sloops=sum([ceil(n) * r.sloops for r, n in solution.items()]),
     )
 
 

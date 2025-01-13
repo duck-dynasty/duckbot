@@ -68,8 +68,8 @@ if __name__ == "__main__":
         ],
         extras_require={
             "dev": [
-                "pytest==7.4.4",
-                "pytest-asyncio==0.23.8",
+                "pytest==8.3.4",
+                "pytest-asyncio==0.25.1",
                 "pytest-xdist[psutil]==3.6.1",
                 "flake8==7.1.1",
                 "black==24.10.0",
@@ -85,7 +85,6 @@ if __name__ == "__main__":
                 "pytest-sugar==1.0.0",
                 "pytest-icdiff==0.9",
                 "pytest-cov==6.0.0",
-                "pytest-lazy-fixture==0.6.3",
             ],
             "cdk": [
                 "aws-cdk.core==1.204.0",
