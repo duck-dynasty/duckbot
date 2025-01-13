@@ -314,7 +314,7 @@ def alternates() -> List[Recipe]:
         manu("CateriumComputer", Item.CircuitBoard * 15 + Item.Quickwire * 52.5 + Item.Rubber * 22.5 >> Item.Computer * 3.75),
         refine("WetConcrete", Item.Limestone * 120 + Item.Water * 100 >> Item.Concrete * 80),
         assy("RubberConcrete", Item.Limestone * 100 + Item.Rubber * 20 >> Item.Concrete * 90),
-        assy("FineConcrete", Item.Silica * 15 + Item.Limestone * 60 >> Item.Concrete * 60),
+        assy("FineConcrete", Item.Silica * 15 + Item.Limestone * 60 >> Item.Concrete * 50),
         blend("CoolingDevice", Item.HeatSink * 10 + Item.Motor * 2.5 + Item.NitrogenGas * 60 >> Item.CoolingSystem * 5),
         refine("PureCopperIngot", Item.CopperOre * 15 + Item.Water * 10 >> Item.CopperIngot * 37.5),
         foundry("CopperAlloyIngot", Item.CopperOre * 50 + Item.IronOre * 50 >> Item.CopperIngot * 100),
