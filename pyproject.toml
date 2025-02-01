@@ -13,7 +13,6 @@ multi_line_output = 3
 [tool.pytest.ini_options]
 addopts = """\
     -ra \
-    --mdformat \
     -n auto --dist loadfile \
     --blockage"""
 asyncio_mode = "auto"
