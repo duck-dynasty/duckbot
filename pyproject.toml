@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools", "wheel", "nltk==3.9.1", "textblob==0.18.0.post0"]
+requires = ["setuptools", "wheel", "nltk==3.9.1", "textblob==0.19.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.black]
@@ -13,7 +13,6 @@ multi_line_output = 3
 [tool.pytest.ini_options]
 addopts = """\
     -ra \
-    --mdformat \
     -n auto --dist loadfile \
     --blockage"""
 asyncio_mode = "auto"
