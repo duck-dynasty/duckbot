@@ -8,8 +8,8 @@ from .recipe import ModifiedRecipe
 
 @dataclass
 class Factory:
-    inputs: Rates = Rates()
-    targets: Rates = Rates()
+    inputs: Rates = field(default_factory=Rates)
+    targets: Rates = field(default_factory=Rates)
     maximize: Set[Item] = field(default_factory=set)
     recipes: Set[ModifiedRecipe] = field(default_factory=set)
     limits: Dict[ModifiedRecipe, float] = field(default_factory=dict)
