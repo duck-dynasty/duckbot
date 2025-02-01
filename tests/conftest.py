@@ -4,7 +4,6 @@ import logging
 pytest_plugins = (
     "tests.fixtures",
     "tests.fixtures.discord",
-    "tests.fixtures.mdformat",
 )
 
 
