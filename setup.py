@@ -64,7 +64,7 @@ if __name__ == "__main__":
             "wolframalpha==5.1.3",
             "yfinance==0.2.51",
             "mip==1.15.0",
-            "anthropic==0.42.0",  # sdk for llm
+            "anthropic==0.45.2",  # sdk for llm
         ],
         extras_require={
             "dev": [
