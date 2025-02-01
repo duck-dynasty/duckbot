@@ -57,7 +57,7 @@ if __name__ == "__main__":
             "SQLAlchemy==2.0.37",
             "d20==1.1.2",
             "nltk==3.9.1",  # also in pyproject.toml, required for setup script above
-            "textblob==0.18.0.post0",  # also in pyproject.toml, required for setup script above
+            "textblob==0.19.0",  # also in pyproject.toml, required for setup script above
             "pyfiglet==1.0.2",
             "matplotlib==3.10.0",
             "PyGithub==2.1.1",
@@ -72,9 +72,9 @@ if __name__ == "__main__":
                 "pytest-asyncio==0.25.3",
                 "pytest-xdist[psutil]==3.6.1",
                 "flake8==7.1.1",
-                "black==24.10.0",
+                "black==25.1.0",
                 "flake8-black==0.3.6",
-                "isort==5.13.2",
+                "isort==6.0.0",
                 "flake8-isort==6.1.2",
                 "pep8-naming==0.14.1",
                 "mdformat==0.7.22",
