@@ -67,6 +67,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.repository == 'duck-dynasty/duckbot'
     concurrency: deploy
+    environment: prod
     steps:
     - uses: actions/checkout@v4
     - name: Build and Push Docker Image
