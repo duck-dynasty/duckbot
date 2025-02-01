@@ -48,12 +48,12 @@ async def test_react_to_tito_reaction_tito_emoji(payload, bot, channel, message)
 
 def assert_flags_sent(message):
     calls = [
-        mock.call("\U0001F1E7\U0001F1E6"),
-        mock.call("\U0001F1ED\U0001F1F7"),
-        mock.call("\U0001F1FD\U0001F1F0"),
-        mock.call("\U0001F1F2\U0001F1EA"),
-        mock.call("\U0001F1F2\U0001F1F0"),
-        mock.call("\U0001F1F7\U0001F1F8"),
-        mock.call("\U0001F1F8\U0001F1EE"),
+        mock.call("\U0001f1e7\U0001f1e6"),
+        mock.call("\U0001f1ed\U0001f1f7"),
+        mock.call("\U0001f1fd\U0001f1f0"),
+        mock.call("\U0001f1f2\U0001f1ea"),
+        mock.call("\U0001f1f2\U0001f1f0"),
+        mock.call("\U0001f1f7\U0001f1f8"),
+        mock.call("\U0001f1f8\U0001f1ee"),
     ]
     message.add_reaction.assert_has_calls(calls, any_order=True)
