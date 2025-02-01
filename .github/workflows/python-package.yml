@@ -59,21 +59,11 @@ jobs:
         . ../${{ steps.cdk.outputs.venv-path }}/bin/activate
         cdk synth
 
-  release:
+  deploy:
     needs:
     - test
     - sanity
     - synthesize
-    runs-on: ubuntu-latest
-    if: ${{ always() }}
-    steps:
-    - run: exit 1
-      if: ${{ contains(needs.*.result, 'failure') }}
-    - run: echo all checks passed
-
-  deploy:
-    needs:
-    - release
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.repository == 'duck-dynasty/duckbot'
     concurrency: deploy
