@@ -32,7 +32,7 @@ jobs:
     - name: Run Linter
       run: |
         . ${{ steps.venv.outputs.path }}/bin/activate
-        flake8 duckbot tests && mdformat --check .
+        flake8 duckbot tests *.py && mdformat --check duckbot tests wiki *.md
 
   sanity:
     runs-on: ubuntu-latest
