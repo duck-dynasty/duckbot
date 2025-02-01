@@ -15,7 +15,7 @@ async def test_react_duck_random_fails(random, bot, message):
 async def test_react_duck_random_passes(random, bot, message):
     clazz = Duck(bot)
     await clazz.react_duck(message)
-    message.add_reaction.assert_called_once_with("\U0001F986")
+    message.add_reaction.assert_called_once_with("\U0001f986")
 
 
 @mock.patch("random.random", return_value=0)

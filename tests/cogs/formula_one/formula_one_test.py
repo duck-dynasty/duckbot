@@ -41,9 +41,9 @@ async def test_car_do_be_going_fast_though_not_dank_channel(bot, message, setup_
     message.add_reaction.assert_not_called()
 
 
-@mock.patch("random.choice", return_value=["\U0001F170"])
+@mock.patch("random.choice", return_value=["\U0001f170"])
 async def test_car_do_be_going_fast_though_dank_channel(random, bot, message, setup_emojis):
     message.channel.name = "dank"
     clazz = FormulaOne(bot)
     await clazz.car_do_be_going_fast_though(message)
-    message.add_reaction.assert_called_once_with("\U0001F170")
+    message.add_reaction.assert_called_once_with("\U0001f170")
