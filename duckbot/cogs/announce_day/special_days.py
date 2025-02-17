@@ -2,7 +2,7 @@ import math
 from datetime import date, datetime
 
 import discord
-from dateutil.relativedelta import FR, SU
+from dateutil.relativedelta import FR, MO, SU
 from dateutil.relativedelta import relativedelta as rd
 from holidays.countries import CA
 
@@ -28,6 +28,7 @@ class SpecialDays(CA):
         self[date(year, 1, 31)] = f"Erin and Taras' Anniversary. It's been {year-2010} entire years"
         self[date(year, 2, 2)] = "Groundhog Day"
         self[date(year, 2, 14)] = "Valentine's Day"
+        self[date(year, 2, 1) + rd(weekday=MO(+3))] = "Family Day"
         self[date(year, 3, 9)] = f"Lachlan's Birthday. He is {year-1989} years old. All hail this magnificent and unsurpassed achievement in longevity. Glory be unto him"
         self[date(year, 3, 14)] = f"Pi Day ({math.pi}). Celebrate by eating half of a pie"
         self[date(year, 3, 17)] = "St. Patrick's Day"

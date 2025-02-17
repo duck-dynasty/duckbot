@@ -43,3 +43,9 @@ def test_populate_duckbot_day(now, bot, time, seconds):
     now.return_value = time
     clazz = SpecialDays(bot)
     assert clazz.get_list(time) == [f"DuckBot's Inception Day. I'm about {seconds}s old"]
+
+
+@pytest.mark.parametrize("date", [datetime(2024, 2, 19), datetime(2025, 2, 17), datetime(2026, 2, 16)])
+def test_populate_family_day(bot, date):
+    clazz = SpecialDays(bot)
+    assert clazz.get_list(date) == ["Family Day"]
