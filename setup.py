@@ -95,7 +95,7 @@ if __name__ == "__main__":
                 "aws-cdk.aws-iam==1.204.0",
                 "aws-cdk.aws-logs==1.204.0",
                 "aws-cdk.aws-ssm==1.204.0",
-                "boto3==1.36.11",
+                "boto3==1.37.4",
             ],
         },
         entry_points={
