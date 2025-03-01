@@ -47,7 +47,7 @@ if __name__ == "__main__":
         cmdclass={"develop": PostDevelop, "install": PostInstall},
         install_requires=[
             "discord.py[voice]==2.4.0",
-            "beautifulsoup4==4.12.3",
+            "beautifulsoup4==4.13.3",
             "requests==2.32.3",
             "pytz==2025.1",
             "timezonefinder==6.5.8",
