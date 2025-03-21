@@ -53,4 +53,15 @@ def phrases(supermax):
             regional_indicator("e"),
             regional_indicator("d"),
         ],
+        # San Diego
+        [
+            regional_indicator("s"),
+            regional_indicator("a"),
+            regional_indicator("n"),
+            regional_indicator("d"),
+            regional_indicator("i"),
+            regional_indicator("e"),
+            regional_indicator("g"),
+            regional_indicator("o"),
+        ],
     ]
