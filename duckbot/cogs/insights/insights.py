@@ -16,7 +16,7 @@ class Insights(commands.Cog):
     def cog_unload(self):
         self.check_should_respond_loop.cancel()
 
-    @tasks.loop(minutes=139.0)
+    @tasks.loop(minutes=random.choice([101, 113, 131, 139, 151]))
     async def check_should_respond_loop(self):
         await self.check_should_respond()
 
