@@ -49,7 +49,7 @@ if __name__ == "__main__":
             "discord.py[voice]==2.5.0",
             "beautifulsoup4==4.13.3",
             "requests==2.32.3",
-            "pytz==2025.1",
+            "pytz==2025.2",
             "timezonefinder==6.5.9",
             "holidays==0.69",
             "pyowm==3.3.0",  # openweather
