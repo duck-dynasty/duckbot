@@ -1,15 +1,8 @@
 import os
-import subprocess
 
 from setuptools import find_packages, setup
-from setuptools.command.develop import develop
+from setuptools.command.editable_wheel import editable_wheel
 from setuptools.command.install import install
-
-
-def run_code_formatters():
-    for tool in ["isort .", "black .", "mdformat .", "flake8 duckbot tests *.py", "mdformat --check duckbot tests wiki *.md"]:
-        print(f"running `{tool}`")
-        subprocess.run(tool, shell=True)
 
 
 def download_nltk_data():
@@ -25,9 +18,9 @@ def download_nltk_data():
     textblob.download_corpora.main()
 
 
-class PostDevelop(develop):
+class PostDevelop(editable_wheel):
     def run(self):
-        develop.run(self)
+        editable_wheel.run(self)
         self.execute(download_nltk_data, [], msg="Download NLTK Data")
 
 
@@ -44,7 +37,7 @@ if __name__ == "__main__":
         url="https://github.com/duck-dynasty/duckbot",
         python_requires=">=3.10",
         packages=find_packages(),
-        cmdclass={"develop": PostDevelop, "install": PostInstall},
+        cmdclass={"editable_wheel": PostDevelop, "install": PostInstall},
         install_requires=[
             "discord.py[voice]==2.5.0",
             "beautifulsoup4==4.13.3",
@@ -100,7 +93,7 @@ if __name__ == "__main__":
         },
         entry_points={
             "console_scripts": [
-                f"format = setup:{run_code_formatters.__name__} [dev]",
+                "format = scripts:format [dev]",
             ]
         },
     )

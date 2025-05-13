@@ -21,7 +21,7 @@ Before running DuckBot, you want to create a virtualenv to develop in. DuckBot r
 python3.10 -m venv --clear --prompt duckbot venv
 . venv/bin/activate
 pip install --upgrade pip setuptools wheel
-SETUPTOOLS_ENABLE_FEATURES="legacy-editable" pip install --editable .[dev]
+pip install --editable .[dev]
 ```
 
 The `dev` extras will also install development dependencies, like `pytest`. The installation commands should be run whenever you merge from upstream.
@@ -82,7 +82,7 @@ If your work doesn't need a full setup, you can just run `python -m duckbot` for
 Deployment scripts are written using [CDK](https://docs.aws.amazon.com/cdk/latest/guide/home.html), the AWS Cloud Development Kit. The CDK dependencies can be installed alongside DuckBot.
 
 ```sh
-SETUPTOOLS_ENABLE_FEATURES="legacy-editable" pip install --editable .[dev,cdk]  # run from repository root
+pip install --editable .[dev,cdk]  # run from repository root
 ```
 
 You'll then actually need CDK. It's a nodejs package, so you'll need that as well.
