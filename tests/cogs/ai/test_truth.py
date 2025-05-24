@@ -1,3 +1,4 @@
+from datetime import datetime
 from unittest import mock
 
 import discord
@@ -45,7 +46,11 @@ def ctx():
 
 @pytest.fixture
 def message():
-    return mock.Mock(content="This is a message.")
+    msg = mock.Mock(content="This is a message.")
+    msg.created_at = datetime(2024, 1, 15, 12, 0, 0)
+    msg.edited_at = None
+    msg.author.display_name = "TestUser"
+    return msg
 
 
 @pytest.fixture(autouse=True)
@@ -93,6 +98,8 @@ async def test_truth_with_reference(truth, ctx):
     referenced_message = mock.MagicMock(spec=discord.Message)
     referenced_message.content = "Test content"
     referenced_message.author.display_name = "TestUser"
+    referenced_message.created_at = datetime(2024, 1, 15, 12, 0, 0)
+    referenced_message.edited_at = None
     referenced_message.reply = mock.AsyncMock()
 
     # Mock get_message_reference directly with the referenced message
@@ -102,3 +109,19 @@ async def test_truth_with_reference(truth, ctx):
     # Verify only that the referenced message got the reply
     referenced_message.reply.assert_called_once_with("Fact-checked response.")
     ctx.message.delete.assert_called()
+
+
+async def test_fact_check_uses_edited_timestamp_when_available(truth):
+    # Create a message with both created and edited timestamps
+    message = mock.MagicMock(spec=discord.Message)
+    message.content = "This is an edited message."
+    message.author.display_name = "TestUser"
+    message.created_at = datetime(2024, 1, 15, 12, 0, 0)
+    message.edited_at = datetime(2024, 1, 16, 14, 30, 0)
+
+    await truth.fact_check(message)
+
+    # Verify the AI client was called with the edited date
+    call_args = truth.ai_client.messages.create.call_args
+    prompt_text = call_args.kwargs["messages"][0]["content"][0]["text"]
+    assert "January 16, 2024" in prompt_text  # Should use edited date, not created date
