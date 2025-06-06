@@ -24,10 +24,7 @@ pip install --editable .[dev]
 setup_nltk
 ```
 
-The `dev` extras will also install development dependencies, like `pytest`. The installation commands should be run whenever you merge from upstream.
-
-`setup_nltk` is required to download the NLTK corpa for NLTK to work properly.
-
+The `dev` extras will also install development dependencies, like `pytest`. The installation commands should be run whenever you merge from upstream. The `setup_nltk` post-install script is required to download the NLTK corpora for NLTK to work properly.
 ### Run Tests & Formatter
 
 ```sh
