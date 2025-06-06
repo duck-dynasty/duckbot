@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61", "wheel", "nltk==3.9.1", "textblob==0.19.0"]
+requires = ["setuptools>=61", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
@@ -70,8 +70,8 @@ cdk = [
 ]
 
 [project.scripts]
-format = "scripts.cli:format"
-setup_nltk = "scripts.cli:setup_nltk"
+format = "scripts.format:main"
+setup_nltk = "scripts.setup_nltk:main"
 
 [tool.black]
 line-length = 200

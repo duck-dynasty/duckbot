@@ -1,17 +1,10 @@
 import os
-import subprocess
 
 import nltk
 import textblob.download_corpora
 
 
-def format():
-    for tool in ["isort .", "black .", "mdformat .", "flake8 duckbot tests scripts", "mdformat --check duckbot tests wiki *.md"]:
-        print(f"running `{tool}`")
-        subprocess.run(tool, shell=True)
-
-
-def setup_nltk():
+def main():
     venv = os.getenv("VIRTUAL_ENV")
     base = venv if venv else os.getenv("HOME")
     download_dir = os.path.join(base, "nltk_data")
