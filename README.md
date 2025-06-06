@@ -20,11 +20,11 @@ Before running DuckBot, you want to create a virtualenv to develop in. DuckBot r
 ```sh
 python3.10 -m venv --clear --prompt duckbot venv
 . venv/bin/activate
-pip install --upgrade pip setuptools wheel
 pip install --editable .[dev]
+setup_nltk
 ```
 
-The `dev` extras will also install development dependencies, like `pytest`. The installation commands should be run whenever you merge from upstream.
+The `dev` extras will also install development dependencies, like `pytest`. The installation commands should be run whenever you merge from upstream. The `setup_nltk` post-install script is required to download the NLTK corpora for NLTK to work properly.
 
 ### Run Tests & Formatter
 
@@ -83,6 +83,7 @@ Deployment scripts are written using [CDK](https://docs.aws.amazon.com/cdk/lates
 
 ```sh
 pip install --editable .[dev,cdk]  # run from repository root
+setup_nltk
 ```
 
 You'll then actually need CDK. It's a nodejs package, so you'll need that as well.

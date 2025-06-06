@@ -35,7 +35,7 @@ runs:
     uses: actions/cache@v3
     with:
       path: ${{ steps.path.outputs.path }}
-      key: ${{ env.pythonLocation }}-${{ inputs.extras }}-${{ hashFiles('setup.py', 'pyproject.toml') }}
+      key: ${{ env.pythonLocation }}-${{ inputs.extras }}-${{ hashFiles('pyproject.toml') }}
 
   - name: Install Packages
     if: steps.venv.outputs.cache-hit != 'true'
@@ -43,5 +43,5 @@ runs:
     run: |
       python -m venv --clear ${{ steps.path.outputs.path }}
       . ${{ steps.path.outputs.path }}/bin/activate
-      pip install --upgrade pip setuptools wheel
       pip install --editable .[${{ inputs.extras }}]
+      setup_nltk
