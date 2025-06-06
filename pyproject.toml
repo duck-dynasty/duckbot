@@ -24,8 +24,8 @@ dependencies = [
     "psycopg2==2.9.10",
     "SQLAlchemy==2.0.41",
     "d20==1.1.2",
-    "nltk==3.9.1",          # Required for nltk setup script
-    "textblob==0.19.0",     # Required for nltk setup script
+    "nltk==3.9.1",
+    "textblob==0.19.0",
     "pyfiglet==1.0.2",
     "matplotlib==3.10.3",
     "PyGithub==2.1.1",
