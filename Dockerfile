@@ -9,6 +9,7 @@ RUN apt-get update && apt-get -y install \
     libatlas-base-dev \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 COPY pyproject.toml .
+COPY scripts/ ./scripts
 RUN pip install .
 RUN setup_nltk
 
