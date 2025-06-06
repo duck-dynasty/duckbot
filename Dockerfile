@@ -4,14 +4,13 @@ ENV VIRTUAL_ENV "/opt/venv"
 RUN python -m venv $VIRTUAL_ENV
 ENV PATH "$VIRTUAL_ENV/bin:$PATH"
 WORKDIR /pip-dependencies
-RUN pip install --upgrade pip setuptools wheel
 # install atlas for numpy (matplotlib dependency)
 RUN apt-get update && apt-get -y install \
     libatlas-base-dev \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 COPY pyproject.toml .
-COPY setup.py .
 RUN pip install .
+RUN setup_nltk
 
 FROM python:3.10-slim as prod
 # ffmpeg: for discord audio
