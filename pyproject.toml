@@ -90,5 +90,6 @@ asyncio_mode = "auto"
 [tool.flake8]
 max-line-length = 200
 max-complexity = 10
+
 # ignore unused imports in __init__.py files
 per-file-ignores = ["__init__.py:F401"]
