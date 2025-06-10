@@ -30,21 +30,21 @@ def test_wolfram_returns_cached_instance(wolfram, wra_client):
 
 
 async def test_calc_single_pod(wolfram, context, wra_client):
-    wra_client.query.return_value = result([pod(subpods=[subpod(img=image())])])
+    wra_client.aquery.return_value = result([pod(subpods=[subpod(img=image())])])
     await wolfram.calc(context, "query")
     embed = discord.Embed(title="title").set_image(url="src").add_field(name="subtitle", value="plaintext")
     context.send.assert_called_once_with("https://www.wolframalpha.com/input/?i=query", embeds=[embed])
 
 
 async def test_calc_single_pod_large_embed(wolfram, context, wra_client):
-    wra_client.query.return_value = result([pod(title="p" * MAX_EMBED_LENGTH, subpods=[subpod(title="s" * MAX_EMBED_LENGTH, plaintext="t" * MAX_EMBED_LENGTH, img=image())])])
+    wra_client.aquery.return_value = result([pod(title="p" * MAX_EMBED_LENGTH, subpods=[subpod(title="s" * MAX_EMBED_LENGTH, plaintext="t" * MAX_EMBED_LENGTH, img=image())])])
     await wolfram.calc(context, "query")
     embed = discord.Embed(title="p" * MAX_TITLE_LENGTH).set_image(url="src").add_field(name="s" * 64, value="t" * 512)
     context.send.assert_called_once_with("https://www.wolframalpha.com/input/?i=query", embeds=[embed])
 
 
 async def test_calc_multiple_pods_and_subpods(wolfram, context, wra_client):
-    wra_client.query.return_value = result(
+    wra_client.aquery.return_value = result(
         [
             pod(title="pod1", subpods=[subpod(title="1"), subpod(title="2", img=image(src="2.img"))]),
             pod(title="pod2", subpods=[subpod(title="3")]),
