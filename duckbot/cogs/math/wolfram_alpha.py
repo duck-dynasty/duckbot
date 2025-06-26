@@ -33,9 +33,11 @@ class WolframAlpha(commands.Cog):
     # see embed limits duckbot.util.embeds; some values are shorter here for legibility
     def as_embed(self, pod) -> discord.Embed:
         embed = discord.Embed(title=pod.title[:MAX_TITLE_LENGTH])
+        img_set = False
         for sub in itertools.islice(pod.subpods, 10):
-            if not embed.image and sub.img and sub.img.src:
+            if not img_set and sub.img and sub.img.src:
                 embed.set_image(url=sub.img.src)
+                img_set = True
             if sub.title:
                 embed.add_field(name=sub.title[:64], value=sub.plaintext[:512])
             else:
