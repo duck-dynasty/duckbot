@@ -21,7 +21,7 @@ class Recipe(commands.Cog):
         recipe_list = []
         soup = BeautifulSoup(html_content, "html.parser")
 
-        articles = soup.findAll("div", {"class": "component card card__recipe card__facetedSearchResult"})
+        articles = soup.find_all("div", {"class": "component card card__recipe card__facetedSearchResult"})
 
         for article in articles:
             data = {}
@@ -29,7 +29,7 @@ class Recipe(commands.Cog):
                 data["name"] = article.find("h3", {"class": "card__title"}).get_text().strip(" \t\n\r")
                 data["description"] = article.find("div", {"class": "card__summary"}).get_text().strip(" \t\n\r")
                 data["url"] = article.find("a", href=re.compile(r"^https://www\.allrecipes\.com/recipe/"))["href"]
-                data["rating"] = len(article.findAll("span", {"class": "rating-star active"}))
+                data["rating"] = len(article.find_all("span", {"class": "rating-star active"}))
 
                 recipe_list.append(data)
             except Exception:

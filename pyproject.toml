@@ -16,7 +16,7 @@ urls = { Homepage = "https://github.com/duck-dynasty/duckbot" }
 dependencies = [
     "discord.py[voice]==2.5.2",
     "beautifulsoup4==4.13.4",
-    "requests==2.32.3",
+    "requests==2.32.4",
     "pytz==2025.2",
     "timezonefinder==6.5.9",
     "holidays==0.73",
@@ -87,6 +87,7 @@ addopts = """\
     -n auto --dist loadfile \
     --blockage"""
 asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
 
 [tool.flake8]
 max-line-length = 200
