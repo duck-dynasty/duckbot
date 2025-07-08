@@ -1,6 +1,7 @@
 import asyncio
 from unittest import mock
 
+import discord
 import discord.ext.tasks
 import pytest
 
@@ -27,4 +28,5 @@ async def bot(autospec, monkeypatch) -> DuckBot:
     # mock out loop, it uses `asyncio.get_event_loop()` by default
     monkeypatch.setattr(discord.ext.tasks, "Loop", mock.Mock(spec=discord.ext.tasks.Loop))
     monkeypatch.setattr(discord.ext.tasks, "loop", mock.Mock(spec=discord.ext.tasks.loop))
+    b.wait_until_ready = mock.AsyncMock(spec=discord.Client.wait_until_ready(b))
     return b
