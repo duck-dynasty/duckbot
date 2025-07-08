@@ -20,10 +20,17 @@ class AutoSpec:
     def of(self, spec: Union[Type[T], str]) -> T:
         """Returns an autospec'd mock of the class of the given type."""
         name = spec if type(spec) is str else qualified_name(spec)
-        if name not in self.cache:
+
+        def build():
             with mock.patch(name, autospec=True) as instance:
-                self.cache[name] = instance
-        return copy.deepcopy(self.cache[name])
+                return instance
+
+        if name not in self.cache:
+            self.cache[name] = build()
+        try:  # try to clone; faster than building anew
+            return copy.deepcopy(self.cache[name])
+        except TypeError:  # some types aren't clone-able though
+            return build()
 
 
 @pytest.fixture(scope="session")
