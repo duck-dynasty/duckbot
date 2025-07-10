@@ -46,7 +46,7 @@ def test_github_returns_cached_instance(yolo, gh):
 
 async def test_yolo_list_no_pulls(yolo, context, gh, repo, skip_if_private_channel):
     gh.get_repo.return_value = repo
-    repo.get_pulls.return_value = []
+    repo.get_pulls.return_value = MockPaginatedList([])
     await yolo.yolo(context, None)
     context.send.assert_called_once_with("There's no open pull requests, brother. Never forget to wumbo.")
 
@@ -54,7 +54,7 @@ async def test_yolo_list_no_pulls(yolo, context, gh, repo, skip_if_private_chann
 async def test_yolo_list_send_pull_status(yolo, context, gh, repo, skip_if_private_channel):
     gh.get_repo.return_value = repo
     pull, embed_value = make_pull_request(1)
-    repo.get_pulls.return_value = [pull]
+    repo.get_pulls.return_value = MockPaginatedList([pull])
     await yolo.yolo(context, None)
     context.send.assert_called_once_with(embed=discord.Embed().add_field(name="#1", value=embed_value))
 
@@ -63,7 +63,7 @@ async def test_yolo_list_max_six_pulls(yolo, context, gh, repo, skip_if_private_
     gh.get_repo.return_value = repo
     all_pulls = [make_pull_request(i, i % 2 == 0) for i in range(15)]
     kept_pulls = all_pulls[:6]
-    repo.get_pulls.return_value = [p[0] for p in all_pulls]
+    repo.get_pulls.return_value = MockPaginatedList([p[0] for p in all_pulls])
     await yolo.yolo(context, None)
     embed = discord.Embed()
     for pull, embed_value in kept_pulls:
@@ -201,3 +201,7 @@ class MockPaginatedList(list):
         copy = [x for x in self]
         copy.reverse()
         return copy
+    
+    @property
+    def totalCount(self):
+        return len(self)

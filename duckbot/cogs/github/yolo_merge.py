@@ -53,7 +53,7 @@ class YoloMerge(commands.Cog):
     async def list(self, context: commands.Context, repo: Repository):
         pulls = repo.get_pulls()
         if pulls.totalCount > 0:
-            prs = list(repo.get_pulls()[:6])
+            prs = list(pulls[:6])
             embed = self.as_embed(prs)
             await context.send(embed=embed)
         else:
