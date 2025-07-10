@@ -4,6 +4,7 @@ from typing import Dict, List, Optional
 
 import discord
 import github
+import github.Auth
 from discord.ext import commands
 from discord.utils import utcnow
 from github.PullRequest import PullRequest
@@ -33,7 +34,7 @@ class YoloMerge(commands.Cog):
     @property
     def github(self) -> github.Github:
         if self._github is None:
-            self._github = github.Github(os.getenv("BOT_GITHUB_TOKEN"))
+            self._github = github.Github(auth=github.Auth.Token(os.getenv("BOT_GITHUB_TOKEN")))
         return self._github
 
     @commands.command(name="yolo")
@@ -50,9 +51,10 @@ class YoloMerge(commands.Cog):
             await self.merge(context, repo, pr_id)
 
     async def list(self, context: commands.Context, repo: Repository):
-        pulls = list(repo.get_pulls()[:6])
-        if pulls:
-            embed = self.as_embed(pulls)
+        pulls = repo.get_pulls()
+        if pulls.totalCount > 0:
+            prs = list(repo.get_pulls()[:6])
+            embed = self.as_embed(prs)
             await context.send(embed=embed)
         else:
             await context.send("There's no open pull requests, brother. Never forget to wumbo.")
