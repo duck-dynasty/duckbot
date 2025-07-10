@@ -201,7 +201,7 @@ class MockPaginatedList(list):
         copy = [x for x in self]
         copy.reverse()
         return copy
-    
+
     @property
     def totalCount(self):
         return len(self)
