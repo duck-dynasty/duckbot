@@ -203,5 +203,5 @@ class MockPaginatedList(list):
         return copy
 
     @property
-    def totalCount(self):
+    def totalCount(self):  # noqa: N802
         return len(self)
