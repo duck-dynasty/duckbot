@@ -55,4 +55,4 @@ class SpecialDays(CA):
         self[date(year, 12, 3)] = f"DuckBot's Inception Day. I'm about {(now()-datetime(2020, 12, 3, 10, 39, tzinfo=timezone())).total_seconds()}s old"
         self[date(year, 12, 5)] = f"Taras' Birthday. He's {year-1989} years old"
         self[date(year, 12, 15)] = "https://github.com/duck-dynasty/duckbot/pull/644"
-        self[date(year, 12, 31)] = "New Year's Eve, or whatever"
+        self[date(year, 12, 31)] = "New Year's Eve — see y'all next year"
