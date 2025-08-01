@@ -22,7 +22,7 @@ dependencies = [
     "holidays==0.75",
     "pyowm==3.3.0",         # openweather
     "psycopg2==2.9.10",
-    "SQLAlchemy==2.0.41",
+    "SQLAlchemy==2.0.42",
     "d20==1.1.2",
     "nltk==3.9.1",
     "textblob==0.19.0",
