@@ -87,6 +87,7 @@ days = {
             "Sunday",
             "Sunday, Sunday, Sunday",
             "the first day of the week",
+            "Funday",
         ],
         "templates": [
             "WEEKEND ALERT: {today}!",
