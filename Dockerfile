@@ -21,7 +21,7 @@ FROM python:3.10-slim as prod
 RUN apt-get update && apt-get -y install \
     ffmpeg \
     libpq-dev \
-    libatlas-base-dev \
+    libopenblas-dev \
     fortune-mod fortunes cowsay \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 ENV PATH "$PATH:/usr/games"
