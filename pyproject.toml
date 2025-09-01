@@ -52,7 +52,7 @@ dev = [
     "mdformat-black==0.1.1",
     "responses==0.25.7",
     "pytest-blockage==0.2.4",
-    "pytest-sugar==1.0.0",
+    "pytest-sugar==1.1.1",
     "pytest-icdiff==0.9",
     "pytest-cov==6.2.1",
 ]
