@@ -18,7 +18,7 @@ dependencies = [
     "beautifulsoup4==4.13.5",
     "requests==2.32.5",
     "pytz==2025.2",
-    "timezonefinder==7.0.1",
+    "timezonefinder==8.0.0",
     "holidays==0.79",
     "pyowm==3.3.0",         # openweather
     "psycopg2==2.9.10",
