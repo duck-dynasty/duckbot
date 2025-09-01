@@ -4,9 +4,9 @@ ENV VIRTUAL_ENV "/opt/venv"
 RUN python -m venv $VIRTUAL_ENV
 ENV PATH "$VIRTUAL_ENV/bin:$PATH"
 WORKDIR /pip-dependencies
-# install atlas for numpy (matplotlib dependency)
+# install openblas for numpy (matplotlib dependency)
 RUN apt-get update && apt-get -y install \
-    libatlas-base-dev \
+    libopenblas-dev \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 COPY scripts/ ./scripts
 COPY pyproject.toml .
@@ -16,7 +16,7 @@ RUN setup_nltk
 FROM python:3.10-slim as prod
 # ffmpeg: for discord audio
 # libpq-dev: postgres client libraries
-# libatlas-base-dev: matplotlib dependencies
+# libopenblas-dev: matplotlib dependencies
 # fortune/cowsay: for !fortune command
 RUN apt-get update && apt-get -y install \
     ffmpeg \
