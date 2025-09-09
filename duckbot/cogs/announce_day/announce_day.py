@@ -84,10 +84,12 @@ class AnnounceDay(commands.Cog):
         await self.on_gandalf()
 
     async def on_gandalf(self):
-        channel = self.get_general_channel()
-        with path("resources", "10am-mfer.png") as img:
-            gandalf = File(str(img))
-            await channel.send(file=gandalf)
+        now = duckbot.util.datetime.now()
+        if now.month == 10 and now.day == 24:
+            channel = self.get_general_channel()
+            with path("resources", "10am-mfer.png") as img:
+                gandalf = File(str(img))
+                await channel.send(file=gandalf)
 
     @on_hour_loop.before_loop
     @on_gandalf_loop.before_loop
