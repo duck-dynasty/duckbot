@@ -42,7 +42,8 @@ class SpecialDays(CA):
         self[date(year, 6, 28)] = f"Tau Day ({math.tau}); a day twice as good as Pi Day"
         self[date(year, 6, 21)] = f"Erin's Birthday. She's {year-1991} years old"
         self[date(year, 8, 10)] = f"Dave and Sabrina's wedding anniversary. It's been {year-2025} years since he finally put a ring on it"
-        self[date(year, 9, 8)] = f"Dan's Birthday. He {year-1989} old. :headstone: to a legend"
+        self[date(year, 9, 5)] = "The day @J decided to be a eunuch https://giphy.com/gifs/theoffice-BmKLItgwfoHbcvVf8n "
+        self[date(year, 9, 8)] = f"Dan's Birthday. He {year-1989} old. ~~:headstone: to a legend~~"
         self[date(year, 9, 26)] = f"Tom's Birthday. He's {year-1990} years old. How he made it this far, we'll never know"
         self[date(year, 10, 7)] = f"Delta's Birthday. He's {year-2015} years old and is a good boy"
         self[date(year, 10, 9)] = "Leif Erikson Day. Hinga Dinga Durgen! https://tenor.com/view/viking-spongebob-squarepants-durgen-fall-down-hard-gif-7302846 "  # intentional trailing space for gif
