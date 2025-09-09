@@ -2,12 +2,12 @@ import datetime
 import os
 from math import ceil
 from typing import Optional
+from zoneinfo import ZoneInfo
 
 import discord
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import pyowm
-import pytz
 import requests
 import timezonefinder
 from discord.ext import commands
@@ -162,7 +162,7 @@ class Weather(commands.Cog):
 
     def weather_graph(self, city: Location, weather: OneCall):
         hourly = [weather.forecast_hourly[i] for i in range(24)]
-        tz = pytz.timezone(timezonefinder.TimezoneFinder().timezone_at(lat=city.lat, lng=city.lon))
+        tz = ZoneInfo(timezonefinder.TimezoneFinder().timezone_at(lat=city.lat, lng=city.lon))
         hours = [w.reference_time("date").astimezone(tz=tz) for w in hourly]
         figure, left_axis = plt.subplots()
         left_axis.set_xlabel("Time")

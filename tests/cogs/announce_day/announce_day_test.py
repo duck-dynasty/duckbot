@@ -86,3 +86,9 @@ async def test_on_hour_not_7am(now, bot, dog_photos, hour):
     clazz = AnnounceDay(bot, dog_photos)
     await clazz.on_hour()
     bot.get_all_channels.assert_not_called()
+
+
+async def test_on_gandalf_sends_message(bot, dog_photos, general_channel):
+    clazz = AnnounceDay(bot, dog_photos)
+    await clazz.on_gandalf()
+    general_channel.send.assert_called_once()
