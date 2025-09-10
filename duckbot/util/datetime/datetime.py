@@ -1,6 +1,5 @@
 import datetime
-
-import pytz
+from zoneinfo import ZoneInfo
 
 
 def timezone():
@@ -8,7 +7,7 @@ def timezone():
     Returns the default timezone of this module.
     :return: US/Eastern
     """
-    return pytz.timezone("US/Eastern")
+    return ZoneInfo("US/Eastern")
 
 
 def now():

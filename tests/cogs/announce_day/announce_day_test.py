@@ -86,3 +86,19 @@ async def test_on_hour_not_7am(now, bot, dog_photos, hour):
     clazz = AnnounceDay(bot, dog_photos)
     await clazz.on_hour()
     bot.get_all_channels.assert_not_called()
+
+
+@mock.patch("duckbot.util.datetime.now")
+async def test_on_gandalf_oct24_sends_message(now, bot, dog_photos, general_channel):
+    now.return_value = datetime.datetime(2002, 10, 24)
+    clazz = AnnounceDay(bot, dog_photos)
+    await clazz.on_gandalf()
+    general_channel.send.assert_called_once()
+
+
+@mock.patch("duckbot.util.datetime.now")
+async def test_on_gandalf_not_oct24_does_nothing(now, bot, dog_photos, general_channel):
+    now.return_value = datetime.datetime(2002, 10, 23)
+    clazz = AnnounceDay(bot, dog_photos)
+    await clazz.on_gandalf()
+    general_channel.send.assert_not_called()

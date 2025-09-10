@@ -1,7 +1,9 @@
 import logging
 import random
+from datetime import time
+from importlib.resources import path
 
-from discord import ChannelType
+from discord import ChannelType, File
 from discord.ext import commands, tasks
 from discord.utils import get
 
@@ -21,9 +23,14 @@ class AnnounceDay(commands.Cog):
         self.days = days
         self.templates = templates
         self.on_hour_loop.start()
+        self.on_gandalf_loop.start()
 
     def cog_unload(self):
         self.on_hour_loop.cancel()
+        self.on_gandalf_loop.cancel()
+
+    def get_general_channel(self):
+        return get(self.bot.get_all_channels(), guild__name="Friends Chat", name="general", type=ChannelType.text)
 
     def should_announce_day(self):
         return duckbot.util.datetime.now().hour == 7
@@ -47,7 +54,7 @@ class AnnounceDay(commands.Cog):
 
     async def on_hour(self):
         if self.should_announce_day():
-            channel = get(self.bot.get_all_channels(), guild__name="Friends Chat", name="general", type=ChannelType.text)
+            channel = self.get_general_channel()
             message = self.get_message()
             await channel.send(message)
 
@@ -68,10 +75,23 @@ class AnnounceDay(commands.Cog):
         if self.days[day]["gifs"]:
             await channel.send(random.choice(self.days[day]["gifs"]))
 
-    @on_hour_loop.before_loop
-    async def before_loop(self):
-        await self.bot.wait_until_ready()
-
     @commands.command(name="day")
     async def day_command(self, context):
         await context.send(self.get_message())
+
+    @tasks.loop(time=time(hour=10, minute=0, tzinfo=duckbot.util.datetime.timezone()))
+    async def on_gandalf_loop(self):
+        await self.on_gandalf()
+
+    async def on_gandalf(self):
+        now = duckbot.util.datetime.now()
+        if now.month == 10 and now.day == 24:
+            channel = self.get_general_channel()
+            with path("resources", "10am-mfer.png") as img:
+                gandalf = File(str(img))
+                await channel.send(file=gandalf)
+
+    @on_hour_loop.before_loop
+    @on_gandalf_loop.before_loop
+    async def before_loop(self):
+        await self.bot.wait_until_ready()
