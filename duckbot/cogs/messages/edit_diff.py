@@ -23,7 +23,7 @@ class EditDiff(commands.Cog):
                 msg += d[2:]  # append the letter
                 prev = change
         msg += self.try_leave_diff_chunk(" ", prev)  # close the final diff chunk if necessary
-        await after.channel.send(f":eyes: {after.author.mention}.\n{msg}", delete_after=300)
+        await after.channel.send(f":eyes: {after.author.mention}.\n{msg}", delete_after=120)
 
     def split_words(self, content):
         return re.split(r"(\s+)", content)
