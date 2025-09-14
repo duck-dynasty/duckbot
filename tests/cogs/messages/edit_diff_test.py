@@ -27,7 +27,7 @@ async def test_show_edit_diff_typical_case(before, after, before_text, after_tex
     after.clean_content = after_text
     clazz = EditDiff(bot)
     await clazz.show_edit_diff(before, after)
-    after.channel.send.assert_called_once_with(f":eyes: {after.author.mention}.\n{diff}", delete_after=300)
+    after.channel.send.assert_called_once_with(f":eyes: {after.author.mention}.\n{diff}", delete_after=120)
 
 
 @mock.patch("discord.Message")
