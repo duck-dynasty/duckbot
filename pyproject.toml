@@ -17,7 +17,7 @@ dependencies = [
     "discord.py[voice]==2.6.3",
     "beautifulsoup4==4.13.5",
     "requests==2.32.5",
-    "timezonefinder==8.0.0",
+    "timezonefinder==8.1.0",
     "holidays==0.81",
     "pyowm==3.3.0",         # openweather
     "psycopg2==2.9.10",
