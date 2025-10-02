@@ -7,7 +7,11 @@ updates:
     interval: monthly
   open-pull-requests-limit: 100
 - package-ecosystem: github-actions
-  directory: /
+  directories:
+  - /
+  - /.github/actions/build-push-docker-image/
+  - /.github/actions/setup-aws-cdk/
+  - /.github/actions/setup-python-venv/
   schedule:
     interval: monthly
   open-pull-requests-limit: 100
