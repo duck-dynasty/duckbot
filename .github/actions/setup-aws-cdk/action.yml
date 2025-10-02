@@ -19,7 +19,7 @@ runs:
       path: cdk
 
   - name: Set up Node.js
-    uses: actions/setup-node@v3
+    uses: actions/setup-node@v5
     with:
       node-version: 20.x
 
