@@ -65,7 +65,7 @@ cdk = [
     "aws-cdk.aws-iam==1.204.0",
     "aws-cdk.aws-logs==1.204.0",
     "aws-cdk.aws-ssm==1.204.0",
-    "boto3==1.40.42",
+    "boto3==1.40.43",
 ]
 
 [project.scripts]
