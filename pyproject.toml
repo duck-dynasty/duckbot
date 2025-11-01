@@ -20,7 +20,7 @@ dependencies = [
     "timezonefinder==8.1.0",
     "holidays==0.83",
     "pyowm==3.3.0",         # openweather
-    "psycopg2==2.9.10",
+    "psycopg2==2.9.11",
     "SQLAlchemy==2.0.44",
     "d20==1.1.2",
     "nltk==3.9.2",
