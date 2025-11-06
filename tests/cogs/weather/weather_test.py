@@ -1,9 +1,9 @@
 from unittest import mock
 
 import pytest
-from pyowm.weatherapi25.location import Location
-from pyowm.weatherapi25.one_call import OneCall
-from pyowm.weatherapi25.weather import Weather as pyowmWeather
+from pyowm.weatherapi30.location import Location
+from pyowm.weatherapi30.one_call import OneCall
+from pyowm.weatherapi30.weather import Weather as pyowmWeather
 
 from duckbot.cogs.weather import Weather
 from duckbot.cogs.weather.saved_location import SavedLocation
@@ -16,7 +16,7 @@ def city_id(c):
 
 
 @pytest.fixture
-@mock.patch("pyowm.weatherapi25.weather_manager.WeatherManager")
+@mock.patch("pyowm.weatherapi30.weather_manager.WeatherManager")
 def weather_manager(w):
     return w
 
