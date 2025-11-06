@@ -12,8 +12,8 @@ import requests
 import timezonefinder
 from discord.ext import commands
 from pyowm.utils import config
-from pyowm.weatherapi25.location import Location
-from pyowm.weatherapi25.one_call import OneCall
+from pyowm.weatherapi30.location import Location
+from pyowm.weatherapi30.one_call import OneCall
 
 from duckbot.db import Database
 
