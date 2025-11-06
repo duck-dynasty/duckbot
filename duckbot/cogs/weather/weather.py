@@ -8,7 +8,6 @@ import discord
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import pyowm
-import requests
 import timezonefinder
 from discord.ext import commands
 from pyowm.utils import config
