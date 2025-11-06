@@ -36,9 +36,7 @@ class Weather(commands.Cog):
         return self._owm
 
     def one_call(self, **kwargs):
-        # pyowm doesn't support onecall 3.0: https://github.com/csparpa/pyowm/issues/404
-        json = requests.get(url="https://api.openweathermap.org/data/3.0/onecall", params=kwargs | {"appid": os.getenv("OPENWEATHER_TOKEN")}).json()
-        return OneCall.from_dict(json)
+        return self.weather_manager().one_call(**kwargs)
 
     @commands.hybrid_group(name="weather", invoke_without_command=True)
     async def weather_command(self, context: commands.Context, city: Optional[str] = None, country: Optional[str] = None, index: Optional[int] = None):
