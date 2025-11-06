@@ -154,10 +154,10 @@ class Weather(commands.Cog):
             messages.append("I might need to take a break today, it hot.")
         return " ".join(messages)
 
-    def __is_rainy(self, weather) -> str:
+    def __is_rainy(self, weather) -> bool:
         return (weather.status and "rain" in weather.status.lower()) or (weather.detailed_status and "rain" in weather.detailed_status.lower())
 
-    def __is_snowy(self, weather) -> str:
+    def __is_snowy(self, weather) -> bool:
         return (weather.status and "snow" in weather.status.lower()) or (weather.detailed_status and "snow" in weather.detailed_status.lower())
 
     def weather_graph(self, city: Location, weather: OneCall):
