@@ -30,8 +30,12 @@ class Weather(commands.Cog):
     @property
     def owm(self) -> pyowm.OWM:
         if self._owm is None:
+            token = os.getenv("OPENWEATHER_TOKEN")
+            print(f"DEBUG: Loaded token prefix: {'...' + token[-4:] if token else 'None/Empty'}")  # Masks most of it for logs
+            if not token:
+                raise ValueError("OPENWEATHER_TOKEN env var is missing!")
             conf = config.get_default_config_for_subscription_type("free")
-            self._owm = pyowm.OWM(os.getenv("OPENWEATHER_TOKEN"), conf)
+            self._owm = pyowm.OWM(token, conf)
         return self._owm
 
     def one_call(self, **kwargs):
