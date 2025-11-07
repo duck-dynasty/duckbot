@@ -35,7 +35,7 @@ class Weather(commands.Cog):
         return self._owm
 
     def one_call(self, **kwargs):
-        return self.weather_manager().one_call(**kwargs)
+        return self.owm.weather_manager().one_call(**kwargs)
 
     @commands.hybrid_group(name="weather", invoke_without_command=True)
     async def weather_command(self, context: commands.Context, city: Optional[str] = None, country: Optional[str] = None, index: Optional[int] = None):
