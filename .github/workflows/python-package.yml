@@ -12,7 +12,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up Python Environment
       id: venv
       uses: ./.github/actions/setup-python-venv
@@ -37,7 +37,7 @@ jobs:
   sanity:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Test Connection to Discord
       run: |
         docker compose run --build --rm \
@@ -48,7 +48,7 @@ jobs:
   synthesize:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Set up CDK
       id: cdk
       uses: ./.github/actions/setup-aws-cdk
@@ -69,7 +69,7 @@ jobs:
     concurrency: deploy
     environment: prod
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Build and Push Docker Image
       id: image
       uses: ./.github/actions/build-push-docker-image
