@@ -31,7 +31,7 @@ dependencies = [
     "wolframalpha==5.1.3",
     "yfinance==0.2.66",
     "mip==1.15.0",
-    "anthropic==0.72.0",    # sdk for llm
+    "anthropic==0.75.0",    # sdk for llm
 ]
 
 [project.optional-dependencies]
