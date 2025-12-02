@@ -15,7 +15,7 @@ urls = { Homepage = "https://github.com/duck-dynasty/duckbot" }
 
 dependencies = [
     "discord.py[voice]==2.6.4",
-    "beautifulsoup4==4.14.2",
+    "beautifulsoup4==4.14.3",
     "requests==2.32.5",
     "timezonefinder==8.1.0",
     "holidays==0.85",
