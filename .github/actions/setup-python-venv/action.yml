@@ -32,7 +32,7 @@ runs:
 
   - name: Set up Virtual Environment Cache
     id: venv
-    uses: actions/cache@v4
+    uses: actions/cache@v5
     with:
       path: ${{ steps.path.outputs.path }}
       key: ${{ env.pythonLocation }}-${{ inputs.extras }}-${{ hashFiles('pyproject.toml') }}
