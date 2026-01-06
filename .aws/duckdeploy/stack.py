@@ -87,7 +87,7 @@ class DuckBotStack(core.Stack):
             instance_type=ec2.InstanceType.of(instance_class=ec2.InstanceClass.T3, instance_size=ec2.InstanceSize.MICRO),
             cpu_credits=ec2.CpuCredits.STANDARD,
             key_name="duckbot",  # needs to be created manually
-            machine_image=ec2.MachineImage.generic_linux(ami_map={"us-east-1": "ami-0c90bcaed0062d19b"}),  # custom ECS AMI created manually via https://github.com/aws/amazon-ecs-ami
+            machine_image=ec2.MachineImage.generic_linux(ami_map={"us-east-1": "ami-0cdf40f78318eeff6"}),  # custom ECS AMI created manually via https://github.com/aws/amazon-ecs-ami
             security_group=ec2.SecurityGroup(self, "HostSecurityGroup", vpc=vpc),
             role=iam.Role(self, "HostRole", assumed_by=iam.ServicePrincipal("ec2.amazonaws.com")),
             user_data=ec2.UserData.for_linux(),
