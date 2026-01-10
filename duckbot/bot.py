@@ -1,5 +1,6 @@
 from discord import Intents
 from discord.ext import commands
+import random
 
 
 def intents() -> Intents:
@@ -19,3 +20,4 @@ class DuckBot(commands.Bot):
 
     async def setup_hook(self):
         print("DuckBot online")
+        print(random.random())
