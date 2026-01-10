@@ -2,6 +2,9 @@ from discord import Intents
 from discord.ext import commands
 import random
 
+# TODO: Remove this - intentionally failing SonarCloud check
+SONAR_TEST_PASSWORD = "SuperSecretPassword123!"  # noqa: S105
+
 
 def intents() -> Intents:
     intent = Intents.none()
@@ -20,4 +23,3 @@ class DuckBot(commands.Bot):
 
     async def setup_hook(self):
         print("DuckBot online")
-        print(random.random())
