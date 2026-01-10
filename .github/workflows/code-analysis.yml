@@ -14,6 +14,7 @@ on:
 
 jobs:
   analyze-codeql:
+    if: github.event_name != 'pull_request_target'
     permissions:
       actions: read
       contents: read
@@ -32,10 +33,14 @@ jobs:
 
   sonarqube:
     runs-on: ubuntu-latest
+    # Skip the redundant pull_request run when pull_request_target also fires (fork PRs)
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          # For pull_request_target, checkout the PR head to analyze the actual PR code
+          ref: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.sha || '' }}
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@v6
         env:
