@@ -7,14 +7,10 @@ on:
   pull_request:
     branches:
     - main
-  pull_request_target:
-    branches:
-    - main
   merge_group:
 
 jobs:
   analyze-codeql:
-    if: github.event_name != 'pull_request_target'
     permissions:
       actions: read
       contents: read
@@ -30,24 +26,3 @@ jobs:
       uses: github/codeql-action/autobuild@v4
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v4
-
-  sonarqube:
-    runs-on: ubuntu-latest
-    # Skip the redundant pull_request run when pull_request_target also fires (fork PRs)
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
-    permissions:
-      contents: read
-      pull-requests: write
-      statuses: write
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-          # For pull_request_target, checkout the PR head to analyze the actual PR code
-          ref: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.sha || '' }}
-      - name: SonarQube Scan
-        id: sonar
-        continue-on-error: true
-        uses: SonarSource/sonarqube-scan-action@v6
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
