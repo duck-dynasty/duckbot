@@ -9,5 +9,6 @@
     "python.testing.pytestEnabled": true,
     "python.formatting.blackPath": "python -m black",
     "python.linting.flake8Path": "python -m flake8",
-    "python.envFile": "${workspaceFolder}/duckbot/.env"
+    "python.envFile": "${workspaceFolder}/duckbot/.env",
+    "ansible.python.interpreterPath": "/home/lemon/git/duckbot/venv/bin/python"
 }
