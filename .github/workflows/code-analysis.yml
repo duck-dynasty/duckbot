@@ -48,8 +48,6 @@ jobs:
           # For pull_request_target, checkout the PR head to analyze the actual PR code
           ref: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.sha || '' }}
       - name: SonarQube Scan
-        id: sonar
-        continue-on-error: true
         uses: SonarSource/sonarqube-scan-action@v6
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
@@ -63,20 +61,3 @@ jobs:
               github.event.pull_request.head.ref,
               github.event.pull_request.base.ref,
               github.event.pull_request.head.sha) || '' }}
-      - name: Set PR status for fork PRs
-        if: github.event_name == 'pull_request_target'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            await github.rest.repos.createCommitStatus({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              sha: '${{ github.event.pull_request.head.sha }}',
-              state: '${{ steps.sonar.outcome }}' === 'success' ? 'success' : 'failure',
-              context: 'SonarCloud Code Analysis',
-              description: 'Quality Gate ' + ('${{ steps.sonar.outcome }}' === 'success' ? 'passed' : 'failed'),
-              target_url: 'https://sonarcloud.io/dashboard?id=duck-dynasty_duckbot&pullRequest=${{ github.event.pull_request.number }}'
-            });
-      - name: Fail if Quality Gate failed
-        if: steps.sonar.outcome == 'failure'
-        run: exit 1
