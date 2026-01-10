@@ -1,9 +1,5 @@
 from discord import Intents
 from discord.ext import commands
-import random
-
-# TODO: Remove this - intentionally failing SonarCloud check
-SONAR_TEST_PASSWORD = "SuperSecretPassword123!"  # noqa: S105
 
 
 def intents() -> Intents:
