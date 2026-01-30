@@ -55,6 +55,7 @@ def solution_embed(solution: dict[ModifiedRecipe, float]) -> List[Embed]:
     def plrl(val: float) -> str:
         return "s" if val > 1 else ""
 
+    consumption_map = build_consumption_map(solution)
     embeds: List[Embed] = [Embed()]
     for recipe, num in sorted(solution.items(), key=lambda kv: (kv[0].name, kv[0].sloops, kv[0].power_shards)):
         if len(embeds[-1].fields) >= MAX_FIELDS:
@@ -71,7 +72,11 @@ def solution_embed(solution: dict[ModifiedRecipe, float]) -> List[Embed]:
             name = f"{name} {'+' if ' @ ' in name else '@'} {recipe.sloop_scale}x"
             building = f"{building} {'+' if ' with ' in building else 'with'} {recipe.sloops} Somersloop{plrl(recipe.sloops)}"
 
-        embeds[-1].add_field(name=name, value=f"{rnd(num)} {building}\n{inout_str(recipe.inputs, recipe.outputs, num)}", inline=False)
+        consumed_by = consumed_by_str(recipe.outputs, consumption_map, recipe.original_recipe.name)
+        field_value = f"{rnd(num)} {building}\n{inout_str(recipe.inputs, recipe.outputs, num)}"
+        if consumed_by:
+            field_value = f"{field_value}\n{consumed_by}"
+        embeds[-1].add_field(name=name, value=field_value, inline=False)
 
     summary = solution_summary(solution)
     footer = inout_str(summary.inputs, summary.outputs)
@@ -88,6 +93,22 @@ def inout_str(inputs: Rates, outputs: Rates, scale_factor: float = 1.0) -> str:
     inputs = rates_str(inputs * scale_factor)
     output = rates_str(outputs * scale_factor)
     return f"{inputs} -> {output}"
+
+
+def build_consumption_map(solution: dict[ModifiedRecipe, float]) -> dict[Item, list[tuple[str, float]]]:
+    flat = [(item, recipe.original_recipe.name, rate * count) for recipe, count in solution.items() for item, rate in recipe.inputs.items()]
+    items = set(item for item, _, _ in flat)
+    return {item: [(name, amount) for i, name, amount in flat if i == item] for item in items}
+
+
+def consumed_by_str(outputs: Rates, consumption_map: dict[Item, list[tuple[str, float]]], current_recipe: str) -> str:
+    consumers = [(name, amount) for item in outputs for name, amount in consumption_map.get(item, []) if name != current_recipe]
+    if not consumers:
+        return ""
+    names = set(name for name, _ in consumers)
+    grouped = {name: sum(amount for n, amount in consumers if n == name) for name in names}
+    parts = [f"{name}: {rnd(amount)}" for name, amount in sorted(grouped.items())]
+    return "-# consumed by: " + ", ".join(parts)
 
 
 @dataclass
