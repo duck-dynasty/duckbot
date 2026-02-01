@@ -29,7 +29,7 @@ dependencies = [
     "matplotlib==3.10.8",
     "PyGithub==2.8.1",
     "wolframalpha==5.1.3",
-    "yfinance==1.0",
+    "yfinance==1.1.0",
     "mip==1.15.0",
     "anthropic==0.77.0",    # sdk for llm
 ]
