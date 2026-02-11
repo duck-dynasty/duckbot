@@ -66,3 +66,8 @@ def test_healthcheck_healthy(reader, writer, bot):
 async def test_start_health_check_tasks(server, bot):
     clazz = HealthCheck(bot)
     await clazz.start_health_check_tasks()
+
+
+def test_sanity_check_passes(bot):
+    clazz = HealthCheck(bot)
+    assert clazz.sanity_check() is True
