@@ -10,6 +10,19 @@ on:
   merge_group:
 
 jobs:
+  deployment-window:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+    - name: Check Deployment Window
+      run: |
+        TZ='America/Toronto' date +%H
+        current_hour=$(TZ='America/Toronto' date +%H)
+        if [ "$current_hour" -lt 7 ] || [ "$current_hour" -ge 22 ]; then
+          echo "::error::Deployments are disabled between 10pm and 7am"
+          exit 1
+        fi
+
   test:
     runs-on: ubuntu-latest
     steps:
@@ -62,6 +75,7 @@ jobs:
 
   deploy:
     needs:
+    - deployment-window
     - test
     - sanity
     - synthesize
