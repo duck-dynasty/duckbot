@@ -66,3 +66,20 @@ def test_healthcheck_healthy(reader, writer, bot):
 async def test_start_health_check_tasks(server, bot):
     clazz = HealthCheck(bot)
     await clazz.start_health_check_tasks()
+
+
+def test_sanity_check_passes(bot):
+    clazz = HealthCheck(bot)
+    assert clazz.sanity_check() is True
+
+
+def test_sanity_check_fails_when_corpus_missing(bot):
+    clazz = HealthCheck(bot)
+    clazz.REQUIRED_CORPORA = ["corpora/nonexistent"]
+    assert clazz.sanity_check() is False
+
+
+def test_sanity_check_fails_when_resource_missing(bot):
+    clazz = HealthCheck(bot)
+    clazz.REQUIRED_RESOURCES = ["nonexistent.png"]
+    assert clazz.sanity_check() is False
