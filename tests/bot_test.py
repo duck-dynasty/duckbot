@@ -11,6 +11,7 @@ def test_intents_has_required_permissions():
         messages=True,
         message_content=True,
         reactions=True,
+        typing=True,
         voice_states=True,
     )
     assert intents() == expected
