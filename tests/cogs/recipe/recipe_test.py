@@ -202,7 +202,9 @@ def with_articles(*args):
          </div>
       </div>
    </div>
-</div>""".replace("\n", "\\n")
+</div>""".replace(
+            "\n", "\\n"
+        )
     return html + """","hasNext":true,"totalResults":4624}"""
 
 
