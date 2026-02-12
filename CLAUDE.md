@@ -54,8 +54,8 @@ setup_nltk
       async def foo_command(self, context):
           await self.foo(context)
 
-      async def foo(self, context):
-          ...
+      async def foo(self, context): ...
+
 
   # test
   async def test_foo(bot, context):
