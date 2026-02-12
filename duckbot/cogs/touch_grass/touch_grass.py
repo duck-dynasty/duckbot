@@ -5,7 +5,7 @@ from discord import Message
 from discord.ext import commands
 from discord.utils import utcnow
 
-from .touch_grass_phrases import phrases
+from .touch_grass_phrases import phrases, work_phrases
 
 
 class TouchGrass(commands.Cog):
@@ -35,11 +35,17 @@ class TouchGrass(commands.Cog):
         # Clean up old messages (outside 60-minute window)
         self.clean_old_messages(user_id, now)
 
-        # Check if we should notify
+        # Check if we should notify — lower threshold during work hours
         message_count = len(self.activity[user_id]["messages"])
-        if message_count >= 40 and self.should_notify(user_id, now):
-            await self.send_notification(message, message_count)
+        work_hours = self.is_work_hours(now)
+        threshold = 40 if work_hours else 120
+        if message_count >= threshold and self.should_notify(user_id, now):
+            await self.send_notification(message, message_count, work_hours)
             self.activity[user_id]["last_notification"] = now
+
+    def is_work_hours(self, now) -> bool:
+        """Check if current time is Mon-Fri 9am-5pm UTC."""
+        return now.weekday() < 5 and 9 <= now.hour < 17
 
     def clean_old_messages(self, user_id: int, now):
         """Remove timestamps older than 60 minutes from the tracking window."""
@@ -53,13 +59,14 @@ class TouchGrass(commands.Cog):
             return True
         return (now - last_notif).total_seconds() >= 3600  # 1 hour
 
-    async def send_notification(self, message: Message, count: int):
-        """Send a random playful message telling the user to touch grass."""
-        phrase = random.choice(phrases).format(name=message.author.display_name, count=count)
+    async def send_notification(self, message: Message, count: int, work_hours: bool):
+        """Send a notification — work-themed during work hours, touch grass otherwise."""
+        phrase_list = work_phrases if work_hours else phrases
+        phrase = random.choice(phrase_list).format(name=message.author.display_name, count=count)
         await message.channel.send(phrase)
 
-    @commands.command(name="grass-stats")
-    async def grass_stats_command(self, context):
+    @commands.hybrid_command(name="grass-stats", description="Show activity leaderboard for all tracked users.")
+    async def grass_stats_command(self, context: commands.Context):
         """Show activity leaderboard for all tracked users."""
         await self.show_activity_stats(context)
 

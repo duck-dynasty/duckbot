@@ -3,6 +3,9 @@ from unittest import mock
 
 from duckbot.cogs.touch_grass import TouchGrass
 
+MONDAY_NOON = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)  # Mon, work hours
+SATURDAY_NOON = datetime.datetime(2024, 1, 6, 12, 0, 0, tzinfo=datetime.timezone.utc)  # Sat, off hours
+
 
 @mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
 async def test_bot_messages_are_ignored(mock_utcnow, bot, message):
@@ -230,17 +233,35 @@ async def test_should_notify_returns_true_after_cooldown(mock_utcnow, bot, messa
 
 @mock.patch("random.choice")
 @mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
-async def test_send_notification_uses_random_phrase(mock_utcnow, mock_random, bot, message):
-    """Notification should select a random phrase from the list."""
+async def test_send_notification_uses_random_grass_phrase_off_hours(mock_utcnow, mock_random, bot, message):
+    """Off-hours notification should select from touch grass phrases."""
     mock_random.return_value = "Test message with {name} and {count}"
-    base_time = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)
-    mock_utcnow.return_value = base_time
+    mock_utcnow.return_value = SATURDAY_NOON
     message.author.display_name = "TestUser"
 
     clazz = TouchGrass(bot)
-    await clazz.send_notification(message, 42)
+    await clazz.send_notification(message, 42, work_hours=False)
 
     message.channel.send.assert_called_once()
+    call_args = message.channel.send.call_args[0][0]
+    assert "TestUser" in call_args
+    assert "42" in call_args
+
+
+@mock.patch("random.choice")
+@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+async def test_send_notification_uses_work_phrase_during_work_hours(mock_utcnow, mock_random, bot, message):
+    """Work-hours notification should select from work phrases."""
+    mock_random.return_value = "Get back to work {name}! {count} messages."
+    mock_utcnow.return_value = MONDAY_NOON
+    message.author.display_name = "TestUser"
+
+    clazz = TouchGrass(bot)
+    await clazz.send_notification(message, 42, work_hours=True)
+
+    from duckbot.cogs.touch_grass.touch_grass_phrases import work_phrases
+
+    mock_random.assert_called_once_with(work_phrases)
     call_args = message.channel.send.call_args[0][0]
     assert "TestUser" in call_args
     assert "42" in call_args
@@ -369,3 +390,173 @@ async def test_show_activity_stats_excludes_old_messages(mock_utcnow, bot, conte
 
     # Should show no activity since all messages are too old
     context.send.assert_called_once_with("No recent activity tracked in the last hour.")
+
+
+@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+async def test_show_activity_stats_no_guild(mock_utcnow, bot, context, message):
+    """Stats command resolves names via bot cache when guild is unavailable."""
+    base_time = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)
+    mock_utcnow.return_value = base_time
+
+    clazz = TouchGrass(bot)
+
+    message.author.id = 123
+    for i in range(5):
+        await clazz.track_activity(message)
+
+    context.guild = None
+    user = mock.Mock()
+    user.display_name = "CachedUser"
+    bot.get_user.return_value = user
+
+    await clazz.show_activity_stats(context)
+
+    call_args = context.send.call_args[0][0]
+    assert "CachedUser" in call_args
+    assert "5" in call_args
+
+
+@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+async def test_show_activity_stats_member_not_in_guild(mock_utcnow, bot, context, message, guild):
+    """Stats command falls back to bot cache when member is not in guild."""
+    base_time = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)
+    mock_utcnow.return_value = base_time
+
+    clazz = TouchGrass(bot)
+
+    message.author.id = 999
+    for i in range(5):
+        await clazz.track_activity(message)
+
+    context.guild = guild
+    guild.get_member.return_value = None
+    user = mock.Mock()
+    user.display_name = "FallbackUser"
+    bot.get_user.return_value = user
+
+    await clazz.show_activity_stats(context)
+
+    call_args = context.send.call_args[0][0]
+    assert "FallbackUser" in call_args
+    assert "5" in call_args
+
+
+@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+async def test_show_activity_stats_unknown_user(mock_utcnow, bot, context, message, guild):
+    """Stats command shows User-{id} when user is not in guild or bot cache."""
+    base_time = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)
+    mock_utcnow.return_value = base_time
+
+    clazz = TouchGrass(bot)
+
+    message.author.id = 999
+    for i in range(5):
+        await clazz.track_activity(message)
+
+    context.guild = guild
+    guild.get_member.return_value = None
+    bot.get_user.return_value = None
+
+    await clazz.show_activity_stats(context)
+
+    call_args = context.send.call_args[0][0]
+    assert "User-999" in call_args
+    assert "5" in call_args
+
+
+async def test_is_work_hours_weekday_within_hours(bot):
+    """Mon-Fri 9am-5pm UTC should be work hours."""
+    clazz = TouchGrass(bot)
+    # Monday 12:00 UTC
+    assert clazz.is_work_hours(MONDAY_NOON) is True
+    # Monday 9:00 UTC (boundary start)
+    assert clazz.is_work_hours(datetime.datetime(2024, 1, 1, 9, 0, 0, tzinfo=datetime.timezone.utc)) is True
+    # Monday 16:59 UTC (boundary end)
+    assert clazz.is_work_hours(datetime.datetime(2024, 1, 1, 16, 59, 0, tzinfo=datetime.timezone.utc)) is True
+
+
+async def test_is_work_hours_weekday_outside_hours(bot):
+    """Before 9am and at/after 5pm on weekdays should not be work hours."""
+    clazz = TouchGrass(bot)
+    # Monday 8:59 UTC
+    assert clazz.is_work_hours(datetime.datetime(2024, 1, 1, 8, 59, 0, tzinfo=datetime.timezone.utc)) is False
+    # Monday 17:00 UTC
+    assert clazz.is_work_hours(datetime.datetime(2024, 1, 1, 17, 0, 0, tzinfo=datetime.timezone.utc)) is False
+    # Monday 23:00 UTC
+    assert clazz.is_work_hours(datetime.datetime(2024, 1, 1, 23, 0, 0, tzinfo=datetime.timezone.utc)) is False
+
+
+async def test_is_work_hours_weekend(bot):
+    """Weekends should not be work hours regardless of time."""
+    clazz = TouchGrass(bot)
+    # Saturday 12:00 UTC
+    assert clazz.is_work_hours(SATURDAY_NOON) is False
+    # Sunday 12:00 UTC
+    assert clazz.is_work_hours(datetime.datetime(2024, 1, 7, 12, 0, 0, tzinfo=datetime.timezone.utc)) is False
+
+
+@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+async def test_off_hours_threshold_119_no_notification(mock_utcnow, bot, message):
+    """119 messages outside work hours should not trigger notification."""
+    mock_utcnow.return_value = SATURDAY_NOON
+
+    clazz = TouchGrass(bot)
+
+    for i in range(119):
+        mock_utcnow.return_value = SATURDAY_NOON + datetime.timedelta(seconds=i * 30)
+        await clazz.track_activity(message)
+
+    message.channel.send.assert_not_called()
+
+
+@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+async def test_off_hours_threshold_120_sends_notification(mock_utcnow, bot, message):
+    """120 messages outside work hours should trigger notification."""
+    mock_utcnow.return_value = SATURDAY_NOON
+    message.author.display_name = "TestUser"
+
+    clazz = TouchGrass(bot)
+
+    for i in range(120):
+        mock_utcnow.return_value = SATURDAY_NOON + datetime.timedelta(seconds=i * 30)
+        await clazz.track_activity(message)
+
+    assert message.channel.send.call_count == 1
+
+
+@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+async def test_off_hours_40_messages_no_notification(mock_utcnow, bot, message):
+    """40 messages outside work hours should not trigger (threshold is 120)."""
+    mock_utcnow.return_value = SATURDAY_NOON
+
+    clazz = TouchGrass(bot)
+
+    for i in range(40):
+        await clazz.track_activity(message)
+
+    message.channel.send.assert_not_called()
+
+
+@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+async def test_leaderboard_unaffected_by_time_of_day(mock_utcnow, bot, context, message, guild):
+    """Leaderboard should show all activity regardless of work hours or thresholds."""
+    mock_utcnow.return_value = SATURDAY_NOON
+
+    clazz = TouchGrass(bot)
+
+    # Send 10 messages on a Saturday (well below 120 threshold)
+    message.author.id = 123
+    for i in range(10):
+        await clazz.track_activity(message)
+
+    context.guild = guild
+    member = mock.Mock()
+    member.display_name = "WeekendUser"
+    guild.get_member.return_value = member
+
+    await clazz.show_activity_stats(context)
+
+    call_args = context.send.call_args[0][0]
+    assert "Activity Leaderboard" in call_args
+    assert "WeekendUser" in call_args
+    assert "10" in call_args
