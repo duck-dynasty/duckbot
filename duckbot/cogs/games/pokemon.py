@@ -56,8 +56,7 @@ class Pokemon(commands.Cog):
     @commands.hybrid_command(name="pokemon", description="Show a Pokemon by name or ID. No args gives the Pokemon of the Day.")
     async def pokemon_command(self, context: commands.Context, *, name_or_id: Optional[str] = None):
         """
-        :param name: The name of the Pokemon to show.
-        :param id: The Pokedex ID of the Pokemon to show.
+        :param name_or_id: The name or ID of the Pokemon to show.
         """
         await self.pokemon(context, name_or_id)
 
