@@ -114,12 +114,12 @@ def test_get_flavor_text_returns_english():
 def test_get_flavor_text_no_english_returns_fallback():
     species = {"flavor_text_entries": [{"flavor_text": "Japanese", "language": {"name": "ja"}, "version": {"name": "red"}}]}
     result = Pokemon.get_flavor_text(species)
-    assert result == "No description available."
+    assert result == "It eats people."
 
 
 def test_get_flavor_text_empty_entries():
     result = Pokemon.get_flavor_text({"flavor_text_entries": []})
-    assert result == "No description available."
+    assert result == "It eats people."
 
 
 def test_get_genus_returns_english():

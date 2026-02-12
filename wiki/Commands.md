@@ -14,6 +14,7 @@
 |       `!help` or `!wiki`       | gives a link to this wiki                          |
 |            `!lmgt`             | generates a google search link for the given query |
 |            `!mock`             | converts text into MoCkInG tExT                    |
+|     [`!pokemon`](#pokemon)     | gives information about pokemon                    |
 |  [`!recipe`](#recipe-search)   | search for a random recipe                         |
 |        [`!roll`](#dice)        | rolls Dungeons and Dragons style dice              |
 |  [`!start`, `!stop`](#music)   | start or stop playing music                        |
@@ -52,6 +53,14 @@ DuckBot will roll Dungeons and Dragons style dice for you. See [dice syntax](htt
 ## Music
 
 DuckBot plays everyone's favourite background noise inside whatever voice channel you're in. Use `!start` to summon the bot, and `!stop` to dismiss it. DuckBot only has so much stamina, and will stop playing music after about four hours.
+
+## Pokemon
+
+DuckBot can provide information about Pokémon, because that matters. The command can search for pokemon by name (autocomplete available) or by id. Providing no arguments gives the _pokemon of the day!!!_ Yayyy!!
+
+```
+/pokemon [name-or-id]
+```
 
 ## Truth
 

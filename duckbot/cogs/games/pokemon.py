@@ -70,7 +70,7 @@ class Pokemon(commands.Cog):
 
                 is_potd = name_or_id is None
                 data = self.get_pokemon(query)
-                species = self.get_species(data["species"]["url"])
+                species = self.get_species(data)
                 embed = self.build_embed(data, species, is_potd=is_potd)
                 await context.send(embed=embed)
             except requests.exceptions.HTTPError:
@@ -89,8 +89,8 @@ class Pokemon(commands.Cog):
         response.raise_for_status()
         return response.json()
 
-    def get_species(self, url: str) -> dict:
-        response = requests.get(url)
+    def get_species(self, pokemon: dict) -> dict:
+        response = requests.get(pokemon["species"]["url"])
         response.raise_for_status()
         return response.json()
 
@@ -104,7 +104,7 @@ class Pokemon(commands.Cog):
         for entry in reversed(entries):
             if entry.get("language", {}).get("name") == "en":
                 return Pokemon.clean_flavor_text(entry["flavor_text"])
-        return "No description available."
+        return "It eats people."
 
     @staticmethod
     def get_genus(species: dict) -> str:
