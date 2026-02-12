@@ -74,8 +74,7 @@ class Pokemon(commands.Cog):
                 embed = self.build_embed(data, species, is_potd=is_potd)
                 await context.send(embed=embed)
             except requests.exceptions.HTTPError:
-                lookup = name_or_id if name_or_id is not None else str(id)
-                await context.send(f"Could not find a Pokemon named '{lookup}'.")
+                await context.send(f"Could not find a Pokemon named '{name_or_id}'.")
 
     def _get_pokemon_of_the_day_id(self) -> int:
         n = self.pokemon_count
