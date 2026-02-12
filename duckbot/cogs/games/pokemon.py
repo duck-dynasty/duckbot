@@ -84,8 +84,8 @@ class Pokemon(commands.Cog):
         days_since_anchor = (date.today() - ANCHOR_DATE).days
         return ids[days_since_anchor % n]
 
-    def get_pokemon(self, id_or_name: str) -> dict:
-        response = requests.get(f"https://pokeapi.co/api/v2/pokemon/{id_or_name}")
+    def get_pokemon(self, name_or_id: str) -> dict:
+        response = requests.get(f"https://pokeapi.co/api/v2/pokemon/{name_or_id}")
         response.raise_for_status()
         return response.json()
 
