@@ -9,6 +9,7 @@ def intents() -> Intents:
     intent.messages = True
     intent.message_content = True
     intent.reactions = True
+    intent.typing = True
     intent.voice_states = True
     return intent
 
