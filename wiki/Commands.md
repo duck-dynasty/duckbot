@@ -1,26 +1,27 @@
 ## Command Overview
 
-|            Command             | Summary                                            |
+| Command | Summary |
 | :----------------------------: | -------------------------------------------------- |
-|            `!8ball`            | get a magic eight ball style fortune               |
-|            `!ascii`            | renders text as ascii art                          |
-|   [`!calc`](#wolfram-alpha)    | search for something on wolfram alpha              |
-|            `!coin`             | flips a coin in real life                          |
-|  [`!day`](#day-announcements)  | announces the current day of the week              |
-|   [`!define`](#definitions)    | define a word                                      |
-|             `!dog`             | displays a random dog photo                        |
-|            `!duck`             | gives a link to this repo                          |
-|           `!fortune`           | get a random fortune told to you by a cow          |
-|       `!help` or `!wiki`       | gives a link to this wiki                          |
-|            `!lmgt`             | generates a google search link for the given query |
-|            `!mock`             | converts text into MoCkInG tExT                    |
-|  [`!recipe`](#recipe-search)   | search for a random recipe                         |
-|        [`!roll`](#dice)        | rolls Dungeons and Dragons style dice              |
-|  [`!start`, `!stop`](#music)   | start or stop playing music                        |
-|       [`!truth`](#truth)       | fact checks a message when used in a reply         |
-|     [`!weather`](#weather)     | retrieve weather information                       |
-|     [`!satisfy`](#satisfy)     | produce a factory for _Satisfactory_               |
-| [`!yolo`](#yolo-pull-requests) | list open pull requests in this repo               |
+| `!8ball` | get a magic eight ball style fortune |
+| `!ascii` | renders text as ascii art |
+| [`!calc`](#wolfram-alpha) | search for something on wolfram alpha |
+| `!coin` | flips a coin in real life |
+| [`!day`](#day-announcements) | announces the current day of the week |
+| [`!define`](#definitions) | define a word |
+| `!dog` | displays a random dog photo |
+| `!duck` | gives a link to this repo |
+| `!fortune` | get a random fortune told to you by a cow |
+| `!help` or `!wiki` | gives a link to this wiki |
+| `!lmgt` | generates a google search link for the given query |
+| `!mock` | converts text into MoCkInG tExT |
+| [`!recipe`](#recipe-search) | search for a random recipe |
+| [`!roll`](#dice) | rolls Dungeons and Dragons style dice |
+| [`!start`, `!stop`](#music) | start or stop playing music |
+| [`!truth`](#truth) | fact checks a message when used in a reply |
+| [`!weather`](#weather) | retrieve weather information |
+| [`!satisfy`](#satisfy) | produce a factory for _Satisfactory_ |
+| [`/grass-stats`](#touch-grass) | show activity leaderboard for the last hour |
+| [`!yolo`](#yolo-pull-requests) | list open pull requests in this repo |
 
 ## Wolfram Alpha
 
@@ -250,6 +251,12 @@ DuckBot rejects you outright if the factory state does not have enough informati
 
 **->**\
 DuckBot will sometimes produce the null factory. Either the input and output were trivial, or the solution is infinite. Workarounds include not using raw supply recipes, or not using any inputs at all when using raw supply.
+
+## Touch Grass
+
+DuckBot monitors message activity and will tell you to touch grass if you're sending too many messages. During work hours (Mon-Fri 9am-5pm UTC) the threshold is 40 messages per hour; outside work hours it's 120 messages per hour. Notifications have a 1-hour cooldown per user.
+
+Use `/grass-stats` to see the activity leaderboard showing message counts for all tracked users in the last 60 minutes.
 
 ## Yolo Pull Requests
 
