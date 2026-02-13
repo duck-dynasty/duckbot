@@ -1,13 +1,13 @@
 import datetime
 from unittest import mock
 
-from duckbot.cogs.touch_grass import TouchGrass
+from duckbot.cogs.messages.touch_grass import TouchGrass
 
 MONDAY_NOON = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)  # Mon, work hours
 SATURDAY_NOON = datetime.datetime(2024, 1, 6, 12, 0, 0, tzinfo=datetime.timezone.utc)  # Sat, off hours
 
 
-@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+@mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
 async def test_bot_messages_are_ignored(mock_utcnow, bot, message):
     """Bot's own messages should not be tracked."""
     message.author = bot.user
@@ -22,7 +22,7 @@ async def test_bot_messages_are_ignored(mock_utcnow, bot, message):
     message.channel.send.assert_not_called()
 
 
-@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+@mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
 async def test_tracks_user_messages(mock_utcnow, bot, message):
     """User messages should be tracked with timestamps."""
     base_time = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)
@@ -38,7 +38,7 @@ async def test_tracks_user_messages(mock_utcnow, bot, message):
     assert all(ts == base_time for ts in clazz.activity[message.author.id]["messages"])
 
 
-@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+@mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
 async def test_threshold_not_reached_no_notification(mock_utcnow, bot, message):
     """Sending 39 messages should not trigger notification."""
     base_time = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)
@@ -55,7 +55,7 @@ async def test_threshold_not_reached_no_notification(mock_utcnow, bot, message):
     message.channel.send.assert_not_called()
 
 
-@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+@mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
 async def test_threshold_reached_sends_notification(mock_utcnow, bot, message):
     """Sending 40 messages should trigger notification."""
     base_time = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)
@@ -77,7 +77,7 @@ async def test_threshold_reached_sends_notification(mock_utcnow, bot, message):
     assert "TestUser" in call_args
 
 
-@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+@mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
 async def test_cooldown_prevents_duplicate_notifications(mock_utcnow, bot, message):
     """Cooldown should prevent multiple notifications within 1 hour."""
     base_time = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)
@@ -99,7 +99,7 @@ async def test_cooldown_prevents_duplicate_notifications(mock_utcnow, bot, messa
     assert message.channel.send.call_count == 1
 
 
-@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+@mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
 async def test_cooldown_expires_allows_new_notification(mock_utcnow, bot, message):
     """After 1 hour cooldown, should be able to notify again."""
     base_time = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)
@@ -122,7 +122,7 @@ async def test_cooldown_expires_allows_new_notification(mock_utcnow, bot, messag
     assert message.channel.send.call_count == 2
 
 
-@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+@mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
 async def test_sliding_window_removes_old_messages(mock_utcnow, bot, message):
     """Messages older than 60 minutes should be removed from tracking."""
     base_time = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)
@@ -144,7 +144,7 @@ async def test_sliding_window_removes_old_messages(mock_utcnow, bot, message):
     message.channel.send.assert_not_called()
 
 
-@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+@mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
 async def test_multiple_users_tracked_separately(mock_utcnow, bot, message):
     """Different users should have separate tracking."""
     base_time = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)
@@ -170,7 +170,7 @@ async def test_multiple_users_tracked_separately(mock_utcnow, bot, message):
     assert message.channel.send.call_count == 1
 
 
-@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+@mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
 async def test_clean_old_messages_preserves_recent(mock_utcnow, bot, message):
     """Cleanup should only remove old messages, not recent ones."""
     base_time = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)
@@ -195,7 +195,7 @@ async def test_clean_old_messages_preserves_recent(mock_utcnow, bot, message):
     assert len(clazz.activity[message.author.id]["messages"]) == 21
 
 
-@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+@mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
 async def test_should_notify_returns_true_for_new_user(mock_utcnow, bot, message):
     """First notification for a user should be allowed."""
     base_time = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)
@@ -207,7 +207,7 @@ async def test_should_notify_returns_true_for_new_user(mock_utcnow, bot, message
     assert clazz.should_notify(message.author.id, base_time) is True
 
 
-@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+@mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
 async def test_should_notify_returns_false_within_cooldown(mock_utcnow, bot, message):
     """Notification within cooldown period should be blocked."""
     base_time = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)
@@ -219,7 +219,7 @@ async def test_should_notify_returns_false_within_cooldown(mock_utcnow, bot, mes
     assert clazz.should_notify(message.author.id, base_time) is False
 
 
-@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+@mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
 async def test_should_notify_returns_true_after_cooldown(mock_utcnow, bot, message):
     """Notification after cooldown expires should be allowed."""
     base_time = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)
@@ -232,7 +232,7 @@ async def test_should_notify_returns_true_after_cooldown(mock_utcnow, bot, messa
 
 
 @mock.patch("random.choice")
-@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+@mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
 async def test_send_notification_uses_random_grass_phrase_off_hours(mock_utcnow, mock_random, bot, message):
     """Off-hours notification should select from touch grass phrases."""
     mock_random.return_value = "Test message with {name} and {count}"
@@ -249,7 +249,7 @@ async def test_send_notification_uses_random_grass_phrase_off_hours(mock_utcnow,
 
 
 @mock.patch("random.choice")
-@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+@mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
 async def test_send_notification_uses_work_phrase_during_work_hours(mock_utcnow, mock_random, bot, message):
     """Work-hours notification should select from work phrases."""
     mock_random.return_value = "Get back to work {name}! {count} messages."
@@ -259,7 +259,7 @@ async def test_send_notification_uses_work_phrase_during_work_hours(mock_utcnow,
     clazz = TouchGrass(bot)
     await clazz.send_notification(message, 42, work_hours=True)
 
-    from duckbot.cogs.touch_grass.touch_grass_phrases import work_phrases
+    from duckbot.cogs.messages.touch_grass_phrases import work_phrases
 
     mock_random.assert_called_once_with(work_phrases)
     call_args = message.channel.send.call_args[0][0]
@@ -267,7 +267,7 @@ async def test_send_notification_uses_work_phrase_during_work_hours(mock_utcnow,
     assert "42" in call_args
 
 
-@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+@mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
 async def test_show_activity_stats_no_activity(mock_utcnow, bot, context):
     """Stats command shows message when no recent activity."""
     base_time = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)
@@ -276,10 +276,10 @@ async def test_show_activity_stats_no_activity(mock_utcnow, bot, context):
     clazz = TouchGrass(bot)
     await clazz.show_activity_stats(context)
 
-    context.send.assert_called_once_with("No recent activity tracked in the last hour.")
+    context.send.assert_called_once_with("https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMmU1Mm0wZ2UxMW45MjR0M3I0dzVpaDVkajRpNDRyc2txd2xnZW13dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3OzmcOUXM3Kw0/giphy.gif")
 
 
-@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+@mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
 async def test_show_activity_stats_with_activity(mock_utcnow, bot, context, message, guild):
     """Stats command shows leaderboard with user activity."""
     base_time = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)
@@ -321,7 +321,7 @@ async def test_show_activity_stats_with_activity(mock_utcnow, bot, context, mess
     assert "10" in call_args
 
 
-@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+@mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
 async def test_show_activity_stats_sorts_by_count(mock_utcnow, bot, context, message, guild):
     """Stats command sorts users by message count descending."""
     base_time = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)
@@ -370,7 +370,7 @@ async def test_show_activity_stats_sorts_by_count(mock_utcnow, bot, context, mes
     assert user_b_pos < user_c_pos < user_a_pos
 
 
-@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+@mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
 async def test_show_activity_stats_excludes_old_messages(mock_utcnow, bot, context, message):
     """Stats command only shows messages within 60-minute window."""
     base_time = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)
@@ -389,10 +389,10 @@ async def test_show_activity_stats_excludes_old_messages(mock_utcnow, bot, conte
     await clazz.show_activity_stats(context)
 
     # Should show no activity since all messages are too old
-    context.send.assert_called_once_with("No recent activity tracked in the last hour.")
+    context.send.assert_called_once_with("https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMmU1Mm0wZ2UxMW45MjR0M3I0dzVpaDVkajRpNDRyc2txd2xnZW13dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3OzmcOUXM3Kw0/giphy.gif")
 
 
-@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+@mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
 async def test_show_activity_stats_no_guild(mock_utcnow, bot, context, message):
     """Stats command resolves names via bot cache when guild is unavailable."""
     base_time = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)
@@ -416,7 +416,7 @@ async def test_show_activity_stats_no_guild(mock_utcnow, bot, context, message):
     assert "5" in call_args
 
 
-@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+@mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
 async def test_show_activity_stats_member_not_in_guild(mock_utcnow, bot, context, message, guild):
     """Stats command falls back to bot cache when member is not in guild."""
     base_time = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)
@@ -441,7 +441,7 @@ async def test_show_activity_stats_member_not_in_guild(mock_utcnow, bot, context
     assert "5" in call_args
 
 
-@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+@mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
 async def test_show_activity_stats_unknown_user(mock_utcnow, bot, context, message, guild):
     """Stats command shows User-{id} when user is not in guild or bot cache."""
     base_time = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)
@@ -465,23 +465,23 @@ async def test_show_activity_stats_unknown_user(mock_utcnow, bot, context, messa
 
 
 async def test_is_work_hours_weekday_within_hours(bot):
-    """Mon-Fri 9am-5pm UTC should be work hours."""
+    """Mon-Fri 8am-6pm EDT (12pm-10pm UTC) should be work hours."""
     clazz = TouchGrass(bot)
     # Monday 12:00 UTC
     assert clazz.is_work_hours(MONDAY_NOON) is True
-    # Monday 9:00 UTC (boundary start)
-    assert clazz.is_work_hours(datetime.datetime(2024, 1, 1, 9, 0, 0, tzinfo=datetime.timezone.utc)) is True
-    # Monday 16:59 UTC (boundary end)
-    assert clazz.is_work_hours(datetime.datetime(2024, 1, 1, 16, 59, 0, tzinfo=datetime.timezone.utc)) is True
+    # Monday 12:00 UTC (boundary start)
+    assert clazz.is_work_hours(datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)) is True
+    # Monday 21:59 UTC (boundary end)
+    assert clazz.is_work_hours(datetime.datetime(2024, 1, 1, 21, 59, 0, tzinfo=datetime.timezone.utc)) is True
 
 
 async def test_is_work_hours_weekday_outside_hours(bot):
-    """Before 9am and at/after 5pm on weekdays should not be work hours."""
+    """Before 12pm and at/after 10pm UTC on weekdays should not be work hours."""
     clazz = TouchGrass(bot)
-    # Monday 8:59 UTC
-    assert clazz.is_work_hours(datetime.datetime(2024, 1, 1, 8, 59, 0, tzinfo=datetime.timezone.utc)) is False
-    # Monday 17:00 UTC
-    assert clazz.is_work_hours(datetime.datetime(2024, 1, 1, 17, 0, 0, tzinfo=datetime.timezone.utc)) is False
+    # Monday 11:59 UTC
+    assert clazz.is_work_hours(datetime.datetime(2024, 1, 1, 11, 59, 0, tzinfo=datetime.timezone.utc)) is False
+    # Monday 22:00 UTC
+    assert clazz.is_work_hours(datetime.datetime(2024, 1, 1, 22, 0, 0, tzinfo=datetime.timezone.utc)) is False
     # Monday 23:00 UTC
     assert clazz.is_work_hours(datetime.datetime(2024, 1, 1, 23, 0, 0, tzinfo=datetime.timezone.utc)) is False
 
@@ -495,7 +495,7 @@ async def test_is_work_hours_weekend(bot):
     assert clazz.is_work_hours(datetime.datetime(2024, 1, 7, 12, 0, 0, tzinfo=datetime.timezone.utc)) is False
 
 
-@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+@mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
 async def test_off_hours_threshold_119_no_notification(mock_utcnow, bot, message):
     """119 messages outside work hours should not trigger notification."""
     mock_utcnow.return_value = SATURDAY_NOON
@@ -509,7 +509,7 @@ async def test_off_hours_threshold_119_no_notification(mock_utcnow, bot, message
     message.channel.send.assert_not_called()
 
 
-@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+@mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
 async def test_off_hours_threshold_120_sends_notification(mock_utcnow, bot, message):
     """120 messages outside work hours should trigger notification."""
     mock_utcnow.return_value = SATURDAY_NOON
@@ -524,7 +524,7 @@ async def test_off_hours_threshold_120_sends_notification(mock_utcnow, bot, mess
     assert message.channel.send.call_count == 1
 
 
-@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+@mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
 async def test_off_hours_40_messages_no_notification(mock_utcnow, bot, message):
     """40 messages outside work hours should not trigger (threshold is 120)."""
     mock_utcnow.return_value = SATURDAY_NOON
@@ -537,7 +537,7 @@ async def test_off_hours_40_messages_no_notification(mock_utcnow, bot, message):
     message.channel.send.assert_not_called()
 
 
-@mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+@mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
 async def test_leaderboard_unaffected_by_time_of_day(mock_utcnow, bot, context, message, guild):
     """Leaderboard should show all activity regardless of work hours or thresholds."""
     mock_utcnow.return_value = SATURDAY_NOON
