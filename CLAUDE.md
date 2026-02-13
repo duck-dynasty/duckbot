@@ -62,6 +62,43 @@ setup_nltk
       clazz = Foo(bot)
       await clazz.foo(context)
   ```
+
+### Mocking Patterns
+
+- **Mock imported functions at the import location**, not where they're defined:
+  ```python
+  # If your_module.py has: from discord.utils import utcnow
+  # Then patch: "duckbot.cogs.your_module.your_module.utcnow"
+  @mock.patch("duckbot.cogs.touch_grass.touch_grass.utcnow")
+  async def test_something(mock_utcnow, bot, message):
+      mock_utcnow.return_value = datetime.datetime(
+          2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc
+      )
+  ```
+  See examples: `tests/cogs/insights/insights_test.py`, `tests/cogs/github/yolo_merge_test.py`
+- **Multiple patches**: Stack decorators; parameters appear in reverse order:
+  ```python
+  @mock.patch("random.choice")
+  @mock.patch("module.utcnow")
+  async def test(mock_utcnow, mock_random):  # reversed!
+      ...
+  ```
+
+### Fixture Usage
+
+- **`message` fixture**: Parametrized across channel types (text_channel, dm_channel, group_channel, thread). Each test using this fixture runs 4 times automatically.
+
+- **`raw_message` fixture**: Bare mock with no properties set. Use when you need custom setup that differs from defaults.
+
+- **`bot` fixture**: Mocked DuckBot instance. Use `bot.user` for the bot's author.
+
+- **Mutating fixtures is allowed**: You can set properties directly on fixtures:
+
+  ```python
+  message.author.id = 12345
+  message.author.display_name = "TestUser"
+  ```
+
 - Don't aim for 100% coverage — discord.py decorators make some methods hard to cover directly.
 
 ## Environment Variables

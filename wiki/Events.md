@@ -80,6 +80,10 @@ DuckBot will attempt to correct typos a user's previous message when they send _
 
 DuckBot has a very small chance to react to any message with 🦆 .
 
+## Touch Grass
+
+DuckBot keeps an eye on how active users are. If someone sends 120+ messages in an hour (or 40+ during work hours), DuckBot will suggest they go touch some grass. Work hours are Mon-Fri 8am-6pm EDT (12pm-10pm UTC). Users get at most one notification per hour.
+
 ## Robot
 
 DuckBot is a robot, and as such does not like being humanized. DuckBot tells people to stop thanking a robot when they explicitly thank the robot.
