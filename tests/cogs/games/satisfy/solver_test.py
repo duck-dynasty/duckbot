@@ -2,11 +2,13 @@ from typing import Set
 
 import pytest
 
+from duckbot.cogs.games.satisfy.building import Building
 from duckbot.cogs.games.satisfy.factory import Factory
 from duckbot.cogs.games.satisfy.item import Item
 from duckbot.cogs.games.satisfy.rates import Rates
 from duckbot.cogs.games.satisfy.recipe import (
     ModifiedRecipe,
+    Recipe,
     all,
     as_slooped,
     default,
@@ -235,3 +237,39 @@ def test_optimize_recycled_bois_returns_chain():
 
 def recipe_by_name(name: str | Item, power_shards: int = 0, sloops: int = 0) -> ModifiedRecipe:
     return ModifiedRecipe(next(r for r in all() if r.name == str(name)), power_shards, sloops)
+
+
+def test_optimize_solid_input_exceeds_belt_limit():
+    recipe = Recipe("test", Building.Assembler, inputs=Item.IronOre * 500, outputs=Item.IronIngot * 100)
+    f = factory(input=Item.IronOre * 2400, target=Item.IronIngot * 960, recipes=[recipe], power_shards=6, sloops=4)
+    assert optimize(f) == {ModifiedRecipe(recipe, 3, 2): approx(2.0)}
+
+
+def test_optimize_fluid_input_exceeds_pipe_limit():
+    recipe = Recipe("test", Building.Assembler, inputs=Item.Water * 250, outputs=Item.IronIngot * 100)
+    f = factory(input=Item.Water * 1200, target=Item.IronIngot * 960, recipes=[recipe], power_shards=6, sloops=4)
+    assert optimize(f) == {ModifiedRecipe(recipe, 3, 2): approx(2.0)}
+
+
+def test_optimize_solid_output_exceeds_belt_limit():
+    recipe = recipe_by_name("TurboRifleAmmo#Manufacturer").original_recipe
+    f = factory(
+        input=Item.RifleAmmo * 576 + Item.AluminumCasing * 72 + Item.PackagedTurbofuel * 72,
+        target=Item.TurboRifleAmmo * 2400,
+        recipes=[recipe],
+        power_shards=6,
+        sloops=8,
+    )
+    assert optimize(f) == {recipe_by_name("TurboRifleAmmo#Manufacturer", 3, 4): approx(2.0)}
+
+
+def test_optimize_fluid_output_exceeds_pipe_limit():
+    recipe = recipe_by_name("SuperpositionOscillator").original_recipe
+    f = factory(
+        input=Item.DarkMatterCrystal * 144 + Item.CrystalOscillator * 24 + Item.AlcladAluminumSheet * 216 + Item.ExcitedPhotonicMatter * 600,
+        target=Item.SuperpositionOscillator * 48,
+        recipes=[recipe],
+        power_shards=6,
+        sloops=8,
+    )
+    assert optimize(f) == {recipe_by_name("SuperpositionOscillator", 3, 4): approx(2.0)}
