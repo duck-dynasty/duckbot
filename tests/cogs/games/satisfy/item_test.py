@@ -1,8 +1,9 @@
 import random
+from math import inf
 
 import pytest
 
-from duckbot.cogs.games.satisfy.item import Form, Item, sinkable
+from duckbot.cogs.games.satisfy.item import Form, Item, sinkable, transport_limit
 from duckbot.cogs.games.satisfy.rates import Rates
 
 
@@ -26,6 +27,21 @@ def test_mul_returns_rates(item: Item):
 def test_lt_alphabetical_order_by_name(item: Item):
     rhs = random.choice([x for x in Item])
     assert (item < rhs) == (item.name < rhs.name)
+
+
+@pytest.mark.parametrize("item", [i for i in Item if i.form == Form.Solid])
+def test_transport_limit_solid_is_belt_limit(item: Item):
+    assert transport_limit(item) == 1200
+
+
+@pytest.mark.parametrize("item", [i for i in Item if i.form == Form.Fluid])
+def test_transport_limit_fluid_is_pipe_limit(item: Item):
+    assert transport_limit(item) == 600
+
+
+@pytest.mark.parametrize("item", [i for i in Item if i.form == Form.Aux])
+def test_transport_limit_aux_is_infinite(item: Item):
+    assert transport_limit(item) == inf
 
 
 @pytest.mark.parametrize("item", [i for i in Item if i.form != Form.Solid])

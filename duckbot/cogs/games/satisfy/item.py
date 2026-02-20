@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from enum import Enum, auto, unique
+from math import inf
 
 
 @unique
@@ -214,3 +215,12 @@ class Item(Enum):
 
 def sinkable(item: Item) -> bool:
     return item.form == Form.Solid and item.points > 0
+
+
+def transport_limit(item: Item) -> float:
+    if item.form == Form.Solid:
+        return 1200
+    elif item.form == Form.Fluid:
+        return 600
+    else:
+        return inf
