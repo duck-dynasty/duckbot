@@ -58,6 +58,8 @@ jobs:
       working-directory: .aws
       run: |
         . ../${{ steps.cdk.outputs.venv-path }}/bin/activate
+        # https://aws.amazon.com/blogs/devops/cdk-v1-end-of-support/ https://github.com/aws/aws-cdk/issues/19836
+        cdk acknowledge 19836
         cdk synth
 
   deploy:
