@@ -126,7 +126,6 @@ class DuckBotStack(cdk.Stack):
                 cluster,
                 "AsgCapacityProvider",
                 auto_scaling_group=asg,
-                enable_managed_draining=False,
                 enable_managed_termination_protection=False,
             ),
         )
