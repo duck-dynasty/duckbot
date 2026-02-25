@@ -2,8 +2,8 @@ import json
 import os
 from typing import List
 
+import aws_cdk as cdk
 import boto3
-from aws_cdk import core
 from duckdeploy.secret import Secret
 from duckdeploy.stack import DuckBotStack
 
@@ -32,7 +32,7 @@ def publish_secrets(secrets: List[Secret]):
 
 
 if __name__ == "__main__":
-    app = core.App()
+    app = cdk.App()
 
     write_secrets = app.node.try_get_context("write_secrets")
     if write_secrets and json.loads(write_secrets.lower()):

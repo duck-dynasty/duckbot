@@ -27,5 +27,5 @@ runs:
     shell: bash
     run: |
       . ${{ steps.venv.outputs.path }}/bin/activate
-      npm install -g aws-cdk@$(python -c 'from importlib.metadata import version; print(version("aws-cdk.core"))')
+      npm install -g aws-cdk
       cdk --version
