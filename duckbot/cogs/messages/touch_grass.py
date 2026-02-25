@@ -11,11 +11,6 @@ from .touch_grass_phrases import phrases, work_phrases
 WORK_HOURS_THRESHOLD = 40
 OFF_HOURS_THRESHOLD = 120
 
-# Work hours definition (Mon-Fri, 8am-6pm EDT / 12pm-10pm UTC)
-WORK_DAY_CUTOFF = 5  # Monday (0) through Friday (4)
-WORK_START_HOUR = 12
-WORK_END_HOUR = 22
-
 # Tracking and cooldown windows
 TRACKING_WINDOW_HOURS = 1
 COOLDOWN_SECONDS = 3600
@@ -60,7 +55,7 @@ class TouchGrass(commands.Cog):
 
     def is_work_hours(self, now) -> bool:
         """Check if current time is Mon-Fri 8am-6pm EDT (12pm-10pm UTC)."""
-        return now.weekday() < WORK_DAY_CUTOFF and WORK_START_HOUR <= now.hour < WORK_END_HOUR
+        return now.weekday() < 5 and 12 <= now.hour < 22
 
     def clean_old_messages(self, user_id: int, now):
         """Remove timestamps older than 60 minutes from the tracking window."""
@@ -89,17 +84,19 @@ class TouchGrass(commands.Cog):
         """Show activity leaderboard with current message counts."""
         now = utcnow()
 
+        for user_id in self.activity:
+            self.clean_old_messages(user_id, now)
+
         stats = []
         for user_id, data in self.activity.items():
-            cutoff = now - datetime.timedelta(hours=TRACKING_WINDOW_HOURS)
-            data["messages"] = [ts for ts in data["messages"] if ts > cutoff]
-
             count = len(data["messages"])
             if count > 0:
                 stats.append((user_id, count))
 
         if not stats:
-            await context.send("https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMmU1Mm0wZ2UxMW45MjR0M3I0dzVpaDVkajRpNDRyc2txd2xnZW13dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3OzmcOUXM3Kw0/giphy.gif")
+            await context.send(
+                "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMmU1Mm0wZ2UxMW45MjR0M3I0dzVpaDVkajRpNDRyc2txd2xnZW13dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3OzmcOUXM3Kw0/giphy.gif"
+            )
             return
 
         stats.sort(key=lambda x: x[1], reverse=True)

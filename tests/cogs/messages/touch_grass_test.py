@@ -276,7 +276,9 @@ async def test_show_activity_stats_no_activity(mock_utcnow, bot, context):
     clazz = TouchGrass(bot)
     await clazz.show_activity_stats(context)
 
-    context.send.assert_called_once_with("https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMmU1Mm0wZ2UxMW45MjR0M3I0dzVpaDVkajRpNDRyc2txd2xnZW13dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3OzmcOUXM3Kw0/giphy.gif")
+    context.send.assert_called_once_with(
+        "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMmU1Mm0wZ2UxMW45MjR0M3I0dzVpaDVkajRpNDRyc2txd2xnZW13dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3OzmcOUXM3Kw0/giphy.gif"
+    )
 
 
 @mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
@@ -389,7 +391,9 @@ async def test_show_activity_stats_excludes_old_messages(mock_utcnow, bot, conte
     await clazz.show_activity_stats(context)
 
     # Should show no activity since all messages are too old
-    context.send.assert_called_once_with("https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMmU1Mm0wZ2UxMW45MjR0M3I0dzVpaDVkajRpNDRyc2txd2xnZW13dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3OzmcOUXM3Kw0/giphy.gif")
+    context.send.assert_called_once_with(
+        "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExMmU1Mm0wZ2UxMW45MjR0M3I0dzVpaDVkajRpNDRyc2txd2xnZW13dSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3OzmcOUXM3Kw0/giphy.gif"
+    )
 
 
 @mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
