@@ -21,6 +21,7 @@
 |       [`!truth`](#truth)       | fact checks a message when used in a reply         |
 |     [`!weather`](#weather)     | retrieve weather information                       |
 |     [`!satisfy`](#satisfy)     | produce a factory for _Satisfactory_               |
+| [`/grass-stats`](#touch-grass) | show activity leaderboard for the last hour        |
 | [`!yolo`](#yolo-pull-requests) | list open pull requests in this repo               |
 
 ## Wolfram Alpha
@@ -259,6 +260,12 @@ DuckBot rejects you outright if the factory state does not have enough informati
 
 **->**\
 DuckBot will sometimes produce the null factory. Either the input and output were trivial, or the solution is infinite. Workarounds include not using raw supply recipes, or not using any inputs at all when using raw supply.
+
+## Touch Grass
+
+DuckBot monitors message activity and will tell you to touch grass if you're sending too many messages. During work hours (Mon-Fri 8am-6pm EDT / 12pm-10pm UTC) the threshold is 40 messages per hour; outside work hours it's 120 messages per hour. Notifications have a 1-hour cooldown per user.
+
+Use `/grass-stats` to see the activity leaderboard showing message counts for all tracked users in the last 60 minutes.
 
 ## Yolo Pull Requests
 

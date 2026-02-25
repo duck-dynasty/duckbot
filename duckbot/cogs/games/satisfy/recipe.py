@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from typing import List
 
 from .building import Building
-from .item import Item, sinkable
+from .item import Item, sinkable, transport_limit
 from .rates import Rates
 
 
@@ -36,15 +36,21 @@ class ModifiedRecipe:
 
     @property
     def inputs(self) -> Rates:
-        return self.original_recipe.inputs * self.shard_scale
+        return self.original_recipe.inputs * self.capped_shard_scale
 
     @property
     def outputs(self) -> Rates:
-        return self.original_recipe.outputs * self.shard_scale * self.sloop_scale
+        return self.original_recipe.outputs * self.capped_shard_scale * self.sloop_scale
 
     @property
     def shard_scale(self) -> float:
         return 1.0 + self.power_shards * 0.5 if self.building.max_shards > 0 else 1.0
+
+    @property
+    def capped_shard_scale(self) -> float:
+        input_caps = [transport_limit(item) / rate for item, rate in self.original_recipe.inputs.items()]
+        output_caps = [transport_limit(item) / (rate * self.sloop_scale) for item, rate in self.original_recipe.outputs.items()]
+        return min([self.shard_scale] + input_caps + output_caps)
 
     @property
     def sloop_scale(self) -> float:

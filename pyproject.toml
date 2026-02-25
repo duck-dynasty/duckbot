@@ -18,10 +18,10 @@ dependencies = [
     "beautifulsoup4==4.14.3",
     "requests==2.32.5",
     "timezonefinder==8.2.0",
-    "holidays==0.89",
+    "holidays==0.91",
     "pyowm==3.3.0",         # openweather
     "psycopg2==2.9.11",
-    "SQLAlchemy==2.0.45",
+    "SQLAlchemy==2.0.46",
     "d20==1.1.2",
     "nltk==3.9.2",
     "textblob==0.19.0",
@@ -30,9 +30,9 @@ dependencies = [
     "networkx==3.4.2",
     "PyGithub==2.8.1",
     "wolframalpha==5.1.3",
-    "yfinance==1.1.0",
+    "yfinance==1.2.0",
     "mip==1.15.0",
-    "anthropic==0.77.0",    # sdk for llm
+    "anthropic==0.83.0",    # sdk for llm
 ]
 
 [project.optional-dependencies]
@@ -44,13 +44,13 @@ dev = [
     "flake8-pyproject==1.2.4",
     "black==26.1.0",
     "flake8-black==0.4.0",
-    "isort==7.0.0",
+    "isort==8.0.0",
     "flake8-isort==7.0.0",
     "pep8-naming==0.15.1",
     "mdformat==1.0.0",
     "mdformat-gfm==1.0.0",
     "mdformat-black==0.1.1",
-    "responses==0.25.8",
+    "responses==0.26.0",
     "pytest-blockage==0.2.4",
     "pytest-sugar==1.1.1",
     "pytest-icdiff==0.9",
@@ -66,7 +66,7 @@ cdk = [
     "aws-cdk.aws-iam==1.204.0",
     "aws-cdk.aws-logs==1.204.0",
     "aws-cdk.aws-ssm==1.204.0",
-    "boto3==1.42.39",
+    "boto3==1.42.54",
 ]
 
 [project.scripts]
