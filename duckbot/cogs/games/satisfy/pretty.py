@@ -65,7 +65,7 @@ def solution_embed(solution: dict[ModifiedRecipe, float]) -> List[Embed]:
         building = recipe.building.name
 
         if recipe.power_shards > 0:
-            name = f"{name} @ {int(recipe.shard_scale * 100)}%"
+            name = f"{name} @ {int(recipe.capped_shard_scale * 100)}%"
             building = f"{building} with {recipe.power_shards} Power Shard{plrl(recipe.power_shards)}"
 
         if recipe.sloops > 0:
