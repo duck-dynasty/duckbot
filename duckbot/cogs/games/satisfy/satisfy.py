@@ -1,5 +1,6 @@
 from typing import List, Optional
 
+import discord
 from discord import Interaction
 from discord.app_commands import Choice
 from discord.ext.commands import Cog, Context, hybrid_group
@@ -7,6 +8,7 @@ from discord.ext.commands import Cog, Context, hybrid_group
 from duckbot.util.embeds import group_by_max_length
 
 from .factory import Factory
+from .graph import solution_graph
 from .item import Item
 from .pretty import factory_embed, solution_embed
 from .recipe import all, as_slooped
@@ -144,6 +146,7 @@ class Satisfy(Cog):
                 else:
                     for embeds in group_by_max_length([factory_embed(factory)] + solution_embed(solution)):
                         await context.send(embeds=embeds)
+                    await context.send(file=discord.File(solution_graph(solution), filename="solution.png"))
         else:
             await context.send("No.", delete_after=60)
 

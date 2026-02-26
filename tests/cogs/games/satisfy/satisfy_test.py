@@ -1,13 +1,15 @@
+import io
 from copy import copy
 from unittest import mock
 
+import discord
 import pytest
 
 from duckbot.cogs.games.satisfy import Satisfy
 from duckbot.cogs.games.satisfy.factory import Factory
 from duckbot.cogs.games.satisfy.item import Item
 from duckbot.cogs.games.satisfy.rates import Rates
-from duckbot.cogs.games.satisfy.recipe import all, as_slooped, default
+from duckbot.cogs.games.satisfy.recipe import ModifiedRecipe, all, as_slooped, default
 
 
 @pytest.fixture
@@ -254,6 +256,18 @@ async def test_solve_recipe_excludes(opt, clazz, context, default_factory):
     clazz.save(context, default_factory)
     await clazz.solve.callback(clazz, context)
     opt.assert_called_once_with(expected)
+
+
+@mock.patch("duckbot.cogs.games.satisfy.satisfy.solution_graph", return_value=io.BytesIO(b"fake-png"))
+@mock.patch("duckbot.cogs.games.satisfy.satisfy.optimize", return_value={ModifiedRecipe(next(r for r in all() if r.name == "IronIngot"), 0, 0): 1.0})
+async def test_solve_sends_graph_file(mock_opt, mock_graph, clazz, context, default_factory):
+    default_factory.inputs = Item.IronOre * 30
+    default_factory.maximize = {Item.IronIngot}
+    clazz.save(context, default_factory)
+    await clazz.solve.callback(clazz, context)
+    last_call_kwargs = context.send.call_args_list[-1].kwargs
+    assert "file" in last_call_kwargs
+    assert isinstance(last_call_kwargs["file"], discord.File)
 
 
 def sloop(recipes):
