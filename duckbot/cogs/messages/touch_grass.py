@@ -32,7 +32,7 @@ class TouchGrass(commands.Cog):
 
     async def track_activity(self, message: Message):
         """Track user message activity and send notification if threshold is reached."""
-        if message.author == self.bot.user:
+        if message.author.bot:
             return
 
         user_id = message.author.id

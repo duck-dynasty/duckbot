@@ -6,8 +6,7 @@ from nltk import edit_distance
 
 
 class EditDiff(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
+    def __init__(self):
         self.edit_threshold = 6
         self.delete_after_seconds = 120
 
@@ -28,8 +27,8 @@ class EditDiff(commands.Cog):
 
     def should_send_diff(self, before, after):
         return (
-            before.author != self.bot.user
-            and after.author != self.bot.user
+            not before.author.bot
+            and not after.author.bot
             and before.content != after.content
             and (before.author.id == 244629273191645184 or after.author.id == 244629273191645184 or edit_distance(before.clean_content, after.clean_content) > self.edit_threshold)
         )

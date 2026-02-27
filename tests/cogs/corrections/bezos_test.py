@@ -3,11 +3,11 @@ import pytest
 from duckbot.cogs.corrections import Bezos
 
 
-async def test_correct_bezos_bot_author(bot, message):
-    message.author = bot.user
+async def test_correct_bezos_bot_author(bot, bot_message):
+    bot_message.content = "bezo"
     clazz = Bezos(bot)
-    await clazz.correct_bezos(message)
-    message.channel.send.assert_not_called()
+    await clazz.correct_bezos(bot_message)
+    bot_message.channel.send.assert_not_called()
 
 
 @pytest.mark.parametrize("text", ["Jeffrey Bezos", "fekin bezo at it again"])

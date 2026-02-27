@@ -14,7 +14,7 @@ class Haiku(commands.Cog):
 
     @commands.Cog.listener("on_message")
     async def detect_haiku(self, message):
-        if message.author == self.bot.user:
+        if message.author.bot:
             return
         words = self.get_words(message)
         i = 0

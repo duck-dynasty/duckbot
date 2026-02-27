@@ -21,7 +21,7 @@ async def test_typing_response_random_passes(random, sleep, bot, text_channel, u
 
 @mock.patch("asyncio.sleep", return_value=None)
 @mock.patch("random.random", return_value=0)
-async def test_typing_response_ignores_bot_user(random, sleep, bot, text_channel):
+async def test_typing_response_ignores_bot_user(random, sleep, bot, bot_user, text_channel):
     clazz = Typing(bot)
-    await clazz.typing_response(text_channel, bot.user, None)
+    await clazz.typing_response(text_channel, bot_user, None)
     text_channel.typing.assert_not_called()
