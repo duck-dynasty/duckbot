@@ -11,7 +11,7 @@ async def test_search_recipes_returns_scraped_html(bot, responses):
     search_term = "test1"
     mock_data = get_mock_data(search_term, 5)
     setup_responses(responses, search_term, with_articles(mock_data))
-    clazz = Recipe(bot)
+    clazz = Recipe()
     response = clazz.search_recipes(search_term)
     assert response == json_articles(mock_data)
     assert_requests(responses, search_term)
@@ -21,7 +21,7 @@ async def test_parse_recipes_returns_articles(bot):
     mock_data = get_mock_data("test1", 5)
     expected_response = [get_mock_data("test1", 5) for _ in range(5)]
     html = json_articles(mock_data)
-    clazz = Recipe(bot)
+    clazz = Recipe()
     response = clazz.parse_recipes(html)
     assert response == expected_response
 
@@ -29,7 +29,7 @@ async def test_parse_recipes_returns_articles(bot):
 async def test_parse_recipes_returns_empty(bot):
     expected_response = []
     html = without_articles()
-    clazz = Recipe(bot)
+    clazz = Recipe()
     response = clazz.parse_recipes(html)
     assert response == expected_response
 
@@ -37,21 +37,21 @@ async def test_parse_recipes_returns_empty(bot):
 async def test_parse_recipes_no_content_returns_empty(bot):
     expected_response = []
     html = without_content()
-    clazz = Recipe(bot)
+    clazz = Recipe()
     response = clazz.parse_recipes(html)
     assert response == expected_response
 
 
 async def test_select_recipes_with_one_return_one(bot):
     recipe_list = [get_mock_data("test1", 5)]
-    clazz = Recipe(bot)
+    clazz = Recipe()
     response = clazz.select_recipe(recipe_list)
     assert response == recipe_list[0]
 
 
 async def test_select_recipes_with_many_return_one(bot):
     recipe_list = [get_mock_data("test1", 5), get_mock_data("test2", 4)]
-    clazz = Recipe(bot)
+    clazz = Recipe()
     response = clazz.select_recipe(recipe_list)
     assert response in recipe_list
 
@@ -61,7 +61,7 @@ async def test_recipe_with_content_return_recipe(bot, context, responses):
     mock_data = get_mock_data(search_term, 5)
     expected_response = f"How about a nice {mock_data['name']}. {mock_data['description']} This recipe has a {mock_data['rating']}/5 rating! {mock_data['url']}"
     setup_responses(responses, search_term, with_articles(mock_data))
-    clazz = Recipe(bot)
+    clazz = Recipe()
     await clazz.recipe(context, search_term)
     context.send.assert_called_once_with(expected_response)
     assert_requests(responses, search_term)
@@ -71,7 +71,7 @@ async def test_recipe_without_articles_return_sorry(bot, context, responses):
     search_term = "test1"
     expected_response = f"I am terribly sorry. There doesn't seem to be any recipes for {search_term}."
     setup_responses(responses, search_term, without_articles(), num_pages=1)
-    clazz = Recipe(bot)
+    clazz = Recipe()
     await clazz.recipe(context, search_term)
     context.send.assert_called_once_with(expected_response)
     assert_requests(responses, search_term, num_pages=1)
@@ -81,7 +81,7 @@ async def test_recipe_without_content_return_sorry(bot, context, responses):
     search_term = "test1"
     expected_response = "I am terribly sorry. I am having problems reading All Recipes for you."
     setup_responses(responses, search_term, without_content(), num_pages=1)
-    clazz = Recipe(bot)
+    clazz = Recipe()
     await clazz.recipe(context, search_term)
     context.send.assert_called_once_with(expected_response)
     assert_requests(responses, search_term, num_pages=1)

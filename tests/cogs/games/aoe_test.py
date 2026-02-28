@@ -10,7 +10,7 @@ from duckbot.cogs.games import AgeOfEmpires
 @pytest.mark.parametrize("text", ["105", "  105  "])
 async def test_expand_taunt_message_is_taunt_and_not_reply(get_message_reference, bot, message, text):
     message.content = text
-    clazz = AgeOfEmpires(bot)
+    clazz = AgeOfEmpires()
     await clazz.expand_taunt(message)
     message.channel.send.assert_called_once_with(f"{message.author.mention} > 105: _You can resign again._")
     message.delete.assert_called()
@@ -23,7 +23,7 @@ async def test_expand_taunt_message_is_taunt_and_reply(get_message_reference, bo
     reply = autospec.of(discord.Message)
     get_message_reference.return_value = reply
     message.content = text
-    clazz = AgeOfEmpires(bot)
+    clazz = AgeOfEmpires()
     await clazz.expand_taunt(message)
     reply.reply.assert_called_once_with(f"{message.author.mention} > 105: _You can resign again._")
     message.delete.assert_called()
@@ -33,7 +33,7 @@ async def test_expand_taunt_message_is_taunt_and_reply(get_message_reference, bo
 @mock.patch("duckbot.cogs.games.aoe.get_message_reference")
 async def test_expand_taunt_message_is_not_taunt(get_message_reference, bot, message):
     message.content = "0"
-    clazz = AgeOfEmpires(bot)
+    clazz = AgeOfEmpires()
     await clazz.expand_taunt(message)
     message.channel.send.assert_not_called()
     message.delete.assert_not_called()

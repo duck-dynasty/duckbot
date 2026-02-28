@@ -8,14 +8,14 @@ from duckbot.cogs.fortune import Stocks
 async def test_stock_info_bot_author(bot, message):
     message.author.bot = True
     message.content = "$DUX"
-    clazz = Stocks(bot)
+    clazz = Stocks()
     await clazz.stock_info(message)
     message.channel.send.assert_not_called()
 
 
 async def test_stock_info_no_stocks_in_message(bot, message):
     message.content = "bruh, no stocks!"
-    clazz = Stocks(bot)
+    clazz = Stocks()
     await clazz.stock_info(message)
     message.channel.send.assert_not_called()
 
@@ -25,7 +25,7 @@ async def test_stock_info_no_stocks_in_message(bot, message):
 async def test_stock_info_single_stock_ignores_duplicates(ticker, bot, message, text):
     ticker.return_value.info = info()
     message.content = text
-    clazz = Stocks(bot)
+    clazz = Stocks()
     await clazz.stock_info(message)
     ticker.assert_called_once_with("DUX")
     message.channel.send.assert_called_once_with("DUX (Ducks): **1,000.00** (USD) per share, -0.99% today; +10.0% over a year")
@@ -36,7 +36,7 @@ async def test_stock_info_single_stock_ignores_duplicates(ticker, bot, message, 
 async def test_stock_info_ignores_failed_symbols(ticker, bot, message, text):
     ticker.return_value.info = {}
     message.content = text
-    clazz = Stocks(bot)
+    clazz = Stocks()
     await clazz.stock_info(message)
     ticker.assert_called_once_with("DUX")
     message.channel.send.assert_not_called()
@@ -54,7 +54,7 @@ async def test_stock_info_multiple_stocks(ticker, bot, message, text):
 
     ticker.side_effect = set_info
     message.content = text
-    clazz = Stocks(bot)
+    clazz = Stocks()
     await clazz.stock_info(message)
     ticker.assert_any_call("DUX1")
     ticker.assert_any_call("DUX2")
@@ -75,7 +75,7 @@ async def test_stock_info_ignores_failed_symbols_when_multiple(ticker, bot, mess
 
     ticker.side_effect = set_info
     message.content = text
-    clazz = Stocks(bot)
+    clazz = Stocks()
     await clazz.stock_info(message)
     ticker.assert_any_call("DUX1")
     ticker.assert_any_call("DUX2")

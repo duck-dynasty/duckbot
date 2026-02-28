@@ -4,9 +4,6 @@ from textblob import TextBlob
 
 
 class Typos(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-
     @commands.Cog.listener("on_message")
     async def correct_typos(self, message: Message):
         """Try to correct common typos for user's previous message."""

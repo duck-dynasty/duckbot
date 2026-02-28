@@ -8,9 +8,9 @@ from .satisfy import setup as satisfy_setup
 
 
 async def setup(bot):
-    await bot.add_cog(Dice(bot))
-    await bot.add_cog(AgeOfEmpires(bot))
-    await bot.add_cog(CoinFlip(bot))
+    await bot.add_cog(Dice())
+    await bot.add_cog(AgeOfEmpires())
+    await bot.add_cog(CoinFlip())
     await bot.add_cog(DiscordActivity(bot))
     await bot.add_cog(OfficeHours(bot))
     await bot.add_cog(Pokemon(bot))

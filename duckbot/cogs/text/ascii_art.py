@@ -5,9 +5,6 @@ from duckbot.util.messages import MAX_MESSAGE_LENGTH
 
 
 class AsciiArt(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-
     @commands.command(name="ascii")
     async def ascii_command(self, context, *, text: str = "I need text, brother."):
         await self.ascii(context, text)

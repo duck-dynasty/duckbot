@@ -6,9 +6,6 @@ from discord.ext import commands
 
 
 class Stocks(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-
     @commands.Cog.listener("on_message")
     async def stock_info(self, message: discord.Message):
         if not message.author.bot:
