@@ -58,14 +58,8 @@ dev = [
 ]
 
 cdk = [
-    "aws-cdk.core==1.204.0",
-    "aws-cdk.aws-ec2==1.204.0",
-    "aws-cdk.aws-ecs==1.204.0",
-    "aws-cdk.aws-autoscaling==1.204.0",
-    "aws-cdk.aws-efs==1.204.0",
-    "aws-cdk.aws-iam==1.204.0",
-    "aws-cdk.aws-logs==1.204.0",
-    "aws-cdk.aws-ssm==1.204.0",
+    "aws-cdk-lib==2.239.0",
+    "constructs==10.5.1",
     "boto3==1.42.54",
 ]
 
