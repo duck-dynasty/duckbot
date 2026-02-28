@@ -3,11 +3,11 @@ import pytest
 from duckbot.cogs.corrections import Bitcoin
 
 
-async def test_correct_bitcoin_bot_author(bot, message):
-    message.author = bot.user
+async def test_correct_bitcoin_bot_author(bot, bot_message):
+    bot_message.content = "bitcoin"
     clazz = Bitcoin(bot)
-    await clazz.correct_bitcoin(message)
-    message.channel.send.assert_not_called()
+    await clazz.correct_bitcoin(bot_message)
+    bot_message.channel.send.assert_not_called()
 
 
 @pytest.mark.parametrize("text", ["bitcoin", "BITCOIN", "BiTcOiN"])

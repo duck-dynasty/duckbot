@@ -9,7 +9,7 @@ class Tarlson(commands.Cog):
     async def correct_tarlson(self, message):
         """Corrections for tarlson"""
 
-        if message.author == self.bot.user:
+        if message.author.bot:
             return
 
         if "tucker carlson" in message.content.lower():
