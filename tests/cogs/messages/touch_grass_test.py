@@ -280,8 +280,9 @@ async def test_show_activity_stats_no_activity(mock_utcnow, bot, context):
     )
 
 
+@mock.patch("duckbot.cogs.messages.touch_grass.get_user")
 @mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
-async def test_show_activity_stats_with_activity(mock_utcnow, bot, context, message, guild):
+async def test_show_activity_stats_with_activity(mock_utcnow, mock_get_user, bot, context, message):
     """Stats command shows leaderboard with user activity."""
     base_time = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)
     mock_utcnow.return_value = base_time
@@ -297,20 +298,15 @@ async def test_show_activity_stats_with_activity(mock_utcnow, bot, context, mess
     for i in range(10):
         await clazz.track_activity(message)
 
-    # Setup guild
-    context.guild = guild
-
-    def get_member_side_effect(user_id):
-        member = mock.Mock()
+    def get_user_side_effect(bot, user_id, guild=None):
+        user = mock.Mock()
         if user_id == 123:
-            member.display_name = "User1"
+            user.display_name = "User1"
         elif user_id == 456:
-            member.display_name = "User2"
-        else:
-            return None
-        return member
+            user.display_name = "User2"
+        return user
 
-    guild.get_member.side_effect = get_member_side_effect
+    mock_get_user.side_effect = get_user_side_effect
 
     await clazz.show_activity_stats(context)
 
@@ -322,8 +318,9 @@ async def test_show_activity_stats_with_activity(mock_utcnow, bot, context, mess
     assert "10" in call_args
 
 
+@mock.patch("duckbot.cogs.messages.touch_grass.get_user")
 @mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
-async def test_show_activity_stats_sorts_by_count(mock_utcnow, bot, context, message, guild):
+async def test_show_activity_stats_sorts_by_count(mock_utcnow, mock_get_user, bot, context, message):
     """Stats command sorts users by message count descending."""
     base_time = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)
     mock_utcnow.return_value = base_time
@@ -345,20 +342,17 @@ async def test_show_activity_stats_sorts_by_count(mock_utcnow, bot, context, mes
     for i in range(5):
         await clazz.track_activity(message)
 
-    # Setup guild
-    context.guild = guild
-
-    def get_member_side_effect(user_id):
-        member = mock.Mock()
+    def get_user_side_effect(bot, user_id, guild=None):
+        user = mock.Mock()
         if user_id == 111:
-            member.display_name = "UserA"
+            user.display_name = "UserA"
         elif user_id == 222:
-            member.display_name = "UserB"
+            user.display_name = "UserB"
         elif user_id == 333:
-            member.display_name = "UserC"
-        return member
+            user.display_name = "UserC"
+        return user
 
-    guild.get_member.side_effect = get_member_side_effect
+    mock_get_user.side_effect = get_user_side_effect
 
     await clazz.show_activity_stats(context)
 
@@ -395,70 +389,19 @@ async def test_show_activity_stats_excludes_old_messages(mock_utcnow, bot, conte
     )
 
 
+@mock.patch("duckbot.cogs.messages.touch_grass.get_user")
 @mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
-async def test_show_activity_stats_no_guild(mock_utcnow, bot, context, message):
-    """Stats command resolves names via bot cache when guild is unavailable."""
+async def test_show_activity_stats_unknown_user(mock_utcnow, mock_get_user, bot, context, message):
+    """Stats command shows User-{id} when get_user returns None."""
     base_time = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)
     mock_utcnow.return_value = base_time
-
-    clazz = TouchGrass(bot)
-
-    message.author.id = 123
-    for i in range(5):
-        await clazz.track_activity(message)
-
-    context.guild = None
-    user = mock.Mock()
-    user.display_name = "CachedUser"
-    bot.get_user.return_value = user
-
-    await clazz.show_activity_stats(context)
-
-    call_args = context.send.call_args[0][0]
-    assert "CachedUser" in call_args
-    assert "5" in call_args
-
-
-@mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
-async def test_show_activity_stats_member_not_in_guild(mock_utcnow, bot, context, message, guild):
-    """Stats command falls back to bot cache when member is not in guild."""
-    base_time = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)
-    mock_utcnow.return_value = base_time
+    mock_get_user.return_value = None
 
     clazz = TouchGrass(bot)
 
     message.author.id = 999
     for i in range(5):
         await clazz.track_activity(message)
-
-    context.guild = guild
-    guild.get_member.return_value = None
-    user = mock.Mock()
-    user.display_name = "FallbackUser"
-    bot.get_user.return_value = user
-
-    await clazz.show_activity_stats(context)
-
-    call_args = context.send.call_args[0][0]
-    assert "FallbackUser" in call_args
-    assert "5" in call_args
-
-
-@mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
-async def test_show_activity_stats_unknown_user(mock_utcnow, bot, context, message, guild):
-    """Stats command shows User-{id} when user is not in guild or bot cache."""
-    base_time = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)
-    mock_utcnow.return_value = base_time
-
-    clazz = TouchGrass(bot)
-
-    message.author.id = 999
-    for i in range(5):
-        await clazz.track_activity(message)
-
-    context.guild = guild
-    guild.get_member.return_value = None
-    bot.get_user.return_value = None
 
     await clazz.show_activity_stats(context)
 
@@ -540,8 +483,9 @@ async def test_off_hours_40_messages_no_notification(mock_utcnow, bot, message):
     message.channel.send.assert_not_called()
 
 
+@mock.patch("duckbot.cogs.messages.touch_grass.get_user")
 @mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
-async def test_leaderboard_unaffected_by_time_of_day(mock_utcnow, bot, context, message, guild):
+async def test_leaderboard_unaffected_by_time_of_day(mock_utcnow, mock_get_user, bot, context, message):
     """Leaderboard should show all activity regardless of work hours or thresholds."""
     mock_utcnow.return_value = SATURDAY_NOON
 
@@ -552,10 +496,9 @@ async def test_leaderboard_unaffected_by_time_of_day(mock_utcnow, bot, context, 
     for i in range(10):
         await clazz.track_activity(message)
 
-    context.guild = guild
-    member = mock.Mock()
-    member.display_name = "WeekendUser"
-    guild.get_member.return_value = member
+    user = mock.Mock()
+    user.display_name = "WeekendUser"
+    mock_get_user.return_value = user
 
     await clazz.show_activity_stats(context)
 
