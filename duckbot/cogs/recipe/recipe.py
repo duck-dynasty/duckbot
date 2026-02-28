@@ -7,9 +7,6 @@ from discord.ext import commands
 
 
 class Recipe(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-
     @staticmethod
     def select_recipe(recipe_list):
         """Given a list of recipes, select a random one."""

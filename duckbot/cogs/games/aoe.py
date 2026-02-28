@@ -7,9 +7,6 @@ from .aoe_phrases import taunts
 
 
 class AgeOfEmpires(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-
     @commands.Cog.listener("on_message")
     async def expand_taunt(self, message: discord.Message):
         content = message.content.strip()

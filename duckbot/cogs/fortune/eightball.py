@@ -8,9 +8,6 @@ from .eightball_phrases import joke_phrases, phrases
 
 
 class EightBall(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-
     @commands.hybrid_command(name="eightball", aliases=["8ball"], description="Ask the magic 8 ball a question!")
     async def eightball_command(self, context: commands.Context, *, question: str = None):
         """

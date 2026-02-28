@@ -4,13 +4,10 @@ from textblob import TextBlob
 
 
 class Typos(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-
     @commands.Cog.listener("on_message")
     async def correct_typos(self, message: Message):
         """Try to correct common typos for user's previous message."""
-        if message.content.strip().lower() == "fuck":
+        if not message.author.bot and message.content.strip().lower() == "fuck":
             prev = await self.get_previous_message(message)
             if prev is not None:
                 c = self.correct(prev.content)

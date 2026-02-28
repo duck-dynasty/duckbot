@@ -6,9 +6,6 @@ from duckbot.util.messages import MAX_MESSAGE_LENGTH
 
 
 class Fortune(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-
     @commands.command(name="fortune")
     async def fortune(self, context):
         await context.send(self.get_fortune())
