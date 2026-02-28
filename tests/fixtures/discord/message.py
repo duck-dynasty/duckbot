@@ -12,6 +12,16 @@ def message(request, raw_message, channel, is_private_channel) -> discord.Messag
 
 
 @pytest.fixture
+def bot_message(autospec, request, channel, is_private_channel) -> discord.Message:
+    """Returns a message from a bot user, for each channel type a message can be sent to."""
+    msg = autospec.of(discord.Message)
+    msg.channel = channel
+    msg.guild = None if is_private_channel else request.getfixturevalue("guild")
+    msg.author = request.getfixturevalue("bot_user" if is_private_channel else "bot_member")
+    return msg
+
+
+@pytest.fixture
 def raw_message(autospec) -> discord.Message:
     """Returns a mock discord message with no properties set."""
     return autospec.of(discord.Message)

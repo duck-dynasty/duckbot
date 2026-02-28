@@ -23,7 +23,7 @@ class Kubernetes(commands.Cog):
         await self.correct(message, ["k8"], "Kubernetes", self.k8s, self.kubernetes)
 
     async def correct(self, message, wrongs, right, wrong_emoji, right_emoji):
-        if message.author == self.bot.user:
+        if message.author.bot:
             return
         if wrong_emoji and right_emoji and str(wrong_emoji) in message.content:
             await message.channel.send(f"I think {message.author.display_name} means {right_emoji}")
@@ -37,7 +37,7 @@ class Kubernetes(commands.Cog):
     @commands.Cog.listener("on_raw_reaction_add")
     async def react_to_k8s_reaction(self, payload):
         """Reacts with :kubernetes: when someone reacts with :k8s:, and visa-versa"""
-        if payload.user_id != self.bot.user.id:
+        if payload.member and not payload.member.bot:
             if payload.emoji.name == self.k8s.name:
                 await self.react(payload, self.kubernetes)
             elif payload.emoji.name == self.kubernetes.name:

@@ -1,0 +1,35 @@
+# The Dockerfile only COPYs: scripts/, pyproject.toml, resources/, duckbot/
+# Everything else can be excluded from the build context.
+
+# Version control / CI
+.git
+.github
+
+# Python build artifacts
+venv/
+.venv/
+*.egg-info/
+build/
+*.pyc
+__pycache__/
+.pytest_cache/
+.coverage
+
+# Runtime artifacts
+logs/
+weather.png
+
+# Dev / tooling
+.aws
+.claude
+.vscode
+.env
+sonar-project.properties
+
+# Docs / repo metadata
+tests/
+wiki/
+README.md
+CLAUDE.md
+LICENSE
+docker-compose.yml

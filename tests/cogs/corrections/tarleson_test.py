@@ -3,11 +3,11 @@ import pytest
 from duckbot.cogs.corrections import Tarlson
 
 
-async def test_correct_tarlson_bot_author(bot, message):
-    message.author = bot.user
+async def test_correct_tarlson_bot_author(bot, bot_message):
+    bot_message.content = "tucker carlson"
     clazz = Tarlson(bot)
-    await clazz.correct_tarlson(message)
-    message.channel.send.assert_not_called()
+    await clazz.correct_tarlson(bot_message)
+    bot_message.channel.send.assert_not_called()
 
 
 @pytest.mark.parametrize("text", ["Tucker Carlson", "tucker carlson", "TUCKER CARLSON", "TuCkEr CaRlSon"])

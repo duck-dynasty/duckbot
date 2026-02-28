@@ -14,11 +14,12 @@ async def test_build_syllable_dictionary_builds_table(cmu, bot):
     assert clazz.syllables == {"a": 1, "and": 1, "batman": 2}
 
 
-async def test_detect_haiku_bot_author(bot, message):
-    message.author = bot.user
+async def test_detect_haiku_bot_author(bot, bot_message):
+    bot_message.clean_content = "five seven five"
     clazz = Haiku(bot)
-    await clazz.detect_haiku(message)
-    message.channel.send.assert_not_called()
+    clazz.syllables = {"five": 5, "seven": 7}
+    await clazz.detect_haiku(bot_message)
+    bot_message.channel.send.assert_not_called()
 
 
 async def test_detect_haiku_finds_one_word_per_line_haiku(bot, message):
