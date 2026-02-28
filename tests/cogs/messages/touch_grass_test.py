@@ -8,18 +8,17 @@ SATURDAY_NOON = datetime.datetime(2024, 1, 6, 12, 0, 0, tzinfo=datetime.timezone
 
 
 @mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
-async def test_bot_messages_are_ignored(mock_utcnow, bot, message):
-    """Bot's own messages should not be tracked."""
-    message.author = bot.user
+async def test_bot_messages_are_ignored(mock_utcnow, bot, bot_message):
+    """Bot messages should not be tracked."""
     base_time = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)
     mock_utcnow.return_value = base_time
 
     clazz = TouchGrass(bot)
-    await clazz.on_message_activity(message)
+    await clazz.on_message_activity(bot_message)
 
     # Should not have tracked anything
     assert len(clazz.activity) == 0
-    message.channel.send.assert_not_called()
+    bot_message.channel.send.assert_not_called()
 
 
 @mock.patch("duckbot.cogs.messages.touch_grass.utcnow")

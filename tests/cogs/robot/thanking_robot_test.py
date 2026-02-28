@@ -5,12 +5,11 @@ import pytest
 from duckbot.cogs.robot import ThankingRobot
 
 
-async def test_correct_giving_thanks_bot_author(bot, message):
-    message.author = bot.user
-    message.content = "Thank you DuckBot."
+async def test_correct_giving_thanks_bot_author(bot, bot_message):
+    bot_message.content = "Thank you DuckBot."
     clazz = ThankingRobot(bot)
-    await clazz.correct_giving_thanks(message)
-    message.channel.send.assert_not_called()
+    await clazz.correct_giving_thanks(bot_message)
+    bot_message.channel.send.assert_not_called()
 
 
 @pytest.mark.parametrize("text", ["Thank you DuckBot. You're becoming so much more polite.", " tHaNks, DuCK BOt", "thx duck bot my man"])

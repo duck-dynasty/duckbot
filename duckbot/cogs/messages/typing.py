@@ -15,6 +15,6 @@ class Typing(commands.Cog):
     @commands.Cog.listener("on_typing")
     async def typing_response(self, channel: discord.abc.Messageable, user: discord.User, when: datetime.datetime) -> None:
         """Small chance to show typing when someone starts typing."""
-        if user != self.bot.user and random.random() < 1.0 / 1_000:
+        if not user.bot and random.random() < 1.0 / 1_000:
             async with channel.typing():
                 await asyncio.sleep(random.uniform(1.0, 3.0))

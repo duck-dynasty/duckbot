@@ -11,7 +11,7 @@ class ThankingRobot(commands.Cog):
     async def correct_giving_thanks(self, message):
         """Correcting people who thank the robot."""
 
-        if message.author == self.bot.user:
+        if message.author.bot:
             return
 
         thanks = ["thank you duckbot", "thanks duckbot", "thank you duck bot", "thanks duck bot", "thx duckbot", "thx duck bot"]

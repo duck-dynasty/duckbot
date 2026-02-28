@@ -48,12 +48,11 @@ async def test_store_emojis_no_emojis_found(bot):
     assert clazz.kubernetes is None
 
 
-async def test_correct_kubernetes_bot_author(bot, message):
-    message.author = bot.user
-    message.content = "kubernetes"
+async def test_correct_kubernetes_bot_author(bot, bot_message):
+    bot_message.content = "kubernetes"
     clazz = Kubernetes(bot)
-    await clazz.correct_kubernetes(message)
-    message.channel.send.assert_not_called()
+    await clazz.correct_kubernetes(bot_message)
+    bot_message.channel.send.assert_not_called()
 
 
 @pytest.mark.parametrize("text", ["koober nets", "kuber nets", "kubernets", "kubernetes", "kubernetes kubernets"])
@@ -87,12 +86,11 @@ async def test_correct_kubernetes_message_is_kubernetes_emoji(bot, message, kube
     message.channel.send.assert_called_once_with(f"I think {message.author.display_name} means {k8s_emoji}")
 
 
-async def test_correct_k8s_bot_author(bot, message):
-    message.author = bot.user
-    message.content = "k8s"
+async def test_correct_k8s_bot_author(bot, bot_message):
+    bot_message.content = "k8s"
     clazz = Kubernetes(bot)
-    await clazz.correct_k8s(message)
-    message.channel.send.assert_not_called()
+    await clazz.correct_k8s(bot_message)
+    bot_message.channel.send.assert_not_called()
 
 
 @pytest.mark.parametrize("text", ["k8", "k8s", "K8", "K8s", "K8S"])
@@ -129,6 +127,7 @@ async def test_correct_k8s_message_is_k8s_emoji(bot, message, kubernetes_emoji, 
 @mock.patch("discord.RawReactionActionEvent")
 async def test_react_to_k8s_reaction_not_either_emoji(payload, bot, setup_emojis):
     payload.emoji.name = "some-other-crap"
+    payload.member.bot = False
     clazz = Kubernetes(bot)
     await clazz.store_emojis()
     await clazz.react_to_k8s_reaction(payload)
@@ -139,7 +138,7 @@ async def test_react_to_k8s_reaction_not_either_emoji(payload, bot, setup_emojis
 @mock.patch("discord.RawReactionActionEvent")
 async def test_react_to_k8s_reaction_bot_sent_reaction(payload, name, bot, setup_emojis):
     payload.emoji.name = name
-    payload.user_id = bot.user.id
+    payload.member.bot = True
     clazz = Kubernetes(bot)
     await clazz.store_emojis()
     await clazz.react_to_k8s_reaction(payload)
@@ -150,6 +149,7 @@ async def test_react_to_k8s_reaction_bot_sent_reaction(payload, name, bot, setup
 @mock.patch("discord.RawReactionActionEvent")
 async def test_react_to_k8s_reaction_kubernetes_emoji(payload, name, bot, kubernetes_emoji, k8s_emoji, setup_emojis, channel, message):
     payload.emoji.name = name
+    payload.member.bot = False
     payload.channel_id = 123
     payload.message_id = 456
     bot.fetch_channel.return_value = channel

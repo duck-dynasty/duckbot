@@ -9,7 +9,7 @@ class Bitcoin(commands.Cog):
     async def correct_bitcoin(self, message):
         """Corrections for bitcoin"""
 
-        if message.author == self.bot.user:
+        if message.author.bot:
             return
 
         if "bitcoin" in message.content.lower():
