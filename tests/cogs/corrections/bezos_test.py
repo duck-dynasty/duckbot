@@ -3,7 +3,7 @@ import pytest
 from duckbot.cogs.corrections import Bezos
 
 
-async def test_correct_bezos_bot_author(bot, bot_message):
+async def test_correct_bezos_bot_author(bot_message):
     bot_message.content = "bezo"
     clazz = Bezos()
     await clazz.correct_bezos(bot_message)
@@ -11,7 +11,7 @@ async def test_correct_bezos_bot_author(bot, bot_message):
 
 
 @pytest.mark.parametrize("text", ["Jeffrey Bezos", "fekin bezo at it again"])
-async def test_correct_bezos_message_contains_bezos(bot, message, text):
+async def test_correct_bezos_message_contains_bezos(message, text):
     message.content = text
     clazz = Bezos()
     await clazz.correct_bezos(message)
@@ -19,7 +19,7 @@ async def test_correct_bezos_message_contains_bezos(bot, message, text):
 
 
 @pytest.mark.parametrize("text", ["andy is the new jeff"])
-async def test_correct_bezos_message_is_not_bezos(bot, message, text):
+async def test_correct_bezos_message_is_not_bezos(message, text):
     message.content = text
     clazz = Bezos()
     await clazz.correct_bezos(message)

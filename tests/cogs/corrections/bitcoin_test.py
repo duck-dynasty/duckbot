@@ -3,7 +3,7 @@ import pytest
 from duckbot.cogs.corrections import Bitcoin
 
 
-async def test_correct_bitcoin_bot_author(bot, bot_message):
+async def test_correct_bitcoin_bot_author(bot_message):
     bot_message.content = "bitcoin"
     clazz = Bitcoin()
     await clazz.correct_bitcoin(bot_message)
@@ -11,7 +11,7 @@ async def test_correct_bitcoin_bot_author(bot, bot_message):
 
 
 @pytest.mark.parametrize("text", ["bitcoin", "BITCOIN", "BiTcOiN"])
-async def test_correct_bitcoin_message_is_bitcoin(bot, message, text):
+async def test_correct_bitcoin_message_is_bitcoin(message, text):
     message.content = text
     clazz = Bitcoin()
     await clazz.correct_bitcoin(message)
@@ -19,7 +19,7 @@ async def test_correct_bitcoin_message_is_bitcoin(bot, message, text):
 
 
 @pytest.mark.parametrize("text", [" BiTcOiN   broooooooo!!!....:??", "bitcoin, brother"])
-async def test_correct_bitcoin_message_contains_bitcoin(bot, message, text):
+async def test_correct_bitcoin_message_contains_bitcoin(message, text):
     message.content = text
     clazz = Bitcoin()
     await clazz.correct_bitcoin(message)
@@ -27,7 +27,7 @@ async def test_correct_bitcoin_message_contains_bitcoin(bot, message, text):
 
 
 @pytest.mark.parametrize("text", ["bit coin", "dogecoin", "hi"])
-async def test_correct_bitcoin_message_is_not_bitcoin(bot, message, text):
+async def test_correct_bitcoin_message_is_not_bitcoin(message, text):
     message.content = text
     clazz = Bitcoin()
     await clazz.correct_bitcoin(message)

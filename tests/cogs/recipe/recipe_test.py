@@ -7,7 +7,7 @@ from duckbot.cogs.recipe import Recipe
 RECIPE_SEARCH_URI = "https://www.allrecipes.com/element-api/content-proxy/faceted-searches-load-more"
 
 
-async def test_search_recipes_returns_scraped_html(bot, responses):
+async def test_search_recipes_returns_scraped_html(responses):
     search_term = "test1"
     mock_data = get_mock_data(search_term, 5)
     setup_responses(responses, search_term, with_articles(mock_data))
@@ -17,7 +17,7 @@ async def test_search_recipes_returns_scraped_html(bot, responses):
     assert_requests(responses, search_term)
 
 
-async def test_parse_recipes_returns_articles(bot):
+async def test_parse_recipes_returns_articles():
     mock_data = get_mock_data("test1", 5)
     expected_response = [get_mock_data("test1", 5) for _ in range(5)]
     html = json_articles(mock_data)
@@ -26,7 +26,7 @@ async def test_parse_recipes_returns_articles(bot):
     assert response == expected_response
 
 
-async def test_parse_recipes_returns_empty(bot):
+async def test_parse_recipes_returns_empty():
     expected_response = []
     html = without_articles()
     clazz = Recipe()
@@ -34,7 +34,7 @@ async def test_parse_recipes_returns_empty(bot):
     assert response == expected_response
 
 
-async def test_parse_recipes_no_content_returns_empty(bot):
+async def test_parse_recipes_no_content_returns_empty():
     expected_response = []
     html = without_content()
     clazz = Recipe()
@@ -42,21 +42,21 @@ async def test_parse_recipes_no_content_returns_empty(bot):
     assert response == expected_response
 
 
-async def test_select_recipes_with_one_return_one(bot):
+async def test_select_recipes_with_one_return_one():
     recipe_list = [get_mock_data("test1", 5)]
     clazz = Recipe()
     response = clazz.select_recipe(recipe_list)
     assert response == recipe_list[0]
 
 
-async def test_select_recipes_with_many_return_one(bot):
+async def test_select_recipes_with_many_return_one():
     recipe_list = [get_mock_data("test1", 5), get_mock_data("test2", 4)]
     clazz = Recipe()
     response = clazz.select_recipe(recipe_list)
     assert response in recipe_list
 
 
-async def test_recipe_with_content_return_recipe(bot, context, responses):
+async def test_recipe_with_content_return_recipe(context, responses):
     search_term = "test1"
     mock_data = get_mock_data(search_term, 5)
     expected_response = f"How about a nice {mock_data['name']}. {mock_data['description']} This recipe has a {mock_data['rating']}/5 rating! {mock_data['url']}"
@@ -67,7 +67,7 @@ async def test_recipe_with_content_return_recipe(bot, context, responses):
     assert_requests(responses, search_term)
 
 
-async def test_recipe_without_articles_return_sorry(bot, context, responses):
+async def test_recipe_without_articles_return_sorry(context, responses):
     search_term = "test1"
     expected_response = f"I am terribly sorry. There doesn't seem to be any recipes for {search_term}."
     setup_responses(responses, search_term, without_articles(), num_pages=1)
@@ -77,7 +77,7 @@ async def test_recipe_without_articles_return_sorry(bot, context, responses):
     assert_requests(responses, search_term, num_pages=1)
 
 
-async def test_recipe_without_content_return_sorry(bot, context, responses):
+async def test_recipe_without_content_return_sorry(context, responses):
     search_term = "test1"
     expected_response = "I am terribly sorry. I am having problems reading All Recipes for you."
     setup_responses(responses, search_term, without_content(), num_pages=1)

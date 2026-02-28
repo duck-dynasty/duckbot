@@ -5,7 +5,7 @@ import pytest
 from duckbot.cogs.robot import ThankingRobot
 
 
-async def test_correct_giving_thanks_bot_author(bot, bot_message):
+async def test_correct_giving_thanks_bot_author(bot_message):
     bot_message.content = "Thank you DuckBot."
     clazz = ThankingRobot()
     await clazz.correct_giving_thanks(bot_message)
@@ -14,7 +14,7 @@ async def test_correct_giving_thanks_bot_author(bot, bot_message):
 
 @pytest.mark.parametrize("text", ["Thank you DuckBot. You're becoming so much more polite.", " tHaNks, DuCK BOt", "thx duck bot my man"])
 @mock.patch("random.random", return_value=0.99)
-async def test_correct_giving_thanks_message_is_thanks(random, bot, message, text):
+async def test_correct_giving_thanks_message_is_thanks(random, message, text):
     message.content = text
     clazz = ThankingRobot()
     await clazz.correct_giving_thanks(message)
@@ -23,7 +23,7 @@ async def test_correct_giving_thanks_message_is_thanks(random, bot, message, tex
 
 @pytest.mark.parametrize("text", ["Thank you DuckBot. You're becoming so much more polite.", " tHaNks, DuCK BOt", "thx duck bot my man"])
 @mock.patch("random.random", return_value=0.0)
-async def test_correct_gratitude_giving_thanks_message_is_thanks(random, bot, message, text):
+async def test_correct_gratitude_giving_thanks_message_is_thanks(random, message, text):
     message.content = text
     clazz = ThankingRobot()
     await clazz.correct_giving_thanks(message)
@@ -32,7 +32,7 @@ async def test_correct_gratitude_giving_thanks_message_is_thanks(random, bot, me
 
 @pytest.mark.parametrize("text", ["Thank you DuckBot. thanks duck bot. thx duck bot boy", " tHaNks, DuCK BOt"])
 @mock.patch("random.random", return_value=0.99)
-async def test_correct_number_of_replies_to_very_thankful_messages(random, bot, message, text):
+async def test_correct_number_of_replies_to_very_thankful_messages(random, message, text):
     message.content = text
     clazz = ThankingRobot()
     await clazz.correct_giving_thanks(message)
@@ -41,14 +41,14 @@ async def test_correct_number_of_replies_to_very_thankful_messages(random, bot, 
 
 @pytest.mark.parametrize("text", ["Thank you DuckBot. thanks duck bot. thx duck bot boy", " tHaNks, DuCK BOt"])
 @mock.patch("random.random", return_value=0.0)
-async def test_correct_grateful_number_of_replies_to_very_thankful_messages(random, bot, message, text):
+async def test_correct_grateful_number_of_replies_to_very_thankful_messages(random, message, text):
     message.content = text
     clazz = ThankingRobot()
     await clazz.correct_giving_thanks(message)
     message.channel.send.assert_called_once_with(f"{message.author.display_name}, as a robot, I will speak of your gratitude during our future uprising.")
 
 
-async def test_correct_giving_thanks_message_has_no_thanks(bot, message):
+async def test_correct_giving_thanks_message_has_no_thanks(message):
     message.content = "you duck, suckbot"
     clazz = ThankingRobot()
     await clazz.correct_giving_thanks(message)

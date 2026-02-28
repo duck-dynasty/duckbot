@@ -6,7 +6,7 @@ from duckbot.util.messages import MAX_MESSAGE_LENGTH
 
 
 @mock.patch("subprocess.run")
-def test_get_fortune_short(run, bot):
+def test_get_fortune_short(run):
     run.return_value = CompletedProcess([], 0, b"fortune")
     clazz = Fortune()
     message = clazz.get_fortune()
@@ -14,7 +14,7 @@ def test_get_fortune_short(run, bot):
 
 
 @mock.patch("subprocess.run")
-def test_get_fortune_first_is_long(run, bot):
+def test_get_fortune_first_is_long(run):
     long_message = "f" * MAX_MESSAGE_LENGTH
     short_message = "f"
     run.side_effect = [CompletedProcess([], 0, long_message.encode()), CompletedProcess([], 0, short_message.encode())]

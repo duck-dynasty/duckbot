@@ -6,21 +6,21 @@ from duckbot.cogs.corrections import Typos
 from tests import list_as_async_generator
 
 
-async def test_correct_typos_bot_user(bot, message):
-    bot.user = message.author
+async def test_correct_typos_bot_user(bot_message):
+    bot_message.content = "fuck"
     clazz = Typos()
-    await clazz.correct_typos(message)
-    message.channel.history.assert_not_called()
+    await clazz.correct_typos(bot_message)
+    bot_message.channel.history.assert_not_called()
 
 
-async def test_correct_typos_message_is_not_fuck(bot, message):
+async def test_correct_typos_message_is_not_fuck(message):
     message.content = "poopy"
     clazz = Typos()
     await clazz.correct_typos(message)
     message.channel.history.assert_not_called()
 
 
-async def test_correct_typos_no_previous_message(bot, message):
+async def test_correct_typos_no_previous_message(message):
     message.content = "fuck"
     message.channel.history.return_value = list_as_async_generator([])
     clazz = Typos()
@@ -30,7 +30,7 @@ async def test_correct_typos_no_previous_message(bot, message):
 
 @mock.patch("discord.Message")
 @mock.patch("textblob.TextBlob")
-async def test_correct_typos_no_typos_in_previous(textblob, prev_message, bot, message):
+async def test_correct_typos_no_typos_in_previous(textblob, prev_message, message):
     message.author.id = 1
     prev_message.author = message.author
     message.content = "fuck"
@@ -44,7 +44,7 @@ async def test_correct_typos_no_typos_in_previous(textblob, prev_message, bot, m
 
 @mock.patch("discord.Message")
 @mock.patch("textblob.TextBlob")
-async def test_correct_typos_sends_correction(textblob, prev_message, bot, message):
+async def test_correct_typos_sends_correction(textblob, prev_message, message):
     message.author.id = 1
     prev_message.author = message.author
     message.content = "fuck"
