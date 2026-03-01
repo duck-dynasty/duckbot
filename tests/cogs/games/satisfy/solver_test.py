@@ -235,6 +235,36 @@ def test_optimize_recycled_bois_returns_chain():
     )
 
 
+def test_optimize_heavy_modular_frame_returns_chain():
+    f = factory(input=Item.IronOre * 480 + Item.Coal * 120 + Item.Limestone * 270, target=Item.HeavyModularFrame * 2, recipes=all_no_raw)
+    concrete = recipe_by_name("Concrete")
+    encased_industrial_pipe = recipe_by_name("EncasedIndustrialPipe")
+    heavy_encased_frame = recipe_by_name("HeavyEncasedFrame")
+    iron_ingot = recipe_by_name("IronIngot")
+    iron_wire = recipe_by_name("IronWire")
+    modular_frame = recipe_by_name("ModularFrame")
+    solid_steel_ingot = recipe_by_name("SolidSteelIngot")
+    steel_cast_plate = recipe_by_name("SteelCastPlate")
+    steel_pipe = recipe_by_name("SteelPipe")
+    steel_rod = recipe_by_name("SteelRod")
+    stitched_iron_plate = recipe_by_name("StitchedIronPlate")
+    assert optimize(f) == dict(
+        [
+            (concrete, approx(3.2)),
+            (encased_industrial_pipe, approx(1.6667)),
+            (heavy_encased_frame, approx(0.7111)),
+            (iron_ingot, approx(3.7926)),
+            (iron_wire, approx(2.3704)),
+            (modular_frame, approx(2.6667)),
+            (solid_steel_ingot, approx(1.8815)),
+            (steel_cast_plate, approx(0.5926)),
+            (steel_pipe, approx(3.2)),
+            (steel_rod, approx(0.6667)),
+            (stitched_iron_plate, approx(1.4222)),
+        ]
+    )
+
+
 def recipe_by_name(name: str | Item, power_shards: int = 0, sloops: int = 0) -> ModifiedRecipe:
     return ModifiedRecipe(next(r for r in all() if r.name == str(name)), power_shards, sloops)
 
