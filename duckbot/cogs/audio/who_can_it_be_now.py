@@ -71,14 +71,15 @@ class WhoCanItBeNow(commands.Cog):
     async def stop(self, context: Optional[commands.Context] = None):
         """Stops the music loop if it is playing."""
         if self.streaming:
+            self.streaming = False
             await self.voice_client.disconnect()
             try:
                 self.audio_task.cancel()
                 await self.audio_task
             except asyncio.CancelledError:
-                self.audio_task = None
+                pass
+            self.audio_task = None
             self.voice_client = None
-            self.streaming = False
             if context:
                 await context.send(":disappointed_relieved:", delete_after=30)
         elif context is not None:
