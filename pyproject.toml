@@ -21,7 +21,7 @@ dependencies = [
     "holidays==0.91",
     "pyowm==3.3.0",         # openweather
     "psycopg2==2.9.11",
-    "SQLAlchemy==2.0.46",
+    "SQLAlchemy==2.0.47",
     "d20==1.1.2",
     "nltk==3.9.3",
     "textblob==0.19.0",
