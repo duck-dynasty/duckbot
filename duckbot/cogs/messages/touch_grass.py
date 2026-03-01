@@ -5,6 +5,8 @@ from discord import Message
 from discord.ext import commands
 from discord.utils import utcnow
 
+from duckbot.util.users import get_user
+
 from .touch_grass_phrases import phrases, work_phrases
 
 # Notification thresholds
@@ -14,10 +16,6 @@ OFF_HOURS_THRESHOLD = 120
 # Tracking and cooldown windows
 TRACKING_WINDOW_HOURS = 1
 COOLDOWN_SECONDS = 3600
-
-# Display formatting
-MAX_DISPLAY_NAME_LENGTH = 22
-LEADERBOARD_SEPARATOR_WIDTH = 34
 
 
 class TouchGrass(commands.Cog):
@@ -103,16 +101,11 @@ class TouchGrass(commands.Cog):
 
         lines = ["**Activity Leaderboard (Last 60 Minutes)**", "```"]
         lines.append(f"{'User':<24} {'Messages':>8}")
-        lines.append("-" * LEADERBOARD_SEPARATOR_WIDTH)
+        lines.append("-" * 34)
 
         for user_id, count in stats:
-            member = context.guild.get_member(user_id) if context.guild else None
-            if member:
-                name = member.display_name[:MAX_DISPLAY_NAME_LENGTH]
-            else:
-                user = self.bot.get_user(user_id)
-                name = user.display_name[:MAX_DISPLAY_NAME_LENGTH] if user else f"User-{user_id}"
-
+            user = await get_user(self.bot, user_id, context.guild)
+            name = user.display_name if user else f"User-{user_id}"
             lines.append(f"{name:<24} {count:>8}")
 
         lines.append("```")

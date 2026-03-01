@@ -4,9 +4,6 @@ import duckbot.util.messages
 
 
 class MockText(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-
     @commands.command(name="mock")
     async def mock_text_command(self, context: commands.Context, *, text: str = ""):
         await self.mock_text(context, text)

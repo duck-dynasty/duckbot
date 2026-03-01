@@ -5,9 +5,6 @@ from discord.ext import commands
 
 
 class DogPhotos(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-
     @commands.hybrid_command(name="dog", aliases=["doge"], description="Show a random dog you probably don't know")
     async def dog_command(self, context: commands.Context, *, breed: Optional[str] = None):
         """

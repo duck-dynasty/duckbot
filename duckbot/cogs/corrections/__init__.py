@@ -6,8 +6,8 @@ from .typos import Typos
 
 
 async def setup(bot):
-    await bot.add_cog(Bitcoin(bot))
+    await bot.add_cog(Bitcoin())
     await bot.add_cog(Kubernetes(bot))
-    await bot.add_cog(Typos(bot))
-    await bot.add_cog(Bezos(bot))
-    await bot.add_cog(Tarlson(bot))
+    await bot.add_cog(Typos())
+    await bot.add_cog(Bezos())
+    await bot.add_cog(Tarlson())

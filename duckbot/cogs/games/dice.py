@@ -5,9 +5,6 @@ from duckbot.util.messages import MAX_MESSAGE_LENGTH
 
 
 class Dice(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-
     @commands.hybrid_command(name="roll", aliases=["r"], description="Roll some Dungeons & Dragons style dice!")
     async def roll_command(self, context: commands.Context, *, expression: str = "1d20"):
         """

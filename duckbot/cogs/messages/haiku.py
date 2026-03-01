@@ -4,8 +4,7 @@ from nltk.corpus import cmudict
 
 
 class Haiku(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
+    def __init__(self):
         self.syllables = {}
 
     @commands.Cog.listener("on_ready")
