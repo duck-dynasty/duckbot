@@ -8,12 +8,11 @@ import discord
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
 import pyowm
-import requests
 import timezonefinder
 from discord.ext import commands
 from pyowm.utils import config
-from pyowm.weatherapi25.location import Location
-from pyowm.weatherapi25.one_call import OneCall
+from pyowm.weatherapi30.location import Location
+from pyowm.weatherapi30.one_call import OneCall
 
 from duckbot.db import Database
 
@@ -34,11 +33,6 @@ class Weather(commands.Cog):
             conf = config.get_default_config_for_subscription_type("free")
             self._owm = pyowm.OWM(os.getenv("OPENWEATHER_TOKEN"), conf)
         return self._owm
-
-    def one_call(self, **kwargs):
-        # pyowm doesn't support onecall 3.0: https://github.com/csparpa/pyowm/issues/404
-        json = requests.get(url="https://api.openweathermap.org/data/3.0/onecall", params=kwargs | {"appid": os.getenv("OPENWEATHER_TOKEN")}).json()
-        return OneCall.from_dict(json)
 
     @commands.hybrid_group(name="weather", invoke_without_command=True)
     async def weather_command(self, context: commands.Context, city: Optional[str] = None, country: Optional[str] = None, index: Optional[int] = None):
@@ -85,7 +79,7 @@ class Weather(commands.Cog):
             if country is not None and len(country) != 2:
                 await context.send("Country must be an ISO country code, such as CA for Canada.")
                 return None
-            locations = self.owm.city_id_registry().locations_for(city.replace(",", ""), country=country)
+            locations = self.owm.geocoding_manager().geocode(city.replace(",", ""), country=country, limit=10)
             if not locations:
                 await context.send("No cities found matching search.")
                 return None
@@ -118,7 +112,7 @@ class Weather(commands.Cog):
         else:
             location = await self.search_location(context, city, country, index)
         if location is not None:
-            weather = self.one_call(lat=location.lat, lon=location.lon, exclude="minutely", units="metric")
+            weather = self.owm.weather_manager().one_call(lat=location.lat, lon=location.lon, exclude="minutely", units="metric")
             await context.send(self.weather_message(location, weather), file=discord.File(self.weather_graph(location, weather)))
 
     def weather_message(self, city: Location, weather: OneCall) -> str:

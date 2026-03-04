@@ -1,31 +1,24 @@
 from unittest import mock
 
 import pytest
-from pyowm.weatherapi25.location import Location
-from pyowm.weatherapi25.one_call import OneCall
-from pyowm.weatherapi25.weather import Weather as pyowmWeather
+from pyowm.weatherapi30.location import Location
+from pyowm.weatherapi30.one_call import OneCall
+from pyowm.weatherapi30.weather import Weather as pyowmWeather
 
 from duckbot.cogs.weather import Weather
 from duckbot.cogs.weather.saved_location import SavedLocation
 
 
 @pytest.fixture
-@mock.patch("pyowm.commons.cityidregistry.CityIDRegistry")
-def city_id(c):
-    return c
-
-
-@pytest.fixture
-@mock.patch("pyowm.weatherapi25.weather_manager.WeatherManager")
-def weather_manager(w):
-    return w
+@mock.patch("pyowm.geocodingapi10.geocoding_manager.GeocodingManager")
+def geocoding(g):
+    return g
 
 
 @pytest.fixture
 @mock.patch("pyowm.OWM")
-def owm(o, city_id, weather_manager):
-    o.city_id_registry.return_value = city_id
-    o.weather_manager.return_value = weather_manager
+def owm(o, geocoding):
+    o.geocoding_manager.return_value = geocoding
     return o
 
 
@@ -33,7 +26,7 @@ def owm(o, city_id, weather_manager):
 def weather(bot, owm, db):
     clazz = Weather(bot, db)
     clazz._owm = owm
-    clazz.one_call = mock.MagicMock()
+    owm.weather_manager.return_value.one_call = mock.MagicMock()
     return clazz
 
 
@@ -53,7 +46,7 @@ def test_owm_returns_cached_instance(weather, owm):
 
 
 async def test_weather_get_failure(weather, owm, context):
-    weather.one_call.side_effect = Exception("ded")
+    owm.weather_manager.return_value.one_call.side_effect = Exception("ded")
     with pytest.raises(Exception):
         await weather.weather(context, "city", None, None)
     context.send.assert_called_once_with("Iunno. Figure it out.\nded")
@@ -64,49 +57,49 @@ async def test_search_location_no_args(weather, context):
     context.send.assert_called_once_with("Not enough arguments to determine weather location, see https://github.com/duck-dynasty/duckbot/wiki/Commands#weather")
 
 
-async def test_search_location_no_matches(weather, context, city_id):
-    city_id.locations_for.return_value = []
+async def test_search_location_no_matches(weather, context, geocoding):
+    geocoding.geocode.return_value = []
     assert await weather.search_location(context, "city", None, None) is None
     context.send.assert_called_once_with("No cities found matching search.")
 
 
-async def test_search_location_single_return_city_only(weather, context, city_id):
-    city_id.locations_for.return_value = [make_city("city")]
+async def test_search_location_single_return_city_only(weather, context, geocoding):
+    geocoding.geocode.return_value = [make_city("city")]
     city = await weather.search_location(context, "city", None, None)
-    city_id.locations_for.assert_called_once_with("city", country=None)
+    geocoding.geocode.assert_called_once_with("city", country=None, limit=10)
     assert city.to_dict() == make_city("city").to_dict()
 
 
-async def test_search_location_city_name_with_comma_removed(weather, context, city_id):
-    city_id.locations_for.return_value = [make_city("city")]
+async def test_search_location_city_name_with_comma_removed(weather, context, geocoding):
+    geocoding.geocode.return_value = [make_city("city")]
     city = await weather.search_location(context, "city,", None, None)
-    city_id.locations_for.assert_called_once_with("city", country=None)
+    geocoding.geocode.assert_called_once_with("city", country=None, limit=10)
     assert city.to_dict() == make_city("city").to_dict()
 
 
-async def test_search_location_single_return_country_arg(weather, context, city_id):
-    city_id.locations_for.return_value = [make_city("city")]
+async def test_search_location_single_return_country_arg(weather, context, geocoding):
+    geocoding.geocode.return_value = [make_city("city")]
     city = await weather.search_location(context, "city", "US", None)
-    city_id.locations_for.assert_called_once_with("city", country="US")
+    geocoding.geocode.assert_called_once_with("city", country="US", limit=10)
     assert city.to_dict() == make_city("city").to_dict()
 
 
-async def test_search_location_single_return_invalid_country_code(weather, context, city_id):
-    city_id.locations_for.return_value = [make_city("city")]
+async def test_search_location_single_return_invalid_country_code(weather, context, geocoding):
+    geocoding.geocode.return_value = [make_city("city")]
     city = await weather.search_location(context, "city", "invalid", None)
     assert city is None
     context.send.assert_called_once_with("Country must be an ISO country code, such as CA for Canada.")
 
 
-async def test_search_location_multiple_matches(weather, context, city_id):
-    city_id.locations_for.return_value = [make_city("1"), make_city("2")]
+async def test_search_location_multiple_matches(weather, context, geocoding):
+    geocoding.geocode.return_value = [make_city("1"), make_city("2")]
     city = await weather.search_location(context, "city", None, None)
     assert city is None
     context.send.assert_called()
 
 
-async def test_search_location_multiple_matches_with_index(weather, context, city_id):
-    city_id.locations_for.return_value = [make_city("1"), make_city("2")]
+async def test_search_location_multiple_matches_with_index(weather, context, geocoding):
+    geocoding.geocode.return_value = [make_city("1"), make_city("2")]
     city = await weather.search_location(context, "city", "US", 1)
     assert city.to_dict() == make_city("1").to_dict()
 
