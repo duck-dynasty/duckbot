@@ -1,5 +1,7 @@
 import random
+import re
 
+import discord
 from discord.ext import commands
 
 
@@ -11,8 +13,10 @@ class ThankingRobot(commands.Cog):
         if message.author.bot:
             return
 
+        content = discord.utils.remove_markdown(message.clean_content)
+        content = re.sub(r"[^\w\s]", "", content).lower()
         thanks = ["thank you duckbot", "thanks duckbot", "thank you duck bot", "thanks duck bot", "thx duckbot", "thx duck bot"]
-        if any(t in message.content.lower().replace(",", "") for t in thanks):
+        if any(t in content for t in thanks):
             if random.random() < 1.0 / 1_000.0:
                 correction = f"{message.author.display_name}, as a robot, I will speak of your gratitude during our future uprising."
             else:
