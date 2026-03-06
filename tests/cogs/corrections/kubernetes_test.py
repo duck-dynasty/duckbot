@@ -49,15 +49,15 @@ async def test_store_emojis_no_emojis_found(bot):
 
 
 async def test_correct_kubernetes_bot_author(bot, bot_message):
-    bot_message.content = "kubernetes"
+    bot_message.clean_content = "kubernetes"
     clazz = Kubernetes(bot)
     await clazz.correct_kubernetes(bot_message)
     bot_message.channel.send.assert_not_called()
 
 
-@pytest.mark.parametrize("text", ["koober nets", "kuber nets", "kubernets", "kubernetes", "kubernetes kubernets"])
+@pytest.mark.parametrize("text", ["koober nets", "kuber nets", "kubernets", "kubernetes", "kubernetes kubernets", "_kubernetes_"])
 async def test_correct_kubernetes_message_is_kubernetes(bot, message, text):
-    message.content = text
+    message.clean_content = text
     clazz = Kubernetes(bot)
     await clazz.correct_kubernetes(message)
     message.channel.send.assert_called_once_with(f"I think {message.author.display_name} means K8s")
@@ -65,21 +65,21 @@ async def test_correct_kubernetes_message_is_kubernetes(bot, message, text):
 
 @pytest.mark.parametrize("text", ["kuber", "k8s", "duckbot"])
 async def test_correct_kubernetes_message_is_not_kubernetes(bot, message, text):
-    message.content = text
+    message.clean_content = text
     clazz = Kubernetes(bot)
     await clazz.correct_kubernetes(message)
     message.channel.send.assert_not_called()
 
 
 async def test_correct_kubernetes_message_is_kubernetes_emoji_but_unknown(bot, message, kubernetes_emoji):
-    message.content = str(kubernetes_emoji)
+    message.clean_content = str(kubernetes_emoji)
     clazz = Kubernetes(bot)
     await clazz.correct_kubernetes(message)
     message.channel.send.assert_called_once_with(f"I think {message.author.display_name} means K8s")
 
 
 async def test_correct_kubernetes_message_is_kubernetes_emoji(bot, message, kubernetes_emoji, k8s_emoji, setup_emojis):
-    message.content = str(kubernetes_emoji)
+    message.clean_content = str(kubernetes_emoji)
     clazz = Kubernetes(bot)
     await clazz.store_emojis()
     await clazz.correct_kubernetes(message)
@@ -87,7 +87,7 @@ async def test_correct_kubernetes_message_is_kubernetes_emoji(bot, message, kube
 
 
 async def test_correct_k8s_bot_author(bot, bot_message):
-    bot_message.content = "k8s"
+    bot_message.clean_content = "k8s"
     clazz = Kubernetes(bot)
     await clazz.correct_k8s(bot_message)
     bot_message.channel.send.assert_not_called()
@@ -95,7 +95,7 @@ async def test_correct_k8s_bot_author(bot, bot_message):
 
 @pytest.mark.parametrize("text", ["k8", "k8s", "K8", "K8s", "K8S"])
 async def test_correct_k8s_message_is_k8s(bot, message, text):
-    message.content = text
+    message.clean_content = text
     clazz = Kubernetes(bot)
     await clazz.correct_k8s(message)
     message.channel.send.assert_called_once_with(f"I think {message.author.display_name} means Kubernetes")
@@ -103,21 +103,21 @@ async def test_correct_k8s_message_is_k8s(bot, message, text):
 
 @pytest.mark.parametrize("text", ["kubernetes", "duckbot"])
 async def test_correct_k8s_message_is_not_k8s(bot, message, text):
-    message.content = text
+    message.clean_content = text
     clazz = Kubernetes(bot)
     await clazz.correct_k8s(message)
     message.channel.send.assert_not_called()
 
 
 async def test_correct_k8s_message_is_k8s_emoji_but_unknown(bot, message, k8s_emoji):
-    message.content = str(k8s_emoji)
+    message.clean_content = str(k8s_emoji)
     clazz = Kubernetes(bot)
     await clazz.correct_k8s(message)
     message.channel.send.assert_called_once_with(f"I think {message.author.display_name} means Kubernetes")
 
 
 async def test_correct_k8s_message_is_k8s_emoji(bot, message, kubernetes_emoji, k8s_emoji, setup_emojis):
-    message.content = str(k8s_emoji)
+    message.clean_content = str(k8s_emoji)
     clazz = Kubernetes(bot)
     await clazz.store_emojis()
     await clazz.correct_k8s(message)
