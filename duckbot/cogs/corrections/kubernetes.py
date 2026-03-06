@@ -25,10 +25,10 @@ class Kubernetes(commands.Cog):
     async def correct(self, message, wrongs, right, wrong_emoji, right_emoji):
         if message.author.bot:
             return
-        if wrong_emoji and right_emoji and str(wrong_emoji) in message.content:
+        if wrong_emoji and right_emoji and str(wrong_emoji) in message.clean_content:
             await message.channel.send(f"I think {message.author.display_name} means {right_emoji}")
         else:
-            content = message.content.lower()
+            content = discord.utils.remove_markdown(message.clean_content).lower()
             for s in wrongs:
                 if s in content:
                     await message.channel.send(f"I think {message.author.display_name} means {right}")

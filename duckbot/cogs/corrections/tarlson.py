@@ -1,3 +1,4 @@
+import discord
 from discord.ext import commands
 
 
@@ -9,6 +10,6 @@ class Tarlson(commands.Cog):
         if message.author.bot:
             return
 
-        if "tucker carlson" in message.content.lower():
+        if "tucker carlson" in discord.utils.remove_markdown(message.clean_content).lower():
             correction = "I believe it is pronounced cucker tarlson"
             await message.channel.send(correction)
