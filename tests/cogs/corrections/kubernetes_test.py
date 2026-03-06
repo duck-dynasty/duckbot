@@ -55,7 +55,7 @@ async def test_correct_kubernetes_bot_author(bot, bot_message):
     bot_message.channel.send.assert_not_called()
 
 
-@pytest.mark.parametrize("text", ["koober nets", "kuber nets", "kubernets", "kubernetes", "kubernetes kubernets", "_kubernetes_"])
+@pytest.mark.parametrize("text", ["koober nets", "kuber nets", "kubernets", "kubernetes", "kubernetes kubernets", "_kuber**net**es_"])
 async def test_correct_kubernetes_message_is_kubernetes(bot, message, text):
     message.clean_content = text
     clazz = Kubernetes(bot)

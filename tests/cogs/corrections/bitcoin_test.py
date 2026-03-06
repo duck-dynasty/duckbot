@@ -10,7 +10,7 @@ async def test_correct_bitcoin_bot_author(bot_message):
     bot_message.channel.send.assert_not_called()
 
 
-@pytest.mark.parametrize("text", ["bitcoin", "BITCOIN", "BiTcOiN", "**bitcoin**"])
+@pytest.mark.parametrize("text", ["bitcoin", "BITCOIN", "BiTcOiN", "**bit_coin_**"])
 async def test_correct_bitcoin_message_is_bitcoin(message, text):
     message.clean_content = text
     clazz = Bitcoin()
