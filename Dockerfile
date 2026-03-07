@@ -29,6 +29,7 @@ ENV VIRTUAL_ENV "/opt/venv"
 ENV PATH "$VIRTUAL_ENV/bin:$PATH"
 WORKDIR /duckbot
 COPY --from=pip-dependencies "$VIRTUAL_ENV" "$VIRTUAL_ENV"
+COPY alembic.ini .
 COPY resources/ ./resources
 COPY duckbot/ ./duckbot
 ENV DUCKBOT_ARGS ""

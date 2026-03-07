@@ -134,7 +134,7 @@ async def test_send_weather_no_default_no_args(weather, session, context):
 
 @mock.patch("discord.File")
 async def test_send_weather_default_location(file, weather, session, context):
-    session.get.return_value = SavedLocation(id=1, name="city", country="country", city_id=123, latitude=1, longitude=2)
+    session.get.return_value = SavedLocation(id=1, name="city", country="country", latitude=1, longitude=2)
     weather.weather_message = stub_weather_msg
     weather.weather_graph = stub_weather_gph
     await weather.send_weather(context, None, None, None)
