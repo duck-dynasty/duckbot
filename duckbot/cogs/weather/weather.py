@@ -67,7 +67,7 @@ class Weather(commands.Cog):
     async def set_default_location(self, context: commands.Context, city: Optional[str], country: Optional[str], index: Optional[int]) -> None:
         location = await self.search_location(context, city, country, index)
         if location is not None:
-            saved_location = SavedLocation(id=context.author.id, name=location.name, country=location.country, city_id=location.id, latitude=location.lat, longitude=location.lon)
+            saved_location = SavedLocation(id=context.author.id, name=location.name, country=location.country, latitude=location.lat, longitude=location.lon)
             with self.db.session(SavedLocation) as session:
                 session.merge(saved_location)
                 session.commit()
@@ -106,7 +106,7 @@ class Weather(commands.Cog):
             with self.db.session(SavedLocation) as session:
                 saved = session.get(SavedLocation, context.author.id)
             if saved is not None:
-                location = Location(name=saved.name, lon=saved.longitude, lat=saved.latitude, _id=saved.city_id, country=saved.country)
+                location = Location(name=saved.name, lon=saved.longitude, lat=saved.latitude, _id=None, country=saved.country)
             else:
                 await context.send("Set a default location using `!weather set city country-code`")
         else:
