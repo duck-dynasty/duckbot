@@ -34,3 +34,41 @@ def test_session_creates_tables(create, base):
     session = clazz.session(base)
     base.metadata.create_all.assert_called_once_with(clazz.db)
     assert session is not None
+
+
+@mock.patch("duckbot.db.database.command")
+@mock.patch("duckbot.db.database.MigrationContext")
+@mock.patch("duckbot.db.database.sa")
+@mock.patch("duckbot.db.database.Config")
+@mock.patch("duckbot.db.database.create_engine")
+def test_migrate_stamps_and_upgrades_existing_db_without_alembic_version(create, config, sa, migration_context, command):
+    migration_context.configure.return_value.get_current_revision.return_value = None
+    sa.inspect.return_value.has_table.return_value = True
+    Database().migrate()
+    command.stamp.assert_called_once_with(config.return_value, "001_weather_locations")
+    command.upgrade.assert_called_once_with(config.return_value, "head")
+
+
+@mock.patch("duckbot.db.database.command")
+@mock.patch("duckbot.db.database.MigrationContext")
+@mock.patch("duckbot.db.database.sa")
+@mock.patch("duckbot.db.database.Config")
+@mock.patch("duckbot.db.database.create_engine")
+def test_migrate_skips_stamp_for_fresh_db(create, config, sa, migration_context, command):
+    migration_context.configure.return_value.get_current_revision.return_value = None
+    sa.inspect.return_value.has_table.return_value = False
+    Database().migrate()
+    command.stamp.assert_not_called()
+    command.upgrade.assert_called_once_with(config.return_value, "head")
+
+
+@mock.patch("duckbot.db.database.command")
+@mock.patch("duckbot.db.database.MigrationContext")
+@mock.patch("duckbot.db.database.sa")
+@mock.patch("duckbot.db.database.Config")
+@mock.patch("duckbot.db.database.create_engine")
+def test_migrate_skips_stamp_when_already_versioned(create, config, sa, migration_context, command):
+    migration_context.configure.return_value.get_current_revision.return_value = "001_weather_locations"
+    Database().migrate()
+    command.stamp.assert_not_called()
+    command.upgrade.assert_called_once_with(config.return_value, "head")
