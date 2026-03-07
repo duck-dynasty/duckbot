@@ -1,5 +1,5 @@
 # collect pip dependencies into a virtualenv, which we'll copy into the prod stage
-FROM python:3.10 as pip-dependencies
+FROM python:3.13 as pip-dependencies
 ENV VIRTUAL_ENV "/opt/venv"
 RUN python -m venv $VIRTUAL_ENV
 ENV PATH "$VIRTUAL_ENV/bin:$PATH"
@@ -13,7 +13,7 @@ COPY pyproject.toml .
 RUN pip install .
 RUN setup_nltk
 
-FROM python:3.10-slim as prod
+FROM python:3.13-slim as prod
 # ffmpeg: for discord audio
 # libpq-dev: postgres client libraries
 # libopenblas-dev: matplotlib dependencies
