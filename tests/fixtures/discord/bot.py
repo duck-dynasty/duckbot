@@ -27,13 +27,13 @@ async def bot(autospec, monkeypatch) -> DuckBot:
     b.command_prefix = "!"
 
     # stub the bot being started already
-    b.wait_until_ready = mock.Mock(spec=b.wait_until_ready)
+    b.wait_until_ready = mock.AsyncMock(spec=DuckBot.wait_until_ready)
 
     # set emojis to empty list; Mock has __aiter__ which causes discord.utils.get
     # to return an unawaited coroutine when iterating
     b.emojis = []
 
-    b.loop = mock.Mock(spec=asyncio.get_event_loop())
+    b.loop = mock.Mock(spec=asyncio.AbstractEventLoop)
     # mock out loop, it uses `asyncio.get_event_loop()` by default
     monkeypatch.setattr(discord.ext.tasks, "Loop", mock.Mock(spec=discord.ext.tasks.Loop))
     monkeypatch.setattr(discord.ext.tasks, "loop", mock.Mock(spec=discord.ext.tasks.loop))
