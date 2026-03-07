@@ -10,6 +10,6 @@ class SavedLocation(Base):
     id = Column(BigInteger, primary_key=True)
     name = Column(String, nullable=False)
     country = Column(String, nullable=False)
-    city_id = Column(BigInteger, nullable=False)
+    city_id = Column(BigInteger, nullable=True)
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
