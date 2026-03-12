@@ -20,13 +20,12 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     op.create_table(
         "weather_locations",
-        sa.Column("id", sa.BigInteger(), nullable=False),
+        sa.Column("id", sa.BigInteger(), primary_key=True),
         sa.Column("name", sa.String(), nullable=False),
         sa.Column("country", sa.String(), nullable=False),
-        sa.Column("city_id", sa.BigInteger(), nullable=False),
+        sa.Column("city_id", sa.BigInteger(), nullable=True),
         sa.Column("latitude", sa.Float(), nullable=False),
         sa.Column("longitude", sa.Float(), nullable=False),
-        sa.PrimaryKeyConstraint("id"),
     )
 
 
