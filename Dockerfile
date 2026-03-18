@@ -32,6 +32,6 @@ COPY --from=pip-dependencies "$VIRTUAL_ENV" "$VIRTUAL_ENV"
 COPY alembic.ini .
 COPY resources/ ./resources
 COPY duckbot/ ./duckbot
-ENV DUCKBOT_ARGS ""
+ENV RUN_MIGRATIONS "true"
 ENTRYPOINT [ "python" ]
 CMD [ "-u", "-m", "duckbot" ]

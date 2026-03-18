@@ -14,7 +14,7 @@ def set_discord_token_env(monkeypatch):
 
 
 async def test_run_duckbot_connection_test(bot_spy, monkeypatch):
-    monkeypatch.setenv("DUCKBOT_ARGS", "connection-test")
+    monkeypatch.setenv("CONNECTION_TEST", "true")
     await run_duckbot(bot_spy)
     assert_extensions_loaded(bot_spy, [duckbot.util.connection_test.__name__])
     bot_spy.start.assert_called_once_with(DISCORD_TOKEN)
