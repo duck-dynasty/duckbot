@@ -81,8 +81,9 @@ async def test_post_to_duckboard_no_duckboard_channel(mock_get, bot, message, sk
 
 
 @mock.patch("duckbot.cogs.duck.duck.discord.utils.get")
+@mock.patch("random.choice", return_value=0x3B7A57)
 @mock.patch("random.random", return_value=0.000009)
-async def test_react_duck_sends_to_duckboard(random, mock_get, bot, message, skip_if_private_channel, autospec):
+async def test_react_duck_sends_to_duckboard(random, mock_choice, mock_get, bot, message, skip_if_private_channel, autospec):
     duckboard_channel = autospec.of(discord.TextChannel)
     mock_get.return_value = duckboard_channel
     message.content = "hello world"
@@ -94,7 +95,7 @@ async def test_react_duck_sends_to_duckboard(random, mock_get, bot, message, ski
     await clazz.react_duck(message)
     message.add_reaction.assert_called_once_with("\U0001f986")
     mock_get.assert_called_once_with(message.guild.text_channels, name="duckboard")
-    embed = discord.Embed(description="hello world", color=0xF4AC0B, url="https://discord.com/channels/1/2/3")
+    embed = discord.Embed(description="hello world", color=0x3B7A57, url="https://discord.com/channels/1/2/3")
     embed.set_author(name="TestUser", icon_url="https://example.com/avatar.png")
     embed.add_field(name="\u200b", value="<#456>")
     duckboard_channel.send.assert_called_once_with(embed=embed)
