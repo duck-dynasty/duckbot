@@ -1,5 +1,6 @@
 import random
 
+import discord
 from discord.ext import commands
 
 from duckbot.util.emojis import regional_indicator
@@ -15,6 +16,17 @@ class Duck(commands.Cog):
         """Tiny chance to react with :duck: to any message."""
         if random.random() < 1.0 / 10_000.0:
             await message.add_reaction("\U0001f986")
+            await self.post_to_duckboard(message)
+
+    async def post_to_duckboard(self, message):
+        """Post a duck reaction announcement to the #duckboard channel."""
+        if message.guild is not None:
+            duckboard = discord.utils.get(message.guild.text_channels, name="duckboard")
+            if duckboard is not None:
+                embed = discord.Embed(description=message.content, color=0xF4AC0B, url=message.jump_url)
+                embed.set_author(name=message.author.display_name, icon_url=message.author.display_avatar.url)
+                embed.add_field(name="\u200b", value=message.channel.mention)
+                await duckboard.send(embed=embed)
 
     @commands.Cog.listener("on_message")
     async def react_with_duckbot(self, message):
