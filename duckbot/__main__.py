@@ -16,7 +16,7 @@ from duckbot.db import Database
 async def run_duckbot(bot: commands.Bot):
     await bot.load_extension(duckbot.logs.__name__)
 
-    if "connection-test" in os.getenv("DUCKBOT_ARGS", ""):
+    if os.getenv("CONNECTION_TEST"):
         await bot.load_extension(duckbot.util.connection_test.__name__)
 
     await bot.load_extension(duckbot.health.__name__)
@@ -30,5 +30,6 @@ async def run_duckbot(bot: commands.Bot):
 
 
 if __name__ == "__main__":
-    Database().migrate()
+    if os.getenv("RUN_MIGRATIONS"):
+        Database().migrate()
     asyncio.run(run_duckbot(DuckBot()))
