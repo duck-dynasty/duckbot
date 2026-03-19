@@ -22,9 +22,9 @@ class Duck(commands.Cog):
     @commands.Cog.listener("on_message")
     async def react_duck(self, message):
         """Tiny chance to react with :duck: to any message."""
-        # if random.random() < 1.0 / 10_000.0:
-        await message.add_reaction("\U0001f986")
-        await self.post_to_duckboard(message)
+        if random.random() < 1.0 / 10_000.0:
+            await message.add_reaction("\U0001f986")
+            await self.post_to_duckboard(message)
 
     async def post_to_duckboard(self, message):
         """Post a duck reaction announcement to the #duckboard channel."""
