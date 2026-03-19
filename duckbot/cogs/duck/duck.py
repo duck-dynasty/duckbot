@@ -22,18 +22,18 @@ class Duck(commands.Cog):
     @commands.Cog.listener("on_message")
     async def react_duck(self, message):
         """Tiny chance to react with :duck: to any message."""
-        if random.random() < 1.0 / 10_000.0:
-            await message.add_reaction("\U0001f986")
-            await self.post_to_duckboard(message)
+        # if random.random() < 1.0 / 10_000.0:
+        await message.add_reaction("\U0001f986")
+        await self.post_to_duckboard(message)
 
     async def post_to_duckboard(self, message):
         """Post a duck reaction announcement to the #duckboard channel."""
         if message.guild is not None:
             duckboard = discord.utils.get(message.guild.text_channels, name="duckboard")
             if duckboard is not None:
-                embed = discord.Embed(description=message.content, color=random.choice(DUCK_COLORS), url=message.jump_url)
+                embed = discord.Embed(description=message.content, color=random.choice(DUCK_COLORS))
                 embed.set_author(name=message.author.display_name, icon_url=message.author.display_avatar.url)
-                embed.add_field(name="\u200b", value=message.channel.mention)
+                embed.add_field(name="\u200b", value=message.jump_url)
                 await duckboard.send(embed=embed)
 
     @commands.Cog.listener("on_message")
