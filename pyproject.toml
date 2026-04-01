@@ -19,7 +19,7 @@ dependencies = [
     "requests==2.33.1",
     "timezonefinder==8.2.2",
     "tzdata==2025.3",
-    "holidays==0.91",
+    "holidays==0.93",
     "pyowm==3.5.0",
     "psycopg2==2.9.11",
     "SQLAlchemy==2.0.47",
