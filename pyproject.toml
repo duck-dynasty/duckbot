@@ -14,7 +14,7 @@ requires-python = ">=3.13"
 urls = { Homepage = "https://github.com/duck-dynasty/duckbot" }
 
 dependencies = [
-    "discord.py[voice]==2.7.0",
+    "discord.py[voice]==2.7.1",
     "beautifulsoup4==4.14.3",
     "requests==2.33.1",
     "timezonefinder==8.2.2",
