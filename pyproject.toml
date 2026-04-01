@@ -56,7 +56,7 @@ dev = [
     "pytest-blockage==0.2.4",
     "pytest-sugar==1.1.1",
     "pytest-icdiff==0.9",
-    "pytest-cov==7.0.0",
+    "pytest-cov==7.1.0",
 ]
 
 cdk = [
