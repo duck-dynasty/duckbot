@@ -35,6 +35,7 @@ class SpecialDays(CA):
         self[date(year, 3, 20)] = f"Tom and Kelly's real wedding anniversary. They've been real together for {year-2015} years"
         self[date(year, 3, 25)] = "The Day the One Ring was cast into the fires of Mt. Doom, bringing about the fall of Sauron"
         self[date(year, 4, 12)] = "National Grilled Cheese Day"
+        self[date(year, 4, 21)] = f"Big Hersh turns {year-2023} today. Short legs, tall achievements."
         self[date(year, 5, 1) + rd(weekday=SU(+2))] = "Mother's Day"
         self[date(year, 5, 7)] = f"Bro Tito Day {tito}"
         self[date(year, 5, 25)] = "Towel Day! DON'T PANIC :thumbsup:"
