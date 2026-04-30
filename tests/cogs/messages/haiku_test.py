@@ -49,6 +49,69 @@ async def test_detect_haiku_finds_case_insensitive_haiku(message):
     message.channel.send.assert_called_once_with(embed=embed)
 
 
+async def test_detect_haiku_ignores_bold_markdown(message):
+    message.clean_content = "**five** seven five"
+    clazz = Haiku()
+    clazz.syllables = {"five": 5, "seven": 7}
+    await clazz.detect_haiku(message)
+    embed = Embed(colour=Colour.dark_red()).add_field(name=EMBED_NAME, value="_five\nseven\nfive_")
+    message.channel.send.assert_called_once_with(embed=embed)
+
+
+async def test_detect_haiku_ignores_italic_markdown(message):
+    message.clean_content = "*five* _seven_ five"
+    clazz = Haiku()
+    clazz.syllables = {"five": 5, "seven": 7}
+    await clazz.detect_haiku(message)
+    embed = Embed(colour=Colour.dark_red()).add_field(name=EMBED_NAME, value="_five\nseven\nfive_")
+    message.channel.send.assert_called_once_with(embed=embed)
+
+
+async def test_detect_haiku_ignores_strikethrough_markdown(message):
+    message.clean_content = "~~five~~ seven five"
+    clazz = Haiku()
+    clazz.syllables = {"five": 5, "seven": 7}
+    await clazz.detect_haiku(message)
+    embed = Embed(colour=Colour.dark_red()).add_field(name=EMBED_NAME, value="_five\nseven\nfive_")
+    message.channel.send.assert_called_once_with(embed=embed)
+
+
+async def test_detect_haiku_ignores_code_markdown(message):
+    message.clean_content = "`five` seven five"
+    clazz = Haiku()
+    clazz.syllables = {"five": 5, "seven": 7}
+    await clazz.detect_haiku(message)
+    embed = Embed(colour=Colour.dark_red()).add_field(name=EMBED_NAME, value="_five\nseven\nfive_")
+    message.channel.send.assert_called_once_with(embed=embed)
+
+
+async def test_detect_haiku_ignores_spoiler_markdown(message):
+    message.clean_content = "||five|| seven five"
+    clazz = Haiku()
+    clazz.syllables = {"five": 5, "seven": 7}
+    await clazz.detect_haiku(message)
+    embed = Embed(colour=Colour.dark_red()).add_field(name=EMBED_NAME, value="_five\nseven\nfive_")
+    message.channel.send.assert_called_once_with(embed=embed)
+
+
+async def test_detect_haiku_ignores_block_quote_markdown(message):
+    message.clean_content = "> five seven five"
+    clazz = Haiku()
+    clazz.syllables = {"five": 5, "seven": 7}
+    await clazz.detect_haiku(message)
+    embed = Embed(colour=Colour.dark_red()).add_field(name=EMBED_NAME, value="_five\nseven\nfive_")
+    message.channel.send.assert_called_once_with(embed=embed)
+
+
+async def test_detect_haiku_ignores_combined_markdown(message):
+    message.clean_content = "**five**, _seven_! ~~five~~."
+    clazz = Haiku()
+    clazz.syllables = {"five": 5, "seven": 7}
+    await clazz.detect_haiku(message)
+    embed = Embed(colour=Colour.dark_red()).add_field(name=EMBED_NAME, value="_five\nseven\nfive_")
+    message.channel.send.assert_called_once_with(embed=embed)
+
+
 async def test_detect_haiku_finds_multiple_word_haiki(message):
     message.clean_content = "two two one three two one one one four"
     clazz = Haiku()

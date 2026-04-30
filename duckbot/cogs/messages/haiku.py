@@ -1,5 +1,6 @@
 from discord import Colour, Embed
 from discord.ext import commands
+from discord.utils import remove_markdown
 from nltk.corpus import cmudict
 
 
@@ -31,7 +32,7 @@ class Haiku(commands.Cog):
             await message.channel.send(embed=embed)
 
     def get_words(self, message):
-        return message.clean_content.replace(",", "").replace(".", "").replace("!", "").replace("?", "").split()
+        return remove_markdown(message.clean_content).replace(",", "").replace(".", "").replace("!", "").replace("?", "").split()
 
     def get_haiku_line(self, words, target):
         i = 0
