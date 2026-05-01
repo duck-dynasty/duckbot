@@ -1,7 +1,11 @@
+import re
+
 from discord import Colour, Embed
 from discord.ext import commands
 from discord.utils import remove_markdown
 from nltk.corpus import cmudict
+
+UNDERSCORE_ITALIC_RE = re.compile(r"(?<!_)_([^_\n]+?)_(?!_)")
 
 
 class Haiku(commands.Cog):
@@ -27,7 +31,8 @@ class Haiku(commands.Cog):
             else:
                 return  # it's not a haiku
         if i == len(words):
-            haiku = "\n".join(lines).replace("_", r"\_")
+            # Convert `_..._` italics to `*..*` so user underscores don't collide with the wrapping italic.
+            haiku = UNDERSCORE_ITALIC_RE.sub(r"*\1*", "\n".join(lines))
             embed = Embed(colour=Colour.dark_red()).add_field(name=":cherry_blossom: **Haiku Detected** :cherry_blossom:", value=f"_{haiku}_")
             await message.channel.send(embed=embed)
 
