@@ -32,13 +32,13 @@ class Haiku(commands.Cog):
             await message.channel.send(embed=embed)
 
     def get_words(self, message):
-        return remove_markdown(message.clean_content).replace(",", "").replace(".", "").replace("!", "").replace("?", "").split()
+        return message.clean_content.replace(",", "").replace(".", "").replace("!", "").replace("?", "").split()
 
     def get_haiku_line(self, words, target):
         i = 0
         line = []
         while target > 0 and i < len(words):
-            word = words[i].lower()
+            word = remove_markdown(words[i]).lower()
             if word in self.syllables:
                 line.append(words[i])
                 target -= self.syllables[word]
