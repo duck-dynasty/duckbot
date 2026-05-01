@@ -45,6 +45,19 @@ def test_populate_duckbot_day(now, bot, time, seconds):
     assert clazz.get_list(time) == [f"DuckBot's Inception Day. I'm about {seconds}s old"]
 
 
+@mock.patch("duckbot.cogs.announce_day.special_days.now")
+def test_populate_duckbot_day_recomputes_age_on_each_lookup(now, bot):
+    inception_day = datetime(2022, 12, 3, 10, 39, tzinfo=timezone())
+    earlier = datetime(2022, 6, 1, 12, 0, tzinfo=timezone())
+    clazz = SpecialDays(bot)
+
+    now.return_value = earlier
+    clazz.get_list(earlier)  # triggers _populate(2022) while now() == earlier
+
+    now.return_value = inception_day
+    assert clazz.get_list(inception_day) == [f"DuckBot's Inception Day. I'm about {(inception_day - datetime(2020, 12, 3, 10, 39, tzinfo=timezone())).total_seconds()}s old"]
+
+
 @pytest.mark.parametrize("date", [datetime(2024, 2, 19), datetime(2025, 2, 17), datetime(2026, 2, 16)])
 def test_populate_family_day(bot, date):
     clazz = SpecialDays(bot)
