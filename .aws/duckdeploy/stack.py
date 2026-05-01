@@ -77,6 +77,15 @@ class DuckBotStack(cdk.Stack):
         )
         duckbot.add_link(postgres)
 
+        # https://docs.aws.amazon.com/AmazonECS/latest/developerguide/automated_image_cleanup.html
+        user_data = ec2.UserData.for_linux()
+        user_data.add_commands(
+            "echo ECS_ENGINE_TASK_CLEANUP_WAIT_DURATION=30m >> /etc/ecs/ecs.config",
+            "echo ECS_IMAGE_CLEANUP_INTERVAL=10m >> /etc/ecs/ecs.config",
+            "echo ECS_IMAGE_MINIMUM_CLEANUP_AGE=20m >> /etc/ecs/ecs.config",
+            "echo ECS_NUM_IMAGES_DELETE_PER_CYCLE=10 >> /etc/ecs/ecs.config",
+        )
+
         launch_template = ec2.LaunchTemplate(
             self,
             "LaunchTemplate",
@@ -87,7 +96,7 @@ class DuckBotStack(cdk.Stack):
             machine_image=ec2.MachineImage.generic_linux(ami_map={"us-east-1": "ami-0cdf40f78318eeff6"}),  # custom ECS AMI created manually via https://github.com/aws/amazon-ecs-ami
             security_group=ec2.SecurityGroup(self, "HostSecurityGroup", vpc=vpc),
             role=iam.Role(self, "HostRole", assumed_by=iam.ServicePrincipal("ec2.amazonaws.com")),
-            user_data=ec2.UserData.for_linux(),
+            user_data=user_data,
         )
         launch_template.connections.allow_to_default_port(file_system)
         launch_template.connections.allow_from(ec2.Peer.any_ipv4(), ec2.Port.tcp(22))
