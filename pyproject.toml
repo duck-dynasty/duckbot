@@ -21,7 +21,7 @@ dependencies = [
     "tzdata==2025.3",
     "holidays==0.93",
     "pyowm==3.5.0",
-    "psycopg2==2.9.11",
+    "psycopg2==2.9.12",
     "SQLAlchemy==2.0.48",
     "d20==1.1.2",
     "nltk==3.9.4",
