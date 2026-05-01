@@ -1,5 +1,6 @@
 from discord import Colour, Embed
 from discord.ext import commands
+from discord.utils import remove_markdown
 from nltk.corpus import cmudict
 
 
@@ -37,7 +38,7 @@ class Haiku(commands.Cog):
         i = 0
         line = []
         while target > 0 and i < len(words):
-            word = words[i].lower()
+            word = remove_markdown(words[i]).lower()
             if word in self.syllables:
                 line.append(words[i])
                 target -= self.syllables[word]

@@ -1,5 +1,6 @@
 from unittest import mock
 
+import pytest
 from discord import Colour, Embed
 
 from duckbot.cogs.messages import Haiku
@@ -46,6 +47,26 @@ async def test_detect_haiku_finds_case_insensitive_haiku(message):
     clazz.syllables = {"five": 5, "seven": 7}
     await clazz.detect_haiku(message)
     embed = Embed(colour=Colour.dark_red()).add_field(name=EMBED_NAME, value="_FiVe\nSEVEN\nfIve_")
+    message.channel.send.assert_called_once_with(embed=embed)
+
+
+@pytest.mark.parametrize(
+    "clean_content,haiku_value",
+    [
+        ("**five** seven five", "**five**\nseven\nfive"),
+        ("*five* _seven_ five", "*five*\n_seven_\nfive"),
+        ("~~five~~ seven five", "~~five~~\nseven\nfive"),
+        ("`five` seven five", "`five`\nseven\nfive"),
+        ("||five|| seven five", "||five||\nseven\nfive"),
+        ("**five**, _seven_! ~~five~~.", "**five**\n_seven_\n~~five~~"),
+    ],
+)
+async def test_detect_haiku_preserves_markdown(message, clean_content, haiku_value):
+    message.clean_content = clean_content
+    clazz = Haiku()
+    clazz.syllables = {"five": 5, "seven": 7}
+    await clazz.detect_haiku(message)
+    embed = Embed(colour=Colour.dark_red()).add_field(name=EMBED_NAME, value=f"_{haiku_value}_")
     message.channel.send.assert_called_once_with(embed=embed)
 
 
