@@ -6,10 +6,7 @@ from dateutil.relativedelta import FR, MO, SU
 from dateutil.relativedelta import relativedelta as rd
 from holidays.countries import CA
 
-from duckbot.util.datetime import now, timezone
-
-INCEPTION = datetime(2020, 12, 3, 10, 39, tzinfo=timezone())
-DUCKBOT_DAY_TEMPLATE = "DuckBot's Inception Day. I'm about {seconds}s old"
+from duckbot.util.datetime import timezone
 
 
 class SpecialDays(CA):
@@ -21,17 +18,6 @@ class SpecialDays(CA):
     def __init__(self, bot):
         CA.__init__(self)
         self.bot = bot
-
-    def get_list(self, key):
-        # `_populate` runs once per year and its values are cached, so any value
-        # that depends on the current time must be rendered here at lookup time.
-        return [self._render(value) for value in super().get_list(key)]
-
-    @staticmethod
-    def _render(value):
-        if value == DUCKBOT_DAY_TEMPLATE:
-            return value.format(seconds=(now() - INCEPTION).total_seconds())
-        return value
 
     def _populate(self, year):
         CA._populate(self, year)
@@ -69,7 +55,7 @@ class SpecialDays(CA):
         self[date(year, 11, 14)] = f"Male Kelly's birthday... Maybe... idk. He's around {year - 1989} years old now."
         self[date(year, 11, 1) + rd(weekday=FR(+4))] = "Black Friday. I hope I can get some new socks"
         self[date(year, 12, 2)] = f"Female Kelly's Birthday. She's {year-1989} years old"
-        self[date(year, 12, 3)] = DUCKBOT_DAY_TEMPLATE
+        self[date(year, 12, 3)] = f"DuckBot's Inception Day. I'm about {(datetime(year, 12, 3, 7, 0, tzinfo=timezone()) - datetime(2020, 12, 3, 10, 39, tzinfo=timezone())).total_seconds()}s old"
         self[date(year, 12, 5)] = f"Taras' Birthday. He's {year-1989} years old"
         self[date(year, 12, 15)] = "https://github.com/duck-dynasty/duckbot/pull/644"
         self[date(year, 12, 31)] = "New Year's Eve — see y'all next year"
