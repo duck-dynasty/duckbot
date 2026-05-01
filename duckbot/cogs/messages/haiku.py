@@ -27,7 +27,7 @@ class Haiku(commands.Cog):
             else:
                 return  # it's not a haiku
         if i == len(words):
-            haiku = "\n".join(lines)
+            haiku = "\n".join(lines).replace("_", r"\_")
             embed = Embed(colour=Colour.dark_red()).add_field(name=":cherry_blossom: **Haiku Detected** :cherry_blossom:", value=f"_{haiku}_")
             await message.channel.send(embed=embed)
 
