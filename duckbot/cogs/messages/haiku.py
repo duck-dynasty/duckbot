@@ -5,7 +5,7 @@ from discord.ext import commands
 from discord.utils import remove_markdown
 from nltk.corpus import cmudict
 
-UNDERSCORE_ITALIC_RE = re.compile(r"(?<!_)_([^_\n]+?)_(?!_)")
+UNDERSCORE_ITALIC_RE = re.compile(r"(?<!\w)_([^_\n]+?)_(?!\w)")
 
 
 class Haiku(commands.Cog):
