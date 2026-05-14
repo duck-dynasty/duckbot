@@ -114,7 +114,7 @@ def sloops_used(model: Model, factory: Factory, recipes: List[ModifiedRecipe], u
 def limited_item_used(model: Model, item: str, limit: int, recipes: List[ModifiedRecipe], use_recipe: List[Var], amount_recipe_uses: Callable[[ModifiedRecipe], int]) -> LinExpr:
     """Power shards and sloopers are a limited, indivisible item that can be put into machines. This sums up the
     number of shards or sloops used based on recipe usage. The number of items used is `ceil(num_recipe)`,
-    and the total of those must be constrainted by the amount available to the factory."""
+    and the total of those must be constrained by the amount available to the factory."""
     item_cost = [
         (
             r,
