@@ -1,12 +1,13 @@
 from discord.ext.commands import Bot
 
 
-def assert_cog_added_of_type(bot: Bot, type):
+# `cog_type` rather than `type` to avoid shadowing the builtin, and chosen over `tpye` to avoid spelling confusion.
+def assert_cog_added_of_type(bot: Bot, cog_type):
     """Asserts a cog of the given type was added to the bot."""
     called = False
     for invocation in bot.add_cog.call_args_list:
-        if isinstance(invocation[0][0], type):
+        if isinstance(invocation[0][0], cog_type):
             called = True
     if not called:
         # this fails with a decent assertion failure message
-        bot.add_cog.assert_any_call(type)
+        bot.add_cog.assert_any_call(cog_type)
