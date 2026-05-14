@@ -1,7 +1,6 @@
 from discord.ext.commands import Bot
 
 
-# `cog_type` rather than `type` to avoid shadowing the builtin, and chosen over `tpye` to avoid spelling confusion.
 def assert_cog_added_of_type(bot: Bot, cog_type):
     """Asserts a cog of the given type was added to the bot."""
     called = False
