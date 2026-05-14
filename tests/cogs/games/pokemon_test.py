@@ -37,9 +37,8 @@ async def test_pokemon_no_args_shows_potd(bot, context, responses):
     responses.add(responses.GET, f"{POKEMON_API}/{potd_id}", json=build_pokemon_data(name="testmon", pokemon_id=potd_id))
     responses.add(responses.GET, f"{SPECIES_API}/{potd_id}/", json=build_species_data(pokemon_id=potd_id))
     clazz = Pokemon(bot)
-    with patch("duckbot.cogs.games.pokemon.date") as mock_date:
-        mock_date.today.return_value = ANCHOR_DATE
-        mock_date.side_effect = lambda *a, **kw: date(*a, **kw)
+    with patch("duckbot.cogs.games.pokemon.now") as mock_now:
+        mock_now.return_value.date.return_value = ANCHOR_DATE
         await clazz.pokemon(context, None)
     context.send.assert_called_once()
     embed = context.send.call_args.kwargs["embed"]
@@ -137,9 +136,8 @@ def test_get_genus_no_english_returns_empty():
 def test_potd_deterministic(bot):
     clazz = Pokemon(bot)
     clazz._pokemon_count = 1025
-    with patch("duckbot.cogs.games.pokemon.date") as mock_date:
-        mock_date.today.return_value = date(2025, 6, 15)
-        mock_date.side_effect = lambda *a, **kw: date(*a, **kw)
+    with patch("duckbot.cogs.games.pokemon.now") as mock_now:
+        mock_now.return_value.date.return_value = date(2025, 6, 15)
         id1 = clazz._get_pokemon_of_the_day_id()
         id2 = clazz._get_pokemon_of_the_day_id()
     assert id1 == id2
@@ -149,11 +147,10 @@ def test_potd_deterministic(bot):
 def test_potd_different_days_give_different_pokemon(bot):
     clazz = Pokemon(bot)
     clazz._pokemon_count = 1025
-    with patch("duckbot.cogs.games.pokemon.date") as mock_date:
-        mock_date.side_effect = lambda *a, **kw: date(*a, **kw)
-        mock_date.today.return_value = date(2025, 6, 15)
+    with patch("duckbot.cogs.games.pokemon.now") as mock_now:
+        mock_now.return_value.date.return_value = date(2025, 6, 15)
         id1 = clazz._get_pokemon_of_the_day_id()
-        mock_date.today.return_value = date(2025, 6, 16)
+        mock_now.return_value.date.return_value = date(2025, 6, 16)
         id2 = clazz._get_pokemon_of_the_day_id()
     assert id1 != id2
 
