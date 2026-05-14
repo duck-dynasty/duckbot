@@ -1,7 +1,12 @@
+from typing import Optional
+
 import d20
 from discord.ext import commands
 
 from duckbot.util.messages import MAX_MESSAGE_LENGTH
+
+CRIT_HIT_FLAVOUR = ":dart: **Critical hit!**"
+CRIT_FAIL_FLAVOUR = ":skull: **Critical fail!**"
 
 
 class Dice(commands.Cog):
@@ -18,7 +23,11 @@ class Dice(commands.Cog):
             roller = self.make_roller(100_000)
             result = roller.roll(expression, allow_comments=True, stringifier=DiceStringifier())
             text = f"{result.result[:max_length]}..." if len(result.result) > max_length else result.result
-            await context.send(f"**Rolls**: {text}\n**Total**: {result.total}")
+            response = f"**Rolls**: {text}\n**Total**: {result.total}"
+            flavour = self._crit_flavour(result.expr)
+            if flavour:
+                response = f"{flavour}\n{response}"
+            await context.send(response)
         except d20.errors.TooManyRolls:
             await context.send(f"I can only roll up to {roller.context.max_rolls} dice.", delete_after=30)
         except d20.errors.RollError as e:
@@ -26,6 +35,24 @@ class Dice(commands.Cog):
 
     def make_roller(self, max_rolls: int):
         return d20.Roller(d20.RollContext(max_rolls))
+
+    @staticmethod
+    def _crit_flavour(expr) -> Optional[str]:
+        """Returns crit flavour if the expression rolled exactly one d20; otherwise None."""
+        rolled = []
+        stack = [expr]
+        while stack:
+            node = stack.pop()
+            if isinstance(node, d20.Dice) and node.size == 20:
+                rolled.extend(die.total for die in node.values)
+            stack.extend(node.children)
+        if len(rolled) != 1:
+            return None
+        if rolled[0] == 20:
+            return CRIT_HIT_FLAVOUR
+        if rolled[0] == 1:
+            return CRIT_FAIL_FLAVOUR
+        return None
 
 
 class DiceStringifier(d20.MarkdownStringifier):

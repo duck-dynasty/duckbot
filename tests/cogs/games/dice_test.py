@@ -35,3 +35,51 @@ async def test_roll_sends_result(roller, context):
     clazz = Dice()
     await clazz.roll(context, "1d20")
     context.send.assert_called_once_with("**Rolls**: results\n**Total**: 1")
+
+
+@mock.patch("random.randrange", return_value=19)  # randrange(20) + 1 == 20
+async def test_roll_natural_20_shows_crit_hit(randrange, context):
+    clazz = Dice()
+    await clazz.roll(context, "1d20")
+    sent = context.send.call_args[0][0]
+    assert ":dart: **Critical hit!**" in sent
+
+
+@mock.patch("random.randrange", return_value=0)  # randrange(20) + 1 == 1
+async def test_roll_natural_1_shows_crit_fail(randrange, context):
+    clazz = Dice()
+    await clazz.roll(context, "1d20")
+    sent = context.send.call_args[0][0]
+    assert ":skull: **Critical fail!**" in sent
+
+
+@mock.patch("random.randrange", return_value=9)  # 10
+async def test_roll_middle_value_has_no_flavour(randrange, context):
+    clazz = Dice()
+    await clazz.roll(context, "1d20")
+    sent = context.send.call_args[0][0]
+    assert "Critical" not in sent
+
+
+@mock.patch("random.randrange", return_value=19)
+async def test_roll_natural_20_with_modifier_still_crits(randrange, context):
+    clazz = Dice()
+    await clazz.roll(context, "1d20+5")
+    sent = context.send.call_args[0][0]
+    assert ":dart: **Critical hit!**" in sent
+
+
+@mock.patch("random.randrange", return_value=19)
+async def test_roll_2d20_does_not_crit_even_with_20(randrange, context):
+    clazz = Dice()
+    await clazz.roll(context, "2d20")
+    sent = context.send.call_args[0][0]
+    assert "Critical" not in sent
+
+
+@mock.patch("random.randrange", return_value=19)
+async def test_roll_d6_does_not_crit(randrange, context):
+    clazz = Dice()
+    await clazz.roll(context, "1d6")
+    sent = context.send.call_args[0][0]
+    assert "Critical" not in sent
