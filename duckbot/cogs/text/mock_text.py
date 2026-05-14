@@ -1,6 +1,11 @@
+import random
+import re
+
 from discord.ext import commands
 
 import duckbot.util.messages
+
+WRAPPERS = ["", "**", "_"]
 
 
 class MockText(commands.Cog):
@@ -28,7 +33,13 @@ class MockText(commands.Cog):
                     char = char.upper()
                 counter += 1
             char_list.append(char)
-        return "".join(char_list)
+        return "".join(self._wrap(t) for t in re.split(r"(\s+)", "".join(char_list)))
+
+    def _wrap(self, token: str) -> str:
+        if not any(c.isalpha() for c in token):
+            return token
+        wrapper = random.choice(WRAPPERS)
+        return f"{wrapper}{token}{wrapper}"
 
     @mock_text_command.after_invoke
     async def delete_command_message(self, context: commands.Context):
