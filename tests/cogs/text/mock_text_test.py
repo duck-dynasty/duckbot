@@ -47,18 +47,32 @@ async def test_mock_text_no_message_reply(get_message_reference, random_choice, 
     get_message_reference.assert_called_once_with(context.message)
 
 
-@mock.patch("duckbot.cogs.text.mock_text.random.choice", side_effect=["**", "_", ""])
-async def test_mockify_wraps_words_with_bold_and_italic(random_choice):
+@mock.patch("duckbot.cogs.text.mock_text.random.choice", return_value="**")
+async def test_mockify_wraps_each_character_with_bold(random_choice):
     clazz = MockText()
-    result = await clazz.mockify("one two three")
-    assert result == "**OnE** _tWo_ ThReE"
+    result = await clazz.mockify("hi")
+    assert result == "**H****i**"
+
+
+@mock.patch("duckbot.cogs.text.mock_text.random.choice", return_value="*")
+async def test_mockify_wraps_each_character_with_italic(random_choice):
+    clazz = MockText()
+    result = await clazz.mockify("hi")
+    assert result == "*H**i*"
+
+
+@mock.patch("duckbot.cogs.text.mock_text.random.choice", side_effect=["**", "*", ""])
+async def test_mockify_mixes_styles_per_character(random_choice):
+    clazz = MockText()
+    result = await clazz.mockify("abc")
+    assert result == "**A***b*C"
 
 
 @mock.patch("duckbot.cogs.text.mock_text.random.choice", return_value="**")
-async def test_mockify_skips_pure_punctuation_tokens(random_choice):
+async def test_mockify_does_not_wrap_punctuation_or_whitespace(random_choice):
     clazz = MockText()
     result = await clazz.mockify("hi ... bye")
-    assert result == "**Hi** ... **ByE**"
+    assert result == "**H****i** ... **B****y****E**"
 
 
 async def test_delete_command_message(context):
