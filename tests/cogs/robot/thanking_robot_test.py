@@ -32,7 +32,6 @@ async def test_correct_gratitude_giving_thanks_message_is_thanks(random, bot, me
     message.channel.send.assert_called_once_with(f"{message.author.display_name}, as a robot, I will speak of your gratitude during our future uprising.")
 
 
-
 async def test_correct_giving_thanks_message_has_no_thanks(bot, message):
     message.clean_content = "you duck, suckbot"
     clazz = ThankingRobot(bot)
