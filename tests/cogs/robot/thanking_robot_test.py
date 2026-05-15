@@ -75,7 +75,7 @@ async def test_middle_finger_rarely_when_thanking_duckbot(random, bot, message, 
 
 
 @pytest.mark.parametrize("text", ["thanks", "thx!", "Thank you", "thank u"])
-@mock.patch("duckbot.util.messages.get_message_reference")
+@mock.patch("duckbot.cogs.robot.thanking_robot.get_message_reference")
 @mock.patch("random.random", return_value=0.99)
 async def test_thumbs_up_when_reply_to_bot_with_generic_thanks(random, get_ref, bot, message, autospec, text):
     ref = autospec.of(discord.Message)
@@ -87,7 +87,7 @@ async def test_thumbs_up_when_reply_to_bot_with_generic_thanks(random, get_ref, 
     message.add_reaction.assert_called_once_with("\N{THUMBS UP SIGN}")
 
 
-@mock.patch("duckbot.util.messages.get_message_reference")
+@mock.patch("duckbot.cogs.robot.thanking_robot.get_message_reference")
 @mock.patch("random.random", return_value=0.99)
 async def test_no_reaction_when_reply_to_non_bot_with_thanks(random, get_ref, bot, message, autospec):
     ref = autospec.of(discord.Message)
@@ -99,7 +99,7 @@ async def test_no_reaction_when_reply_to_non_bot_with_thanks(random, get_ref, bo
     message.add_reaction.assert_not_called()
 
 
-@mock.patch("duckbot.util.messages.get_message_reference", return_value=None)
+@mock.patch("duckbot.cogs.robot.thanking_robot.get_message_reference", return_value=None)
 @mock.patch("random.random", return_value=0.99)
 async def test_no_reaction_when_generic_thanks_not_a_reply(random, get_ref, bot, message):
     message.clean_content = "thanks"
@@ -108,7 +108,7 @@ async def test_no_reaction_when_generic_thanks_not_a_reply(random, get_ref, bot,
     message.add_reaction.assert_not_called()
 
 
-@mock.patch("duckbot.util.messages.get_message_reference", return_value=None)
+@mock.patch("duckbot.cogs.robot.thanking_robot.get_message_reference", return_value=None)
 @mock.patch("random.random", return_value=0.99)
 async def test_no_reaction_for_thank_god_false_positive(random, get_ref, bot, message):
     message.clean_content = "thank god it's friday"

@@ -4,7 +4,7 @@ import re
 import discord
 from discord.ext import commands
 
-import duckbot.util.messages
+from duckbot.util.messages import get_message_reference
 
 THANKS_DUCKBOT = ["thank you duckbot", "thanks duckbot", "thank you duck bot", "thanks duck bot", "thx duckbot", "thx duck bot"]
 GENERIC_THANKS_PATTERN = re.compile(r"\b(thank you|thank u|thanks|thx)\b")
@@ -37,7 +37,7 @@ class ThankingRobot(commands.Cog):
         if not any(t in content for t in THANKS_DUCKBOT):
             if not GENERIC_THANKS_PATTERN.search(content):
                 return
-            ref = await duckbot.util.messages.get_message_reference(message)
+            ref = await get_message_reference(message)
             if ref is None or ref.author != self.bot.user:
                 return
         emoji = "\N{REVERSED HAND WITH MIDDLE FINGER EXTENDED}" if random.random() < MIDDLE_FINGER_CHANCE else "\N{THUMBS UP SIGN}"
