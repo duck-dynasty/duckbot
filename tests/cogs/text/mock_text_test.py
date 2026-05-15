@@ -51,28 +51,28 @@ async def test_mock_text_no_message_reply(get_message_reference, random_choice, 
 async def test_mockify_wraps_each_character_with_bold(random_choice):
     clazz = MockText()
     result = await clazz.mockify("hi")
-    assert result == "**H****i**"
+    assert result == "**H**i"
 
 
 @mock.patch("duckbot.cogs.text.mock_text.random.choice", return_value="*")
 async def test_mockify_wraps_each_character_with_italic(random_choice):
     clazz = MockText()
     result = await clazz.mockify("hi")
-    assert result == "*H**i*"
+    assert result == "*H*i"
 
 
-@mock.patch("duckbot.cogs.text.mock_text.random.choice", side_effect=["**", "*", ""])
+@mock.patch("duckbot.cogs.text.mock_text.random.choice", side_effect=["**", "*"])
 async def test_mockify_mixes_styles_per_character(random_choice):
     clazz = MockText()
     result = await clazz.mockify("abc")
-    assert result == "**A***b*C"
+    assert result == "**A**b*C*"
 
 
 @mock.patch("duckbot.cogs.text.mock_text.random.choice", return_value="**")
 async def test_mockify_does_not_wrap_punctuation_or_whitespace(random_choice):
     clazz = MockText()
     result = await clazz.mockify("hi ... bye")
-    assert result == "**H****i** ... **B****y****E**"
+    assert result == "**H**i ... **B**y**E**"
 
 
 async def test_delete_command_message(context):

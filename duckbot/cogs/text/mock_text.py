@@ -25,15 +25,18 @@ class MockText(commands.Cog):
 
     async def mockify(self, text: str):
         counter = 0
+        previous_was_emphasis = False  # enforce plain char between emphasis spans to avoid adjacent markdown collision
         parts = []
         for char in text.lower():
             if char.isalpha():
                 if counter % 2 == 0:
                     char = char.upper()
                 counter += 1
-                wrapper = random.choice(WRAPPERS)
+                wrapper = "" if previous_was_emphasis else random.choice(WRAPPERS)
+                previous_was_emphasis = wrapper != ""
                 parts.append(f"{wrapper}{char}{wrapper}")
             else:
+                previous_was_emphasis = False
                 parts.append(char)
         return "".join(parts)
 
