@@ -1,8 +1,10 @@
 from unittest import mock
 
 import d20
+import pytest
 
 from duckbot.cogs.games import Dice
+from duckbot.cogs.games.dice import CRIT_FAIL_FLAVOUR, CRIT_HIT_FLAVOUR
 from duckbot.util.messages import MAX_MESSAGE_LENGTH
 
 
@@ -37,49 +39,37 @@ async def test_roll_sends_result(roller, context):
     context.send.assert_called_once_with("**Rolls**: results\n**Total**: 1")
 
 
-@mock.patch("random.randrange", return_value=19)  # randrange(20) + 1 == 20
-async def test_roll_natural_20_shows_crit_hit(randrange, context):
+@pytest.mark.parametrize(
+    "flavour, expected_message",
+    [
+        (CRIT_HIT_FLAVOUR, f"{CRIT_HIT_FLAVOUR}\n**Rolls**: results\n**Total**: 20"),
+        (None, "**Rolls**: results\n**Total**: 20"),
+    ],
+)
+@mock.patch("duckbot.cogs.games.dice.Dice._crit_flavour")
+@mock.patch("d20.Roller")
+async def test_roll_includes_crit_flavour(roller, crit_flavour, flavour, expected_message, context):
+    roller.return_value.roll.return_value.result = "results"
+    roller.return_value.roll.return_value.total = 20
+    crit_flavour.return_value = flavour
     clazz = Dice()
     await clazz.roll(context, "1d20")
-    sent = context.send.call_args[0][0]
-    assert ":dart: **Critical hit!**" in sent
+    context.send.assert_called_once_with(expected_message)
 
 
-@mock.patch("random.randrange", return_value=0)  # randrange(20) + 1 == 1
-async def test_roll_natural_1_shows_crit_fail(randrange, context):
-    clazz = Dice()
-    await clazz.roll(context, "1d20")
-    sent = context.send.call_args[0][0]
-    assert ":skull: **Critical fail!**" in sent
-
-
-@mock.patch("random.randrange", return_value=9)  # 10
-async def test_roll_middle_value_has_no_flavour(randrange, context):
-    clazz = Dice()
-    await clazz.roll(context, "1d20")
-    sent = context.send.call_args[0][0]
-    assert "Critical" not in sent
-
-
-@mock.patch("random.randrange", return_value=19)
-async def test_roll_natural_20_with_modifier_still_crits(randrange, context):
-    clazz = Dice()
-    await clazz.roll(context, "1d20+5")
-    sent = context.send.call_args[0][0]
-    assert ":dart: **Critical hit!**" in sent
-
-
-@mock.patch("random.randrange", return_value=19)
-async def test_roll_2d20_does_not_crit_even_with_20(randrange, context):
-    clazz = Dice()
-    await clazz.roll(context, "2d20")
-    sent = context.send.call_args[0][0]
-    assert "Critical" not in sent
-
-
-@mock.patch("random.randrange", return_value=19)
-async def test_roll_d6_does_not_crit(randrange, context):
-    clazz = Dice()
-    await clazz.roll(context, "1d6")
-    sent = context.send.call_args[0][0]
-    assert "Critical" not in sent
+@pytest.mark.parametrize(
+    "expression, randrange_val, expected",
+    [
+        ("1d20", 19, CRIT_HIT_FLAVOUR),
+        ("1d20", 0, CRIT_FAIL_FLAVOUR),
+        ("1d20", 9, None),
+        ("1d20+5", 19, CRIT_HIT_FLAVOUR),
+        ("2d20", 19, None),
+        ("1d6", 5, None),
+    ],
+)
+@mock.patch("random.randrange")
+def test_crit_flavour(randrange, expression, randrange_val, expected):
+    randrange.return_value = randrange_val
+    result = d20.roll(expression)
+    assert Dice._crit_flavour(result.expr) == expected
