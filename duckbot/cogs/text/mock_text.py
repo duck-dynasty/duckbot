@@ -25,7 +25,7 @@ class MockText(commands.Cog):
 
     async def mockify(self, text: str):
         counter = 0
-        previous_was_emphasis = False  # enforce plain char between emphasis spans to avoid adjacent markdown collision
+        previous_was_emphasis = False
         parts = []
         for char in text.lower():
             if char.isalpha():
