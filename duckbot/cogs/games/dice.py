@@ -38,7 +38,6 @@ class Dice(commands.Cog):
 
     @staticmethod
     def _crit_flavour(expr) -> Optional[str]:
-        """Returns crit flavour if the expression rolled exactly one d20; otherwise None."""
         rolled = []
         stack = [expr]
         while stack:
