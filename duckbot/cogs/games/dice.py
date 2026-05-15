@@ -38,19 +38,18 @@ class Dice(commands.Cog):
 
     @staticmethod
     def _crit_flavour(expr) -> Optional[str]:
-        rolled = []
         stack = [expr]
         while stack:
             node = stack.pop()
             if isinstance(node, d20.Dice) and node.size == 20:
-                rolled.extend(die.total for die in node.values)
+                if node.num != 1:
+                    return None
+                if node.values[0].total == 20:
+                    return CRIT_HIT_FLAVOUR
+                if node.values[0].total == 1:
+                    return CRIT_FAIL_FLAVOUR
+                return None
             stack.extend(node.children)
-        if len(rolled) != 1:
-            return None
-        if rolled[0] == 20:
-            return CRIT_HIT_FLAVOUR
-        if rolled[0] == 1:
-            return CRIT_FAIL_FLAVOUR
         return None
 
 
