@@ -41,8 +41,8 @@ def factory_embed(factory: Factory) -> Embed:
 
     def group_recipes(names, limits={}):
         limits = {r.name: v for r, v in limits.items()}
-        names = names | {n for n in limits.keys()}
-        return sorted(list({n.split("#")[0] + (f" <= {rnd(limits.get(n))}" if n in limits else "") for n in names}))
+        names = names | set(limits)
+        return sorted({n.split("#")[0] + (f" <= {rnd(limits.get(n))}" if n in limits else "") for n in names})
 
     embed.add_field(name="Recipe Bank", value=factory.recipe_bank)
     embed.add_field(name="Recipe Includes", value="\n".join(group_recipes(factory.include_recipes)) if factory.include_recipes else "N/A")
@@ -97,7 +97,7 @@ def inout_str(inputs: Rates, outputs: Rates, scale_factor: float = 1.0) -> str:
 
 def build_consumption_map(solution: dict[ModifiedRecipe, float]) -> dict[Item, list[tuple[str, float]]]:
     flat = [(item, recipe.original_recipe.name, rate * count) for recipe, count in solution.items() for item, rate in recipe.inputs.items()]
-    items = set(item for item, _, _ in flat)
+    items = {item for item, _, _ in flat}
     return {item: [(name, amount) for i, name, amount in flat if i == item] for item in items}
 
 
@@ -105,7 +105,7 @@ def consumed_by_str(outputs: Rates, consumption_map: dict[Item, list[tuple[str, 
     consumers = [(name, amount) for item in outputs for name, amount in consumption_map.get(item, []) if name != current_recipe]
     if not consumers:
         return ""
-    names = set(name for name, _ in consumers)
+    names = {name for name, _ in consumers}
     grouped = {name: sum(amount for n, amount in consumers if n == name) for name in names}
     parts = [f"{name}: {rnd(amount)}" for name, amount in sorted(grouped.items())]
     return "-# consumed by: " + ", ".join(parts)
@@ -121,17 +121,16 @@ class SolutionSummary:
 
 def solution_summary(solution: dict[ModifiedRecipe, float]) -> SolutionSummary:
     raw_creation = [r.name for r in raw()]
-    inputs = reduce(sum_by_item, [r.inputs * -v for r, v in solution.items()], dict())
-    outputs = reduce(sum_by_item, [r.outputs * v for r, v in solution.items() if r.original_recipe.name not in raw_creation], dict())
+    inputs = reduce(sum_by_item, [r.inputs * -v for r, v in solution.items()], {})
+    outputs = reduce(sum_by_item, [r.outputs * v for r, v in solution.items() if r.original_recipe.name not in raw_creation], {})
     totals = sum_by_item(inputs, outputs)
     return SolutionSummary(
-        inputs=Rates(dict((k, -v) for k, v in totals.items() if v < 0)),
-        outputs=Rates(dict((k, v) for k, v in totals.items() if v > 0)),
+        inputs=Rates({k: -v for k, v in totals.items() if v < 0}),
+        outputs=Rates({k: v for k, v in totals.items() if v > 0}),
         total_shards=sum([ceil(n) * r.power_shards for r, n in solution.items()]),
         total_sloops=sum([ceil(n) * r.sloops for r, n in solution.items()]),
     )
 
 
 def sum_by_item(lhs: Rates | dict[Item, float], rhs: Rates | dict[Item, float]) -> dict[Item, float]:
-    sum = [(item, lhs.get(item, 0) + rhs.get(item, 0)) for item in Item if (item in lhs or item in rhs)]
-    return dict((i, s) for i, s in sum if not isclose(s, 0, abs_tol=1e-4))
+    return {item: s for item in Item if (item in lhs or item in rhs) and not isclose(s := lhs.get(item, 0) + rhs.get(item, 0), 0, abs_tol=1e-4)}
