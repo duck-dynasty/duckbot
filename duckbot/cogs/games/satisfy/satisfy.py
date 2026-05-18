@@ -66,7 +66,7 @@ class Satisfy(Cog):
         self.save(context, factory)
         await context.send(embed=factory_embed(factory), delete_after=60)
 
-    @satisfy.command(name="maximize", description="Toggle whether to maximize output of the given item.")
+    @satisfy.command(name="maximize", description="Toggle maximizing output of the given item.")
     async def toggle_maximize(self, context: Context, item: str):
         factory = self.factory(context)
         if Item[item] in factory.maximize:
