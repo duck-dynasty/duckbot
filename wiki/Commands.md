@@ -189,7 +189,7 @@ Tells the solver to maximize output of the given item. Should only be used when 
 
 Maximization occurs by item weights, so it will _not_ behave as you expect when multiple items are maximized. The solver will pick the item with the better rate to weight ratio. It is recommended to maximize a single item only.
 
-There's no way to remove a maximize item, a full reset of the factory is required.
+Running `/satisfy maximize` again for an item that is already being maximized will remove it from the maximize set.
 
 ```
 /satisfy booster   item amount

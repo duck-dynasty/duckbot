@@ -55,13 +55,29 @@ async def test_add_target_stores_output_rate(clazz, context, default_factory):
     assert clazz.factory(context) == default_factory
 
 
-async def test_add_maximize_stores_maximizer(clazz, context, default_factory):
-    await clazz.add_maximize.callback(clazz, context, str(Item.IronOre))
+async def test_toggle_maximize_stores_maximizer(clazz, context, default_factory):
+    await clazz.toggle_maximize.callback(clazz, context, str(Item.IronOre))
     default_factory.maximize = {Item.IronOre}
     assert clazz.factory(context) == default_factory
 
-    await clazz.add_maximize.callback(clazz, context, str(Item.IronIngot))
+    await clazz.toggle_maximize.callback(clazz, context, str(Item.IronIngot))
     default_factory.maximize = {Item.IronOre, Item.IronIngot}
+    assert clazz.factory(context) == default_factory
+
+
+async def test_toggle_maximize_removes_already_maximized_item(clazz, context, default_factory):
+    await clazz.toggle_maximize.callback(clazz, context, str(Item.IronOre))
+    await clazz.toggle_maximize.callback(clazz, context, str(Item.IronOre))
+    default_factory.maximize = set()
+    assert clazz.factory(context) == default_factory
+
+
+async def test_toggle_maximize_removes_toggled_only(clazz, context, default_factory):
+    await clazz.toggle_maximize.callback(clazz, context, str(Item.IronOre))
+    await clazz.toggle_maximize.callback(clazz, context, str(Item.IronIngot))
+    await clazz.toggle_maximize.callback(clazz, context, str(Item.CopperOre))
+    await clazz.toggle_maximize.callback(clazz, context, str(Item.IronIngot))
+    default_factory.maximize = {Item.IronOre, Item.CopperOre}
     assert clazz.factory(context) == default_factory
 
 
