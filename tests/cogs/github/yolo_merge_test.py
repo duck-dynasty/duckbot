@@ -198,7 +198,7 @@ def check_suite(c) -> github.CheckSuite.CheckSuite:
 class MockPaginatedList(list):
     @property
     def reversed(self):
-        copy = [x for x in self]
+        copy = list(self)
         copy.reverse()
         return copy
 

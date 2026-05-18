@@ -22,7 +22,7 @@ class Typos(commands.Cog):
     async def get_previous_message(self, message: Message):
         # limit of 20 may be restricting, since it includes everyone's messages
         hist = [msg async for msg in message.channel.history(limit=20, before=message)]
-        by_same_author = list(x for x in hist if x.author.id == message.author.id)
+        by_same_author = [x for x in hist if x.author.id == message.author.id]
         if not by_same_author:
             return None
         else:

@@ -31,7 +31,7 @@ def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
         def regular_limit():
             if recipe.sloops > 0:
                 return factory.sloops / recipe.sloops
-            item, rate = next(x for x in recipe.outputs.items())
+            item, rate = next(iter(recipe.outputs.items()))
             if recipe.inputs == Rates() and item in map_limits:
                 return (map_limits[item] - factory.inputs.get(item, 0)) / rate
             else:
@@ -41,7 +41,7 @@ def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
 
     use_recipe = [model.add_var(name=r.name, lb=0, ub=upper_bound(r)) for r in recipes]
     generate_raw = {i: next((x * r.outputs.singleton_rate() for r, x in zip(recipes, use_recipe) if r.original_recipe.name == str(i)), 0) for i in map_limits.keys()}
-    can_generate = set(i for i in map_limits.keys() if str(i) in [r.original_recipe.name for r in recipes])
+    can_generate = {i for i in map_limits.keys() if str(i) in [r.original_recipe.name for r in recipes]}
 
     amount_by_item = amount_by_item_expressions(factory, recipes, use_recipe)
     items_must_be_non_negative(model, amount_by_item)
@@ -85,12 +85,12 @@ def amount_by_item_expressions(factory: Factory, recipes: List[ModifiedRecipe], 
     """
 
     def cost(recipe: ModifiedRecipe, use: Var | LinExpr):
-        costs = dict((item, -use * rate) for item, rate in recipe.inputs.items())
-        income = dict((item, use * rate) for item, rate in recipe.outputs.items())
+        costs = {item: -use * rate for item, rate in recipe.inputs.items()}
+        income = {item: use * rate for item, rate in recipe.outputs.items()}
         return costs, income
 
     recipe_costs = [sum_by_item(*cost(r, v)) for r, v in zip(recipes, use_recipe)]
-    initial_conditions = sum_by_item(factory.inputs, dict((i, -r) for i, r in factory.targets.items()))
+    initial_conditions = sum_by_item(factory.inputs, {i: -r for i, r in factory.targets.items()})
     return reduce(sum_by_item, recipe_costs, initial_conditions)
 
 

@@ -36,7 +36,7 @@ class Dictionary(commands.Cog):
         embed = discord.Embed(title=word)
         response = requests.get(f"{self.url}/entries/en-us/{word}", headers=self.headers).json()
         results = response.get("results", [])
-        categories = sorted(set(lex.get("lexicalCategory", {}).get("id", None) for r in results for lex in r.get("lexicalEntries", [])))
+        categories = sorted({lex.get("lexicalCategory", {}).get("id", None) for r in results for lex in r.get("lexicalEntries", [])})
         for category in categories:
             text, pronunciation, lines = self.category_group_data(word, category, results)
             embed.add_field(name=f"{category}: **{text}**  /{pronunciation}/", value="\n".join(lines), inline=False)

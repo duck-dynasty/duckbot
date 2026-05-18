@@ -142,7 +142,7 @@ class Satisfy(Cog):
                 bank = [x for r in recipe_banks[factory.recipe_bank] for x in as_slooped(r)]
                 recipes = [r for r in bank if r.name not in factory.exclude_recipes]
                 includes = [x for r in all() for x in as_slooped(r) if x.name in factory.include_recipes]
-                factory.recipes = {r for r in (recipes + includes)}
+                factory.recipes = set(recipes + includes)
                 solution = optimize(factory)
                 if solution is None:
                     await context.send("Why do you hate possible?", delete_after=60)
