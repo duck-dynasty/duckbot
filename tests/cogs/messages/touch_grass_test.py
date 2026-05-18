@@ -107,14 +107,14 @@ async def test_cooldown_expires_allows_new_notification(mock_utcnow, bot, messag
     clazz = TouchGrass(bot)
 
     # Send 40 messages at T=0 to trigger first notification
-    for i in range(40):
+    for _ in range(40):
         await clazz.track_activity(message)
 
     # 121 minutes later (cooldown expired and all old messages cleaned up)
     mock_utcnow.return_value = base_time + datetime.timedelta(minutes=121)
 
     # Send another 40 messages
-    for i in range(40):
+    for _ in range(40):
         await clazz.track_activity(message)
 
     # Should have notified twice
@@ -130,7 +130,7 @@ async def test_sliding_window_removes_old_messages(mock_utcnow, bot, message):
     clazz = TouchGrass(bot)
 
     # Send 20 messages at T=0
-    for i in range(20):
+    for _ in range(20):
         await clazz.track_activity(message)
 
     # 61 minutes later (outside window)
@@ -153,12 +153,12 @@ async def test_multiple_users_tracked_separately(mock_utcnow, bot, message):
 
     # User 1 sends 40 messages
     message.author.id = 12345
-    for i in range(40):
+    for _ in range(40):
         await clazz.track_activity(message)
 
     # User 2 sends 5 messages
     message.author.id = 67890
-    for i in range(5):
+    for _ in range(5):
         await clazz.track_activity(message)
 
     # User 1 should have 40 messages tracked
@@ -178,12 +178,12 @@ async def test_clean_old_messages_preserves_recent(mock_utcnow, bot, message):
     clazz = TouchGrass(bot)
 
     # Send 20 messages at T=0
-    for i in range(20):
+    for _ in range(20):
         await clazz.track_activity(message)
 
     # Send 20 messages at T=30min
     mock_utcnow.return_value = base_time + datetime.timedelta(minutes=30)
-    for i in range(20):
+    for _ in range(20):
         await clazz.track_activity(message)
 
     # At T=61min, clean up
@@ -291,11 +291,11 @@ async def test_show_activity_stats_with_activity(mock_utcnow, mock_get_user, bot
 
     # Simulate activity for two users
     message.author.id = 123
-    for i in range(5):
+    for _ in range(5):
         await clazz.track_activity(message)
 
     message.author.id = 456
-    for i in range(10):
+    for _ in range(10):
         await clazz.track_activity(message)
 
     def get_user_side_effect(bot, user_id, guild=None):
@@ -329,17 +329,17 @@ async def test_show_activity_stats_sorts_by_count(mock_utcnow, mock_get_user, bo
 
     # User 1: 3 messages
     message.author.id = 111
-    for i in range(3):
+    for _ in range(3):
         await clazz.track_activity(message)
 
     # User 2: 10 messages (most active)
     message.author.id = 222
-    for i in range(10):
+    for _ in range(10):
         await clazz.track_activity(message)
 
     # User 3: 5 messages
     message.author.id = 333
-    for i in range(5):
+    for _ in range(5):
         await clazz.track_activity(message)
 
     def get_user_side_effect(bot, user_id, guild=None):
@@ -375,7 +375,7 @@ async def test_show_activity_stats_excludes_old_messages(mock_utcnow, bot, conte
 
     # Send 10 messages at T=0
     message.author.id = 123
-    for i in range(10):
+    for _ in range(10):
         await clazz.track_activity(message)
 
     # Jump to 61 minutes later (old messages outside window)
@@ -400,7 +400,7 @@ async def test_show_activity_stats_unknown_user(mock_utcnow, mock_get_user, bot,
     clazz = TouchGrass(bot)
 
     message.author.id = 999
-    for i in range(5):
+    for _ in range(5):
         await clazz.track_activity(message)
 
     await clazz.show_activity_stats(context)
@@ -477,7 +477,7 @@ async def test_off_hours_40_messages_no_notification(mock_utcnow, bot, message):
 
     clazz = TouchGrass(bot)
 
-    for i in range(40):
+    for _ in range(40):
         await clazz.track_activity(message)
 
     message.channel.send.assert_not_called()
@@ -493,7 +493,7 @@ async def test_leaderboard_unaffected_by_time_of_day(mock_utcnow, mock_get_user,
 
     # Send 10 messages on a Saturday (well below 120 threshold)
     message.author.id = 123
-    for i in range(10):
+    for _ in range(10):
         await clazz.track_activity(message)
 
     user = mock.Mock()

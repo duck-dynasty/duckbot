@@ -20,12 +20,12 @@ def test_repr_returns_enum_name(item: Item):
 @pytest.mark.parametrize("item", Item)
 def test_mul_returns_rates(item: Item):
     n = random.random()
-    assert item * n == Rates(dict([(item, n)]))
+    assert item * n == Rates({item: n})
 
 
 @pytest.mark.parametrize("item", Item)
 def test_lt_alphabetical_order_by_name(item: Item):
-    rhs = random.choice([x for x in Item])
+    rhs = random.choice(list(Item))
     assert (item < rhs) == (item.name < rhs.name)
 
 

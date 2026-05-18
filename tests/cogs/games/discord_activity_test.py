@@ -11,7 +11,7 @@ async def test_before_loop_waits_for_bot(bot):
     bot.wait_until_ready.assert_called()
 
 
-async def test_cog_unload_cancels_task(bot):
+def test_cog_unload_cancels_task(bot):
     clazz = DiscordActivity(bot)
     clazz.cog_unload()
     clazz.change_activity_loop.cancel.assert_called()
