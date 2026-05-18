@@ -8,6 +8,8 @@ from discord import Interaction
 from discord.app_commands import Choice
 from discord.ext import commands
 
+from duckbot.util.datetime import now
+
 ANCHOR_DATE = date(2020, 12, 3)
 POTD_SEED = 80081355
 
@@ -81,7 +83,7 @@ class Pokemon(commands.Cog):
         ids = list(range(1, n + 1))
         rng = random.Random(POTD_SEED)
         rng.shuffle(ids)
-        days_since_anchor = (date.today() - ANCHOR_DATE).days
+        days_since_anchor = (now().date() - ANCHOR_DATE).days
         return ids[days_since_anchor % n]
 
     def get_pokemon(self, name_or_id: str) -> dict:
