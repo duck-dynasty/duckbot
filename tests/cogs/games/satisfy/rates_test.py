@@ -17,7 +17,7 @@ another_rate = rate
 
 
 def test_init_dict(rate, another_rate):
-    d = {rate[0]: rate[1], another_rate[0]: another_rate[1]}
+    d = dict([rate, another_rate])
     rates = Rates(d)
     assert rates.rates == d and rates.rates is not d
 
@@ -95,7 +95,7 @@ def test_repr_returns_dict_string(rate):
 
 
 def test_add_returns_combined_rates(rate, another_rate):
-    assert to_rates(rate) + to_rates(another_rate) == Rates({rate[0]: rate[1], another_rate[0]: another_rate[1]})
+    assert to_rates(rate) + to_rates(another_rate) == Rates(dict([rate, another_rate]))
 
 
 def test_rshift_creates_rates_output(rate, another_rate):
