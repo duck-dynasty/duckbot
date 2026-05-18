@@ -66,10 +66,13 @@ class Satisfy(Cog):
         self.save(context, factory)
         await context.send(embed=factory_embed(factory), delete_after=60)
 
-    @satisfy.command(name="maximize", description="Specify maximize output of desired item.")
-    async def add_maximize(self, context: Context, item: str):
+    @satisfy.command(name="maximize", description="Toggle whether to maximize output of the given item.")
+    async def toggle_maximize(self, context: Context, item: str):
         factory = self.factory(context)
-        factory.maximize.add(Item[item])
+        if Item[item] in factory.maximize:
+            factory.maximize.discard(Item[item])
+        else:
+            factory.maximize.add(Item[item])
         self.save(context, factory)
         await context.send(embed=factory_embed(factory), delete_after=60)
 
@@ -152,7 +155,7 @@ class Satisfy(Cog):
 
     @add_input.autocomplete("item")
     @add_target.autocomplete("item")
-    @add_maximize.autocomplete("item")
+    @toggle_maximize.autocomplete("item")
     async def items(self, interaction: Interaction, current: str) -> List[Choice[str]]:
         return choices(item_names, current)
 
@@ -187,7 +190,7 @@ class Satisfy(Cog):
     @reset.error
     @add_input.error
     @add_target.error
-    @add_maximize.error
+    @toggle_maximize.error
     @add_booster.error
     @recipe_bank.error
     @include_recipe.error
