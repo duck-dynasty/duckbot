@@ -72,6 +72,15 @@ async def test_toggle_maximize_removes_already_maximized_item(clazz, context, de
     assert clazz.factory(context) == default_factory
 
 
+async def test_toggle_maximize_removes_toggled_only(clazz, context, default_factory):
+    await clazz.toggle_maximize.callback(clazz, context, str(Item.IronOre))
+    await clazz.toggle_maximize.callback(clazz, context, str(Item.IronIngot))
+    await clazz.toggle_maximize.callback(clazz, context, str(Item.CopperOre))
+    await clazz.toggle_maximize.callback(clazz, context, str(Item.IronIngot))
+    default_factory.maximize = {Item.IronOre, Item.CopperOre}
+    assert clazz.factory(context) == default_factory
+
+
 async def test_add_booster_power_shard(clazz, context, default_factory):
     await clazz.add_booster.callback(clazz, context, str(Item.PowerShard), 10)
     default_factory.power_shards = 10
