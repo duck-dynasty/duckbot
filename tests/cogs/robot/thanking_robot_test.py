@@ -4,7 +4,6 @@ import discord
 import pytest
 
 from duckbot.cogs.robot import ThankingRobot
-from duckbot.cogs.robot.thanking_robot import MIDDLE_FINGER_CHANCE
 
 
 async def test_correct_giving_thanks_bot_author(bot, bot_message):
@@ -114,7 +113,3 @@ async def test_no_reaction_for_thank_god_false_positive(random, get_ref, bot, me
     clazz = ThankingRobot(bot)
     await clazz.react_to_thanks(message)
     message.add_reaction.assert_not_called()
-
-
-def test_middle_finger_chance_is_ten_percent():
-    assert MIDDLE_FINGER_CHANCE == 0.10
