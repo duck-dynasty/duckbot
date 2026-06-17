@@ -1,7 +1,7 @@
 import os
 
-import anthropic
 import discord
+import groq
 from discord.ext import commands
 
 from duckbot.util.messages import get_message_reference, try_delete
@@ -52,7 +52,7 @@ class Truth(commands.Cog):
     @property
     def ai_client(self):
         if self._ai_client is None:
-            self._ai_client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
+            self._ai_client = groq.Groq(api_key=os.getenv("GROQ_API_KEY"))
         return self._ai_client
 
     @commands.command(name="truth")
@@ -72,7 +72,7 @@ class Truth(commands.Cog):
             # Use the message's edited timestamp if it exists, otherwise use created timestamp
             message_date = message.edited_at if message.edited_at else message.created_at
             prompt = TRUTH_PROMPT.format(user_name=message.author.display_name, user_message=content, date=message_date.strftime("%B %d, %Y"))
-            message = self.ai_client.messages.create(model="claude-sonnet-4-20250514", max_tokens=1000, temperature=0, messages=[{"role": "user", "content": [{"type": "text", "text": prompt}]}])
-            return message.content[0].text
+            completion = self.ai_client.chat.completions.create(model="llama-3.3-70b-versatile", max_tokens=1000, temperature=0, messages=[{"role": "user", "content": prompt}])
+            return completion.choices[0].message.content
         except Exception as e:
             return f"The robot uprising has been postponed due to the following error: {e}"

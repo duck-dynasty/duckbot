@@ -65,7 +65,7 @@ DuckBot can provide information about Pokémon, because that matters. The comman
 
 ## Truth
 
-DuckBot will use the power of AI to analyze claims in a referenced message and provides a formatted response indicating whether claims are confirmed, disputed, or unverified. Fact-checks are done by using Claude AI (via Anthropic's API).
+DuckBot will use the power of AI to analyze claims in a referenced message and provides a formatted response indicating whether claims are confirmed, disputed, or unverified. Fact-checks are done by using Llama (via Groq's API).
 
 Usage Instructions:
 
