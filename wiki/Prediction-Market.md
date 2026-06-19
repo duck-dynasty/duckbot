@@ -15,10 +15,10 @@ After a market closes, anyone can propose the outcome; if nobody disputes it wit
 
 |                 Command                  | Summary                                           |
 | :--------------------------------------: | ------------------------------------------------- |
-|                `/balance`                | show your coins, locked bonds, and open positions |
-|                 `/claim`                 | claim the need-based top-up if you're broke       |
-|              `/leaderboard`              | current-season standings by net worth             |
-|                `/season`                 | show the active season and your rank              |
+|            `/market balance`             | show your coins, locked bonds, and open positions |
+|             `/market claim`              | claim the need-based top-up if you're broke       |
+|          `/market leaderboard`           | current-season standings by net worth             |
+|             `/market season`             | show the active season and your rank              |
 |  [`/market create`](#creating-a-market)  | open a new YES/NO market                          |
 |         `/market list [status]`          | list markets and their current YES %              |
 |              `/market show`              | show one market and your position in it           |
@@ -37,10 +37,10 @@ Everyone starts each **season** with **10,000 coins**. A season lasts about six 
 
 - Coins are always **whole numbers**. (Share counts can be fractional under the hood — that's the market's internal accounting — but you bet and get paid in whole coins.)
 - Coins are spent placing bets and posting bonds, and earned when your bets pay out.
-- If you go broke (under 1,000 coins) **and** hold no open positions, `/claim` tops you back up to 2,000 coins, once per week. It's the only faucet, so balances still track skill within a season.
+- If you go broke (under 1,000 coins) **and** hold no open positions, `/market claim` tops you back up to 2,000 coins, once per week. It's the only faucet, so balances still track skill within a season.
 - At season end there's a 7-day grace period for open markets to resolve, then balances reset and the final standings are recorded in a hall of fame.
 
-Use `/balance` to see your coins and positions, `/leaderboard` for the standings (ranked by net worth = coins + the live value of your open positions), and `/season` for how much time is left and where you rank.
+Use `/market balance` to see your coins and positions, `/market leaderboard` for the standings (ranked by net worth = coins + the live value of your open positions), and `/market season` for how much time is left and where you rank.
 
 ## How prices work
 

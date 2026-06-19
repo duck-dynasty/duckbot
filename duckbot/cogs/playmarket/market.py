@@ -85,9 +85,15 @@ class PlayMarket(commands.Cog):
             self.settle_season_if_due(session)
             session.commit()
 
+    # --- command group ----------------------------------------------------
+
+    @commands.hybrid_group(name="market", invoke_without_command=True)
+    async def market_group(self, context: commands.Context, status: Optional[str] = None):
+        await self.list_markets(context, status)
+
     # --- economy commands -------------------------------------------------
 
-    @commands.hybrid_command(name="balance", description="Show your coins, locked bonds, and open positions.")
+    @market_group.command(name="balance", description="Show your coins, locked bonds, and open positions.")
     async def balance_command(self, context: commands.Context):
         await self.balance(context)
 
@@ -101,7 +107,7 @@ class PlayMarket(commands.Cog):
             lines += [f"• market {p.market_id}: {_coins(p.yes_shares)} YES / {_coins(p.no_shares)} NO" for p in positions if p.yes_shares or p.no_shares]
         await context.send("\n".join(lines))
 
-    @commands.hybrid_command(name="claim", description="Claim the need-based top-up if you are broke and have no open positions.")
+    @market_group.command(name="claim", description="Claim the need-based top-up if you are broke and have no open positions.")
     async def claim_command(self, context: commands.Context):
         await self.claim(context)
 
@@ -121,7 +127,7 @@ class PlayMarket(commands.Cog):
             session.commit()
             await context.send(f"Topped up to {_coins(account.balance)} coins. Bet wisely.")
 
-    @commands.hybrid_command(name="leaderboard", description="Current-season standings by net worth.")
+    @market_group.command(name="leaderboard", description="Current-season standings by net worth.")
     async def leaderboard_command(self, context: commands.Context):
         await self.leaderboard(context)
 
@@ -134,7 +140,7 @@ class PlayMarket(commands.Cog):
         lines = [f"{i}. {self._name(context, uid)} — {_coins(worth)} coins" for i, (uid, worth) in enumerate(ranked, start=1)]
         await context.send("**Leaderboard**\n" + "\n".join(lines))
 
-    @commands.hybrid_command(name="season", description="Show the active season and your rank.")
+    @market_group.command(name="season", description="Show the active season and your rank.")
     async def season_command(self, context: commands.Context):
         await self.season(context)
 
@@ -149,10 +155,6 @@ class PlayMarket(commands.Cog):
         await context.send(f"**{season.name}** ({status}). Your rank: {rank or 'unranked'} of {len(ranked)}.")
 
     # --- market commands --------------------------------------------------
-
-    @commands.hybrid_group(name="market", invoke_without_command=True)
-    async def market_group(self, context: commands.Context, status: Optional[str] = None):
-        await self.list_markets(context, status)
 
     @market_group.command(name="list", description="List markets with their current YES %.")
     async def list_command(self, context: commands.Context, status: Optional[str] = None):
