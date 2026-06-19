@@ -1,19 +1,22 @@
-"""Tunable game constants. Everything that decides "feel" lives here, not scattered in code."""
+"""Tunable game constants. Everything that decides "feel" lives here, not scattered in code.
+
+Coins are whole integers. The economy is scaled up (a 10,000-coin start) so the market
+maker's unavoidable fractional results round to whole coins with negligible loss.
+"""
 
 from datetime import timedelta
-from decimal import Decimal
 
-STARTING_BALANCE = Decimal(1000)  # granted each season
+STARTING_BALANCE = 10_000  # granted each season
 SEASON_LENGTH = timedelta(days=182)  # ~6 months; only used when auto-creating the next season
 SETTLEMENT_GRACE = timedelta(days=7)  # window after a season ends for open markets to resolve
 
-TOPUP_THRESHOLD = Decimal(100)  # may claim only when balance is below this
-TOPUP_TARGET = Decimal(200)  # claiming tops balance up to this
+TOPUP_THRESHOLD = 1_000  # may claim only when balance is below this
+TOPUP_TARGET = 2_000  # claiming tops balance up to this
 TOPUP_COOLDOWN = timedelta(days=7)
 
-MIN_BET = Decimal(1)
-PROPOSE_BOND = Decimal(50)
-DISPUTE_BOND = Decimal(50)
+MIN_BET = 10
+PROPOSE_BOND = 500
+DISPUTE_BOND = 500
 DISPUTE_WINDOW = timedelta(hours=24)
 
-LIQUIDITY = {"low": 50.0, "med": 100.0, "high": 200.0}  # creator's choice of `b`
+LIQUIDITY = {"low": 500, "med": 1_000, "high": 2_000}  # creator's choice of `b`

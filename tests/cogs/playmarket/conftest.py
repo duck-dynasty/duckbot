@@ -143,7 +143,7 @@ def reconciles(db):
 
 def set_balance(db, user_id, amount):
     with db.session(PlayerAccount) as session:
-        session.get(PlayerAccount, user_id).balance = Decimal(amount)
+        session.get(PlayerAccount, user_id).balance = int(amount)
         session.commit()
 
 

@@ -1,3 +1,4 @@
+import math
 import re
 from datetime import datetime, timedelta
 from decimal import ROUND_DOWN, Decimal
@@ -24,8 +25,13 @@ TRADING = ("OPEN", "CLOSED", "PROPOSED", "DISPUTED")  # market is live; position
 
 
 def _down(value: float) -> Decimal:
-    """Quantise to storage precision, rounding toward the house so solvency always holds."""
+    """Quantise a share count to storage precision, rounding down so solvency always holds."""
     return Decimal(str(value)).quantize(CENT, rounding=ROUND_DOWN)
+
+
+def _whole(value) -> int:
+    """Floor a coin amount to a whole coin; the house keeps the fraction, preserving solvency."""
+    return math.floor(value)
 
 
 def parse_when(text: str) -> Optional[datetime]:
@@ -195,32 +201,32 @@ class PlayMarket(commands.Cog):
             if close_at > season.ends_at:
                 return await context.send(f"Markets must close before the season ends ({_when(season.ends_at)}).")
             self.account(session, season.id, context.author.id)  # ensure creator has an account
-            market = Market(season_id=season.id, creator_id=context.author.id, question=question, rules=rules, b=Decimal(str(b)), subsidy=_down(lmsr.subsidy(b)), close_at=close_at)
+            market = Market(season_id=season.id, creator_id=context.author.id, question=question, rules=rules, b=b, subsidy=_whole(lmsr.subsidy(b)), close_at=close_at)
             session.add(market)
             session.commit()
             await context.send(f"Market **{market.id}** open: _{question}_ — YES 50%. Closes {_when(close_at)}.")
 
     @market_group.command(name="quote", description="Preview a bet without placing it.")
-    async def quote_command(self, context: commands.Context, market_id: int, side: Literal["yes", "no"], amount: float):
+    async def quote_command(self, context: commands.Context, market_id: int, side: Literal["yes", "no"], amount: int):
         await self.quote(context, market_id, side, amount)
 
-    async def quote(self, context: commands.Context, market_id: int, side: str, amount: float):
+    async def quote(self, context: commands.Context, market_id: int, side: str, amount: int):
         with self.db.session(Market) as session:
             market = session.get(Market, market_id)
         if market is None or market.status != "OPEN":
             return await context.send("That market is not open for trading.")
         shares = lmsr.shares_for_budget(float(market.q_yes), float(market.q_no), float(market.b), side, amount)
         after = self._price_after(market, side, _down(shares))
-        await context.send(f"{_coins(Decimal(str(amount)))} coins buys ~{_coins(_down(shares))} {side.upper()} shares; YES would move to {_pct(after)}.")
+        await context.send(f"{_coins(amount)} coins buys ~{_coins(_down(shares))} {side.upper()} shares; YES would move to {_pct(after)}.")
 
     @market_group.command(name="bet", description="Buy YES/NO shares for a coin budget.")
-    async def bet_command(self, context: commands.Context, market_id: int, side: Literal["yes", "no"], amount: float):
+    async def bet_command(self, context: commands.Context, market_id: int, side: Literal["yes", "no"], amount: int):
         await self.bet(context, market_id, side, amount)
 
-    async def bet(self, context: commands.Context, market_id: int, side: str, amount: float):
-        cost = Decimal(str(amount))
+    async def bet(self, context: commands.Context, market_id: int, side: str, amount: int):
+        cost = int(amount)
         if cost < config.MIN_BET:
-            return await context.send(f"Minimum bet is {_coins(config.MIN_BET)} coin.")
+            return await context.send(f"Minimum bet is {_coins(config.MIN_BET)} coins.")
         with self.db.session(Market) as session:
             market = self._lock_market(session, market_id)
             if market is None:
@@ -356,8 +362,8 @@ class PlayMarket(commands.Cog):
         season.status = "archived"
         next_season = self._new_season(session)
         for account in accounts:
-            account.balance = Decimal(0)
-            account.locked = Decimal(0)
+            account.balance = 0
+            account.locked = 0
             self._credit(session, next_season.id, account, None, config.STARTING_BALANCE, "season_grant")
 
     def _new_season(self, session) -> Season:
@@ -384,7 +390,7 @@ class PlayMarket(commands.Cog):
         """Fetch the player's account (locked for update), granting the season's starting balance on first sight."""
         account = self._lock_account(session, user_id)
         if account is None:
-            account = PlayerAccount(id=user_id, balance=Decimal(0), locked=Decimal(0))
+            account = PlayerAccount(id=user_id, balance=0, locked=0)
             session.add(account)
             self._credit(session, season_id, account, None, config.STARTING_BALANCE, "season_grant")
         return account
@@ -428,10 +434,12 @@ class PlayMarket(commands.Cog):
         market.status = "VOID" if outcome == "void" else "RESOLVED"
         market.outcome = outcome
 
-    def _payout(self, position, outcome) -> Decimal:
+    def _payout(self, position, outcome) -> int:
         if outcome == "void":
-            return _down((position.yes_shares + position.no_shares) / 2)
-        return position.yes_shares if outcome == "yes" else position.no_shares
+            shares = (position.yes_shares + position.no_shares) / 2
+        else:
+            shares = position.yes_shares if outcome == "yes" else position.no_shares
+        return _whole(shares)
 
     def _add_shares(self, session, market, user_id, side, delta):
         position = session.get(Position, (user_id, market.id)) or Position(user_id=user_id, market_id=market.id, yes_shares=Decimal(0), no_shares=Decimal(0))
@@ -447,7 +455,7 @@ class PlayMarket(commands.Cog):
         before = lmsr.cost(float(market.q_yes), float(market.q_no), float(market.b))
         q_yes = float(market.q_yes) - (float(amount) if side == "yes" else 0)
         q_no = float(market.q_no) - (float(amount) if side == "no" else 0)
-        return _down(before - lmsr.cost(q_yes, q_no, float(market.b)))
+        return _whole(before - lmsr.cost(q_yes, q_no, float(market.b)))
 
     # --- read helpers -----------------------------------------------------
 

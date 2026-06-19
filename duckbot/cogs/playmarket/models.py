@@ -32,15 +32,15 @@ class Season(Base):
     starts_at = Column(DateTime(timezone=True), nullable=False)
     ends_at = Column(DateTime(timezone=True), nullable=False)  # the season's length lives here, not in code
     status = Column(String, nullable=False, default="active")  # active|settling|archived
-    starting_balance = Column(Numeric(20, 6), nullable=False, default=1000)
+    starting_balance = Column(BigInteger, nullable=False, default=10000)
 
 
 class PlayerAccount(Base):
     __tablename__ = "pm_users"
 
     id = Column(BigInteger, primary_key=True)  # discord user id
-    balance = Column(Numeric(20, 6), nullable=False, default=0)
-    locked = Column(Numeric(20, 6), nullable=False, default=0)  # bonds in flight
+    balance = Column(BigInteger, nullable=False, default=0)
+    locked = Column(BigInteger, nullable=False, default=0)  # bonds in flight
     last_topup_at = Column(DateTime(timezone=True), nullable=True)
 
 
@@ -52,9 +52,9 @@ class Market(Base):
     creator_id = Column(BigInteger, ForeignKey("pm_users.id"), nullable=False)
     question = Column(String, nullable=False)
     rules = Column(String, nullable=False)  # the fine print that decides payout
-    b = Column(Numeric(12, 4), nullable=False)  # liquidity parameter
-    subsidy = Column(Numeric(20, 6), nullable=False)  # = b*ln(2), funded by the house
-    q_yes = Column(Numeric(20, 6), nullable=False, default=0)
+    b = Column(BigInteger, nullable=False)  # liquidity parameter (in coins)
+    subsidy = Column(BigInteger, nullable=False)  # = floor(b*ln(2)), funded by the house
+    q_yes = Column(Numeric(20, 6), nullable=False, default=0)  # shares, kept fractional for the LMSR math
     q_no = Column(Numeric(20, 6), nullable=False, default=0)
     status = Column(String, nullable=False, default="OPEN")  # OPEN|CLOSED|PROPOSED|DISPUTED|RESOLVED|VOID
     outcome = Column(String, nullable=True)  # yes|no|void once resolved
@@ -78,9 +78,9 @@ class Proposal(Base):
     market_id = Column(BigInteger, ForeignKey("pm_markets.id"), nullable=False)
     proposer_id = Column(BigInteger, ForeignKey("pm_users.id"), nullable=False)
     proposed = Column(String, nullable=False)  # yes|no
-    bond = Column(Numeric(20, 6), nullable=False)
+    bond = Column(BigInteger, nullable=False)
     disputer_id = Column(BigInteger, ForeignKey("pm_users.id"), nullable=True)
-    dispute_bond = Column(Numeric(20, 6), nullable=True)
+    dispute_bond = Column(BigInteger, nullable=True)
     resolver_id = Column(BigInteger, nullable=True)  # admin who broke a dispute
     window_ends = Column(DateTime(timezone=True), nullable=False)
     status = Column(String, nullable=False, default="pending")  # pending|disputed|accepted|settled
@@ -91,7 +91,7 @@ class SeasonResult(Base):
 
     season_id = Column(BigInteger, ForeignKey("pm_seasons.id"), primary_key=True)
     user_id = Column(BigInteger, ForeignKey("pm_users.id"), primary_key=True)
-    final_balance = Column(Numeric(20, 6), nullable=False)
+    final_balance = Column(BigInteger, nullable=False)
     rank = Column(Integer, nullable=False)
 
 
@@ -102,6 +102,6 @@ class LedgerEntry(Base):
     season_id = Column(BigInteger, ForeignKey("pm_seasons.id"), nullable=False)
     user_id = Column(BigInteger, ForeignKey("pm_users.id"), nullable=False)
     market_id = Column(BigInteger, ForeignKey("pm_markets.id"), nullable=True)  # null for grants/top-ups
-    delta = Column(Numeric(20, 6), nullable=False)
+    delta = Column(BigInteger, nullable=False)  # whole coins, +/-
     reason = Column(String, nullable=False)  # season_grant|bet|sell|payout|refund|bond|bond_win|topup
     created_at = Column(DateTime(timezone=True), default=_now)

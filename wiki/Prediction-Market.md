@@ -6,8 +6,8 @@ Prices are set by an automated market maker (an LMSR — see [How prices work](#
 
 > Human: /market create question:"Will it rain Saturday?" rules:"Per the NWS forecast at 6pm Friday" closes:"in 2 days"\
 > DuckBot: Market **7** open: _Will it rain Saturday?_ — YES 50%. Closes 2025-07-01 18:00.\
-> Human: /market bet market_id:7 side:yes amount:50\
-> DuckBot: Bought 83 YES shares for 50 coins. YES is now 70%.
+> Human: /market bet market_id:7 side:yes amount:500\
+> DuckBot: Bought 832 YES shares for 500 coins. YES is now 70%.
 
 After a market closes, anyone can propose the outcome; if nobody disputes it within 24 hours, it resolves and winners get paid.
 
@@ -33,10 +33,11 @@ Every command works as both a slash command (`/market bet`) and a prefix command
 
 ## Coins and seasons
 
-Everyone starts each **season** with **1,000 coins**. A season lasts about six months, after which balances reset and a fresh leaderboard begins — so a cold streak is never permanent and everyone re-levels.
+Everyone starts each **season** with **10,000 coins**. A season lasts about six months, after which balances reset and a fresh leaderboard begins — so a cold streak is never permanent and everyone re-levels.
 
+- Coins are always **whole numbers**. (Share counts can be fractional under the hood — that's the market's internal accounting — but you bet and get paid in whole coins.)
 - Coins are spent placing bets and posting bonds, and earned when your bets pay out.
-- If you go broke (under 100 coins) **and** hold no open positions, `/claim` tops you back up to 200 coins, once per week. It's the only faucet, so balances still track skill within a season.
+- If you go broke (under 1,000 coins) **and** hold no open positions, `/claim` tops you back up to 2,000 coins, once per week. It's the only faucet, so balances still track skill within a season.
 - At season end there's a 7-day grace period for open markets to resolve, then balances reset and the final standings are recorded in a hall of fame.
 
 Use `/balance` to see your coins and positions, `/leaderboard` for the standings (ranked by net worth = coins + the live value of your open positions), and `/season` for how much time is left and where you rank.
@@ -70,7 +71,7 @@ A brand-new market has no shares on either side, so YES starts at exactly **50%*
 
 ### Buying and selling
 
-A trade costs the **change** in the cost function. Buying YES shares pushes the YES price up; selling them (or buying NO) pushes it back down. Because you say "bet 50 coins" rather than picking a share count, DuckBot inverts the cost function to work out how many shares 50 coins buys at the current odds — exactly, with no guessing.
+A trade costs the **change** in the cost function. Buying YES shares pushes the YES price up; selling them (or buying NO) pushes it back down. Because you say "bet 500 coins" rather than picking a share count, DuckBot inverts the cost function to work out how many shares 500 coins buys at the current odds — exactly, with no guessing.
 
 You can sell any shares you hold back to the market at any time before it closes, locking in a gain or cutting a loss. You can't sell shares you don't own; to bet the other way, buy the opposite side.
 
@@ -82,14 +83,14 @@ When a market is created, the house (the bot) pre-funds it with a **subsidy** eq
 subsidy = b · ln(2)
 ```
 
-That's about 35 coins for a low-liquidity market, 69 for medium, 139 for high. It can be shown that the pool of coins collected always covers the winning payout, no matter how lopsided the betting gets — so DuckBot can never owe coins it can't pay. Market creation is therefore free and risk-free: anyone can open one.
+That's about 346 coins for a low-liquidity market, 693 for medium, 1,386 for high. It can be shown that the pool of coins collected always covers the winning payout, no matter how lopsided the betting gets — so DuckBot can never owe coins it can't pay. Market creation is therefore free and risk-free: anyone can open one.
 
 ### A worked example
 
 > Start: YES is 50%.\
-> **Alice bets 50 coins on YES.** She gets ~83 shares; YES jumps to ~70%.\
-> **Bob thinks that's too high and bets 50 coins on NO.** He gets ~114 shares; YES falls to ~42%.\
-> **The market resolves YES.** Alice's 83 shares pay 83 coins (a +33 profit on her 50). Bob's NO shares pay nothing (−50). The house comes out slightly ahead.
+> **Alice bets 500 coins on YES.** She gets ~832 shares; YES jumps to ~70%.\
+> **Bob thinks that's too high and bets 500 coins on NO.** He gets ~1,144 shares; YES falls to ~42%.\
+> **The market resolves YES.** Alice's ~832 shares pay 831 coins (a +331 profit on her 500). Bob's NO shares pay nothing (−500). The house comes out slightly ahead.
 
 ## Creating a market
 
@@ -105,11 +106,11 @@ That's about 35 coins for a low-liquidity market, 69 for medium, 139 for high. I
 
 - **liquidity** — how deep the market is (defaults to `med`):
 
-  | Tier   | `b` | Price sensitivity       | House subsidy |
-  | ------ | --- | ----------------------- | ------------- |
-  | `low`  | 50  | swings hard per bet     | ~35 coins     |
-  | `med`  | 100 | a ~60-coin bet ≈ 20 pts | ~69 coins     |
-  | `high` | 200 | barely budges per bet   | ~139 coins    |
+  | Tier   | `b`   | Price sensitivity        | House subsidy |
+  | ------ | ----- | ------------------------ | ------------- |
+  | `low`  | 500   | swings hard per bet      | ~346 coins    |
+  | `med`  | 1,000 | a ~600-coin bet ≈ 20 pts | ~693 coins    |
+  | `high` | 2,000 | barely budges per bet    | ~1,386 coins  |
 
 Anyone can create a market; the house funds the subsidy, so it costs you nothing.
 
@@ -125,7 +126,7 @@ Anyone can create a market; the house funds the subsidy, so it costs you nothing
 - **bet** spends `amount` coins buying shares of the side you pick, at the live price.
 - **sell** returns shares to the market for coins. Pass `all` to dump your whole position on that side.
 
-The minimum bet is 1 coin. You can only trade while a market is **open** (before its close time).
+The minimum bet is 10 coins. You can only trade while a market is **open** (before its close time).
 
 ## Resolving a market
 
@@ -137,9 +138,9 @@ Once a market passes its close time it stops trading and waits to be resolved. R
 /market resolve market_id:<n> outcome:<yes|no|void>   ← admins only
 ```
 
-1. **Propose** — anyone calls `/market propose` with the outcome and posts a **50-coin bond**. The market enters a 24-hour dispute window.
+1. **Propose** — anyone calls `/market propose` with the outcome and posts a **500-coin bond**. The market enters a 24-hour dispute window.
 1. **Undisputed** — if nobody disputes within 24 hours, the outcome is accepted, the proposer gets their bond back, and winners are paid (1 coin per winning share).
-1. **Dispute** — if someone thinks the proposal is wrong, they call `/market dispute` and post a matching 50-coin bond. The market is now **disputed** and needs an admin.
+1. **Dispute** — if someone thinks the proposal is wrong, they call `/market dispute` and post a matching 500-coin bond. The market is now **disputed** and needs an admin.
 1. **Admin ruling** — an admin (the bot owner, or anyone with **Manage Server**) calls `/market resolve` with the true outcome. The side that was right gets their bond back **plus** the other's bond; the side that was wrong forfeits theirs. Then winners are paid.
 
 **Void.** If a question becomes unanswerable, an admin can resolve it `void`: every share — YES and NO — redeems at 0.5 coins, and all bonds are returned. Nobody wins, nobody gets robbed.
@@ -148,13 +149,13 @@ Holders of winning positions are motivated to propose so they get paid, so marke
 
 ## Economy at a glance
 
-| Thing                  | Value                                                |
-| ---------------------- | ---------------------------------------------------- |
-| Starting balance       | 1,000 coins per season                               |
-| Season length          | ~6 months, then balances reset                       |
-| Need-based top-up      | under 100 coins & no positions → back to 200, weekly |
-| Minimum bet            | 1 coin                                               |
-| Propose / dispute bond | 50 coins each                                        |
-| Dispute window         | 24 hours                                             |
-| Trading fee            | 0% — the house funds the markets                     |
-| Liquidity tiers        | low `b=50`, med `b=100`, high `b=200`                |
+| Thing                  | Value                                                    |
+| ---------------------- | -------------------------------------------------------- |
+| Starting balance       | 10,000 coins per season                                  |
+| Season length          | ~6 months, then balances reset                           |
+| Need-based top-up      | under 1,000 coins & no positions → back to 2,000, weekly |
+| Minimum bet            | 10 coins                                                 |
+| Propose / dispute bond | 500 coins each                                           |
+| Dispute window         | 24 hours                                                 |
+| Trading fee            | 0% — the house funds the markets                         |
+| Liquidity tiers        | low `b=500`, med `b=1,000`, high `b=2,000`               |
