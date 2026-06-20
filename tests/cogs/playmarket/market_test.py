@@ -1,23 +1,117 @@
+import datetime
 import math
 from unittest import mock
 
 import pytest
 
 from duckbot.cogs.playmarket import config
-from duckbot.cogs.playmarket.models import Season, SeasonResult
-from tests.cogs.playmarket.conftest import (
-    account,
-    ledger,
-    make_context,
-    market_row,
-    open_market,
-    position,
-    reconciles,
-    set_balance,
+from duckbot.cogs.playmarket.market import PlayMarket
+from duckbot.cogs.playmarket.models import (
+    LedgerEntry,
+    Market,
+    PlayerAccount,
+    Position,
+    Season,
+    SeasonResult,
 )
 
 BET = 500
 STARTING = config.STARTING_BALANCE
+
+
+class Clock:
+    """A movable replacement for now()."""
+
+    def __init__(self):
+        self.t = datetime.datetime(2024, 1, 1, 12, 0)
+
+    def __call__(self):
+        return self.t
+
+    def advance(self, **kwargs):
+        self.t += datetime.timedelta(**kwargs)
+        return self.t
+
+
+@pytest.fixture
+def clock():
+    movable = Clock()
+    with mock.patch("duckbot.cogs.playmarket.market.now", side_effect=movable):
+        yield movable
+
+
+@pytest.fixture
+def cog(bot, in_memory_db, clock):
+    market = PlayMarket(bot, in_memory_db)
+    market.tick_loop.cancel()  # don't run the loop mid-test
+    return market
+
+
+def make_context(user_id):
+    ctx = mock.Mock()
+    ctx.author = mock.Mock(id=user_id, display_name=f"user{user_id}")
+    ctx.guild.get_member = lambda uid: mock.Mock(id=uid, display_name=f"user{uid}")
+    ctx.send = mock.AsyncMock()
+    ctx.bot.is_owner = mock.AsyncMock(return_value=False)
+    return ctx
+
+
+@pytest.fixture
+def alice():
+    return make_context(1)
+
+
+@pytest.fixture
+def bob():
+    return make_context(2)
+
+
+@pytest.fixture
+def carol():
+    return make_context(3)
+
+
+def account(in_memory_db, user_id):
+    with in_memory_db.session(PlayerAccount) as session:
+        return session.get(PlayerAccount, user_id)
+
+
+def market_row(in_memory_db, market_id):
+    with in_memory_db.session(Market) as session:
+        return session.get(Market, market_id)
+
+
+def position(in_memory_db, user_id, market_id):
+    with in_memory_db.session(Position) as session:
+        return session.get(Position, (user_id, market_id))
+
+
+def ledger(in_memory_db, user_id):
+    with in_memory_db.session(LedgerEntry) as session:
+        return session.query(LedgerEntry).filter_by(user_id=user_id).all()
+
+
+def reconciles(in_memory_db):
+    """Each player's balance equals their ledger sum."""
+    with in_memory_db.session(PlayerAccount) as session:
+        for player in session.query(PlayerAccount).all():
+            total = sum((e.delta for e in session.query(LedgerEntry).filter_by(user_id=player.id).all()), 0)
+            if player.balance != total:
+                return False
+    return True
+
+
+def set_balance(in_memory_db, user_id, amount):
+    with in_memory_db.session(PlayerAccount) as session:
+        session.get(PlayerAccount, user_id).balance = int(amount)
+        session.commit()
+
+
+async def open_market(cog, ctx, liquidity="med"):
+    """Create a market and return its id."""
+    await cog.create(ctx, "Will it happen?", "official ruling", liquidity)
+    with cog.db.session(Market) as session:
+        return session.query(Market).order_by(Market.id.desc()).first().id
 
 
 def reasons(in_memory_db, user_id):

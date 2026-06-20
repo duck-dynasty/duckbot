@@ -3,7 +3,15 @@ from types import SimpleNamespace
 
 import pytest
 
-from duckbot.cogs.playmarket.market import _coins, _down, _pct, _whole
+from duckbot.cogs.playmarket.market import PlayMarket, _coins, _down, _pct, _whole
+
+
+@pytest.fixture
+def cog(bot, db):
+    market = PlayMarket(bot, db)
+    market.tick_loop.cancel()
+    return market
+
 
 # --- payout mechanics ----------------------------------------------------
 
