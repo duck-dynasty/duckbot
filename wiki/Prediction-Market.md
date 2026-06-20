@@ -20,8 +20,7 @@ When the outcome is known, the market's creator resolves it and everyone's winni
 |          `/market leaderboard`           | current-season standings by net worth               |
 |  [`/market create`](#creating-a-market)  | open a new YES/NO market                            |
 |         `/market list [status]`          | list markets and their current YES %                |
-|              `/market show`              | show one market and your position in it             |
-|       [`/market quote`](#betting)        | preview a bet without placing it                    |
+|           `/market positions`            | list all your open bets                             |
 |        [`/market bet`](#betting)         | buy YES or NO shares for a coin budget              |
 |        [`/market sell`](#betting)        | sell shares back to the market                      |
 | [`/market resolve`](#resolving-a-market) | _(creator)_ resolve the market and pay everyone out |
@@ -112,14 +111,13 @@ Anyone can create a market; the house funds the subsidy, so it costs you nothing
 ## Betting
 
 ```
-/market quote market:<pick> side:<yes|no> amount:<coins>   ← preview only, no coins spent
-/market bet   market:<pick> side:<yes|no> amount:<coins>
-/market sell  market:<pick> side:<yes|no> shares:<number|all>
+/market bet  market:<pick> side:<yes|no> amount:<coins>
+/market sell market:<pick> side:<yes|no> shares:<number|all>
 ```
 
-- **quote** shows how many shares your budget buys and where the price would land — handy before committing.
 - **bet** spends `amount` coins buying shares of the side you pick, at the live price.
 - **sell** returns shares to the market for coins. Pass `all` to dump your whole position on that side.
+- **`/market positions`** lists all your open bets at a glance. **`/market list`** shows every open market and its current YES %.
 
 The `market` field autocompletes on slash commands — start typing and pick a market by its question, no need to look up its number first.
 

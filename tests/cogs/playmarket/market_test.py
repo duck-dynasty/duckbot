@@ -150,7 +150,7 @@ async def test_balance_lists_open_positions(cog, alice, in_memory_db):
     assert f"market {market_id}" in alice.send.call_args.args[0]
 
 
-# --- list & show ---------------------------------------------------------
+# --- list & positions ----------------------------------------------------
 
 
 async def test_list_says_so_when_there_are_no_markets(cog, alice):
@@ -164,22 +164,25 @@ async def test_list_shows_open_markets_with_their_price(cog, alice):
     assert f"**{market_id}**" in alice.send.call_args.args[0] and "YES 50%" in alice.send.call_args.args[0]
 
 
-async def test_show_reports_the_question_and_rules(cog, alice):
-    market_id = await open_market(cog, alice)
-    await cog.show(alice, market_id)
-    assert "official ruling" in alice.send.call_args.args[0]
+async def test_positions_says_so_when_you_hold_none(cog, alice):
+    await cog.positions(alice)
+    assert alice.send.call_args.args[0] == "You have no open positions."
 
 
-async def test_show_includes_your_position(cog, alice):
+async def test_positions_lists_your_open_bets(cog, alice):
     market_id = await open_market(cog, alice)
     await cog.bet(alice, market_id, "yes", BET)
-    await cog.show(alice, market_id)
-    assert "You hold 832 YES" in alice.send.call_args.args[0]
+    await cog.positions(alice)
+    message = alice.send.call_args.args[0]
+    assert f"**{market_id}**" in message and "832 YES" in message
 
 
-async def test_show_rejects_an_unknown_market(cog, alice):
-    await cog.show(alice, 999)
-    assert alice.send.call_args.args[0] == "No such market."
+async def test_positions_excludes_resolved_markets(cog, alice):
+    market_id = await open_market(cog, alice)
+    await cog.bet(alice, market_id, "yes", BET)
+    await cog.resolve(alice, market_id, "yes")
+    await cog.positions(alice)
+    assert alice.send.call_args.args[0] == "You have no open positions."
 
 
 # --- create --------------------------------------------------------------
@@ -271,34 +274,6 @@ async def test_bet_keeps_the_ledger_reconciled(cog, alice, bob, in_memory_db):
     await cog.bet(alice, market_id, "yes", BET)
     await cog.bet(bob, market_id, "no", 750)
     assert reconciles(in_memory_db)
-
-
-# --- quote ---------------------------------------------------------------
-
-
-async def test_quote_does_not_change_the_market(cog, alice, in_memory_db):
-    market_id = await open_market(cog, alice)
-    await cog.quote(alice, market_id, "yes", BET)
-    assert market_row(in_memory_db, market_id).q_yes == 0
-
-
-async def test_quote_does_not_create_an_account(cog, alice, bob, in_memory_db):
-    market_id = await open_market(cog, alice)
-    await cog.quote(bob, market_id, "yes", BET)
-    assert account(in_memory_db, 2) is None
-
-
-async def test_quote_reports_shares_and_resulting_price(cog, alice):
-    market_id = await open_market(cog, alice)
-    await cog.quote(alice, market_id, "yes", BET)
-    assert alice.send.call_args.args[0] == "500 coins buys ~832 YES shares; YES would move to 70%."
-
-
-async def test_quote_on_a_resolved_market_is_rejected(cog, alice):
-    market_id = await open_market(cog, alice)
-    await cog.resolve(alice, market_id, "yes")
-    await cog.quote(alice, market_id, "yes", BET)
-    assert alice.send.call_args.args[0] == "That market is not open for trading."
 
 
 # --- sell ----------------------------------------------------------------

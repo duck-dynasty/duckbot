@@ -120,18 +120,17 @@ class PlayMarket(commands.Cog):
             return await context.send("No markets. Start one with `/market create`.")
         await context.send("\n".join(self._summary(m) for m in markets))
 
-    @market_group.command(name="show", description="Show one market and your position in it.")
-    async def show_command(self, context: commands.Context, market: int):
-        await self.show(context, market)
+    @market_group.command(name="positions", description="List all your open positions.")
+    async def positions_command(self, context: commands.Context):
+        await self.positions(context)
 
-    async def show(self, context: commands.Context, market_id: int):
+    async def positions(self, context: commands.Context):
         with self.db.session(Market) as session:
-            market = session.get(Market, market_id)
-            if market is None:
-                return await context.send("No such market.")
-            position = session.get(Position, (context.author.id, market_id))
-            mine = f"\nYou hold {_coins(position.yes_shares)} YES / {_coins(position.no_shares)} NO." if position else ""
-        await context.send(f"{self._summary(market)}\n_{market.rules}_{mine}")
+            rows = session.query(Position, Market).join(Market, Position.market_id == Market.id).filter(Position.user_id == context.author.id, Market.status == "OPEN").order_by(Market.id.desc()).all()
+            lines = [f"**{m.id}** {m.question} — YES {_pct(self._price(m))} · you hold {_coins(p.yes_shares)} YES / {_coins(p.no_shares)} NO" for p, m in rows if p.yes_shares or p.no_shares]
+        if not lines:
+            return await context.send("You have no open positions.")
+        await context.send("\n".join(lines))
 
     @market_group.command(name="create", description="Create a YES/NO market you'll resolve yourself.")
     async def create_command(self, context: commands.Context, question: str, rules: str, liquidity: Literal["low", "med", "high"] = "med"):
@@ -148,19 +147,6 @@ class PlayMarket(commands.Cog):
             session.add(market)
             session.commit()
             await context.send(f"Market **{market.id}** open: _{question}_ — YES 50%. Resolve it with `/market resolve {market.id} <yes|no>` when you know the outcome.")
-
-    @market_group.command(name="quote", description="Preview a bet without placing it.")
-    async def quote_command(self, context: commands.Context, market: int, side: Literal["yes", "no"], amount: int):
-        await self.quote(context, market, side, amount)
-
-    async def quote(self, context: commands.Context, market_id: int, side: str, amount: int):
-        with self.db.session(Market) as session:
-            market = session.get(Market, market_id)
-        if market is None or market.status != "OPEN":
-            return await context.send("That market is not open for trading.")
-        shares = lmsr.shares_for_budget(float(market.q_yes), float(market.q_no), float(market.b), side, amount)
-        after = self._price_after(market, side, _down(shares))
-        await context.send(f"{_coins(amount)} coins buys ~{_coins(_down(shares))} {side.upper()} shares; YES would move to {_pct(after)}.")
 
     @market_group.command(name="bet", description="Buy YES/NO shares for a coin budget.")
     async def bet_command(self, context: commands.Context, market: int, side: Literal["yes", "no"], amount: int):
@@ -212,8 +198,6 @@ class PlayMarket(commands.Cog):
     async def resolve_command(self, context: commands.Context, market: int, outcome: Literal["yes", "no", "void"]):
         await self.resolve(context, market, outcome)
 
-    @show_command.autocomplete("market")
-    @quote_command.autocomplete("market")
     @bet_command.autocomplete("market")
     @sell_command.autocomplete("market")
     @resolve_command.autocomplete("market")
@@ -341,11 +325,6 @@ class PlayMarket(commands.Cog):
 
     def _price(self, market) -> float:
         return lmsr.price_yes(float(market.q_yes), float(market.q_no), float(market.b))
-
-    def _price_after(self, market, side, shares) -> float:
-        q_yes = float(market.q_yes) + (float(shares) if side == "yes" else 0)
-        q_no = float(market.q_no) + (float(shares) if side == "no" else 0)
-        return lmsr.price_yes(q_yes, q_no, float(market.b))
 
     def _summary(self, market) -> str:
         return f"**{market.id}** [{market.status}] {market.question} — YES {_pct(self._price(market))}"
