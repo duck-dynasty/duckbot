@@ -46,7 +46,6 @@ class Market(Base):
     season_id = Column(BigInteger, ForeignKey("pm_seasons.id"), nullable=False)
     creator_id = Column(BigInteger, ForeignKey("pm_users.id"), nullable=False)
     question = Column(String, nullable=False)
-    rules = Column(String, nullable=False)
     b = Column(BigInteger, nullable=False)  # liquidity parameter
     subsidy = Column(BigInteger, nullable=False)  # floor(b*ln(2))
     q_yes = Column(Numeric(20, 6), nullable=False, default=0)  # shares stay fractional

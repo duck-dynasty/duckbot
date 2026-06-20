@@ -39,7 +39,6 @@ def upgrade() -> None:
         sa.Column("season_id", sa.BigInteger(), sa.ForeignKey("pm_seasons.id"), nullable=False),
         sa.Column("creator_id", sa.BigInteger(), sa.ForeignKey("pm_users.id"), nullable=False),
         sa.Column("question", sa.String(), nullable=False),
-        sa.Column("rules", sa.String(), nullable=False),
         sa.Column("b", sa.BigInteger(), nullable=False),
         sa.Column("subsidy", sa.BigInteger(), nullable=False),
         sa.Column("q_yes", sa.Numeric(20, 6), nullable=False),

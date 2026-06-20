@@ -36,7 +36,7 @@ class PlayMarket(commands.Cog):
 
     # --- background season rollover ---------------------------------------
 
-    @tasks.loop(minutes=1)
+    @tasks.loop(hours=6)
     async def tick_loop(self):
         await self.tick()
 
@@ -133,17 +133,17 @@ class PlayMarket(commands.Cog):
         await context.send("\n".join(lines))
 
     @market_group.command(name="create", description="Create a YES/NO market you'll resolve yourself.")
-    async def create_command(self, context: commands.Context, question: str, rules: str, liquidity: Literal["low", "med", "high"] = "med"):
-        await self.create(context, question, rules, liquidity)
+    async def create_command(self, context: commands.Context, question: str, liquidity: Literal["low", "med", "high"] = "med"):
+        await self.create(context, question, liquidity)
 
-    async def create(self, context: commands.Context, question: str, rules: str, liquidity: str):
+    async def create(self, context: commands.Context, question: str, liquidity: str):
         b = config.LIQUIDITY[liquidity]
         with self.db.session(Season) as session:
             season = self.active_season(session)
             if season.status != "active":
                 return await context.send("Season's wrapping up, no new markets. Pump the brakes.")
             self.account(session, season.id, context.author.id)  # ensure creator has an account
-            market = Market(season_id=season.id, creator_id=context.author.id, question=question, rules=rules, b=b, subsidy=_whole(lmsr.subsidy(b)))
+            market = Market(season_id=season.id, creator_id=context.author.id, question=question, b=b, subsidy=_whole(lmsr.subsidy(b)))
             session.add(market)
             session.commit()
             await context.send(f"Market **{market.id}** is live: _{question}_ — YES 50%. Place your bets, degenerates.")

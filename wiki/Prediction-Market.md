@@ -4,7 +4,7 @@ Prices are set by an automated market maker (an LMSR — see [How prices work](#
 
 ## Quick start
 
-> Human: /market create question:"Will it rain Saturday?" rules:"Per the NWS forecast at 6pm Friday"\
+> Human: /market create question:"Will it rain Saturday?"\
 > DuckBot: Market **7** open: _Will it rain Saturday?_ — YES 50%. Resolve it with `/market resolve 7 <yes|no>` when you know the outcome.\
 > Human: /market bet market:7 side:yes amount:500\
 > DuckBot: Bought 832 YES shares for 500 coins. YES is now 70%.
@@ -91,12 +91,10 @@ That's about 346 coins for a low-liquidity market, 693 for medium, 1,386 for hig
 ## Creating a market
 
 ```
-/market create question:<text> rules:<text> liquidity:<low|med|high>
+/market create question:<text> liquidity:<low|med|high>
 ```
 
-- **question** — the YES/NO question, e.g. _"Will the deploy go out before Friday?"_
-
-- **rules** — the fine print that decides the payout. Be specific, since you (the creator) will resolve it later. e.g. _"YES if a release tag is pushed to main before 2025-07-04 00:00 UTC."_
+- **question** — the YES/NO question, e.g. _"Will the deploy go out before Friday?"_ Keep it clear; if the outcome's ever ambiguous, hash it out in chat.
 
 - **liquidity** — how deep the market is (defaults to `med`):
 

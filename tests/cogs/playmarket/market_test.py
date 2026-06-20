@@ -109,7 +109,7 @@ def set_balance(in_memory_db, user_id, amount):
 
 async def open_market(cog, ctx, liquidity="med"):
     """Create a market and return its id."""
-    await cog.create(ctx, "Will it happen?", "official ruling", liquidity)
+    await cog.create(ctx, "Will it happen?", liquidity)
     with cog.db.session(Market) as session:
         return session.query(Market).order_by(Market.id.desc()).first().id
 
@@ -195,7 +195,7 @@ async def test_create_opens_a_market_at_fifty_percent(cog, alice, in_memory_db):
 
 
 async def test_create_announces_the_new_market(cog, alice):
-    await cog.create(alice, "Rain?", "NWS call", "med")
+    await cog.create(alice, "Rain?", "med")
     assert "YES 50%" in alice.send.call_args.args[0]
 
 
@@ -210,7 +210,7 @@ async def test_create_sets_liquidity_and_subsidy_by_tier(cog, alice, in_memory_d
 async def test_create_is_blocked_once_the_season_is_settling(cog, alice, clock):
     await open_market(cog, alice)  # creates Season 1
     clock.advance(days=183)  # past the season end
-    await cog.create(alice, "Q", "rules", "med")
+    await cog.create(alice, "Q", "med")
     assert alice.send.call_args.args[0] == "Season's wrapping up, no new markets. Pump the brakes."
 
 
@@ -579,7 +579,7 @@ async def test_tick_loop_runs_a_tick(cog):
         ("leaderboard_command", (), "leaderboard"),
         ("list_command", (None,), "list_markets"),
         ("positions_command", (), "positions"),
-        ("create_command", ("q", "rules", "med"), "create"),
+        ("create_command", ("q", "med"), "create"),
         ("bet_command", (7, "yes", 50), "bet"),
         ("sell_command", (7, "yes", "all"), "sell"),
         ("resolve_command", (7, "yes"), "resolve"),
