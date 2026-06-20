@@ -143,14 +143,23 @@ async def test_balance_reports_coins(cog, alice):
     assert "10,000 coins" in alice.send.call_args.args[0]
 
 
-async def test_balance_lists_open_positions(cog, alice, in_memory_db):
+async def test_balance_lists_your_open_bets(cog, alice, in_memory_db):
     market_id = await open_market(cog, alice)
     await cog.bet(alice, market_id, "yes", BET)
     await cog.balance(alice)
-    assert f"market {market_id}" in alice.send.call_args.args[0]
+    message = alice.send.call_args.args[0]
+    assert f"**{market_id}**" in message and "832 YES" in message
 
 
-# --- list & positions ----------------------------------------------------
+async def test_balance_omits_resolved_bets(cog, alice, in_memory_db):
+    market_id = await open_market(cog, alice)
+    await cog.bet(alice, market_id, "yes", BET)
+    await cog.resolve(alice, market_id, "yes")
+    await cog.balance(alice)
+    assert f"**{market_id}**" not in alice.send.call_args.args[0]
+
+
+# --- list ----------------------------------------------------------------
 
 
 async def test_list_says_so_when_there_are_no_markets(cog, alice):
@@ -162,27 +171,6 @@ async def test_list_shows_open_markets_with_their_price(cog, alice):
     market_id = await open_market(cog, alice)
     await cog.list_markets(alice, None)
     assert f"**{market_id}**" in alice.send.call_args.args[0] and "YES 50%" in alice.send.call_args.args[0]
-
-
-async def test_positions_says_so_when_you_hold_none(cog, alice):
-    await cog.positions(alice)
-    assert alice.send.call_args.args[0] == "You've got no skin in the game, brother."
-
-
-async def test_positions_lists_your_open_bets(cog, alice):
-    market_id = await open_market(cog, alice)
-    await cog.bet(alice, market_id, "yes", BET)
-    await cog.positions(alice)
-    message = alice.send.call_args.args[0]
-    assert f"**{market_id}**" in message and "832 YES" in message
-
-
-async def test_positions_excludes_resolved_markets(cog, alice):
-    market_id = await open_market(cog, alice)
-    await cog.bet(alice, market_id, "yes", BET)
-    await cog.resolve(alice, market_id, "yes")
-    await cog.positions(alice)
-    assert alice.send.call_args.args[0] == "You've got no skin in the game, brother."
 
 
 # --- create --------------------------------------------------------------
@@ -578,7 +566,6 @@ async def test_tick_loop_runs_a_tick(cog):
         ("claim_command", (), "claim"),
         ("leaderboard_command", (), "leaderboard"),
         ("list_command", (None,), "list_markets"),
-        ("positions_command", (), "positions"),
         ("create_command", ("q", "med"), "create"),
         ("bet_command", (7, "yes", 50), "bet"),
         ("sell_command", (7, "yes", "all"), "sell"),

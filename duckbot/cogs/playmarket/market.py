@@ -67,10 +67,10 @@ class PlayMarket(commands.Cog):
         with self.db.session(Season) as session:
             season = self.active_season(session)
             account = self.account(session, season.id, context.author.id)
-            positions = session.query(Position).filter_by(user_id=account.id).all()
+            rows = session.query(Position, Market).join(Market, Position.market_id == Market.id).filter(Position.user_id == account.id, Market.status == "OPEN").order_by(Market.id.desc()).all()
             session.commit()
             lines = [f"**{self._name(context, account.id)}** — {_coins(account.balance)} coins"]
-            lines += [f"• market {p.market_id}: {_coins(p.yes_shares)} YES / {_coins(p.no_shares)} NO" for p in positions if p.yes_shares or p.no_shares]
+            lines += [f"**{m.id}** {m.question} — YES {_pct(self._price(m))} · you hold {_coins(p.yes_shares)} YES / {_coins(p.no_shares)} NO" for p, m in rows if p.yes_shares or p.no_shares]
         await context.send("\n".join(lines))
 
     @market_group.command(name="claim", description="Claim the need-based top-up if you are broke and have no open positions.")
@@ -119,18 +119,6 @@ class PlayMarket(commands.Cog):
         if not markets:
             return await context.send("No markets. What, you hate fun?")
         await context.send("\n".join(self._summary(m) for m in markets))
-
-    @market_group.command(name="positions", description="List all your open positions.")
-    async def positions_command(self, context: commands.Context):
-        await self.positions(context)
-
-    async def positions(self, context: commands.Context):
-        with self.db.session(Market) as session:
-            rows = session.query(Position, Market).join(Market, Position.market_id == Market.id).filter(Position.user_id == context.author.id, Market.status == "OPEN").order_by(Market.id.desc()).all()
-            lines = [f"**{m.id}** {m.question} — YES {_pct(self._price(m))} · you hold {_coins(p.yes_shares)} YES / {_coins(p.no_shares)} NO" for p, m in rows if p.yes_shares or p.no_shares]
-        if not lines:
-            return await context.send("You've got no skin in the game, brother.")
-        await context.send("\n".join(lines))
 
     @market_group.command(name="create", description="Create a YES/NO market you'll resolve yourself.")
     async def create_command(self, context: commands.Context, question: str, liquidity: Literal["low", "med", "high"] = "med"):
