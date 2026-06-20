@@ -82,16 +82,16 @@ class PlayMarket(commands.Cog):
             season = self.active_season(session)
             account = self.account(session, season.id, context.author.id)
             if account.balance >= config.TOPUP_THRESHOLD:
-                return await context.send(f"You only qualify when your balance is under {_coins(config.TOPUP_THRESHOLD)}.")
+                return await context.send("Quit begging, you're not even broke.")
             if session.query(Position).filter_by(user_id=account.id).filter((Position.yes_shares > 0) | (Position.no_shares > 0)).first():
-                return await context.send("Sell or resolve your open positions before claiming.")
+                return await context.send("You've got open bets, brother. No charity for gamblers.")
             if account.last_topup_at and now() < account.last_topup_at + config.TOPUP_COOLDOWN:
-                return await context.send("You already claimed this week.")
+                return await context.send("Already milked that cow this week, greedy.")
             grant = config.TOPUP_TARGET - account.balance
             account.last_topup_at = now()
             self._credit(session, season.id, account, None, grant, "topup")
             session.commit()
-            await context.send(f"Topped up to {_coins(account.balance)} coins. Bet wisely.")
+            await context.send(f"Pity money granted. You're sitting on {_coins(account.balance)} coins now, you charity case.")
 
     @market_group.command(name="leaderboard", description="Current-season standings by net worth.")
     async def leaderboard_command(self, context: commands.Context):
@@ -102,7 +102,7 @@ class PlayMarket(commands.Cog):
             ranked = self._standings(session)
             session.commit()
         if not ranked:
-            return await context.send("Nobody has played yet.")
+            return await context.send("Nobody's played yet. Buncha cowards.")
         lines = [f"{i}. {self._name(context, uid)} — {_coins(worth)} coins" for i, (uid, worth) in enumerate(ranked, start=1)]
         await context.send("**Leaderboard**\n" + "\n".join(lines))
 
@@ -117,7 +117,7 @@ class PlayMarket(commands.Cog):
             query = session.query(Market).filter(Market.status == (status.upper() if status else "OPEN"))
             markets = query.order_by(Market.id.desc()).all()
         if not markets:
-            return await context.send("No markets. Start one with `/market create`.")
+            return await context.send("No markets. What, you hate fun?")
         await context.send("\n".join(self._summary(m) for m in markets))
 
     @market_group.command(name="positions", description="List all your open positions.")
@@ -129,7 +129,7 @@ class PlayMarket(commands.Cog):
             rows = session.query(Position, Market).join(Market, Position.market_id == Market.id).filter(Position.user_id == context.author.id, Market.status == "OPEN").order_by(Market.id.desc()).all()
             lines = [f"**{m.id}** {m.question} — YES {_pct(self._price(m))} · you hold {_coins(p.yes_shares)} YES / {_coins(p.no_shares)} NO" for p, m in rows if p.yes_shares or p.no_shares]
         if not lines:
-            return await context.send("You have no open positions.")
+            return await context.send("You've got no skin in the game, brother.")
         await context.send("\n".join(lines))
 
     @market_group.command(name="create", description="Create a YES/NO market you'll resolve yourself.")
@@ -141,12 +141,12 @@ class PlayMarket(commands.Cog):
         with self.db.session(Season) as session:
             season = self.active_season(session)
             if season.status != "active":
-                return await context.send("The season is wrapping up; no new markets right now.")
+                return await context.send("Season's wrapping up, no new markets. Pump the brakes.")
             self.account(session, season.id, context.author.id)  # ensure creator has an account
             market = Market(season_id=season.id, creator_id=context.author.id, question=question, rules=rules, b=b, subsidy=_whole(lmsr.subsidy(b)))
             session.add(market)
             session.commit()
-            await context.send(f"Market **{market.id}** open: _{question}_ — YES 50%. Resolve it with `/market resolve {market.id} <yes|no>` when you know the outcome.")
+            await context.send(f"Market **{market.id}** is live: _{question}_ — YES 50%. Place your bets, degenerates.")
 
     @market_group.command(name="bet", description="Buy YES/NO shares for a coin budget.")
     async def bet_command(self, context: commands.Context, market: int, side: Literal["yes", "no"], amount: int):
@@ -155,16 +155,16 @@ class PlayMarket(commands.Cog):
     async def bet(self, context: commands.Context, market_id: int, side: str, amount: int):
         cost = int(amount)
         if cost < config.MIN_BET:
-            return await context.send(f"Minimum bet is {_coins(config.MIN_BET)} coins.")
+            return await context.send(f"{_coins(config.MIN_BET)} coins minimum, you cheapskate.")
         with self.db.session(Market) as session:
             market = self._lock_market(session, market_id)
             if market is None:
-                return await context.send("No such market.")
+                return await context.send("No such market, brother.")
             if market.status != "OPEN":
-                return await context.send("That market is resolved; trading is closed.")
+                return await context.send("That market's done. Ship's sailed, brother.")
             account = self.account(session, market.season_id, context.author.id)
             if account.balance < cost:
-                return await context.send(f"You only have {_coins(account.balance)} coins.")
+                return await context.send(f"Broke boy. You've only got {_coins(account.balance)} coins.")
             shares = _down(lmsr.shares_for_budget(float(market.q_yes), float(market.q_no), float(market.b), side, amount))
             self._credit(session, market.season_id, account, market.id, -cost, "bet")
             self._add_shares(session, market, context.author.id, side, shares)
@@ -179,14 +179,14 @@ class PlayMarket(commands.Cog):
         with self.db.session(Market) as session:
             market = self._lock_market(session, market_id)
             if market is None:
-                return await context.send("No such market.")
+                return await context.send("No such market, brother.")
             if market.status != "OPEN":
-                return await context.send("That market is resolved; trading is closed.")
+                return await context.send("That market's done. Ship's sailed, brother.")
             position = session.get(Position, (context.author.id, market_id))
             held = (position.yes_shares if side == "yes" else position.no_shares) if position else Decimal(0)
             amount = held if shares == "all" else Decimal(str(shares))
             if amount <= 0 or amount > held:
-                return await context.send(f"You hold {_coins(held)} {side.upper()} shares.")
+                return await context.send(f"You've only got {_coins(held)} {side.upper()} shares, brother.")
             account = self.account(session, market.season_id, context.author.id)
             proceeds = self._sell_proceeds(market, side, amount)
             self._add_shares(session, market, context.author.id, side, -amount)
@@ -213,14 +213,14 @@ class PlayMarket(commands.Cog):
         with self.db.session(Market) as session:
             market = self._lock_market(session, market_id)
             if market is None:
-                return await context.send("No such market.")
+                return await context.send("No such market, brother.")
             if market.status != "OPEN":
-                return await context.send("That market is already resolved.")
+                return await context.send("That one's already in the books, brother.")
             if context.author.id != market.creator_id and not await self._is_admin(context):
-                return await context.send("Only the market's creator or an admin can resolve it.")
+                return await context.send("Not your market, not your call.")
             self._resolve_market(session, market, outcome)
             session.commit()
-            await context.send(f"Market {market_id} resolved **{outcome.upper()}**. Payouts done.")
+            await context.send(f"Market {market_id} called **{outcome.upper()}**. Winners paid, losers weep.")
 
     # --- season lifecycle -------------------------------------------------
 

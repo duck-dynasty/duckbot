@@ -155,7 +155,7 @@ async def test_balance_lists_open_positions(cog, alice, in_memory_db):
 
 async def test_list_says_so_when_there_are_no_markets(cog, alice):
     await cog.list_markets(alice, None)
-    assert alice.send.call_args.args[0] == "No markets. Start one with `/market create`."
+    assert alice.send.call_args.args[0] == "No markets. What, you hate fun?"
 
 
 async def test_list_shows_open_markets_with_their_price(cog, alice):
@@ -166,7 +166,7 @@ async def test_list_shows_open_markets_with_their_price(cog, alice):
 
 async def test_positions_says_so_when_you_hold_none(cog, alice):
     await cog.positions(alice)
-    assert alice.send.call_args.args[0] == "You have no open positions."
+    assert alice.send.call_args.args[0] == "You've got no skin in the game, brother."
 
 
 async def test_positions_lists_your_open_bets(cog, alice):
@@ -182,7 +182,7 @@ async def test_positions_excludes_resolved_markets(cog, alice):
     await cog.bet(alice, market_id, "yes", BET)
     await cog.resolve(alice, market_id, "yes")
     await cog.positions(alice)
-    assert alice.send.call_args.args[0] == "You have no open positions."
+    assert alice.send.call_args.args[0] == "You've got no skin in the game, brother."
 
 
 # --- create --------------------------------------------------------------
@@ -211,7 +211,7 @@ async def test_create_is_blocked_once_the_season_is_settling(cog, alice, clock):
     await open_market(cog, alice)  # creates Season 1
     clock.advance(days=183)  # past the season end
     await cog.create(alice, "Q", "rules", "med")
-    assert alice.send.call_args.args[0] == "The season is wrapping up; no new markets right now."
+    assert alice.send.call_args.args[0] == "Season's wrapping up, no new markets. Pump the brakes."
 
 
 # --- bet -----------------------------------------------------------------
@@ -251,14 +251,14 @@ async def test_bet_on_no_lowers_the_yes_price(cog, alice, in_memory_db):
 async def test_bet_below_the_minimum_is_rejected(cog, alice, in_memory_db):
     market_id = await open_market(cog, alice)
     await cog.bet(alice, market_id, "yes", 5)
-    assert alice.send.call_args.args[0] == "Minimum bet is 10 coins."
+    assert alice.send.call_args.args[0] == "10 coins minimum, you cheapskate."
     assert market_row(in_memory_db, market_id).q_yes == 0
 
 
 async def test_bet_more_than_you_can_afford_is_rejected(cog, alice, in_memory_db):
     market_id = await open_market(cog, alice)
     await cog.bet(alice, market_id, "yes", STARTING * 100)
-    assert alice.send.call_args.args[0] == "You only have 10,000 coins."
+    assert alice.send.call_args.args[0] == "Broke boy. You've only got 10,000 coins."
     assert account(in_memory_db, 1).balance == STARTING
 
 
@@ -266,7 +266,7 @@ async def test_bet_on_a_resolved_market_is_rejected(cog, alice, bob, in_memory_d
     market_id = await open_market(cog, alice)
     await cog.resolve(alice, market_id, "yes")
     await cog.bet(bob, market_id, "yes", BET)
-    assert "trading is closed" in bob.send.call_args.args[0]
+    assert "Ship's sailed" in bob.send.call_args.args[0]
 
 
 async def test_bet_keeps_the_ledger_reconciled(cog, alice, bob, in_memory_db):
@@ -304,7 +304,7 @@ async def test_sell_reduces_the_market_quantity(cog, alice, in_memory_db):
 async def test_sell_more_than_held_is_rejected(cog, alice, in_memory_db):
     market_id = await open_market(cog, alice)
     await cog.sell(alice, market_id, "yes", "10")
-    assert alice.send.call_args.args[0] == "You hold 0 YES shares."
+    assert alice.send.call_args.args[0] == "You've only got 0 YES shares, brother."
 
 
 async def test_sell_writes_a_sell_ledger_row(cog, alice, in_memory_db):
@@ -319,7 +319,7 @@ async def test_sell_on_a_resolved_market_is_rejected(cog, alice, in_memory_db):
     await cog.bet(alice, market_id, "yes", BET)
     await cog.resolve(alice, market_id, "yes")
     await cog.sell(alice, market_id, "yes", "all")
-    assert "trading is closed" in alice.send.call_args.args[0]
+    assert "Ship's sailed" in alice.send.call_args.args[0]
 
 
 async def test_sell_keeps_the_ledger_reconciled(cog, alice, in_memory_db):
@@ -336,13 +336,13 @@ async def test_creator_can_resolve_their_market(cog, alice, in_memory_db):
     market_id = await open_market(cog, alice)
     await cog.resolve(alice, market_id, "yes")
     assert market_row(in_memory_db, market_id).status == "RESOLVED"
-    assert alice.send.call_args.args[0] == f"Market {market_id} resolved **YES**. Payouts done."
+    assert alice.send.call_args.args[0] == f"Market {market_id} called **YES**. Winners paid, losers weep."
 
 
 async def test_a_non_creator_non_admin_cannot_resolve(cog, alice, bob, in_memory_db):
     market_id = await open_market(cog, alice)
     await cog.resolve(bob, market_id, "yes")
-    assert bob.send.call_args.args[0] == "Only the market's creator or an admin can resolve it."
+    assert bob.send.call_args.args[0] == "Not your market, not your call."
     assert market_row(in_memory_db, market_id).status == "OPEN"
 
 
@@ -357,12 +357,12 @@ async def test_resolving_an_already_resolved_market_is_rejected(cog, alice):
     market_id = await open_market(cog, alice)
     await cog.resolve(alice, market_id, "yes")
     await cog.resolve(alice, market_id, "no")
-    assert alice.send.call_args.args[0] == "That market is already resolved."
+    assert alice.send.call_args.args[0] == "That one's already in the books, brother."
 
 
 async def test_resolving_an_unknown_market_is_rejected(cog, alice):
     await cog.resolve(alice, 999, "yes")
-    assert alice.send.call_args.args[0] == "No such market."
+    assert alice.send.call_args.args[0] == "No such market, brother."
 
 
 async def test_resolving_yes_pays_the_yes_holders(cog, alice, bob, carol, in_memory_db):
@@ -410,7 +410,7 @@ async def test_claim_tops_a_broke_player_up_to_the_target(cog, alice, in_memory_
 
 async def test_claim_is_rejected_when_not_broke(cog, alice, in_memory_db):
     await cog.claim(alice)
-    assert alice.send.call_args.args[0] == "You only qualify when your balance is under 1,000."
+    assert alice.send.call_args.args[0] == "Quit begging, you're not even broke."
 
 
 async def test_claim_is_rejected_with_open_positions(cog, alice, in_memory_db):
@@ -418,7 +418,7 @@ async def test_claim_is_rejected_with_open_positions(cog, alice, in_memory_db):
     await cog.bet(alice, market_id, "yes", BET)
     set_balance(in_memory_db, 1, 10)
     await cog.claim(alice)
-    assert alice.send.call_args.args[0] == "Sell or resolve your open positions before claiming."
+    assert alice.send.call_args.args[0] == "You've got open bets, brother. No charity for gamblers."
 
 
 async def test_claim_is_rejected_within_the_cooldown(cog, alice, in_memory_db):
@@ -427,7 +427,7 @@ async def test_claim_is_rejected_within_the_cooldown(cog, alice, in_memory_db):
     await cog.claim(alice)
     set_balance(in_memory_db, 1, 10)
     await cog.claim(alice)
-    assert alice.send.call_args.args[0] == "You already claimed this week."
+    assert alice.send.call_args.args[0] == "Already milked that cow this week, greedy."
 
 
 async def test_claim_is_allowed_again_after_the_cooldown(cog, alice, clock, in_memory_db):
@@ -445,7 +445,7 @@ async def test_claim_is_allowed_again_after_the_cooldown(cog, alice, clock, in_m
 
 async def test_leaderboard_is_empty_before_anyone_plays(cog, alice):
     await cog.leaderboard(alice)
-    assert alice.send.call_args.args[0] == "Nobody has played yet."
+    assert alice.send.call_args.args[0] == "Nobody's played yet. Buncha cowards."
 
 
 async def test_leaderboard_ranks_by_net_worth(cog, alice, bob, in_memory_db):
