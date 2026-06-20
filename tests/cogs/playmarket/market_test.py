@@ -535,6 +535,41 @@ async def test_rollover_records_the_final_standings(cog, alice, bob, clock, in_m
     assert ranks == {1, 2}
 
 
+# --- market autocomplete -------------------------------------------------
+
+
+async def test_autocomplete_suggests_open_markets_by_question(cog, alice):
+    market_id = await open_market(cog, alice)
+    result = await cog.market_autocomplete(mock.Mock(), "happen")
+    assert any(c.value == market_id for c in result)
+
+
+async def test_autocomplete_matches_by_id(cog, alice):
+    market_id = await open_market(cog, alice)
+    result = await cog.market_autocomplete(mock.Mock(), str(market_id))
+    assert [c.value for c in result] == [market_id]
+
+
+async def test_autocomplete_shows_the_question_in_the_label(cog, alice):
+    await open_market(cog, alice)
+    result = await cog.market_autocomplete(mock.Mock(), "")
+    assert "Will it happen?" in result[0].name
+
+
+async def test_autocomplete_excludes_resolved_markets(cog, alice):
+    market_id = await open_market(cog, alice)
+    await cog.resolve(alice, market_id, "yes")
+    result = await cog.market_autocomplete(mock.Mock(), "")
+    assert all(c.value != market_id for c in result)
+
+
+async def test_autocomplete_is_capped_at_25(cog, alice):
+    for _ in range(30):
+        await open_market(cog, alice)
+    result = await cog.market_autocomplete(mock.Mock(), "")
+    assert len(result) == 25
+
+
 # --- cog lifecycle -------------------------------------------------------
 
 

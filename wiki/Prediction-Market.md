@@ -6,7 +6,7 @@ Prices are set by an automated market maker (an LMSR — see [How prices work](#
 
 > Human: /market create question:"Will it rain Saturday?" rules:"Per the NWS forecast at 6pm Friday"\
 > DuckBot: Market **7** open: _Will it rain Saturday?_ — YES 50%. Resolve it with `/market resolve 7 <yes|no>` when you know the outcome.\
-> Human: /market bet market_id:7 side:yes amount:500\
+> Human: /market bet market:7 side:yes amount:500\
 > DuckBot: Bought 832 YES shares for 500 coins. YES is now 70%.
 
 When the outcome is known, the market's creator resolves it and everyone's winning shares are paid out.
@@ -113,14 +113,16 @@ Anyone can create a market; the house funds the subsidy, so it costs you nothing
 ## Betting
 
 ```
-/market quote market_id:<n> side:<yes|no> amount:<coins>   ← preview only, no coins spent
-/market bet   market_id:<n> side:<yes|no> amount:<coins>
-/market sell  market_id:<n> side:<yes|no> shares:<number|all>
+/market quote market:<pick> side:<yes|no> amount:<coins>   ← preview only, no coins spent
+/market bet   market:<pick> side:<yes|no> amount:<coins>
+/market sell  market:<pick> side:<yes|no> shares:<number|all>
 ```
 
 - **quote** shows how many shares your budget buys and where the price would land — handy before committing.
 - **bet** spends `amount` coins buying shares of the side you pick, at the live price.
 - **sell** returns shares to the market for coins. Pass `all` to dump your whole position on that side.
+
+The `market` field autocompletes on slash commands — start typing and pick a market by its question, no need to look up its number first.
 
 The minimum bet is 10 coins. You can trade right up until the market's creator resolves it.
 
@@ -129,7 +131,7 @@ The minimum bet is 10 coins. You can trade right up until the market's creator r
 There's no close time and no scheduler — the person who **created** the market settles it once the outcome is known:
 
 ```
-/market resolve market_id:<n> outcome:<yes|no|void>
+/market resolve market:<pick> outcome:<yes|no|void>
 ```
 
 - **yes / no** — every winning share is paid 1 coin; losing shares pay 0.

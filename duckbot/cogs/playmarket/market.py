@@ -1,7 +1,9 @@
 import math
 from decimal import ROUND_DOWN, Decimal
-from typing import Literal, Optional
+from typing import List, Literal, Optional
 
+from discord import Interaction
+from discord.app_commands import Choice
 from discord.ext import commands, tasks
 
 from duckbot.db import Database
@@ -133,8 +135,8 @@ class PlayMarket(commands.Cog):
         await context.send("\n".join(self._summary(m) for m in markets))
 
     @market_group.command(name="show", description="Show one market and your position in it.")
-    async def show_command(self, context: commands.Context, market_id: int):
-        await self.show(context, market_id)
+    async def show_command(self, context: commands.Context, market: int):
+        await self.show(context, market)
 
     async def show(self, context: commands.Context, market_id: int):
         with self.db.session(Market) as session:
@@ -162,8 +164,8 @@ class PlayMarket(commands.Cog):
             await context.send(f"Market **{market.id}** open: _{question}_ — YES 50%. Resolve it with `/market resolve {market.id} <yes|no>` when you know the outcome.")
 
     @market_group.command(name="quote", description="Preview a bet without placing it.")
-    async def quote_command(self, context: commands.Context, market_id: int, side: Literal["yes", "no"], amount: int):
-        await self.quote(context, market_id, side, amount)
+    async def quote_command(self, context: commands.Context, market: int, side: Literal["yes", "no"], amount: int):
+        await self.quote(context, market, side, amount)
 
     async def quote(self, context: commands.Context, market_id: int, side: str, amount: int):
         with self.db.session(Market) as session:
@@ -175,8 +177,8 @@ class PlayMarket(commands.Cog):
         await context.send(f"{_coins(amount)} coins buys ~{_coins(_down(shares))} {side.upper()} shares; YES would move to {_pct(after)}.")
 
     @market_group.command(name="bet", description="Buy YES/NO shares for a coin budget.")
-    async def bet_command(self, context: commands.Context, market_id: int, side: Literal["yes", "no"], amount: int):
-        await self.bet(context, market_id, side, amount)
+    async def bet_command(self, context: commands.Context, market: int, side: Literal["yes", "no"], amount: int):
+        await self.bet(context, market, side, amount)
 
     async def bet(self, context: commands.Context, market_id: int, side: str, amount: int):
         cost = int(amount)
@@ -198,8 +200,8 @@ class PlayMarket(commands.Cog):
             await context.send(f"Bought {_coins(shares)} {side.upper()} shares for {_coins(cost)} coins. YES is now {_pct(self._price(market))}.")
 
     @market_group.command(name="sell", description="Sell held shares back to the market.")
-    async def sell_command(self, context: commands.Context, market_id: int, side: Literal["yes", "no"], shares: str):
-        await self.sell(context, market_id, side, shares)
+    async def sell_command(self, context: commands.Context, market: int, side: Literal["yes", "no"], shares: str):
+        await self.sell(context, market, side, shares)
 
     async def sell(self, context: commands.Context, market_id: int, side: str, shares: str):
         with self.db.session(Market) as session:
@@ -221,8 +223,21 @@ class PlayMarket(commands.Cog):
             await context.send(f"Sold {_coins(amount)} {side.upper()} shares for {_coins(proceeds)} coins. YES is now {_pct(self._price(market))}.")
 
     @market_group.command(name="resolve", description="Resolve your market and pay everyone out (creator only).")
-    async def resolve_command(self, context: commands.Context, market_id: int, outcome: Literal["yes", "no", "void"]):
-        await self.resolve(context, market_id, outcome)
+    async def resolve_command(self, context: commands.Context, market: int, outcome: Literal["yes", "no", "void"]):
+        await self.resolve(context, market, outcome)
+
+    @show_command.autocomplete("market")
+    @quote_command.autocomplete("market")
+    @bet_command.autocomplete("market")
+    @sell_command.autocomplete("market")
+    @resolve_command.autocomplete("market")
+    async def market_autocomplete(self, interaction: Interaction, current: str) -> List[Choice[int]]:
+        with self.db.session(Market) as session:
+            markets = session.query(Market).filter(Market.status == "OPEN").order_by(Market.id.desc()).limit(25).all()
+            options = [(m.id, m.question) for m in markets]
+        needle = current.lower()
+        matches = [(mid, q) for mid, q in options if needle in q.lower() or needle in str(mid)]
+        return [Choice(name=f"{mid}: {q}"[:100], value=mid) for mid, q in matches]
 
     async def resolve(self, context: commands.Context, market_id: int, outcome: str):
         with self.db.session(Market) as session:
