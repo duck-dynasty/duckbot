@@ -1,9 +1,4 @@
-"""Test scaffolding for the play-money market.
-
-Unlike the other DB-backed cogs (which assert on a mocked session), money logic is only
-worth testing behaviourally: did the balance, the position and the ledger all end up right?
-So these tests run the cog against a real in-memory SQLite database and assert on real state.
-"""
+"""Test scaffolding: runs the cog against a real in-memory SQLite database."""
 
 import datetime
 from unittest import mock
@@ -26,25 +21,23 @@ from duckbot.cogs.playmarket.models import (
 
 @compiles(BigInteger, "sqlite")
 def _bigint_as_integer(type_, compiler, **kw):
-    # SQLite only auto-increments INTEGER PRIMARY KEY; production Postgres uses BIGSERIAL.
-    return "INTEGER"
+    return "INTEGER"  # SQLite auto-increments INTEGER, not BIGINT
 
 
 class FakeDatabase:
-    """Stand-in for duckbot.db.Database backed by one shared in-memory SQLite database."""
+    """Stand-in for duckbot.db.Database backed by one in-memory SQLite database."""
 
     def __init__(self):
         self.engine = create_engine("sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool)
         Base.metadata.create_all(self.engine)
-        # SQLite drops timezones and there are no relationships, so keep attributes readable after close.
-        self._sessions = sessionmaker(self.engine, expire_on_commit=False)
+        self._sessions = sessionmaker(self.engine, expire_on_commit=False)  # keep rows readable after close
 
     def session(self, _model):
         return self._sessions()
 
 
 class Clock:
-    """A movable replacement for `now()`; naive UTC because SQLite has no timezone type."""
+    """A movable replacement for now()."""
 
     def __init__(self):
         self.t = datetime.datetime(2024, 1, 1, 12, 0)
@@ -65,7 +58,6 @@ def db():
 @pytest.fixture
 def clock():
     movable = Clock()
-    # SQLite has no timezone type, so keep the test clock naive (prod Postgres keeps tz).
     with mock.patch("duckbot.cogs.playmarket.market.now", side_effect=movable):
         yield movable
 
@@ -73,12 +65,12 @@ def clock():
 @pytest.fixture
 def cog(bot, db, clock):
     market = PlayMarket(bot, db)
-    market.tick_loop.cancel()  # never let the background loop run mid-test
+    market.tick_loop.cancel()  # don't run the loop mid-test
     return market
 
 
 def make_context(user_id, display_name=None, guild=True, manage_guild=True):
-    """A minimal command context: real enough to drive a command and assert on its reply."""
+    """A minimal command context."""
     ctx = mock.Mock()
     ctx.author = mock.Mock(id=user_id, display_name=display_name or f"user{user_id}")
     ctx.author.guild_permissions.manage_guild = manage_guild
@@ -130,7 +122,7 @@ def ledger(db, user_id):
 
 
 def reconciles(db):
-    """The core integrity invariant: each player's balance equals their ledger sum."""
+    """Each player's balance equals their ledger sum."""
     with db.session(PlayerAccount) as session:
         for player in session.query(PlayerAccount).all():
             total = sum((e.delta for e in session.query(LedgerEntry).filter_by(user_id=player.id).all()), 0)
@@ -146,7 +138,7 @@ def set_balance(db, user_id, amount):
 
 
 async def open_market(cog, ctx, liquidity="med"):
-    """Create a market through the real command path and return its id."""
+    """Create a market and return its id."""
     await cog.create(ctx, "Will it happen?", "official ruling", liquidity)
     with cog.db.session(Market) as session:
         return session.query(Market).order_by(Market.id.desc()).first().id

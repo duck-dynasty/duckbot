@@ -14,12 +14,12 @@ CENT = Decimal("0.000001")
 
 
 def _down(value: float) -> Decimal:
-    """Quantise a share count to storage precision, rounding down so solvency always holds."""
+    """Round a share count down to storage precision."""
     return Decimal(str(value)).quantize(CENT, rounding=ROUND_DOWN)
 
 
 def _whole(value) -> int:
-    """Floor a coin amount to a whole coin; the house keeps the fraction, preserving solvency."""
+    """Floor a coin amount to a whole coin (house keeps the fraction)."""
     return math.floor(value)
 
 
@@ -43,7 +43,7 @@ class PlayMarket(commands.Cog):
         await self.bot.wait_until_ready()
 
     async def tick(self):
-        """Markets are resolved by their creators; the only thing time drives is the season rollover."""
+        """Roll the season over when its time comes; markets are resolved by their creators."""
         with self.db.session(Season) as session:
             self.active_season(session)
             self.settle_season_if_due(session)
@@ -240,7 +240,7 @@ class PlayMarket(commands.Cog):
     # --- season lifecycle -------------------------------------------------
 
     def active_season(self, session) -> Season:
-        """Return the season scoping play, creating Season 1 on first use and flipping ended seasons to settling."""
+        """The active or settling season; creates Season 1 on first use, flips ended ones to settling."""
         season = session.query(Season).filter(Season.status.in_(("active", "settling"))).order_by(Season.id.desc()).first()
         if season is None:
             return self._new_season(session)
@@ -249,7 +249,7 @@ class PlayMarket(commands.Cog):
         return season
 
     def settle_season_if_due(self, session):
-        """After the grace period, void any markets the creators never resolved and roll into the next season."""
+        """After the grace period, void unresolved markets and roll over to the next season."""
         season = session.query(Season).filter_by(status="settling").first()
         if season is None or now() < season.ends_at + config.SETTLEMENT_GRACE:
             return
@@ -268,13 +268,13 @@ class PlayMarket(commands.Cog):
         count = session.query(Season).count()
         season = Season(name=f"Season {count + 1}", starts_at=now(), ends_at=now() + config.SEASON_LENGTH, status="active", starting_balance=config.STARTING_BALANCE)
         session.add(season)
-        session.flush()  # assign id for use as a foreign key
+        session.flush()  # assign id
         return season
 
-    # --- money mechanics (the only places balances and the ledger change) ---
+    # --- money mechanics ---------------------------------------------------
 
     def account(self, session, season_id: int, user_id: int) -> PlayerAccount:
-        """Fetch the player's account (locked for update), granting the season's starting balance on first sight."""
+        """The player's account, granting the starting balance on first sight."""
         account = self._lock_account(session, user_id)
         if account is None:
             account = PlayerAccount(id=user_id, balance=0)
@@ -283,12 +283,12 @@ class PlayMarket(commands.Cog):
         return account
 
     def _credit(self, session, season_id, account, market_id, delta, reason):
-        """Change a balance and write the matching ledger row in one place, so they never drift apart."""
+        """Apply a balance delta and write the matching ledger row."""
         account.balance += delta
         session.add(LedgerEntry(season_id=season_id, user_id=account.id, market_id=market_id, delta=delta, reason=reason))
 
     def _resolve_market(self, session, market, outcome):
-        """Pay winning shares (or 0.5 each on void), close positions, finalise the market."""
+        """Pay out winning shares (0.5 each on void), close positions, finalise."""
         for position in session.query(Position).filter_by(market_id=market.id).all():
             payout = self._payout(position, outcome)
             if payout > 0:
@@ -324,7 +324,7 @@ class PlayMarket(commands.Cog):
     # --- read helpers -----------------------------------------------------
 
     def _standings(self, session):
-        """List of (user_id, net worth) ranked high to low; net worth = balance + value of open positions."""
+        """(user_id, net worth) ranked high to low; net worth = balance + open position value."""
         worth = {a.id: a.balance for a in session.query(PlayerAccount).all()}
         rows = session.query(Position, Market).join(Market, Position.market_id == Market.id).filter(Market.status == "OPEN").all()
         for position, market in rows:

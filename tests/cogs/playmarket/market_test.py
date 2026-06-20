@@ -15,7 +15,7 @@ from tests.cogs.playmarket.conftest import (
     set_balance,
 )
 
-BET = 500  # a typical bet, scaled to the integer economy
+BET = 500
 STARTING = config.STARTING_BALANCE
 
 
@@ -220,7 +220,6 @@ async def test_sell_returns_almost_the_whole_stake(cog, alice, db):
     market_id = await open_market(cog, alice)
     await cog.bet(alice, market_id, "yes", BET)
     await cog.sell(alice, market_id, "yes", "all")
-    # Round-trip costs only the house's rounding edge, so the balance lands just below the start.
     assert float(account(db, 1).balance) == pytest.approx(STARTING, abs=2)
     assert account(db, 1).balance <= STARTING
 
@@ -303,7 +302,7 @@ async def test_resolving_void_pays_half_to_everyone(cog, alice, bob, db):
     await cog.bet(bob, market_id, "yes", 300)
     await cog.resolve(alice, market_id, "void")
     assert market_row(db, market_id).status == "VOID"
-    # 300 coins buys ~530 YES shares at b=1000; each redeems at 0.5 -> ~265 back on the 9,700 remaining.
+    # ~530 YES shares, each redeems at 0.5 on void
     assert float(account(db, 2).balance) == pytest.approx(9965, abs=1)
 
 
