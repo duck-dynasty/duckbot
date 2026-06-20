@@ -1,39 +1,12 @@
-"""Test scaffolding: runs the cog against a real in-memory SQLite database."""
+"""Test scaffolding for the play-money market; uses the shared `in_memory_db` fixture."""
 
 import datetime
 from unittest import mock
 
 import pytest
-from sqlalchemy import BigInteger, create_engine
-from sqlalchemy.ext.compiler import compiles
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.pool import StaticPool
 
 from duckbot.cogs.playmarket.market import PlayMarket
-from duckbot.cogs.playmarket.models import (
-    Base,
-    LedgerEntry,
-    Market,
-    PlayerAccount,
-    Position,
-)
-
-
-@compiles(BigInteger, "sqlite")
-def _bigint_as_integer(type_, compiler, **kw):
-    return "INTEGER"  # SQLite auto-increments INTEGER, not BIGINT
-
-
-class FakeDatabase:
-    """Stand-in for duckbot.db.Database backed by one in-memory SQLite database."""
-
-    def __init__(self):
-        self.engine = create_engine("sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool)
-        Base.metadata.create_all(self.engine)
-        self._sessions = sessionmaker(self.engine, expire_on_commit=False)  # keep rows readable after close
-
-    def session(self, _model):
-        return self._sessions()
+from duckbot.cogs.playmarket.models import LedgerEntry, Market, PlayerAccount, Position
 
 
 class Clock:
@@ -51,11 +24,6 @@ class Clock:
 
 
 @pytest.fixture
-def db():
-    return FakeDatabase()
-
-
-@pytest.fixture
 def clock():
     movable = Clock()
     with mock.patch("duckbot.cogs.playmarket.market.now", side_effect=movable):
@@ -63,8 +31,8 @@ def clock():
 
 
 @pytest.fixture
-def cog(bot, db, clock):
-    market = PlayMarket(bot, db)
+def cog(bot, in_memory_db, clock):
+    market = PlayMarket(bot, in_memory_db)
     market.tick_loop.cancel()  # don't run the loop mid-test
     return market
 
