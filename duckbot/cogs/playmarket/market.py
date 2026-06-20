@@ -53,7 +53,7 @@ class PlayMarket(commands.Cog):
 
     # --- command group ----------------------------------------------------
 
-    @commands.hybrid_group(name="market", invoke_without_command=True)
+    @commands.hybrid_group(name="market", description="Gamble your friendship away on play-money bets.", invoke_without_command=True)
     async def market_group(self, context: commands.Context, status: Optional[str] = None):
         await self.list_markets(context, status)
 

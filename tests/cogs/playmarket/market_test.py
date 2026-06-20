@@ -269,6 +269,11 @@ async def test_bet_on_a_resolved_market_is_rejected(cog, alice, bob, in_memory_d
     assert "Ship's sailed" in bob.send.call_args.args[0]
 
 
+async def test_bet_on_a_missing_market_is_rejected(cog, alice):
+    await cog.bet(alice, 999, "yes", BET)
+    assert alice.send.call_args.args[0] == "No such market, brother."
+
+
 async def test_bet_keeps_the_ledger_reconciled(cog, alice, bob, in_memory_db):
     market_id = await open_market(cog, alice)
     await cog.bet(alice, market_id, "yes", BET)
@@ -320,6 +325,11 @@ async def test_sell_on_a_resolved_market_is_rejected(cog, alice, in_memory_db):
     await cog.resolve(alice, market_id, "yes")
     await cog.sell(alice, market_id, "yes", "all")
     assert "Ship's sailed" in alice.send.call_args.args[0]
+
+
+async def test_sell_on_a_missing_market_is_rejected(cog, alice):
+    await cog.sell(alice, 999, "yes", "all")
+    assert alice.send.call_args.args[0] == "No such market, brother."
 
 
 async def test_sell_keeps_the_ledger_reconciled(cog, alice, in_memory_db):
@@ -498,6 +508,13 @@ async def test_rollover_records_the_final_standings(cog, alice, bob, clock, in_m
     assert ranks == {1, 2}
 
 
+async def test_tick_does_nothing_before_the_season_ends(cog, alice, in_memory_db):
+    await cog.balance(alice)  # creates Season 1, still active
+    await cog.tick()
+    with in_memory_db.session(Season) as session:
+        assert session.query(Season).count() == 1  # no rollover yet
+
+
 # --- market autocomplete -------------------------------------------------
 
 
@@ -533,7 +550,7 @@ async def test_autocomplete_is_capped_at_25(cog, alice):
     assert len(result) == 25
 
 
-# --- cog lifecycle -------------------------------------------------------
+# --- cog lifecycle & command wiring --------------------------------------
 
 
 def test_cog_unload_cancels_the_loop(cog):
@@ -545,6 +562,33 @@ def test_cog_unload_cancels_the_loop(cog):
 async def test_before_tick_waits_for_the_bot_to_be_ready(cog):
     await cog.before_tick()
     cog.bot.wait_until_ready.assert_called_once()
+
+
+async def test_tick_loop_runs_a_tick(cog):
+    cog.tick = mock.AsyncMock()
+    await PlayMarket.tick_loop.coro(cog)
+    cog.tick.assert_awaited_once()
+
+
+@pytest.mark.parametrize(
+    "command,args,delegate",
+    [
+        ("market_group", (None,), "list_markets"),
+        ("balance_command", (), "balance"),
+        ("claim_command", (), "claim"),
+        ("leaderboard_command", (), "leaderboard"),
+        ("list_command", (None,), "list_markets"),
+        ("positions_command", (), "positions"),
+        ("create_command", ("q", "rules", "med"), "create"),
+        ("bet_command", (7, "yes", 50), "bet"),
+        ("sell_command", (7, "yes", "all"), "sell"),
+        ("resolve_command", (7, "yes"), "resolve"),
+    ],
+)
+async def test_command_delegates_to_its_method(cog, alice, command, args, delegate):
+    setattr(cog, delegate, mock.AsyncMock())
+    await getattr(cog, command).callback(cog, alice, *args)
+    getattr(cog, delegate).assert_awaited_once_with(alice, *args)
 
 
 # --- end-to-end integrity -----------------------------------------------
