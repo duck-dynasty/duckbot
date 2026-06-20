@@ -18,7 +18,6 @@ When the outcome is known, the market's creator resolves it and everyone's winni
 |            `/market balance`             | show your coins and open positions                  |
 |             `/market claim`              | claim the need-based top-up if you're broke         |
 |          `/market leaderboard`           | current-season standings by net worth               |
-|             `/market season`             | show the active season and your rank                |
 |  [`/market create`](#creating-a-market)  | open a new YES/NO market                            |
 |         `/market list [status]`          | list markets and their current YES %                |
 |              `/market show`              | show one market and your position in it             |
@@ -38,7 +37,7 @@ Everyone starts each **season** with **10,000 coins**. A season lasts about six 
 - If you go broke (under 1,000 coins) **and** hold no open positions, `/market claim` tops you back up to 2,000 coins, once per week. It's the only faucet, so balances still track skill within a season.
 - At season end there's a 7-day grace period for open markets to resolve, then balances reset and the final standings are recorded in a hall of fame.
 
-Use `/market balance` to see your coins and positions, `/market leaderboard` for the standings (ranked by net worth = coins + the live value of your open positions), and `/market season` for how much time is left and where you rank.
+Use `/market balance` to see your coins and positions, and `/market leaderboard` for the standings (ranked by net worth = coins + the live value of your open positions).
 
 ## How prices work
 

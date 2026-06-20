@@ -106,20 +106,6 @@ class PlayMarket(commands.Cog):
         lines = [f"{i}. {self._name(context, uid)} — {_coins(worth)} coins" for i, (uid, worth) in enumerate(ranked, start=1)]
         await context.send("**Leaderboard**\n" + "\n".join(lines))
 
-    @market_group.command(name="season", description="Show the active season and your rank.")
-    async def season_command(self, context: commands.Context):
-        await self.season(context)
-
-    async def season(self, context: commands.Context):
-        with self.db.session(Season) as session:
-            season = self.active_season(session)
-            ranked = self._standings(session)
-            session.commit()
-            rank = next((i for i, (uid, _) in enumerate(ranked, start=1) if uid == context.author.id), None)
-            remaining = season.ends_at - now()
-            status = "ending soon — no new markets" if season.status == "settling" else f"{remaining.days} days left"
-        await context.send(f"**{season.name}** ({status}). Your rank: {rank or 'unranked'} of {len(ranked)}.")
-
     # --- market commands --------------------------------------------------
 
     @market_group.command(name="list", description="List markets with their current YES %.")
@@ -129,7 +115,7 @@ class PlayMarket(commands.Cog):
     async def list_markets(self, context: commands.Context, status: Optional[str]):
         with self.db.session(Market) as session:
             query = session.query(Market).filter(Market.status == (status.upper() if status else "OPEN"))
-            markets = query.order_by(Market.id.desc()).limit(20).all()
+            markets = query.order_by(Market.id.desc()).all()
         if not markets:
             return await context.send("No markets. Start one with `/market create`.")
         await context.send("\n".join(self._summary(m) for m in markets))

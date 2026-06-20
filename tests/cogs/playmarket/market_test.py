@@ -465,7 +465,7 @@ async def test_claim_is_allowed_again_after_the_cooldown(cog, alice, clock, in_m
     assert account(in_memory_db, 1).balance == config.TOPUP_TARGET
 
 
-# --- leaderboard & season -----------------------------------------------
+# --- leaderboard ---------------------------------------------------------
 
 
 async def test_leaderboard_is_empty_before_anyone_plays(cog, alice):
@@ -480,18 +480,6 @@ async def test_leaderboard_ranks_by_net_worth(cog, alice, bob, in_memory_db):
     await cog.leaderboard(alice)
     message = alice.send.call_args.args[0]
     assert message.index("user2") < message.index("user1")
-
-
-async def test_season_reports_the_name_and_time_left(cog, alice):
-    await cog.season(alice)
-    assert "Season 1" in alice.send.call_args.args[0] and "days left" in alice.send.call_args.args[0]
-
-
-async def test_season_reports_when_it_is_settling(cog, alice, clock):
-    await open_market(cog, alice)
-    clock.advance(days=183)
-    await cog.season(alice)
-    assert "ending soon" in alice.send.call_args.args[0]
 
 
 # --- season rollover -----------------------------------------------------
