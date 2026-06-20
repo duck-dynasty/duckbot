@@ -231,8 +231,8 @@ class PlayMarket(commands.Cog):
                 return await context.send("No such market.")
             if market.status != "OPEN":
                 return await context.send("That market is already resolved.")
-            if context.author.id != market.creator_id:
-                return await context.send("Only the market's creator can resolve it.")
+            if context.author.id != market.creator_id and not await self._is_admin(context):
+                return await context.send("Only the market's creator or an admin can resolve it.")
             self._resolve_market(session, market, outcome)
             session.commit()
             await context.send(f"Market {market_id} resolved **{outcome.upper()}**. Payouts done.")
@@ -348,6 +348,9 @@ class PlayMarket(commands.Cog):
 
     def _summary(self, market) -> str:
         return f"**{market.id}** [{market.status}] {market.question} — YES {_pct(self._price(market))}"
+
+    async def _is_admin(self, context) -> bool:
+        return await context.bot.is_owner(context.author) or context.author.id in config.ADMIN_IDS
 
     def _name(self, context, user_id) -> str:
         member = context.guild.get_member(user_id) if context.guild else None

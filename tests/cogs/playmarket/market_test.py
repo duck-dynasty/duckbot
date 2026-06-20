@@ -8,6 +8,7 @@ from duckbot.cogs.playmarket.models import Season, SeasonResult
 from tests.cogs.playmarket.conftest import (
     account,
     ledger,
+    make_context,
     market_row,
     open_market,
     position,
@@ -269,11 +270,18 @@ async def test_creator_can_resolve_their_market(cog, alice, db):
     assert alice.send.call_args.args[0] == f"Market {market_id} resolved **YES**. Payouts done."
 
 
-async def test_only_the_creator_can_resolve(cog, alice, bob, db):
+async def test_a_non_creator_non_admin_cannot_resolve(cog, alice, bob, db):
     market_id = await open_market(cog, alice)
     await cog.resolve(bob, market_id, "yes")
-    assert bob.send.call_args.args[0] == "Only the market's creator can resolve it."
+    assert bob.send.call_args.args[0] == "Only the market's creator or an admin can resolve it."
     assert market_row(db, market_id).status == "OPEN"
+
+
+async def test_an_admin_can_resolve_any_market(cog, alice, db):
+    admin = make_context(config.ADMIN_IDS[0])
+    market_id = await open_market(cog, alice)
+    await cog.resolve(admin, market_id, "yes")
+    assert market_row(db, market_id).status == "RESOLVED"
 
 
 async def test_resolving_an_already_resolved_market_is_rejected(cog, alice):
