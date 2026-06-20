@@ -5,6 +5,7 @@ from typing import List, Literal, Optional
 from discord import Interaction
 from discord.app_commands import Choice
 from discord.ext import commands, tasks
+from sqlalchemy import String, cast, or_
 
 from duckbot.db import Database
 from duckbot.util.datetime import now
@@ -190,11 +191,11 @@ class PlayMarket(commands.Cog):
     @sell_command.autocomplete("market")
     @resolve_command.autocomplete("market")
     async def market_autocomplete(self, interaction: Interaction, current: str) -> List[Choice[int]]:
+        needle = f"%{current}%"
         with self.db.session(Market) as session:
-            markets = session.query(Market).filter(Market.status == "OPEN").order_by(Market.id.desc()).limit(25).all()
-            options = [(m.id, m.question) for m in markets]
-        needle = current.lower()
-        matches = [(mid, q) for mid, q in options if needle in q.lower() or needle in str(mid)]
+            matches = session.query(Market.id, Market.question)
+            matches = matches.filter(Market.status == "OPEN", or_(Market.question.ilike(needle), cast(Market.id, String).ilike(needle)))
+            matches = matches.order_by(Market.id.desc()).limit(25).all()  # Discord caps options at 25
         return [Choice(name=f"{mid}: {q}"[:100], value=mid) for mid, q in matches]
 
     async def resolve(self, context: commands.Context, market_id: int, outcome: str):

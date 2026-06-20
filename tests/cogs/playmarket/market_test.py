@@ -538,6 +538,14 @@ async def test_autocomplete_is_capped_at_25(cog, alice):
     assert len(result) == 25
 
 
+async def test_autocomplete_filters_in_the_db_not_after_limiting(cog, alice):
+    await cog.create(alice, "UNICORN", "med")  # the oldest market, far past the 25 most-recent
+    for _ in range(30):
+        await open_market(cog, alice)
+    result = await cog.market_autocomplete(mock.Mock(), "unicorn")
+    assert any("UNICORN" in c.name for c in result)
+
+
 # --- cog lifecycle & command wiring --------------------------------------
 
 
