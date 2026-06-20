@@ -6,7 +6,6 @@ So these tests run the cog against a real in-memory SQLite database and assert o
 """
 
 import datetime
-from decimal import Decimal
 from unittest import mock
 
 import pytest
@@ -66,9 +65,8 @@ def db():
 @pytest.fixture
 def clock():
     movable = Clock()
-    # SQLite has no timezone type, so keep the whole test clock naive — including the
-    # absolute-date parser, which would otherwise return a tz-aware time prod Postgres keeps.
-    with mock.patch("duckbot.cogs.playmarket.market.now", side_effect=movable), mock.patch("duckbot.cogs.playmarket.market.timezone", return_value=None):
+    # SQLite has no timezone type, so keep the test clock naive (prod Postgres keeps tz).
+    with mock.patch("duckbot.cogs.playmarket.market.now", side_effect=movable):
         yield movable
 
 
@@ -132,11 +130,11 @@ def ledger(db, user_id):
 
 
 def reconciles(db):
-    """The core integrity invariant: each player's balance + locked equals their ledger sum."""
+    """The core integrity invariant: each player's balance equals their ledger sum."""
     with db.session(PlayerAccount) as session:
         for player in session.query(PlayerAccount).all():
-            total = sum((e.delta for e in session.query(LedgerEntry).filter_by(user_id=player.id).all()), Decimal(0))
-            if player.balance + player.locked != total:
+            total = sum((e.delta for e in session.query(LedgerEntry).filter_by(user_id=player.id).all()), 0)
+            if player.balance != total:
                 return False
     return True
 
@@ -147,14 +145,8 @@ def set_balance(db, user_id, amount):
         session.commit()
 
 
-async def open_market(cog, ctx, closes="in 1 day", liquidity="med"):
+async def open_market(cog, ctx, liquidity="med"):
     """Create a market through the real command path and return its id."""
-    await cog.create(ctx, "Will it happen?", "official ruling", closes, liquidity)
+    await cog.create(ctx, "Will it happen?", "official ruling", liquidity)
     with cog.db.session(Market) as session:
         return session.query(Market).order_by(Market.id.desc()).first().id
-
-
-async def close_markets(cog, clock, days=2):
-    """Move time past the close date and let the scheduler flip OPEN markets to CLOSED."""
-    clock.advance(days=days)
-    await cog.tick()

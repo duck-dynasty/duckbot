@@ -1,27 +1,16 @@
 import math
-import re
-from datetime import datetime, timedelta
 from decimal import ROUND_DOWN, Decimal
 from typing import Literal, Optional
 
 from discord.ext import commands, tasks
 
 from duckbot.db import Database
-from duckbot.util.datetime import now, timezone
+from duckbot.util.datetime import now
 
 from . import config, lmsr
-from .models import (
-    LedgerEntry,
-    Market,
-    PlayerAccount,
-    Position,
-    Proposal,
-    Season,
-    SeasonResult,
-)
+from .models import LedgerEntry, Market, PlayerAccount, Position, Season, SeasonResult
 
 CENT = Decimal("0.000001")
-TRADING = ("OPEN", "CLOSED", "PROPOSED", "DISPUTED")  # market is live; positions still have value
 
 
 def _down(value: float) -> Decimal:
@@ -34,29 +23,6 @@ def _whole(value) -> int:
     return math.floor(value)
 
 
-def parse_when(text: str) -> Optional[datetime]:
-    """Parse a close time: `in 3 days` / `in 6 hours` / `in 2 weeks`, or `YYYY-MM-DD[ HH:MM]`."""
-    relative = re.fullmatch(r"in (\d+) (hour|day|week)s?", text.strip().lower())
-    if relative:
-        amount, unit = int(relative.group(1)), relative.group(2)
-        return now() + {"hour": timedelta(hours=amount), "day": timedelta(days=amount), "week": timedelta(weeks=amount)}[unit]
-    for fmt in ("%Y-%m-%d %H:%M", "%Y-%m-%d"):
-        try:
-            return datetime.strptime(text.strip(), fmt).replace(tzinfo=timezone())
-        except ValueError:
-            continue
-    return None
-
-
-async def is_market_admin(context: commands.Context) -> bool:
-    """Only the bot owner or someone who can manage the server may break disputes."""
-    if context.guild is None:
-        raise commands.NoPrivateMessage()
-    if not await context.bot.is_owner(context.author) and not context.author.guild_permissions.manage_guild:
-        raise commands.MissingPermissions(["manage server"])
-    return True
-
-
 class PlayMarket(commands.Cog):
     def __init__(self, bot, db: Database):
         self.bot = bot
@@ -66,7 +32,7 @@ class PlayMarket(commands.Cog):
     def cog_unload(self):
         self.tick_loop.cancel()
 
-    # --- background timing ------------------------------------------------
+    # --- background season rollover ---------------------------------------
 
     @tasks.loop(minutes=1)
     async def tick_loop(self):
@@ -77,11 +43,9 @@ class PlayMarket(commands.Cog):
         await self.bot.wait_until_ready()
 
     async def tick(self):
-        """Advance everything time can change: close markets, finalise proposals, roll seasons over."""
+        """Markets are resolved by their creators; the only thing time drives is the season rollover."""
         with self.db.session(Season) as session:
             self.active_season(session)
-            for market in session.query(Market).filter(Market.status.in_(("OPEN", "PROPOSED"))).all():
-                self.advance(session, market)
             self.settle_season_if_due(session)
             session.commit()
 
@@ -93,7 +57,7 @@ class PlayMarket(commands.Cog):
 
     # --- economy commands -------------------------------------------------
 
-    @market_group.command(name="balance", description="Show your coins, locked bonds, and open positions.")
+    @market_group.command(name="balance", description="Show your coins and open positions.")
     async def balance_command(self, context: commands.Context):
         await self.balance(context)
 
@@ -103,7 +67,7 @@ class PlayMarket(commands.Cog):
             account = self.account(session, season.id, context.author.id)
             positions = session.query(Position).filter_by(user_id=account.id).all()
             session.commit()
-            lines = [f"**{self._name(context, account.id)}** — {_coins(account.balance)} coins (+{_coins(account.locked)} locked in bonds)"]
+            lines = [f"**{self._name(context, account.id)}** — {_coins(account.balance)} coins"]
             lines += [f"• market {p.market_id}: {_coins(p.yes_shares)} YES / {_coins(p.no_shares)} NO" for p in positions if p.yes_shares or p.no_shares]
         await context.send("\n".join(lines))
 
@@ -162,11 +126,7 @@ class PlayMarket(commands.Cog):
 
     async def list_markets(self, context: commands.Context, status: Optional[str]):
         with self.db.session(Market) as session:
-            query = session.query(Market)
-            if status:
-                query = query.filter(Market.status == status.upper())
-            else:
-                query = query.filter(Market.status.in_(TRADING))
+            query = session.query(Market).filter(Market.status == (status.upper() if status else "OPEN"))
             markets = query.order_by(Market.id.desc()).limit(20).all()
         if not markets:
             return await context.send("No markets. Start one with `/market create`.")
@@ -185,28 +145,21 @@ class PlayMarket(commands.Cog):
             mine = f"\nYou hold {_coins(position.yes_shares)} YES / {_coins(position.no_shares)} NO." if position else ""
         await context.send(f"{self._summary(market)}\n_{market.rules}_{mine}")
 
-    @market_group.command(name="create", description="Create a YES/NO market.")
-    async def create_command(self, context: commands.Context, question: str, rules: str, closes: str, liquidity: Literal["low", "med", "high"] = "med"):
-        await self.create(context, question, rules, closes, liquidity)
+    @market_group.command(name="create", description="Create a YES/NO market you'll resolve yourself.")
+    async def create_command(self, context: commands.Context, question: str, rules: str, liquidity: Literal["low", "med", "high"] = "med"):
+        await self.create(context, question, rules, liquidity)
 
-    async def create(self, context: commands.Context, question: str, rules: str, closes: str, liquidity: str):
-        close_at = parse_when(closes)
-        if close_at is None:
-            return await context.send("I can't read that close time. Try `2025-07-01 18:00` or `in 3 days`.")
-        if close_at <= now():
-            return await context.send("The close time must be in the future.")
+    async def create(self, context: commands.Context, question: str, rules: str, liquidity: str):
         b = config.LIQUIDITY[liquidity]
         with self.db.session(Season) as session:
             season = self.active_season(session)
             if season.status != "active":
                 return await context.send("The season is wrapping up; no new markets right now.")
-            if close_at > season.ends_at:
-                return await context.send(f"Markets must close before the season ends ({_when(season.ends_at)}).")
             self.account(session, season.id, context.author.id)  # ensure creator has an account
-            market = Market(season_id=season.id, creator_id=context.author.id, question=question, rules=rules, b=b, subsidy=_whole(lmsr.subsidy(b)), close_at=close_at)
+            market = Market(season_id=season.id, creator_id=context.author.id, question=question, rules=rules, b=b, subsidy=_whole(lmsr.subsidy(b)))
             session.add(market)
             session.commit()
-            await context.send(f"Market **{market.id}** open: _{question}_ — YES 50%. Closes {_when(close_at)}.")
+            await context.send(f"Market **{market.id}** open: _{question}_ — YES 50%. Resolve it with `/market resolve {market.id} <yes|no>` when you know the outcome.")
 
     @market_group.command(name="quote", description="Preview a bet without placing it.")
     async def quote_command(self, context: commands.Context, market_id: int, side: Literal["yes", "no"], amount: int):
@@ -233,9 +186,8 @@ class PlayMarket(commands.Cog):
             market = self._lock_market(session, market_id)
             if market is None:
                 return await context.send("No such market.")
-            self.advance(session, market)
             if market.status != "OPEN":
-                return await context.send("Market is closed for trading. Use `/market propose` to resolve it.")
+                return await context.send("That market is resolved; trading is closed.")
             account = self.account(session, market.season_id, context.author.id)
             if account.balance < cost:
                 return await context.send(f"You only have {_coins(account.balance)} coins.")
@@ -254,9 +206,8 @@ class PlayMarket(commands.Cog):
             market = self._lock_market(session, market_id)
             if market is None:
                 return await context.send("No such market.")
-            self.advance(session, market)
             if market.status != "OPEN":
-                return await context.send("Trading is closed on that market.")
+                return await context.send("That market is resolved; trading is closed.")
             position = session.get(Position, (context.author.id, market_id))
             held = (position.yes_shares if side == "yes" else position.no_shares) if position else Decimal(0)
             amount = held if shares == "all" else Decimal(str(shares))
@@ -269,58 +220,7 @@ class PlayMarket(commands.Cog):
             session.commit()
             await context.send(f"Sold {_coins(amount)} {side.upper()} shares for {_coins(proceeds)} coins. YES is now {_pct(self._price(market))}.")
 
-    # --- resolution commands ---------------------------------------------
-
-    @market_group.command(name="propose", description="Propose an outcome for a closed market (posts a bond).")
-    async def propose_command(self, context: commands.Context, market_id: int, outcome: Literal["yes", "no"]):
-        await self.propose(context, market_id, outcome)
-
-    async def propose(self, context: commands.Context, market_id: int, outcome: str):
-        with self.db.session(Market) as session:
-            market = self._lock_market(session, market_id)
-            if market is None:
-                return await context.send("No such market.")
-            self.advance(session, market)
-            if market.status != "CLOSED":
-                return await context.send("Only a closed, unresolved market can be proposed.")
-            account = self.account(session, market.season_id, context.author.id)
-            if account.balance < config.PROPOSE_BOND:
-                return await context.send(f"You need {_coins(config.PROPOSE_BOND)} coins for the bond.")
-            self._hold_bond(account, config.PROPOSE_BOND)
-            session.add(Proposal(market_id=market_id, proposer_id=account.id, proposed=outcome, bond=config.PROPOSE_BOND, window_ends=now() + config.DISPUTE_WINDOW))
-            market.status = "PROPOSED"
-            session.commit()
-            await context.send(f"Market {market_id} proposed **{outcome.upper()}**. Disputable for 24h with `/market dispute`.")
-
-    @market_group.command(name="dispute", description="Dispute the proposed outcome (posts a matching bond).")
-    async def dispute_command(self, context: commands.Context, market_id: int):
-        await self.dispute(context, market_id)
-
-    async def dispute(self, context: commands.Context, market_id: int):
-        with self.db.session(Market) as session:
-            market = self._lock_market(session, market_id)
-            if market is None or market.status != "PROPOSED":
-                return await context.send("There is no open proposal to dispute.")
-            proposal = self._pending(session, market_id)
-            if now() >= proposal.window_ends:
-                self.advance(session, market)
-                session.commit()
-                return await context.send("The dispute window has closed; the market resolved to the proposal.")
-            if proposal.proposer_id == context.author.id:
-                return await context.send("You can't dispute your own proposal.")
-            account = self.account(session, market.season_id, context.author.id)
-            if account.balance < config.DISPUTE_BOND:
-                return await context.send(f"You need {_coins(config.DISPUTE_BOND)} coins for the bond.")
-            self._hold_bond(account, config.DISPUTE_BOND)
-            proposal.disputer_id = account.id
-            proposal.dispute_bond = config.DISPUTE_BOND
-            proposal.status = "disputed"
-            market.status = "DISPUTED"
-            session.commit()
-            await context.send(f"Market {market_id} disputed. An admin must `/market resolve` it.")
-
-    @market_group.command(name="resolve", description="Admin: settle a disputed market and run payouts.")
-    @commands.check(is_market_admin)
+    @market_group.command(name="resolve", description="Resolve your market and pay everyone out (creator only).")
     async def resolve_command(self, context: commands.Context, market_id: int, outcome: Literal["yes", "no", "void"]):
         await self.resolve(context, market_id, outcome)
 
@@ -329,13 +229,10 @@ class PlayMarket(commands.Cog):
             market = self._lock_market(session, market_id)
             if market is None:
                 return await context.send("No such market.")
-            self.advance(session, market)
-            if market.status not in ("CLOSED", "PROPOSED", "DISPUTED"):
-                return await context.send("That market can't be resolved until it closes.")
-            proposal = self._pending(session, market_id)
-            if proposal:
-                proposal.resolver_id = context.author.id
-                self._settle_bonds(session, market, proposal, outcome)
+            if market.status != "OPEN":
+                return await context.send("That market is already resolved.")
+            if context.author.id != market.creator_id:
+                return await context.send("Only the market's creator can resolve it.")
             self._resolve_market(session, market, outcome)
             session.commit()
             await context.send(f"Market {market_id} resolved **{outcome.upper()}**. Payouts done.")
@@ -352,11 +249,11 @@ class PlayMarket(commands.Cog):
         return season
 
     def settle_season_if_due(self, session):
-        """After the grace period, force-void stragglers and roll into the next season."""
+        """After the grace period, void any markets the creators never resolved and roll into the next season."""
         season = session.query(Season).filter_by(status="settling").first()
         if season is None or now() < season.ends_at + config.SETTLEMENT_GRACE:
             return
-        for market in session.query(Market).filter(Market.season_id == season.id, Market.status.notin_(("RESOLVED", "VOID"))).all():
+        for market in session.query(Market).filter(Market.season_id == season.id, Market.status == "OPEN").all():
             self._resolve_market(session, market, "void")
         accounts = session.query(PlayerAccount).all()
         for rank, account in enumerate(sorted(accounts, key=lambda a: a.balance, reverse=True), start=1):
@@ -365,7 +262,6 @@ class PlayMarket(commands.Cog):
         next_season = self._new_season(session)
         for account in accounts:
             account.balance = 0
-            account.locked = 0
             self._credit(session, next_season.id, account, None, config.STARTING_BALANCE, "season_grant")
 
     def _new_season(self, session) -> Season:
@@ -375,24 +271,13 @@ class PlayMarket(commands.Cog):
         session.flush()  # assign id for use as a foreign key
         return season
 
-    def advance(self, session, market: Market):
-        """Apply time-driven transitions to one market (also done lazily on every touch)."""
-        if market.status == "OPEN" and now() >= market.close_at:
-            market.status = "CLOSED"
-        elif market.status == "PROPOSED":
-            proposal = self._pending(session, market.id)
-            if proposal and now() >= proposal.window_ends:
-                self._release_bond(self._lock_account(session, proposal.proposer_id), proposal.bond)
-                proposal.status = "accepted"
-                self._resolve_market(session, market, proposal.proposed)
-
     # --- money mechanics (the only places balances and the ledger change) ---
 
     def account(self, session, season_id: int, user_id: int) -> PlayerAccount:
         """Fetch the player's account (locked for update), granting the season's starting balance on first sight."""
         account = self._lock_account(session, user_id)
         if account is None:
-            account = PlayerAccount(id=user_id, balance=0, locked=0)
+            account = PlayerAccount(id=user_id, balance=0)
             session.add(account)
             self._credit(session, season_id, account, None, config.STARTING_BALANCE, "season_grant")
         return account
@@ -401,29 +286,6 @@ class PlayMarket(commands.Cog):
         """Change a balance and write the matching ledger row in one place, so they never drift apart."""
         account.balance += delta
         session.add(LedgerEntry(season_id=season_id, user_id=account.id, market_id=market_id, delta=delta, reason=reason))
-
-    def _hold_bond(self, account, amount):
-        account.balance -= amount
-        account.locked += amount
-
-    def _release_bond(self, account, amount):
-        account.locked -= amount
-        account.balance += amount
-
-    def _settle_bonds(self, session, market, proposal, outcome):
-        """Zero-sum bond settlement: the loser's bond moves to the winner; void returns both."""
-        proposer = self._lock_account(session, proposal.proposer_id)
-        disputer = self._lock_account(session, proposal.disputer_id) if proposal.disputer_id else None
-        self._release_bond(proposer, proposal.bond)
-        if disputer is None:
-            proposal.status = "settled"
-            return
-        self._release_bond(disputer, proposal.dispute_bond)
-        if outcome != "void":
-            winner, loser, forfeit = (proposer, disputer, proposal.dispute_bond) if proposal.proposed == outcome else (disputer, proposer, proposal.bond)
-            self._credit(session, market.season_id, loser, market.id, -forfeit, "bond")
-            self._credit(session, market.season_id, winner, market.id, forfeit, "bond_win")
-        proposal.status = "settled"
 
     def _resolve_market(self, session, market, outcome):
         """Pay winning shares (or 0.5 each on void), close positions, finalise the market."""
@@ -453,7 +315,7 @@ class PlayMarket(commands.Cog):
             position.no_shares += delta
             market.q_no += delta
 
-    def _sell_proceeds(self, market, side, amount) -> Decimal:
+    def _sell_proceeds(self, market, side, amount) -> int:
         before = lmsr.cost(float(market.q_yes), float(market.q_no), float(market.b))
         q_yes = float(market.q_yes) - (float(amount) if side == "yes" else 0)
         q_no = float(market.q_no) - (float(amount) if side == "no" else 0)
@@ -464,7 +326,7 @@ class PlayMarket(commands.Cog):
     def _standings(self, session):
         """List of (user_id, net worth) ranked high to low; net worth = balance + value of open positions."""
         worth = {a.id: a.balance for a in session.query(PlayerAccount).all()}
-        rows = session.query(Position, Market).join(Market, Position.market_id == Market.id).filter(Market.status.in_(TRADING)).all()
+        rows = session.query(Position, Market).join(Market, Position.market_id == Market.id).filter(Market.status == "OPEN").all()
         for position, market in rows:
             yes_price = Decimal(str(self._price(market)))
             worth[position.user_id] = worth.get(position.user_id, Decimal(0)) + position.yes_shares * yes_price + position.no_shares * (1 - yes_price)
@@ -475,9 +337,6 @@ class PlayMarket(commands.Cog):
 
     def _lock_account(self, session, user_id) -> Optional[PlayerAccount]:
         return session.query(PlayerAccount).filter_by(id=user_id).with_for_update().first()
-
-    def _pending(self, session, market_id) -> Optional[Proposal]:
-        return session.query(Proposal).filter(Proposal.market_id == market_id, Proposal.status.in_(("pending", "disputed"))).first()
 
     def _price(self, market) -> float:
         return lmsr.price_yes(float(market.q_yes), float(market.q_no), float(market.b))
@@ -502,7 +361,3 @@ def _coins(value) -> str:
 
 def _pct(probability: float) -> str:
     return f"{probability * 100:.0f}%"
-
-
-def _when(moment: datetime) -> str:
-    return moment.strftime("%Y-%m-%d %H:%M")

@@ -4,10 +4,9 @@ from unittest import mock
 import pytest
 
 from duckbot.cogs.playmarket import config
-from duckbot.cogs.playmarket.models import Market, Proposal, Season, SeasonResult
+from duckbot.cogs.playmarket.models import Season, SeasonResult
 from tests.cogs.playmarket.conftest import (
     account,
-    close_markets,
     ledger,
     market_row,
     open_market,
@@ -98,7 +97,7 @@ async def test_create_opens_a_market_at_fifty_percent(cog, alice, db):
 
 
 async def test_create_announces_the_new_market(cog, alice):
-    await cog.create(alice, "Rain?", "NWS call", "in 1 day", "med")
+    await cog.create(alice, "Rain?", "NWS call", "med")
     assert "YES 50%" in alice.send.call_args.args[0]
 
 
@@ -110,27 +109,10 @@ async def test_create_sets_liquidity_and_subsidy_by_tier(cog, alice, db, tier, b
     assert market.subsidy == math.floor(b * math.log(2))
 
 
-async def test_create_rejects_an_unparseable_close_time(cog, alice, db):
-    await cog.create(alice, "Q", "rules", "whenever", "med")
-    assert "can't read that close time" in alice.send.call_args.args[0]
-    with db.session(Market) as session:
-        assert session.query(Market).count() == 0
-
-
-async def test_create_rejects_a_close_time_in_the_past(cog, alice, clock):
-    await cog.create(alice, "Q", "rules", "2020-01-01", "med")
-    assert alice.send.call_args.args[0] == "The close time must be in the future."
-
-
-async def test_create_rejects_a_close_after_the_season_ends(cog, alice):
-    await cog.create(alice, "Q", "rules", "in 400 days", "med")
-    assert "before the season ends" in alice.send.call_args.args[0]
-
-
 async def test_create_is_blocked_once_the_season_is_settling(cog, alice, clock):
     await open_market(cog, alice)  # creates Season 1
     clock.advance(days=183)  # past the season end
-    await cog.create(alice, "Q", "rules", "in 1 day", "med")
+    await cog.create(alice, "Q", "rules", "med")
     assert alice.send.call_args.args[0] == "The season is wrapping up; no new markets right now."
 
 
@@ -182,11 +164,11 @@ async def test_bet_more_than_you_can_afford_is_rejected(cog, alice, db):
     assert account(db, 1).balance == STARTING
 
 
-async def test_bet_on_a_closed_market_is_rejected(cog, alice, clock, db):
+async def test_bet_on_a_resolved_market_is_rejected(cog, alice, bob, db):
     market_id = await open_market(cog, alice)
-    await close_markets(cog, clock)
-    await cog.bet(alice, market_id, "yes", BET)
-    assert "closed for trading" in alice.send.call_args.args[0]
+    await cog.resolve(alice, market_id, "yes")
+    await cog.bet(bob, market_id, "yes", BET)
+    assert "trading is closed" in bob.send.call_args.args[0]
 
 
 async def test_bet_keeps_the_ledger_reconciled(cog, alice, bob, db):
@@ -217,9 +199,9 @@ async def test_quote_reports_shares_and_resulting_price(cog, alice):
     assert alice.send.call_args.args[0] == "500 coins buys ~832 YES shares; YES would move to 70%."
 
 
-async def test_quote_on_a_closed_market_is_rejected(cog, alice, clock):
+async def test_quote_on_a_resolved_market_is_rejected(cog, alice):
     market_id = await open_market(cog, alice)
-    await close_markets(cog, clock)
+    await cog.resolve(alice, market_id, "yes")
     await cog.quote(alice, market_id, "yes", BET)
     assert alice.send.call_args.args[0] == "That market is not open for trading."
 
@@ -263,12 +245,12 @@ async def test_sell_writes_a_sell_ledger_row(cog, alice, db):
     assert reasons(db, 1) == ["season_grant", "bet", "sell"]
 
 
-async def test_sell_on_a_closed_market_is_rejected(cog, alice, clock):
+async def test_sell_on_a_resolved_market_is_rejected(cog, alice, db):
     market_id = await open_market(cog, alice)
     await cog.bet(alice, market_id, "yes", BET)
-    await close_markets(cog, clock)
+    await cog.resolve(alice, market_id, "yes")
     await cog.sell(alice, market_id, "yes", "all")
-    assert alice.send.call_args.args[0] == "Trading is closed on that market."
+    assert "trading is closed" in alice.send.call_args.args[0]
 
 
 async def test_sell_keeps_the_ledger_reconciled(cog, alice, db):
@@ -278,224 +260,66 @@ async def test_sell_keeps_the_ledger_reconciled(cog, alice, db):
     assert reconciles(db)
 
 
-# --- propose -------------------------------------------------------------
+# --- resolve (creator only) ----------------------------------------------
 
 
-async def test_propose_moves_a_closed_market_to_proposed(cog, alice, bob, clock, db):
+async def test_creator_can_resolve_their_market(cog, alice, db):
     market_id = await open_market(cog, alice)
-    await close_markets(cog, clock)
-    await cog.propose(bob, market_id, "yes")
-    assert market_row(db, market_id).status == "PROPOSED"
-
-
-async def test_propose_holds_the_bond(cog, alice, bob, clock, db):
-    market_id = await open_market(cog, alice)
-    await close_markets(cog, clock)
-    await cog.propose(bob, market_id, "yes")
-    assert (account(db, 2).balance, account(db, 2).locked) == (STARTING - config.PROPOSE_BOND, config.PROPOSE_BOND)
-
-
-async def test_propose_opens_a_24h_dispute_window(cog, alice, bob, clock, db):
-    market_id = await open_market(cog, alice)
-    await close_markets(cog, clock)
-    await cog.propose(bob, market_id, "yes")
-    with db.session(Proposal) as session:
-        proposal = session.query(Proposal).filter_by(market_id=market_id).one()
-    assert proposal.window_ends == clock.t + config.DISPUTE_WINDOW
-
-
-async def test_propose_before_close_is_rejected(cog, alice, db):
-    market_id = await open_market(cog, alice)
-    await cog.propose(alice, market_id, "yes")
-    assert alice.send.call_args.args[0] == "Only a closed, unresolved market can be proposed."
-
-
-async def test_propose_without_enough_for_the_bond_is_rejected(cog, alice, bob, clock, db):
-    market_id = await open_market(cog, alice)
-    await cog.balance(bob)  # create bob's account
-    set_balance(db, 2, 10)
-    await close_markets(cog, clock)
-    await cog.propose(bob, market_id, "yes")
-    assert bob.send.call_args.args[0] == "You need 500 coins for the bond."
-
-
-# --- dispute -------------------------------------------------------------
-
-
-async def test_dispute_moves_the_market_to_disputed(cog, alice, bob, carol, clock, db):
-    market_id = await open_market(cog, alice)
-    await close_markets(cog, clock)
-    await cog.propose(bob, market_id, "yes")
-    await cog.dispute(carol, market_id)
-    assert market_row(db, market_id).status == "DISPUTED"
-
-
-async def test_dispute_holds_a_matching_bond(cog, alice, bob, carol, clock, db):
-    market_id = await open_market(cog, alice)
-    await close_markets(cog, clock)
-    await cog.propose(bob, market_id, "yes")
-    await cog.dispute(carol, market_id)
-    assert account(db, 3).locked == config.DISPUTE_BOND
-
-
-async def test_disputing_your_own_proposal_is_rejected(cog, alice, bob, clock, db):
-    market_id = await open_market(cog, alice)
-    await close_markets(cog, clock)
-    await cog.propose(bob, market_id, "yes")
-    await cog.dispute(bob, market_id)
-    assert bob.send.call_args.args[0] == "You can't dispute your own proposal."
-
-
-async def test_disputing_with_no_proposal_is_rejected(cog, alice, clock):
-    market_id = await open_market(cog, alice)
-    await close_markets(cog, clock)
-    await cog.dispute(alice, market_id)
-    assert alice.send.call_args.args[0] == "There is no open proposal to dispute."
-
-
-async def test_disputing_after_the_window_finalizes_the_market(cog, alice, bob, carol, clock, db):
-    market_id = await open_market(cog, alice)
-    await close_markets(cog, clock)
-    await cog.propose(bob, market_id, "yes")
-    clock.advance(hours=25)
-    await cog.dispute(carol, market_id)
-    assert "dispute window has closed" in carol.send.call_args.args[0]
-    assert market_row(db, market_id).status == "RESOLVED"
-
-
-# --- resolve -------------------------------------------------------------
-
-
-async def test_admin_can_resolve_a_closed_market_directly(cog, alice, clock, db):
-    market_id = await open_market(cog, alice)
-    await close_markets(cog, clock)
     await cog.resolve(alice, market_id, "yes")
     assert market_row(db, market_id).status == "RESOLVED"
+    assert alice.send.call_args.args[0] == f"Market {market_id} resolved **YES**. Payouts done."
 
 
-async def test_resolving_yes_pays_the_yes_holders(cog, alice, bob, clock, db):
+async def test_only_the_creator_can_resolve(cog, alice, bob, db):
     market_id = await open_market(cog, alice)
-    await cog.bet(alice, market_id, "yes", BET)
-    await cog.bet(bob, market_id, "no", BET)
-    await close_markets(cog, clock)
-    await cog.resolve(alice, market_id, "yes")
-    assert account(db, 1).balance > STARTING  # winning YES paid out above the stake
-    assert account(db, 2).balance == STARTING - BET  # losing NO got nothing
-
-
-async def test_resolving_void_pays_half_to_everyone(cog, alice, clock, db):
-    market_id = await open_market(cog, alice)
-    await cog.bet(alice, market_id, "yes", 300)
-    await close_markets(cog, clock)
-    await cog.resolve(alice, market_id, "void")
-    market = market_row(db, market_id)
-    assert market.status == "VOID"
-    # 300 coins buys ~530 YES shares at b=1000; each redeems at 0.5 -> ~265 back on the 9,700 remaining.
-    assert float(account(db, 1).balance) == pytest.approx(9965, abs=1)
-
-
-async def test_resolving_clears_all_positions(cog, alice, clock, db):
-    market_id = await open_market(cog, alice)
-    await cog.bet(alice, market_id, "yes", BET)
-    await close_markets(cog, clock)
-    await cog.resolve(alice, market_id, "yes")
-    assert position(db, 1, market_id) is None
-
-
-async def test_resolving_before_close_is_rejected(cog, alice, db):
-    market_id = await open_market(cog, alice)
-    await cog.resolve(alice, market_id, "yes")
-    assert alice.send.call_args.args[0] == "That market can't be resolved until it closes."
+    await cog.resolve(bob, market_id, "yes")
+    assert bob.send.call_args.args[0] == "Only the market's creator can resolve it."
     assert market_row(db, market_id).status == "OPEN"
 
 
-async def test_resolve_returns_the_bond_on_an_undisputed_proposal(cog, alice, bob, clock, db):
+async def test_resolving_an_already_resolved_market_is_rejected(cog, alice):
     market_id = await open_market(cog, alice)
-    await close_markets(cog, clock)
-    await cog.propose(bob, market_id, "yes")  # proposed, nobody disputes
-    await cog.resolve(alice, market_id, "yes")  # admin settles it directly
-    assert account(db, 2).balance == STARTING and account(db, 2).locked == 0
-    assert market_row(db, market_id).status == "RESOLVED"
+    await cog.resolve(alice, market_id, "yes")
+    await cog.resolve(alice, market_id, "no")
+    assert alice.send.call_args.args[0] == "That market is already resolved."
 
 
-async def test_resolve_awards_the_disputed_bond_to_a_correct_proposer(cog, alice, bob, carol, clock, db):
+async def test_resolving_an_unknown_market_is_rejected(cog, alice):
+    await cog.resolve(alice, 999, "yes")
+    assert alice.send.call_args.args[0] == "No such market."
+
+
+async def test_resolving_yes_pays_the_yes_holders(cog, alice, bob, carol, db):
     market_id = await open_market(cog, alice)
-    await close_markets(cog, clock)
-    await cog.propose(bob, market_id, "yes")
-    await cog.dispute(carol, market_id)
-    await cog.resolve(alice, market_id, "yes")  # proposer was right
-    assert account(db, 2).balance == STARTING + config.DISPUTE_BOND  # bond back + the disputer's bond
-    assert account(db, 3).balance == STARTING - config.DISPUTE_BOND  # forfeited the dispute bond
+    await cog.bet(bob, market_id, "yes", BET)
+    await cog.bet(carol, market_id, "no", BET)
+    await cog.resolve(alice, market_id, "yes")
+    assert account(db, 2).balance > STARTING  # bob held YES and won
+    assert account(db, 3).balance == STARTING - BET  # carol held NO and got nothing
 
 
-async def test_resolve_awards_the_disputed_bond_to_a_correct_disputer(cog, alice, bob, carol, clock, db):
+async def test_resolving_void_pays_half_to_everyone(cog, alice, bob, db):
     market_id = await open_market(cog, alice)
-    await close_markets(cog, clock)
-    await cog.propose(bob, market_id, "yes")
-    await cog.dispute(carol, market_id)
-    await cog.resolve(alice, market_id, "no")  # disputer was right
-    assert account(db, 3).balance == STARTING + config.PROPOSE_BOND
-    assert account(db, 2).balance == STARTING - config.PROPOSE_BOND
-
-
-async def test_resolving_void_returns_both_bonds(cog, alice, bob, carol, clock, db):
-    market_id = await open_market(cog, alice)
-    await close_markets(cog, clock)
-    await cog.propose(bob, market_id, "yes")
-    await cog.dispute(carol, market_id)
+    await cog.bet(bob, market_id, "yes", 300)
     await cog.resolve(alice, market_id, "void")
-    assert account(db, 2).balance == STARTING and account(db, 2).locked == 0
-    assert account(db, 3).balance == STARTING and account(db, 3).locked == 0
+    assert market_row(db, market_id).status == "VOID"
+    # 300 coins buys ~530 YES shares at b=1000; each redeems at 0.5 -> ~265 back on the 9,700 remaining.
+    assert float(account(db, 2).balance) == pytest.approx(9965, abs=1)
 
 
-async def test_resolving_keeps_the_ledger_reconciled(cog, alice, bob, carol, clock, db):
+async def test_resolving_clears_all_positions(cog, alice, bob, db):
     market_id = await open_market(cog, alice)
-    await cog.bet(alice, market_id, "yes", BET)
-    await cog.bet(bob, market_id, "no", BET)
-    await close_markets(cog, clock)
-    await cog.propose(alice, market_id, "yes")
-    await cog.dispute(carol, market_id)
-    await cog.resolve(bob, market_id, "yes")
+    await cog.bet(bob, market_id, "yes", BET)
+    await cog.resolve(alice, market_id, "yes")
+    assert position(db, 2, market_id) is None
+
+
+async def test_resolving_keeps_the_ledger_reconciled(cog, alice, bob, carol, db):
+    market_id = await open_market(cog, alice)
+    await cog.bet(bob, market_id, "yes", BET)
+    await cog.bet(carol, market_id, "no", BET)
+    await cog.resolve(alice, market_id, "yes")
     assert reconciles(db)
-
-
-# --- scheduler / state machine ------------------------------------------
-
-
-async def test_tick_closes_a_market_whose_time_has_passed(cog, alice, clock, db):
-    market_id = await open_market(cog, alice)
-    clock.advance(days=2)
-    await cog.tick()
-    assert market_row(db, market_id).status == "CLOSED"
-
-
-async def test_tick_finalizes_a_proposal_after_its_window(cog, alice, bob, clock, db):
-    market_id = await open_market(cog, alice)
-    await cog.bet(alice, market_id, "yes", BET)
-    await close_markets(cog, clock)
-    await cog.propose(bob, market_id, "yes")
-    clock.advance(hours=25)
-    await cog.tick()
-    assert market_row(db, market_id).status == "RESOLVED"
-    assert account(db, 2).locked == 0  # proposer's bond returned
-
-
-async def test_tick_leaves_a_disputed_market_for_an_admin(cog, alice, bob, carol, clock, db):
-    market_id = await open_market(cog, alice)
-    await close_markets(cog, clock)
-    await cog.propose(bob, market_id, "yes")
-    await cog.dispute(carol, market_id)
-    clock.advance(days=5)
-    await cog.tick()
-    assert market_row(db, market_id).status == "DISPUTED"
-
-
-async def test_tick_closes_several_markets_at_once(cog, alice, clock, db):
-    first = await open_market(cog, alice)
-    second = await open_market(cog, alice)
-    clock.advance(days=2)
-    await cog.tick()
-    assert market_row(db, first).status == "CLOSED" and market_row(db, second).status == "CLOSED"
 
 
 # --- claim (need-based top-up) ------------------------------------------
@@ -587,7 +411,7 @@ async def test_rollover_resets_every_balance(cog, alice, bob, clock, db):
     await cog.balance(bob)
     clock.advance(days=190)
     await cog.tick()
-    assert account(db, 1).balance == STARTING and account(db, 1).locked == 0
+    assert account(db, 1).balance == STARTING
     assert account(db, 2).balance == STARTING
 
 
@@ -627,25 +451,20 @@ async def test_before_tick_waits_for_the_bot_to_be_ready(cog):
 # --- end-to-end integrity -----------------------------------------------
 
 
-async def test_full_dispute_lifecycle_settles_correctly(cog, alice, bob, clock, db):
+async def test_full_lifecycle_settles_correctly(cog, alice, bob, db):
     market_id = await open_market(cog, alice)
     await cog.bet(alice, market_id, "yes", BET)
     await cog.bet(bob, market_id, "no", BET)
-    await close_markets(cog, clock)
-    await cog.propose(alice, market_id, "yes")
-    await cog.dispute(bob, market_id)
-    await cog.resolve(alice, market_id, "yes")  # alice (proposer + YES holder) is right
-    assert account(db, 1).balance > STARTING + config.DISPUTE_BOND  # payout + bond back + won dispute bond
-    assert account(db, 2).balance == STARTING - BET - config.DISPUTE_BOND  # lost bet + lost dispute bond
-    assert account(db, 1).locked == 0 and account(db, 2).locked == 0
+    await cog.resolve(alice, market_id, "yes")  # alice (creator + YES holder) wins
+    assert account(db, 1).balance > STARTING
+    assert account(db, 2).balance == STARTING - BET
     assert reconciles(db)
 
 
-async def test_coins_stay_whole_after_payouts(cog, alice, bob, clock, db):
+async def test_coins_stay_whole_after_payouts(cog, alice, bob, db):
     market_id = await open_market(cog, alice)
     await cog.bet(alice, market_id, "yes", 333)
     await cog.bet(bob, market_id, "no", 777)
-    await close_markets(cog, clock)
     await cog.resolve(alice, market_id, "yes")
     for uid in (1, 2):
         assert isinstance(account(db, uid).balance, int)
