@@ -3,7 +3,7 @@ from .bitcoin import Bitcoin
 from .kubernetes import Kubernetes
 from .tarlson import Tarlson
 from .typos import Typos
-
+from .timeout import Timeout
 
 async def setup(bot):
     await bot.add_cog(Bitcoin())
@@ -11,3 +11,4 @@ async def setup(bot):
     await bot.add_cog(Typos())
     await bot.add_cog(Bezos())
     await bot.add_cog(Tarlson())
+    await bot.add_cog(Timeout(bot))
