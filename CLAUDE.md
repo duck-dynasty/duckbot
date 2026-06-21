@@ -40,12 +40,21 @@ setup_nltk
 - **Import sorting**: isort (black-compatible profile)
 - **Linter**: flake8 (max line length 200, max complexity 10)
 - Unused imports in `__init__.py` files are allowed (F401 ignored)
+- **Comments are terse.** One short line is plenty — the first sentence is enough detail. Don't write multi-line explainer docstrings, restate what the code already says, or narrate the "why" at length. Reviewers reject verbose, AI-style comments; prefer self-documenting code with the occasional one-liner for genuinely non-obvious things.
+
+## Cog Conventions
+
+- **Group a cog's commands under one `@commands.hybrid_group`** (see `weather`, `games/satisfy`) — e.g. `/market bet`, `/market balance` — rather than adding many top-level commands to the global namespace.
+- **Admin/owner checks**: reuse the owner-id allowlist pattern from `duckbot/cogs/github/yolo_merge.py` (`is_repository_admin`) instead of inventing new permission logic.
+- **Prefer the simplest design that works.** Fewer moving parts, fewer places things happen. Avoid speculative complexity (schedulers, multi-step flows, extra tables/state) when a simpler approach fits a small friend-group bot. Study how existing cogs solve a similar problem and match that before introducing a new pattern.
 
 ## Testing Conventions
 
 - Tests use pytest with `asyncio_mode = "auto"` — async test functions work without explicit markers.
 - Tests run in parallel (`-n auto --dist loadfile`) with network access blocked (`--blockage`).
 - Global fixtures are in `tests/fixtures/` and loaded via `tests/conftest.py`. The `message` fixture generates multiple test cases (guild channel, DM, group channel).
+- **Cog-specific fixtures and helpers live in the test file**, not a per-cog `conftest.py` — there are no per-cog conftests in this repo. Even cogs with many test files (e.g. `games/satisfy`) define their fixtures inline; duplicating a one-line `cog`/`clazz` fixture across files is fine and preferred over a shared conftest. Only put genuinely reusable, behaviour-agnostic fixtures in `tests/fixtures/`.
+- **Don't shadow shared fixtures.** The global `db` fixture is a *mocked* session. For logic worth testing against real rows (balances, ledgers, etc.), use the shared `in_memory_db` fixture (real in-memory SQLite, in `tests/fixtures/database.py`) — don't redefine `db` locally.
 - To test a `@commands.command` or `@tasks.loop` method, delegate the logic to a separate method and test that directly, since the decorators change the method signature:
   ```python
   # source

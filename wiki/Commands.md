@@ -13,6 +13,7 @@
 |           `!fortune`           | get a random fortune told to you by a cow          |
 |       `!help` or `!wiki`       | gives a link to this wiki                          |
 |            `!lmgt`             | generates a google search link for the given query |
+| [`/market`](Prediction-Market) | bet on prediction markets, balances, leaderboard   |
 |            `!mock`             | converts text into MoCkInG tExT                    |
 |     [`!pokemon`](#pokemon)     | gives information about pokemon                    |
 |  [`!recipe`](#recipe-search)   | search for a random recipe                         |
