@@ -1,7 +1,7 @@
 from unittest import mock
 
 import pytest
-from sqlalchemy import BigInteger, create_engine
+from sqlalchemy import BigInteger, create_engine, event
 from sqlalchemy.ext.compiler import compiles
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
@@ -32,6 +32,7 @@ class InMemoryDatabase:
 
     def __init__(self):
         self.engine = create_engine("sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool)
+        event.listen(self.engine, "connect", lambda conn, _: conn.execute("PRAGMA foreign_keys=ON"))
         self._sessions = sessionmaker(self.engine, expire_on_commit=False)  # keep rows readable after close
 
     def session(self, model):

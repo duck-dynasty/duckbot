@@ -253,6 +253,7 @@ class PlayMarket(commands.Cog):
         if account is None:
             account = PlayerAccount(id=user_id, balance=0)
             session.add(account)
+            session.flush()
             self._credit(session, season_id, account, None, config.STARTING_BALANCE, "season_grant")
         return account
 
