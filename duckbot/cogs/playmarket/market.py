@@ -187,17 +187,6 @@ class PlayMarket(commands.Cog):
     async def resolve_command(self, context: commands.Context, market: int, outcome: Literal["yes", "no", "void"]):
         await self.resolve(context, market, outcome)
 
-    @bet_command.autocomplete("market")
-    @sell_command.autocomplete("market")
-    @resolve_command.autocomplete("market")
-    async def market_autocomplete(self, interaction: Interaction, current: str) -> List[Choice[int]]:
-        needle = f"%{current}%"
-        with self.db.session(Market) as session:
-            matches = session.query(Market.id, Market.question)
-            matches = matches.filter(Market.status == "OPEN", or_(Market.question.ilike(needle), cast(Market.id, String).ilike(needle)))
-            matches = matches.order_by(Market.id.desc()).limit(25).all()  # Discord caps options at 25
-        return [Choice(name=f"{mid}: {q}"[:100], value=mid) for mid, q in matches]
-
     async def resolve(self, context: commands.Context, market_id: int, outcome: str):
         with self.db.session(Market) as session:
             market = self._lock_market(session, market_id)
@@ -210,6 +199,22 @@ class PlayMarket(commands.Cog):
             self._resolve_market(session, market, outcome)
             session.commit()
             await context.send(f"Market {market_id} called **{outcome.upper()}**. Winners paid, losers weep.")
+
+    @market_group.autocomplete("status")
+    @list_command.autocomplete("status")
+    async def status_autocomplete(self, interaction: Interaction, current: str) -> List[Choice[str]]:
+        return [Choice(name=s.title(), value=s) for s in ("OPEN", "RESOLVED", "VOID") if current.upper() in s]
+
+    @bet_command.autocomplete("market")
+    @sell_command.autocomplete("market")
+    @resolve_command.autocomplete("market")
+    async def market_autocomplete(self, interaction: Interaction, current: str) -> List[Choice[int]]:
+        needle = f"%{current}%"
+        with self.db.session(Market) as session:
+            matches = session.query(Market.id, Market.question)
+            matches = matches.filter(Market.status == "OPEN", or_(Market.question.ilike(needle), cast(Market.id, String).ilike(needle)))
+            matches = matches.order_by(Market.id.desc()).limit(25).all()  # Discord caps options at 25
+        return [Choice(name=f"{mid}: {q}"[:100], value=mid) for mid, q in matches]
 
     # --- season lifecycle -------------------------------------------------
 

@@ -546,6 +546,24 @@ async def test_autocomplete_filters_in_the_db_not_after_limiting(cog, alice):
     assert any("UNICORN" in c.name for c in result)
 
 
+# --- status autocomplete -------------------------------------------------
+
+
+async def test_status_autocomplete_suggests_all_statuses_when_empty(cog):
+    result = await cog.status_autocomplete(mock.Mock(), "")
+    assert [c.value for c in result] == ["OPEN", "RESOLVED", "VOID"]
+
+
+async def test_status_autocomplete_filters_by_current(cog):
+    result = await cog.status_autocomplete(mock.Mock(), "res")
+    assert [c.value for c in result] == ["RESOLVED"]
+
+
+async def test_status_autocomplete_is_case_insensitive(cog):
+    result = await cog.status_autocomplete(mock.Mock(), "VoId")
+    assert [c.value for c in result] == ["VOID"]
+
+
 # --- cog lifecycle & command wiring --------------------------------------
 
 
