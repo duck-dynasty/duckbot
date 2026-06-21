@@ -69,7 +69,6 @@ class Truth(commands.Cog):
     async def fact_check(self, message: discord.Message) -> str:
         try:
             content = message.content
-            # Use the message's edited timestamp if it exists, otherwise use created timestamp
             message_date = message.edited_at if message.edited_at else message.created_at
             prompt = TRUTH_PROMPT.format(user_name=message.author.display_name, user_message=content, date=message_date.strftime("%B %d, %Y"))
             completion = self.ai_client.chat.completions.create(model="llama-3.3-70b-versatile", max_tokens=1000, temperature=0, messages=[{"role": "user", "content": prompt}])
