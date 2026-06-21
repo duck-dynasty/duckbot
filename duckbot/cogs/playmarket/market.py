@@ -9,6 +9,7 @@ from sqlalchemy import String, cast, or_
 
 from duckbot.db import Database
 from duckbot.util.datetime import now
+from duckbot.util.users import get_user
 
 from . import config, lmsr
 from .models import LedgerEntry, Market, PlayerAccount, Position, Season, SeasonResult
@@ -70,7 +71,7 @@ class PlayMarket(commands.Cog):
             account = self.account(session, season.id, context.author.id)
             rows = session.query(Position, Market).join(Market, Position.market_id == Market.id).filter(Position.user_id == account.id, Market.status == "OPEN").order_by(Market.id.desc()).all()
             session.commit()
-            lines = [f"**{self._name(context, account.id)}** — {_coins(account.balance)} coins"]
+            lines = [f"**{await self._name(context, account.id)}** — {_coins(account.balance)} coins"]
             lines += [f"**{m.id}** {m.question} — YES {_pct(self._price(m))} · you hold {_coins(p.yes_shares)} YES / {_coins(p.no_shares)} NO" for p, m in rows if p.yes_shares or p.no_shares]
         await context.send("\n".join(lines))
 
@@ -104,7 +105,7 @@ class PlayMarket(commands.Cog):
             session.commit()
         if not ranked:
             return await context.send("Nobody's played yet. Buncha cowards.")
-        lines = [f"{i}. {self._name(context, uid)} — {_coins(worth)} coins" for i, (uid, worth) in enumerate(ranked, start=1)]
+        lines = [f"{i}. {await self._name(context, uid)} — {_coins(worth)} coins" for i, (uid, worth) in enumerate(ranked, start=1)]
         await context.send("**Leaderboard**\n" + "\n".join(lines))
 
     # --- market commands --------------------------------------------------
@@ -327,9 +328,8 @@ class PlayMarket(commands.Cog):
     async def _is_admin(self, context) -> bool:
         return await context.bot.is_owner(context.author) or context.author.id in config.ADMIN_IDS
 
-    def _name(self, context, user_id) -> str:
-        member = context.guild.get_member(user_id) if context.guild else None
-        user = member or self.bot.get_user(user_id)
+    async def _name(self, context, user_id) -> str:
+        user = await get_user(self.bot, user_id, context.guild)
         return user.display_name if user else str(user_id)
 
 
