@@ -208,7 +208,19 @@ async def test_create_is_blocked_once_the_season_is_settling(cog, alice, clock):
 async def test_bet_buys_yes_shares_and_moves_the_price(cog, alice, in_memory_db):
     market_id = await open_market(cog, alice)
     await cog.bet(alice, market_id, "yes", BET)
-    assert alice.send.call_args.args[0] == "Bought 832 YES shares for 500 coins. YES is now 70%."
+    embed = alice.send.call_args.kwargs["embed"]
+    assert embed.title == f"Market {market_id} — Will it happen?"
+    assert embed.description == "user1 bought 832 YES shares for 500 coins.\nYES is now 70%."
+
+
+async def test_bet_embed_lists_every_holder(cog, alice, bob, in_memory_db):
+    market_id = await open_market(cog, alice)
+    await cog.bet(alice, market_id, "yes", BET)
+    await cog.bet(bob, market_id, "no", BET)
+    holders = bob.send.call_args.kwargs["embed"].fields[0]
+    assert holders.name == "Holders"
+    assert "user1 — 832 YES / 0 NO" in holders.value
+    assert "user2 — 0 YES /" in holders.value
 
 
 async def test_bet_records_the_position(cog, alice, in_memory_db):
