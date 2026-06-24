@@ -57,6 +57,7 @@ async def test_detect_haiku_finds_case_insensitive_haiku(message):
         ("*five* seven five", "*five*\nseven\nfive"),
         ("_five_ seven five", "*five*\nseven\nfive"),
         ("*five* _seven_ five", "*five*\n*seven*\nfive"),
+        ("five _seven five_", "five\n*seven\nfive*"),
         ("~~five~~ seven five", "~~five~~\nseven\nfive"),
         ("`five` seven five", "`five`\nseven\nfive"),
         ("||five|| seven five", "||five||\nseven\nfive"),
