@@ -12,9 +12,6 @@ MIDDLE_FINGER_CHANCE = 0.10
 
 
 class ThankingRobot(commands.Cog):
-    def __init__(self, bot):
-        self.bot = bot
-
     @commands.Cog.listener("on_message")
     async def correct_giving_thanks(self, message):
         """Correcting people who thank the robot."""
@@ -38,7 +35,7 @@ class ThankingRobot(commands.Cog):
             if not GENERIC_THANKS_PATTERN.search(content):
                 return
             ref = await get_message_reference(message)
-            if ref is None or ref.author != self.bot.user:
+            if ref is None or not ref.author.bot:
                 return
         emoji = "\N{REVERSED HAND WITH MIDDLE FINGER EXTENDED}" if random.random() < MIDDLE_FINGER_CHANCE else "\N{THUMBS UP SIGN}"
         await message.add_reaction(emoji)
