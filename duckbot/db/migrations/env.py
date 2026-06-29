@@ -4,14 +4,15 @@ from logging.config import fileConfig
 import sqlalchemy as sa
 from alembic import context
 
-from duckbot.cogs.weather.saved_location import Base
+from duckbot.cogs.playmarket.models import Base as PlayMarketBase
+from duckbot.cogs.weather.saved_location import Base as WeatherBase
 
 config = context.config
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-target_metadata = Base.metadata
+target_metadata = [WeatherBase.metadata, PlayMarketBase.metadata]
 
 if os.getenv("DATABASE_URL"):
     config.set_main_option("sqlalchemy.url", os.getenv("DATABASE_URL"))

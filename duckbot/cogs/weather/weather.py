@@ -189,4 +189,5 @@ class Weather(commands.Cog):
         plt.setp(left_axis.get_xticklabels(), rotation=30, horizontalalignment="right")
         figure.tight_layout()
         plt.savefig("weather.png", facecolor="ghostwhite")
+        plt.close(figure)
         return "weather.png"

@@ -9,10 +9,10 @@ from duckbot.cogs.ai import Truth
 
 
 @pytest.fixture
-@mock.patch("anthropic.Anthropic")
-def mock_ai_client(mock_anthropic):
-    instance = mock_anthropic.return_value
-    instance.messages.create.return_value = mock.Mock(content=[mock.Mock(text="Fact-checked response.")])
+@mock.patch("groq.Groq")
+def mock_ai_client(mock_groq):
+    instance = mock_groq.return_value
+    instance.chat.completions.create.return_value = mock.Mock(choices=[mock.Mock(message=mock.Mock(content="Fact-checked response."))])
     return instance
 
 
@@ -65,7 +65,7 @@ async def mock_get_message_reference():
 
 
 def test_create_client(bot, monkeypatch):
-    monkeypatch.setenv("ANTHROPIC_API_KEY", "fake_key")
+    monkeypatch.setenv("GROQ_API_KEY", "fake_key")
     clazz = Truth(bot)
     assert clazz._ai_client is None
     assert clazz.ai_client == clazz._ai_client
@@ -83,7 +83,7 @@ async def test_fact_check_response(truth, message):
 
 
 async def test_fact_check_exception(truth, message):
-    truth.ai_client.messages.create.side_effect = Exception("we ran out of GPUs")
+    truth.ai_client.chat.completions.create.side_effect = Exception("we ran out of GPUs")
     response = await truth.fact_check(message)
     assert response == "The robot uprising has been postponed due to the following error: we ran out of GPUs"
 
@@ -122,6 +122,6 @@ async def test_fact_check_uses_edited_timestamp_when_available(truth):
     await truth.fact_check(message)
 
     # Verify the AI client was called with the edited date
-    call_args = truth.ai_client.messages.create.call_args
-    prompt_text = call_args.kwargs["messages"][0]["content"][0]["text"]
+    call_args = truth.ai_client.chat.completions.create.call_args
+    prompt_text = call_args.kwargs["messages"][0]["content"]
     assert "January 16, 2024" in prompt_text  # Should use edited date, not created date

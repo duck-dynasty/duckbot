@@ -13,6 +13,7 @@
 |           `!fortune`           | get a random fortune told to you by a cow          |
 |       `!help` or `!wiki`       | gives a link to this wiki                          |
 |            `!lmgt`             | generates a google search link for the given query |
+| [`/market`](Prediction-Market) | bet on prediction markets, balances, leaderboard   |
 |            `!mock`             | converts text into MoCkInG tExT                    |
 |     [`!pokemon`](#pokemon)     | gives information about pokemon                    |
 |  [`!recipe`](#recipe-search)   | search for a random recipe                         |
@@ -65,7 +66,7 @@ DuckBot can provide information about Pokémon, because that matters. The comman
 
 ## Truth
 
-DuckBot will use the power of AI to analyze claims in a referenced message and provides a formatted response indicating whether claims are confirmed, disputed, or unverified. Fact-checks are done by using Claude AI (via Anthropic's API).
+DuckBot will use the power of AI to analyze claims in a referenced message and provides a formatted response indicating whether claims are confirmed, disputed, or unverified. Fact-checks are done by using Llama (via Groq's API).
 
 Usage Instructions:
 
@@ -189,7 +190,7 @@ Tells the solver to maximize output of the given item. Should only be used when 
 
 Maximization occurs by item weights, so it will _not_ behave as you expect when multiple items are maximized. The solver will pick the item with the better rate to weight ratio. It is recommended to maximize a single item only.
 
-There's no way to remove a maximize item, a full reset of the factory is required.
+Running `/satisfy maximize` again for an item that is already being maximized will remove it from the maximize set.
 
 ```
 /satisfy booster   item amount

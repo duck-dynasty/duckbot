@@ -49,3 +49,21 @@ def test_populate_duckbot_day(now, bot, time, seconds):
 def test_populate_family_day(bot, date):
     clazz = SpecialDays(bot)
     assert clazz.get_list(date) == ["Family Day"]
+
+
+@pytest.mark.parametrize("date", [datetime(2024, 5, 20), datetime(2025, 5, 19), datetime(2026, 5, 18)])
+def test_populate_victoria_day(bot, date):
+    clazz = SpecialDays(bot)
+    assert clazz.get_list(date) == ["Victoria Day"]
+
+
+@pytest.mark.parametrize("date", [datetime(2024, 10, 14), datetime(2025, 10, 13), datetime(2026, 10, 12)])
+def test_populate_thanksgiving_day(bot, date):
+    clazz = SpecialDays(bot)
+    assert clazz.get_list(date) == ["Thanksgiving Day"]
+
+
+@pytest.mark.parametrize("date", [datetime(2024, 12, 26), datetime(2025, 12, 26), datetime(2026, 12, 26)])
+def test_populate_boxing_day(bot, date):
+    clazz = SpecialDays(bot)
+    assert clazz.get_list(date) == ["Boxing Day"]

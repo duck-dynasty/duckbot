@@ -55,13 +55,29 @@ async def test_add_target_stores_output_rate(clazz, context, default_factory):
     assert clazz.factory(context) == default_factory
 
 
-async def test_add_maximize_stores_maximizer(clazz, context, default_factory):
-    await clazz.add_maximize.callback(clazz, context, str(Item.IronOre))
+async def test_toggle_maximize_stores_maximizer(clazz, context, default_factory):
+    await clazz.toggle_maximize.callback(clazz, context, str(Item.IronOre))
     default_factory.maximize = {Item.IronOre}
     assert clazz.factory(context) == default_factory
 
-    await clazz.add_maximize.callback(clazz, context, str(Item.IronIngot))
+    await clazz.toggle_maximize.callback(clazz, context, str(Item.IronIngot))
     default_factory.maximize = {Item.IronOre, Item.IronIngot}
+    assert clazz.factory(context) == default_factory
+
+
+async def test_toggle_maximize_removes_already_maximized_item(clazz, context, default_factory):
+    await clazz.toggle_maximize.callback(clazz, context, str(Item.IronOre))
+    await clazz.toggle_maximize.callback(clazz, context, str(Item.IronOre))
+    default_factory.maximize = set()
+    assert clazz.factory(context) == default_factory
+
+
+async def test_toggle_maximize_removes_toggled_only(clazz, context, default_factory):
+    await clazz.toggle_maximize.callback(clazz, context, str(Item.IronOre))
+    await clazz.toggle_maximize.callback(clazz, context, str(Item.IronIngot))
+    await clazz.toggle_maximize.callback(clazz, context, str(Item.CopperOre))
+    await clazz.toggle_maximize.callback(clazz, context, str(Item.IronIngot))
+    default_factory.maximize = {Item.IronOre, Item.CopperOre}
     assert clazz.factory(context) == default_factory
 
 
@@ -206,7 +222,7 @@ async def test_solve_no_in_or_out(clazz, context, default_factory):
     context.send.assert_called_once_with("No.", delete_after=60)
 
 
-@mock.patch("duckbot.cogs.games.satisfy.satisfy.optimize", return_value=dict())
+@mock.patch("duckbot.cogs.games.satisfy.satisfy.optimize", return_value={})
 async def test_solve_all_defaults(opt, clazz, context, default_factory):
     default_factory.inputs = Item.IronOre * 30
     default_factory.maximize = {Item.IronOre}
@@ -218,7 +234,7 @@ async def test_solve_all_defaults(opt, clazz, context, default_factory):
     opt.assert_called_once_with(expected)
 
 
-@mock.patch("duckbot.cogs.games.satisfy.satisfy.optimize", return_value=dict())
+@mock.patch("duckbot.cogs.games.satisfy.satisfy.optimize", return_value={})
 async def test_solve_different_recipe_bank(opt, clazz, context, default_factory):
     default_factory.inputs = Item.IronOre * 30
     default_factory.maximize = {Item.IronOre}
@@ -231,7 +247,7 @@ async def test_solve_different_recipe_bank(opt, clazz, context, default_factory)
     opt.assert_called_once_with(expected)
 
 
-@mock.patch("duckbot.cogs.games.satisfy.satisfy.optimize", return_value=dict())
+@mock.patch("duckbot.cogs.games.satisfy.satisfy.optimize", return_value={})
 async def test_solve_recipe_includes(opt, clazz, context, default_factory):
     default_factory.inputs = Item.IronOre * 30
     default_factory.maximize = {Item.IronOre}
@@ -245,7 +261,7 @@ async def test_solve_recipe_includes(opt, clazz, context, default_factory):
     opt.assert_called_once_with(expected)
 
 
-@mock.patch("duckbot.cogs.games.satisfy.satisfy.optimize", return_value=dict())
+@mock.patch("duckbot.cogs.games.satisfy.satisfy.optimize", return_value={})
 async def test_solve_recipe_excludes(opt, clazz, context, default_factory):
     default_factory.inputs = Item.IronOre * 30
     default_factory.maximize = {Item.IronOre}
