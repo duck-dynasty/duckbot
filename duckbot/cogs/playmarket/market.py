@@ -2,7 +2,7 @@ import math
 from decimal import ROUND_DOWN, Decimal
 from typing import List, Literal, Optional
 
-from discord import Interaction
+from discord import Color, Embed, Interaction
 from discord.app_commands import Choice
 from discord.ext import commands, tasks
 from sqlalchemy import String, cast, or_
@@ -159,7 +159,8 @@ class PlayMarket(commands.Cog):
             self._credit(session, market.season_id, account, market.id, -cost, "bet")
             self._add_shares(session, market, context.author.id, side, shares)
             session.commit()
-            await context.send(f"Bought {_coins(shares)} {side.upper()} shares for {_coins(cost)} coins. YES is now {_pct(self._price(market))}.")
+            action = f"{context.author.display_name} bought {_coins(shares)} {side.upper()} shares for {_coins(cost)} coins."
+            await context.send(embed=await self._trade_embed(context, session, market, action, side))
 
     @market_group.command(name="sell", description="Sell held shares back to the market.")
     async def sell_command(self, context: commands.Context, market: int, side: Literal["yes", "no"], shares: str):
@@ -182,7 +183,8 @@ class PlayMarket(commands.Cog):
             self._add_shares(session, market, context.author.id, side, -amount)
             self._credit(session, market.season_id, account, market.id, proceeds, "sell")
             session.commit()
-            await context.send(f"Sold {_coins(amount)} {side.upper()} shares for {_coins(proceeds)} coins. YES is now {_pct(self._price(market))}.")
+            action = f"{context.author.display_name} sold {_coins(amount)} {side.upper()} shares for {_coins(proceeds)} coins."
+            await context.send(embed=await self._trade_embed(context, session, market, action, side))
 
     @market_group.command(name="resolve", description="Resolve your market and pay everyone out (creator only).")
     async def resolve_command(self, context: commands.Context, market: int, outcome: Literal["yes", "no", "void"]):
@@ -324,6 +326,15 @@ class PlayMarket(commands.Cog):
 
     def _summary(self, market) -> str:
         return f"**{market.id}** [{market.status}] {market.question} — YES {_pct(self._price(market))}"
+
+    async def _trade_embed(self, context, session, market, action: str, side: str) -> Embed:
+        embed = Embed(title=f"Market {market.id} — {market.question}", description=f"{action}\nYES is now {_pct(self._price(market))}.", color=Color.green() if side == "yes" else Color.red())
+        positions = session.query(Position).filter(Position.market_id == market.id, (Position.yes_shares > 0) | (Position.no_shares > 0)).all()
+        positions.sort(key=lambda p: p.yes_shares + p.no_shares, reverse=True)
+        holders = [f"{await self._name(context, p.user_id)} — {_coins(p.yes_shares)} YES / {_coins(p.no_shares)} NO" for p in positions]
+        if holders:
+            embed.add_field(name="Holders", value="\n".join(holders), inline=False)
+        return embed
 
     async def _is_admin(self, context) -> bool:
         return await context.bot.is_owner(context.author) or context.author.id in config.ADMIN_IDS
