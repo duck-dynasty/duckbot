@@ -2,6 +2,7 @@ import datetime
 import math
 from unittest import mock
 
+import discord
 import pytest
 
 from duckbot.cogs.playmarket import config
@@ -208,19 +209,18 @@ async def test_create_is_blocked_once_the_season_is_settling(cog, alice, clock):
 async def test_bet_buys_yes_shares_and_moves_the_price(cog, alice, in_memory_db):
     market_id = await open_market(cog, alice)
     await cog.bet(alice, market_id, "yes", BET)
-    embed = alice.send.call_args.kwargs["embed"]
-    assert embed.title == f"Market {market_id} — Will it happen?"
-    assert embed.description == "user1 bought 832 YES shares for 500 coins.\nYES is now 70%."
+    expected = discord.Embed(title=f"Market {market_id} — Will it happen?", description="user1 bought 832 YES shares for 500 coins.\nYES is now 70%.", color=discord.Color.green())
+    expected.add_field(name="Holders", value="user1 — 832 YES / 0 NO", inline=False)
+    assert alice.send.call_args.kwargs["embed"] == expected
 
 
 async def test_bet_embed_lists_every_holder(cog, alice, bob, in_memory_db):
     market_id = await open_market(cog, alice)
     await cog.bet(alice, market_id, "yes", BET)
     await cog.bet(bob, market_id, "no", BET)
-    holders = bob.send.call_args.kwargs["embed"].fields[0]
-    assert holders.name == "Holders"
-    assert "user1 — 832 YES / 0 NO" in holders.value
-    assert "user2 — 0 YES /" in holders.value
+    expected = discord.Embed(title=f"Market {market_id} — Will it happen?", description="user2 bought 1,144 NO shares for 500 coins.\nYES is now 42%.", color=discord.Color.red())
+    expected.add_field(name="Holders", value="user2 — 0 YES / 1,144 NO\nuser1 — 832 YES / 0 NO", inline=False)
+    assert bob.send.call_args.kwargs["embed"] == expected
 
 
 async def test_bet_records_the_position(cog, alice, in_memory_db):
@@ -246,6 +246,9 @@ async def test_bet_on_no_lowers_the_yes_price(cog, alice, in_memory_db):
     await cog.bet(alice, market_id, "no", BET)
     assert float(market_row(in_memory_db, market_id).q_no) > 0
     assert cog._price(market_row(in_memory_db, market_id)) < 0.5
+    expected = discord.Embed(title=f"Market {market_id} — Will it happen?", description="user1 bought 832 NO shares for 500 coins.\nYES is now 30%.", color=discord.Color.red())
+    expected.add_field(name="Holders", value="user1 — 0 YES / 832 NO", inline=False)
+    assert alice.send.call_args.kwargs["embed"] == expected
 
 
 async def test_bet_below_the_minimum_is_rejected(cog, alice, in_memory_db):
@@ -289,6 +292,8 @@ async def test_sell_all_clears_the_position(cog, alice, in_memory_db):
     await cog.bet(alice, market_id, "yes", BET)
     await cog.sell(alice, market_id, "yes", "all")
     assert position(in_memory_db, 1, market_id).yes_shares == 0
+    expected = discord.Embed(title=f"Market {market_id} — Will it happen?", description="user1 sold 832 YES shares for 499 coins.\nYES is now 50%.", color=discord.Color.green())
+    assert alice.send.call_args.kwargs["embed"] == expected
 
 
 async def test_sell_returns_almost_the_whole_stake(cog, alice, in_memory_db):
