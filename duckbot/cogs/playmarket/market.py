@@ -61,7 +61,7 @@ class PlayMarket(commands.Cog):
 
     # --- economy commands -------------------------------------------------
 
-    @market_group.command(name="balance", description="Show your coins and open positions.")
+    @market_group.command(name="balance", description="Show your coin balance and active bets.")
     async def balance_command(self, context: commands.Context):
         await self.balance(context)
 
@@ -75,7 +75,7 @@ class PlayMarket(commands.Cog):
             lines += [f"**{m.id}** {m.question} — YES {_pct(self._price(m))} · you hold {_coins(p.yes_shares)} YES / {_coins(p.no_shares)} NO" for p, m in rows if p.yes_shares or p.no_shares]
         await context.send("\n".join(lines))
 
-    @market_group.command(name="claim", description="Claim the need-based top-up if you are broke and have no open positions.")
+    @market_group.command(name="claim", description="Get a coin top-up when you're low and have no active bets.")
     async def claim_command(self, context: commands.Context):
         await self.claim(context)
 
@@ -95,7 +95,7 @@ class PlayMarket(commands.Cog):
             session.commit()
             await context.send(f"Pity money granted. You're sitting on {_coins(account.balance)} coins now, you charity case.")
 
-    @market_group.command(name="leaderboard", description="Current-season standings by net worth.")
+    @market_group.command(name="leaderboard", description="See who's winning this season.")
     async def leaderboard_command(self, context: commands.Context):
         await self.leaderboard(context)
 
@@ -110,7 +110,7 @@ class PlayMarket(commands.Cog):
 
     # --- market commands --------------------------------------------------
 
-    @market_group.command(name="list", description="List markets with their current YES %.")
+    @market_group.command(name="list", description="Browse markets and their current YES odds.")
     async def list_command(self, context: commands.Context, status: Optional[str] = None):
         await self.list_markets(context, status)
 
@@ -122,7 +122,7 @@ class PlayMarket(commands.Cog):
             return await context.send("No markets. What, you hate fun?")
         await context.send("\n".join(self._summary(m) for m in markets))
 
-    @market_group.command(name="create", description="Create a YES/NO market you'll resolve yourself.")
+    @market_group.command(name="create", description="Open a new question for people to bet on.")
     async def create_command(self, context: commands.Context, question: str, liquidity: Literal["low", "med", "high"] = "med"):
         await self.create(context, question, liquidity)
 
@@ -138,7 +138,7 @@ class PlayMarket(commands.Cog):
             session.commit()
             await context.send(f"Market **{market.id}** is live: _{question}_ — YES 50%. Place your bets, degenerates.")
 
-    @market_group.command(name="bet", description="Buy YES/NO shares for a coin budget.")
+    @market_group.command(name="bet", description="Bet coins on a market resolving YES or NO.")
     async def bet_command(self, context: commands.Context, market: int, side: Literal["yes", "no"], amount: int):
         await self.bet(context, market, side, amount)
 
@@ -162,7 +162,7 @@ class PlayMarket(commands.Cog):
             action = f"{context.author.display_name} bought {_coins(shares)} {side.upper()} shares for {_coins(cost)} coins."
             await context.send(embed=await self._trade_embed(context, session, market, action, side))
 
-    @market_group.command(name="sell", description="Sell held shares back to the market.")
+    @market_group.command(name="sell", description="Cash out some or all of your position in a market.")
     async def sell_command(self, context: commands.Context, market: int, side: Literal["yes", "no"], shares: str):
         await self.sell(context, market, side, shares)
 
@@ -186,7 +186,7 @@ class PlayMarket(commands.Cog):
             action = f"{context.author.display_name} sold {_coins(amount)} {side.upper()} shares for {_coins(proceeds)} coins."
             await context.send(embed=await self._trade_embed(context, session, market, action, side))
 
-    @market_group.command(name="resolve", description="Resolve your market and pay everyone out (creator only).")
+    @market_group.command(name="resolve", description="Close your market with an outcome and pay out winners.")
     async def resolve_command(self, context: commands.Context, market: int, outcome: Literal["yes", "no", "void"]):
         await self.resolve(context, market, outcome)
 
