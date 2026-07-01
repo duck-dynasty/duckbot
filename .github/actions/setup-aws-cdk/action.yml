@@ -9,7 +9,7 @@ outputs:
 runs:
   using: composite
   steps:
-  - uses: actions/checkout@v6
+  - uses: actions/checkout@v7
 
   - name: Set up Python Environment
     id: venv
