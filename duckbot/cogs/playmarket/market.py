@@ -199,9 +199,15 @@ class PlayMarket(commands.Cog):
                 return await context.send("That one's already in the books, brother.")
             if context.author.id != market.creator_id and not await self._is_admin(context):
                 return await context.send("Not your market, not your call.")
+            results = []
+            for pos in session.query(Position).filter_by(market_id=market.id).all():
+                if not pos.yes_shares and not pos.no_shares:
+                    continue
+                invested = sum(e.delta for e in session.query(LedgerEntry).filter_by(user_id=pos.user_id, market_id=market.id).filter(LedgerEntry.reason.in_(("bet", "sell"))).all())
+                results.append((pos.user_id, pos.yes_shares, pos.no_shares, invested, self._payout(pos, outcome)))
             self._resolve_market(session, market, outcome)
             session.commit()
-            await context.send(f"Market {market_id} called **{outcome.upper()}**. Winners paid, losers weep.")
+            await context.send(embed=await self._resolve_embed(context, market, outcome, results))
 
     @market_group.autocomplete("status")
     @list_command.autocomplete("status")
@@ -326,6 +332,22 @@ class PlayMarket(commands.Cog):
 
     def _summary(self, market) -> str:
         return f"**{market.id}** [{market.status}] {market.question} — YES {_pct(self._price(market))}"
+
+    async def _resolve_embed(self, context, market, outcome: str, results) -> Embed:
+        color = Color.green() if outcome == "yes" else Color.red() if outcome == "no" else Color.greyple()
+        embed = Embed(title=f"Market {market.id} — {market.question}", description=f"Called **{outcome.upper()}**.", color=color)
+        lines = []
+        for user_id, yes_shares, no_shares, invested, payout in sorted(results, key=lambda r: r[3] + r[4], reverse=True):
+            name = await self._name(context, user_id)
+            net = payout + invested
+            side = "YES" if yes_shares >= no_shares else "NO"
+            if net > 0:
+                lines.append(f"{name} — {_coins(-invested)} on {side}, won {_coins(payout)} (+{_coins(net)})")
+            else:
+                lines.append(f"{name} — {_coins(-invested)} on {side}, lost {_coins(-net)}")
+        if lines:
+            embed.add_field(name="Results", value="\n".join(lines), inline=False)
+        return embed
 
     async def _trade_embed(self, context, session, market, action: str, side: str) -> Embed:
         embed = Embed(title=f"Market {market.id} — {market.question}", description=f"{action}\nYES is now {_pct(self._price(market))}.", color=Color.green() if side == "yes" else Color.red())

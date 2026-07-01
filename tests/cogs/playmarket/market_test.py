@@ -351,7 +351,18 @@ async def test_creator_can_resolve_their_market(cog, alice, in_memory_db):
     market_id = await open_market(cog, alice)
     await cog.resolve(alice, market_id, "yes")
     assert market_row(in_memory_db, market_id).status == "RESOLVED"
-    assert alice.send.call_args.args[0] == f"Market {market_id} called **YES**. Winners paid, losers weep."
+    expected = discord.Embed(title=f"Market {market_id} — Will it happen?", description="Called **YES**.", color=discord.Color.green())
+    alice.send.assert_called_with(embed=expected)
+
+
+async def test_resolve_embed_shows_winners_and_losers(cog, alice, bob, carol, in_memory_db):
+    market_id = await open_market(cog, alice)
+    await cog.bet(bob, market_id, "yes", BET)
+    await cog.bet(carol, market_id, "no", BET)
+    await cog.resolve(alice, market_id, "yes")
+    expected = discord.Embed(title=f"Market {market_id} — Will it happen?", description="Called **YES**.", color=discord.Color.green())
+    expected.add_field(name="Results", value="user2 — 500 on YES, won 831 (+331)\nuser3 — 500 on NO, lost 500", inline=False)
+    alice.send.assert_called_with(embed=expected)
 
 
 async def test_a_non_creator_non_admin_cannot_resolve(cog, alice, bob, in_memory_db):
