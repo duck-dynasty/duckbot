@@ -16,6 +16,8 @@ from .models import LedgerEntry, Market, PlayerAccount, Position, Season, Season
 
 CENT = Decimal("0.000001")
 
+MEDALS = {1: "🥇", 2: "🥈", 3: "🥉"}
+
 
 def _down(value: float) -> Decimal:
     """Round a share count down to storage precision."""
@@ -101,12 +103,11 @@ class PlayMarket(commands.Cog):
 
     async def leaderboard(self, context: commands.Context):
         with self.db.session(Season) as session:
-            ranked = self._standings(session)
+            standings = self._standings(session)
             session.commit()
-        if not ranked:
+        if not standings:
             return await context.send("Nobody's played yet. Buncha cowards.")
-        lines = [f"{i}. {await self._name(context, uid)} — {_coins(worth)} coins" for i, (uid, worth) in enumerate(ranked, start=1)]
-        await context.send("**Leaderboard**\n" + "\n".join(lines))
+        await context.send(embed=await self._leaderboard_embed(context, standings))
 
     # --- market commands --------------------------------------------------
 
@@ -313,13 +314,14 @@ class PlayMarket(commands.Cog):
     # --- read helpers -----------------------------------------------------
 
     def _standings(self, session):
-        """(user_id, net worth) ranked high to low; net worth = balance + open position value."""
-        worth = {a.id: a.balance for a in session.query(PlayerAccount).all()}
+        """(user_id, cash, shares_value) ranked by net worth (cash + shares_value) high to low."""
+        cash = {a.id: a.balance for a in session.query(PlayerAccount).all()}
+        shares_value = {uid: Decimal(0) for uid in cash}
         rows = session.query(Position, Market).join(Market, Position.market_id == Market.id).filter(Market.status == "OPEN").all()
         for position, market in rows:
             yes_price = Decimal(str(self._price(market)))
-            worth[position.user_id] = worth.get(position.user_id, Decimal(0)) + position.yes_shares * yes_price + position.no_shares * (1 - yes_price)
-        return sorted(worth.items(), key=lambda kv: kv[1], reverse=True)
+            shares_value[position.user_id] = shares_value.get(position.user_id, Decimal(0)) + position.yes_shares * yes_price + position.no_shares * (1 - yes_price)
+        return sorted(((uid, cash[uid], shares_value[uid]) for uid in cash), key=lambda row: row[1] + row[2], reverse=True)
 
     def _lock_market(self, session, market_id) -> Optional[Market]:
         return session.query(Market).filter_by(id=market_id).with_for_update().first()
@@ -357,6 +359,13 @@ class PlayMarket(commands.Cog):
         if holders:
             embed.add_field(name="Holders", value="\n".join(holders), inline=False)
         return embed
+
+    async def _leaderboard_embed(self, context, standings) -> Embed:
+        lines = [
+            f"{MEDALS.get(i, f'{i}.')} {await self._name(context, uid)} — {_coins(cash + shares_value)} coins ({_coins(cash)} cash + {_coins(shares_value)} shares)"
+            for i, (uid, cash, shares_value) in enumerate(standings, start=1)
+        ]
+        return Embed(title="Leaderboard", description="\n".join(lines), color=Color.gold())
 
     async def _is_admin(self, context) -> bool:
         return await context.bot.is_owner(context.author) or context.author.id in config.ADMIN_IDS
