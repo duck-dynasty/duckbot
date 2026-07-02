@@ -320,7 +320,7 @@ class PlayMarket(commands.Cog):
         rows = session.query(Position, Market).join(Market, Position.market_id == Market.id).filter(Market.status == "OPEN").all()
         for position, market in rows:
             yes_price = Decimal(str(self._price(market)))
-            shares_value[position.user_id] = shares_value.get(position.user_id, Decimal(0)) + position.yes_shares * yes_price + position.no_shares * (1 - yes_price)
+            shares_value[position.user_id] += position.yes_shares * yes_price + position.no_shares * (1 - yes_price)
         return sorted(((uid, cash[uid], shares_value[uid]) for uid in cash), key=lambda row: row[1] + row[2], reverse=True)
 
     def _lock_market(self, session, market_id) -> Optional[Market]:
@@ -361,11 +361,12 @@ class PlayMarket(commands.Cog):
         return embed
 
     async def _leaderboard_embed(self, context, standings) -> Embed:
-        lines = [
-            f"{MEDALS.get(i, f'{i}.')} {await self._name(context, uid)} — {_coins(cash + shares_value)} coins ({_coins(cash)} cash + {_coins(shares_value)} shares)"
-            for i, (uid, cash, shares_value) in enumerate(standings, start=1)
-        ]
+        lines = [await self._standing_line(context, i, uid, cash, shares_value) for i, (uid, cash, shares_value) in enumerate(standings, start=1)]
         return Embed(title="Leaderboard", description="\n".join(lines), color=Color.gold())
+
+    async def _standing_line(self, context, rank, uid, cash, shares_value) -> str:
+        name = await self._name(context, uid)
+        return f"{MEDALS.get(rank, f'{rank}.')} {name} — {_coins(cash + shares_value)} coins ({_coins(cash)} available)"
 
     async def _is_admin(self, context) -> bool:
         return await context.bot.is_owner(context.author) or context.author.id in config.ADMIN_IDS

@@ -479,7 +479,7 @@ async def test_leaderboard_ranks_by_net_worth(cog, alice, bob, in_memory_db):
     market_id = await open_market(cog, bob)
     await cog.bet(bob, market_id, "yes", BET)  # bob's position is worth more than his spent coins
     await cog.leaderboard(alice)
-    expected = discord.Embed(title="Leaderboard", description="🥇 user2 — 10,080 coins (9,500 cash + 580 shares)\n🥈 user1 — 10,000 coins (10,000 cash + 0 shares)", color=discord.Color.gold())
+    expected = discord.Embed(title="Leaderboard", description="🥇 user2 — 10,080 coins (9,500 available)\n🥈 user1 — 10,000 coins (10,000 available)", color=discord.Color.gold())
     alice.send.assert_called_with(embed=expected)
 
 
@@ -487,10 +487,10 @@ async def test_leaderboard_medals_the_top_three_then_falls_back_to_numbers(cog, 
     standings = [(1, 100, 0), (2, 90, 0), (3, 80, 0), (4, 70, 0)]
     embed = await cog._leaderboard_embed(alice, standings)
     assert embed.description.splitlines() == [
-        "🥇 user1 — 100 coins (100 cash + 0 shares)",
-        "🥈 user2 — 90 coins (90 cash + 0 shares)",
-        "🥉 user3 — 80 coins (80 cash + 0 shares)",
-        "4. user4 — 70 coins (70 cash + 0 shares)",
+        "🥇 user1 — 100 coins (100 available)",
+        "🥈 user2 — 90 coins (90 available)",
+        "🥉 user3 — 80 coins (80 available)",
+        "4. user4 — 70 coins (70 available)",
     ]
 
 
