@@ -209,7 +209,7 @@ async def test_create_is_blocked_once_the_season_is_settling(cog, alice, clock):
 async def test_bet_buys_yes_shares_and_moves_the_price(cog, alice, in_memory_db):
     market_id = await open_market(cog, alice)
     await cog.bet(alice, market_id, "yes", BET)
-    expected = discord.Embed(title=f"Market {market_id} — Will it happen?", description="user1 bought 832 YES shares for 500 coins.\nYES is now 70%.", color=discord.Color.green())
+    expected = discord.Embed(title=f"Market {market_id} — Will it happen?", description="user1 bought 832 YES shares for 500 coins.\nYES is now 69.67%.", color=discord.Color.green())
     expected.add_field(name="Holders", value="user1 — 832 YES / 0 NO", inline=False)
     alice.send.assert_called_with(embed=expected)
 
@@ -218,7 +218,7 @@ async def test_bet_embed_lists_every_holder(cog, alice, bob, in_memory_db):
     market_id = await open_market(cog, alice)
     await cog.bet(alice, market_id, "yes", BET)
     await cog.bet(bob, market_id, "no", BET)
-    expected = discord.Embed(title=f"Market {market_id} — Will it happen?", description="user2 bought 1,144 NO shares for 500 coins.\nYES is now 42%.", color=discord.Color.red())
+    expected = discord.Embed(title=f"Market {market_id} — Will it happen?", description="user2 bought 1,144 NO shares for 500 coins.\nYES is now 42.26%.", color=discord.Color.red())
     expected.add_field(name="Holders", value="user2 — 0 YES / 1,144 NO\nuser1 — 832 YES / 0 NO", inline=False)
     bob.send.assert_called_with(embed=expected)
 
@@ -246,7 +246,7 @@ async def test_bet_on_no_lowers_the_yes_price(cog, alice, in_memory_db):
     await cog.bet(alice, market_id, "no", BET)
     assert float(market_row(in_memory_db, market_id).q_no) > 0
     assert cog._price(market_row(in_memory_db, market_id)) < 0.5
-    expected = discord.Embed(title=f"Market {market_id} — Will it happen?", description="user1 bought 832 NO shares for 500 coins.\nYES is now 30%.", color=discord.Color.red())
+    expected = discord.Embed(title=f"Market {market_id} — Will it happen?", description="user1 bought 832 NO shares for 500 coins.\nYES is now 30.33%.", color=discord.Color.red())
     expected.add_field(name="Holders", value="user1 — 0 YES / 832 NO", inline=False)
     alice.send.assert_called_with(embed=expected)
 
