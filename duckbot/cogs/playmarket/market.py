@@ -371,4 +371,4 @@ def _coins(value) -> str:
 
 
 def _pct(probability: float) -> str:
-    return f"{probability * 100:.0f}%"
+    return f"{probability * 100:.2f}".rstrip("0").rstrip(".") + "%"
