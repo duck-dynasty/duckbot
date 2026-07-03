@@ -400,13 +400,30 @@ async def test_resolving_yes_pays_the_yes_holders(cog, alice, bob, carol, in_mem
     assert account(in_memory_db, 3).balance == STARTING - BET  # carol held NO and got nothing
 
 
-async def test_resolving_void_pays_half_to_everyone(cog, alice, bob, in_memory_db):
+async def test_resolving_void_refunds_every_bet(cog, alice, bob, in_memory_db):
+    market_id = await open_market(cog, alice)
+    await cog.bet(bob, market_id, "no", 99)
+    await cog.bet(bob, market_id, "no", 1234)
+    await cog.resolve(alice, market_id, "void")
+    assert market_row(in_memory_db, market_id).status == "VOID"
+    assert account(in_memory_db, 2).balance == STARTING
+
+
+async def test_resolving_void_refunds_the_stake_net_of_sells(cog, alice, bob, in_memory_db):
+    market_id = await open_market(cog, alice)
+    await cog.bet(bob, market_id, "yes", BET)
+    await cog.sell(bob, market_id, "yes", "200")
+    await cog.resolve(alice, market_id, "void")
+    assert account(in_memory_db, 2).balance == STARTING
+
+
+async def test_resolve_embed_shows_void_refunds(cog, alice, bob, in_memory_db):
     market_id = await open_market(cog, alice)
     await cog.bet(bob, market_id, "yes", 300)
     await cog.resolve(alice, market_id, "void")
-    assert market_row(in_memory_db, market_id).status == "VOID"
-    # ~530 YES shares, each redeems at 0.5 on void
-    assert float(account(in_memory_db, 2).balance) == pytest.approx(9965, abs=1)
+    expected = discord.Embed(title=f"Market {market_id} — Will it happen?", description="Called **VOID**.", color=discord.Color.greyple())
+    expected.add_field(name="Results", value="user2 — 300 on YES, refunded", inline=False)
+    alice.send.assert_called_with(embed=expected)
 
 
 async def test_resolving_clears_all_positions(cog, alice, bob, in_memory_db):
