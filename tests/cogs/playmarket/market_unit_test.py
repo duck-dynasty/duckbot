@@ -65,6 +65,6 @@ def test_coins_are_shown_as_whole_numbers(value, shown):
     assert _coins(value) == shown
 
 
-@pytest.mark.parametrize("probability,shown", [(0.5, "50%"), (0.697, "70%"), (0.0, "0%"), (1.0, "100%")])
-def test_prices_are_shown_as_whole_percents(probability, shown):
+@pytest.mark.parametrize("probability,shown", [(0.5, "50%"), (0.697, "69.7%"), (0.0, "0%"), (1.0, "100%"), (0.0193, "1.93%")])
+def test_prices_keep_a_few_decimal_places(probability, shown):
     assert _pct(probability) == shown
