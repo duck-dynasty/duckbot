@@ -18,27 +18,27 @@ def cog(bot, db):
 
 def test_winning_yes_pays_one_coin_per_share(cog):
     holding = SimpleNamespace(yes_shares=Decimal(10), no_shares=Decimal(4))
-    assert cog._payout(holding, "yes") == 10
+    assert cog._payout(holding, "yes", -7) == 10
 
 
 def test_winning_no_pays_one_coin_per_share(cog):
     holding = SimpleNamespace(yes_shares=Decimal(10), no_shares=Decimal(4))
-    assert cog._payout(holding, "no") == 4
+    assert cog._payout(holding, "no", -7) == 4
 
 
-def test_void_pays_half_of_every_share(cog):
+def test_void_refunds_the_net_stake(cog):
     holding = SimpleNamespace(yes_shares=Decimal(10), no_shares=Decimal(4))
-    assert cog._payout(holding, "void") == 7
+    assert cog._payout(holding, "void", -99) == 99
+
+
+def test_void_never_claws_back_realised_profit(cog):
+    holding = SimpleNamespace(yes_shares=Decimal(10), no_shares=Decimal(0))
+    assert cog._payout(holding, "void", 25) == 0
 
 
 def test_payout_floors_fractional_shares_toward_the_house(cog):
     holding = SimpleNamespace(yes_shares=Decimal("10.9"), no_shares=Decimal(0))
-    assert cog._payout(holding, "yes") == 10
-
-
-def test_void_payout_floors_to_a_whole_coin(cog):
-    holding = SimpleNamespace(yes_shares=Decimal(3), no_shares=Decimal(0))  # 1.5 -> 1
-    assert cog._payout(holding, "void") == 1
+    assert cog._payout(holding, "yes", -7) == 10
 
 
 # --- rounding & formatting ----------------------------------------------

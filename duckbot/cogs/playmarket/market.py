@@ -204,8 +204,8 @@ class PlayMarket(commands.Cog):
             for pos in session.query(Position).filter_by(market_id=market.id).all():
                 if not pos.yes_shares and not pos.no_shares:
                     continue
-                invested = sum(e.delta for e in session.query(LedgerEntry).filter_by(user_id=pos.user_id, market_id=market.id).filter(LedgerEntry.reason.in_(("bet", "sell"))).all())
-                results.append((pos.user_id, pos.yes_shares, pos.no_shares, invested, self._payout(pos, outcome)))
+                invested = self._invested(session, pos.user_id, market.id)
+                results.append((pos.user_id, pos.yes_shares, pos.no_shares, invested, self._payout(pos, outcome, invested)))
             self._resolve_market(session, market, outcome)
             session.commit()
             await context.send(embed=await self._resolve_embed(context, market, outcome, results))
@@ -278,9 +278,9 @@ class PlayMarket(commands.Cog):
         session.add(LedgerEntry(season_id=season_id, user_id=account.id, market_id=market_id, delta=delta, reason=reason))
 
     def _resolve_market(self, session, market, outcome):
-        """Pay out winning shares (0.5 each on void), close positions, finalise."""
+        """Pay out winning shares (net stake back on void), close positions, finalise."""
         for position in session.query(Position).filter_by(market_id=market.id).all():
-            payout = self._payout(position, outcome)
+            payout = self._payout(position, outcome, self._invested(session, position.user_id, market.id))
             if payout > 0:
                 account = self._lock_account(session, position.user_id)
                 self._credit(session, market.season_id, account, market.id, payout, "refund" if outcome == "void" else "payout")
@@ -288,12 +288,14 @@ class PlayMarket(commands.Cog):
         market.status = "VOID" if outcome == "void" else "RESOLVED"
         market.outcome = outcome
 
-    def _payout(self, position, outcome) -> int:
+    def _invested(self, session, user_id, market_id) -> int:
+        """Net of the player's bets and sells on a market; negative while coins are in."""
+        return sum(e.delta for e in session.query(LedgerEntry).filter_by(user_id=user_id, market_id=market_id).filter(LedgerEntry.reason.in_(("bet", "sell"))).all())
+
+    def _payout(self, position, outcome, invested) -> int:
         if outcome == "void":
-            shares = (position.yes_shares + position.no_shares) / 2
-        else:
-            shares = position.yes_shares if outcome == "yes" else position.no_shares
-        return _whole(shares)
+            return max(0, -invested)
+        return _whole(position.yes_shares if outcome == "yes" else position.no_shares)
 
     def _add_shares(self, session, market, user_id, side, delta):
         position = session.get(Position, (user_id, market.id)) or Position(user_id=user_id, market_id=market.id, yes_shares=Decimal(0), no_shares=Decimal(0))
@@ -345,8 +347,10 @@ class PlayMarket(commands.Cog):
             side = "YES" if yes_shares >= no_shares else "NO"
             if net > 0:
                 lines.append(f"{name} — {_coins(-invested)} on {side}, won {_coins(payout)} (+{_coins(net)})")
-            else:
+            elif net < 0:
                 lines.append(f"{name} — {_coins(-invested)} on {side}, lost {_coins(-net)}")
+            else:
+                lines.append(f"{name} — {_coins(-invested)} on {side}, refunded")
         if lines:
             embed.add_field(name="Results", value="\n".join(lines), inline=False)
         return embed
