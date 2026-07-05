@@ -24,4 +24,5 @@ def test_migrations_produce_model_schema(tmp_path, monkeypatch):
     with engine.connect() as conn:
         context = MigrationContext.configure(conn, opts={"compare_type": True})
         diffs = compare_metadata(context, [WeatherBase.metadata, PlayMarketBase.metadata])
+    engine.dispose()
     assert diffs == []
