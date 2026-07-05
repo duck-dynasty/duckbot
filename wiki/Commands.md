@@ -1,29 +1,29 @@
 ## Command Overview
 
-|            Command             | Summary                                            |
-| :----------------------------: | -------------------------------------------------- |
-|            `!8ball`            | get a magic eight ball style fortune               |
-|            `!ascii`            | renders text as ascii art                          |
-|   [`!calc`](#wolfram-alpha)    | search for something on wolfram alpha              |
-|            `!coin`             | flips a coin in real life                          |
-|  [`!day`](#day-announcements)  | announces the current day of the week              |
-|   [`!define`](#definitions)    | define a word                                      |
-|             `!dog`             | displays a random dog photo                        |
-|            `!duck`             | gives a link to this repo                          |
-|           `!fortune`           | get a random fortune told to you by a cow          |
-|       `!help` or `!wiki`       | gives a link to this wiki                          |
-|            `!lmgt`             | generates a google search link for the given query |
-| [`/market`](Prediction-Market) | bet on prediction markets, balances, leaderboard   |
-|            `!mock`             | converts text into MoCkInG tExT                    |
-|     [`!pokemon`](#pokemon)     | gives information about pokemon                    |
-|  [`!recipe`](#recipe-search)   | search for a random recipe                         |
-|        [`!roll`](#dice)        | rolls Dungeons and Dragons style dice              |
-|  [`!start`, `!stop`](#music)   | start or stop playing music                        |
-|       [`!truth`](#truth)       | fact checks a message when used in a reply         |
-|     [`!weather`](#weather)     | retrieve weather information                       |
-| [`/satisfy`](Satisfactory-Solver) | produce a factory for _Satisfactory_            |
-| [`/grass-stats`](#touch-grass) | show activity leaderboard for the last hour        |
-| [`!yolo`](#yolo-pull-requests) | list open pull requests in this repo               |
+|              Command              | Summary                                            |
+| :-------------------------------: | -------------------------------------------------- |
+|             `!8ball`              | get a magic eight ball style fortune               |
+|             `!ascii`              | renders text as ascii art                          |
+|     [`!calc`](#wolfram-alpha)     | search for something on wolfram alpha              |
+|              `!coin`              | flips a coin in real life                          |
+|   [`!day`](#day-announcements)    | announces the current day of the week              |
+|     [`!define`](#definitions)     | define a word                                      |
+|              `!dog`               | displays a random dog photo                        |
+|              `!duck`              | gives a link to this repo                          |
+|            `!fortune`             | get a random fortune told to you by a cow          |
+|        `!help` or `!wiki`         | gives a link to this wiki                          |
+|              `!lmgt`              | generates a google search link for the given query |
+|  [`/market`](Prediction-Market)   | bet on prediction markets, balances, leaderboard   |
+|              `!mock`              | converts text into MoCkInG tExT                    |
+|      [`!pokemon`](#pokemon)       | gives information about pokemon                    |
+|    [`!recipe`](#recipe-search)    | search for a random recipe                         |
+|         [`!roll`](#dice)          | rolls Dungeons and Dragons style dice              |
+|    [`!start`, `!stop`](#music)    | start or stop playing music                        |
+|        [`!truth`](#truth)         | fact checks a message when used in a reply         |
+|      [`!weather`](#weather)       | retrieve weather information                       |
+| [`/satisfy`](Satisfactory-Solver) | produce a factory for _Satisfactory_               |
+|  [`/grass-stats`](#touch-grass)   | show activity leaderboard for the last hour        |
+|  [`!yolo`](#yolo-pull-requests)   | list open pull requests in this repo               |
 
 ## Wolfram Alpha
 
