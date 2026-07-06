@@ -31,8 +31,11 @@ setup_nltk
   - `logs/` — logging configuration
   - `util/` — shared utilities
 - `tests/` — mirrors `duckbot/` structure; uses pytest with pytest-asyncio
-- `scripts/` — CLI entry points (`format`, `setup_nltk`)
-- `.aws/` — CDK deployment (AWS ECS)
+- `scripts/` — CLI entry points (declared in `pyproject.toml` `[project.scripts]`)
+- `.aws/` — CDK deployment (AWS ECS); see `.aws/CLAUDE.md`
+- `wiki/` — end-user docs (how to use the bot's commands/events from Discord), not developer docs
+
+**Reuse shared helpers before writing your own.** `duckbot/util/` holds one concern per subpackage — currently `users`, `embeds`, `datetime`, `emojis`, `messages` (e.g. `util.users.get_user`, `util.embeds.group_by_max_length` are the most-reinvented). Read the module for its current API rather than trusting a signature listed here.
 
 ## Code Style
 
@@ -44,18 +47,38 @@ setup_nltk
 
 ## Cog Conventions
 
-- **Group a cog's commands under one `@commands.hybrid_group`** (see `weather`, `games/satisfy`) — e.g. `/market bet`, `/market balance` — rather than adding many top-level commands to the global namespace.
+- **When a cog exposes multiple related commands, group them under one `@commands.hybrid_group`** (see `weather`, `games/satisfy`) — e.g. `/market bet`, `/market balance` — rather than adding many top-level commands to the global namespace. A group isn't required for a cog with a single command, and many cogs have no commands at all (pure event listeners).
 - **Admin/owner checks**: reuse the owner-id allowlist pattern from `duckbot/cogs/github/yolo_merge.py` (`is_repository_admin`) instead of inventing new permission logic.
 - **Prefer the simplest design that works.** Fewer moving parts, fewer places things happen. Avoid speculative complexity (schedulers, multi-step flows, extra tables/state) when a simpler approach fits a small friend-group bot. Study how existing cogs solve a similar problem and match that before introducing a new pattern.
+
+### Adding a New Cog
+
+- Each subdirectory of `duckbot/cogs/` is auto-loaded at startup — `duckbot/__main__.py` walks `pkgutil.iter_modules` and loads every package (dir with an `__init__.py`).
+- The package `__init__.py` must expose `async def setup(bot)` that calls `bot.add_cog(...)`. Simplest example: `duckbot/cogs/ai/__init__.py`. One `setup` may register several cogs (see `duckbot/cogs/corrections/__init__.py`).
+- The Cog class lives in a sibling module and subclasses `commands.Cog`. It may be command-driven (`@commands.hybrid_group`/`hybrid_command`, see `playmarket`) or event-only (`@commands.Cog.listener`, see `duckbot/cogs/corrections/`) — no commands required.
+- Mirror the source path in tests: `tests/cogs/<name>/<name>_test.py`, with fixtures defined inline (see Testing Conventions).
+
+## Database & Migrations
+
+- `duckbot.db.Database` is a singleton. DB cogs receive it from their `setup`, which passes `Database()` into the constructor (see `duckbot/cogs/playmarket/__init__.py`, `duckbot/cogs/weather/__init__.py`) and store it as `self.db`.
+- Usage: `with self.db.session(SomeModel) as session:` then `session.commit()`. `session(model)` lazily runs `model.metadata.create_all` before returning, so tables are created on first use. Canonical example: `PlayMarket.tick` in `duckbot/cogs/playmarket/market.py`.
+- **Testing the DB** (reinforces "Don't shadow shared fixtures" below): the global `db` fixture is a *mocked* session; use `in_memory_db` (real in-memory SQLite, `tests/fixtures/database.py`) when logic is worth testing against real rows.
+- **Migrations** use Alembic (`alembic.ini` at repo root). Versioned files live in `duckbot/db/migrations/versions/` named `00N_description.py` (e.g. `003_playmarket.py`). They run at startup only when `RUN_MIGRATIONS` is set (`duckbot/__main__.py` → `Database().migrate()`). Since `metadata.create_all` handles fresh tables in dev/tests, migrations are for schema changes to already-deployed tables.
 
 ## Testing Conventions
 
 - Tests use pytest with `asyncio_mode = "auto"` — async test functions work without explicit markers.
+
 - Tests run in parallel (`-n auto --dist loadfile`) with network access blocked (`--blockage`).
+
 - Global fixtures are in `tests/fixtures/` and loaded via `tests/conftest.py`. The `message` fixture generates multiple test cases (guild channel, DM, group channel).
+
 - **Cog-specific fixtures and helpers live in the test file**, not a per-cog `conftest.py` — there are no per-cog conftests in this repo. Even cogs with many test files (e.g. `games/satisfy`) define their fixtures inline; duplicating a one-line `cog`/`clazz` fixture across files is fine and preferred over a shared conftest. Only put genuinely reusable, behaviour-agnostic fixtures in `tests/fixtures/`.
+
 - **Don't shadow shared fixtures.** The global `db` fixture is a *mocked* session. For logic worth testing against real rows (balances, ledgers, etc.), use the shared `in_memory_db` fixture (real in-memory SQLite, in `tests/fixtures/database.py`) — don't redefine `db` locally.
+
 - To test a `@commands.command` or `@tasks.loop` method, delegate the logic to a separate method and test that directly, since the decorators change the method signature:
+
   ```python
   # source
   class Foo(commands.Cog):
@@ -71,6 +94,8 @@ setup_nltk
       clazz = Foo(bot)
       await clazz.foo(context)
   ```
+
+  If the delegate is a private `__foo`, call it name-mangled from the test: `await clazz._Foo__foo(context)`.
 
 ### Mocking Patterns
 
@@ -110,6 +135,12 @@ setup_nltk
 
 - Don't aim for 100% coverage — discord.py decorators make some methods hard to cover directly.
 
+## Pull Requests
+
+- **Open PRs against `duck-dynasty/duckbot`** (`main`) — this is usually a fork, so don't target the fork.
+- **Fill out the PR template** (`.github/pull_request_template.md`): a summary of what/why, and the checklist (tick the source-change items you actually did — `format`, `pytest`, link the fixed issue with a _fixes_ keyword, update the wiki if needed).
+- **Start the PR title with a [gitmoji](https://gitmoji.dev/) shortcode** in `:code:` form (e.g. `:bug:`, `:art:`, `:arrow_up:`) — PRs squash-merge, so the title becomes the commit message. Title by the mechanism / what changed, not the symptom.
+
 ## Environment Variables
 
-Only `DISCORD_TOKEN` is required. Other optional tokens: `OPENWEATHER_TOKEN`, `BOT_GITHUB_TOKEN`, `WOLFRAM_ALPHA_TOKEN`, `WORDNIK_KEY`, `GROQ_API_KEY`. These live in `duckbot/.env` (not committed).
+Only `DISCORD_TOKEN` is required. Other optional tokens: `OPENWEATHER_TOKEN`, `BOT_GITHUB_TOKEN`, `WOLFRAM_ALPHA_TOKEN`, `WORDNIK_KEY`, `GROQ_API_KEY`. These live in `duckbot/.env` (used when running the bot directly / via the VS Code launch config) or the repo-root `.env` (read by `docker-compose`). Neither is committed.
