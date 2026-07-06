@@ -212,7 +212,8 @@ class PlayMarket(commands.Cog):
                 results.append((pos.user_id, pos.yes_shares, pos.no_shares, invested, self._payout(pos, outcome, invested)))
             self._resolve_market(session, market, outcome)
             session.commit()
-            await context.send(embed=await self._resolve_embed(context, market, outcome, results))
+            mentions = " ".join([await self._name(context, r[0], mention=True) for r in results])
+            await context.send(mentions or None, embed=await self._resolve_embed(context, market, outcome, results))
 
     @market_group.autocomplete("status")
     @list_command.autocomplete("status")
@@ -379,9 +380,9 @@ class PlayMarket(commands.Cog):
     async def _is_admin(self, context) -> bool:
         return await context.bot.is_owner(context.author) or context.author.id in config.ADMIN_IDS
 
-    async def _name(self, context, user_id) -> str:
+    async def _name(self, context, user_id, mention=False) -> str:
         user = await get_user(self.bot, user_id, context.guild)
-        return user.display_name if user else str(user_id)
+        return (user.mention if mention else user.display_name) if user else str(user_id)
 
 
 def _coins(value) -> str:

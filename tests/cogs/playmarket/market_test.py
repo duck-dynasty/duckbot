@@ -51,7 +51,7 @@ def cog(bot, in_memory_db, clock):
 def make_context(user_id):
     ctx = mock.Mock()
     ctx.author = mock.Mock(id=user_id, display_name=f"user{user_id}")
-    ctx.guild.get_member = lambda uid: mock.Mock(id=uid, display_name=f"user{uid}")
+    ctx.guild.get_member = lambda uid: mock.Mock(id=uid, display_name=f"user{uid}", mention=f"<@{uid}>")
     ctx.send = mock.AsyncMock()
     ctx.bot.is_owner = mock.AsyncMock(return_value=False)
     return ctx
@@ -373,7 +373,7 @@ async def test_creator_can_resolve_their_market(cog, alice, in_memory_db):
     await cog.resolve(alice, market_id, "yes")
     assert market_row(in_memory_db, market_id).status == "RESOLVED"
     expected = discord.Embed(title=f"Market {market_id} — Will it happen?", description="Called **YES**.", color=discord.Color.green())
-    alice.send.assert_called_with(embed=expected)
+    alice.send.assert_called_with(None, embed=expected)
 
 
 async def test_resolve_embed_shows_winners_and_losers(cog, alice, bob, carol, in_memory_db):
@@ -383,7 +383,7 @@ async def test_resolve_embed_shows_winners_and_losers(cog, alice, bob, carol, in
     await cog.resolve(alice, market_id, "yes")
     expected = discord.Embed(title=f"Market {market_id} — Will it happen?", description="Called **YES**.", color=discord.Color.green())
     expected.add_field(name="Results", value="user2 — 500 on YES, won 831 (+331)\nuser3 — 500 on NO, lost 500", inline=False)
-    alice.send.assert_called_with(embed=expected)
+    alice.send.assert_called_with("<@2> <@3>", embed=expected)
 
 
 async def test_a_non_creator_non_admin_cannot_resolve(cog, alice, bob, in_memory_db):
@@ -444,7 +444,7 @@ async def test_resolve_embed_shows_void_refunds(cog, alice, bob, in_memory_db):
     await cog.resolve(alice, market_id, "void")
     expected = discord.Embed(title=f"Market {market_id} — Will it happen?", description="Called **VOID**.", color=discord.Color.greyple())
     expected.add_field(name="Results", value="user2 — 300 on YES, refunded", inline=False)
-    alice.send.assert_called_with(embed=expected)
+    alice.send.assert_called_with("<@2>", embed=expected)
 
 
 async def test_resolving_clears_all_positions(cog, alice, bob, in_memory_db):

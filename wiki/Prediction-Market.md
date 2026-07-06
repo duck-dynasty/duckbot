@@ -131,6 +131,8 @@ There's no close time and no scheduler — the person who **created** the market
 - **yes / no** — every winning share is paid 1 coin; losing shares pay 0.
 - **void** — if the question became unanswerable, every share (YES and NO) redeems at 0.5 coins. Nobody wins, nobody gets robbed.
 
+Everyone holding a position is pinged with the results, so you'll know how your bet went even if you miss the resolve.
+
 Only the creator can resolve their own market — it's a friends-trust-friends "prop bet" model. If a creator never resolves (or leaves the server), the market is automatically voided when the season ends, so no coins stay stranded.
 
 ## Economy at a glance
