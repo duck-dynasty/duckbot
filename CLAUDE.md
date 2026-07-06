@@ -112,4 +112,4 @@ setup_nltk
 
 ## Environment Variables
 
-Only `DISCORD_TOKEN` is required. Other optional tokens: `OPENWEATHER_TOKEN`, `BOT_GITHUB_TOKEN`, `WOLFRAM_ALPHA_TOKEN`, `OXFORD_DICTIONARY_ID`, `OXFORD_DICTIONARY_KEY`, `GROQ_API_KEY`. These live in `duckbot/.env` (not committed).
+Only `DISCORD_TOKEN` is required. Other optional tokens: `OPENWEATHER_TOKEN`, `BOT_GITHUB_TOKEN`, `WOLFRAM_ALPHA_TOKEN`, `WORDNIK_KEY`, `GROQ_API_KEY`. These live in `duckbot/.env` (not committed).

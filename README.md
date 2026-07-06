@@ -51,8 +51,7 @@ DISCORD_TOKEN=thesecrettoken
 OPENWEATHER_TOKEN=thesecrettoken
 BOT_GITHUB_TOKEN=somesecrettoken
 WOLFRAM_ALPHA_TOKEN=broitssecret
-OXFORD_DICTIONARY_ID=icanttellyou
-OXFORD_DICTIONARY_KEY=itsasecret
+WORDNIK_KEY=icanttellyou
 GROQ_API_KEY=itsasecret
 ```
 
@@ -60,7 +59,7 @@ GROQ_API_KEY=itsasecret
 - You can get an [openweather api token](https://openweathermap.org/api) for free as well
 - The github token is a [personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
 - The wolfram alpha token is available from their [api page](https://products.wolframalpha.com/api/)
-- The oxford dictionary tokens are available from their [developer page](https://developer.oxforddictionaries.com/)
+- The wordnik key is available from their [developer page](https://developer.wordnik.com/)
 - The Groq token can be generated for your personal account in the [API keys page](https://console.groq.com/keys)
 
 You only _need_ the discord token. DuckBot will still function without the others, but features that use the tokens won't work. With your tokens available, you can jam them into your shell environment, so you can run DuckBot. You may want to put this into your bashrc for convenience.
