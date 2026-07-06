@@ -122,14 +122,14 @@ The minimum bet is 10 coins. You can trade right up until the market's creator r
 
 ## Resolving a market
 
-There's no close time and no scheduler — the person who **created** the market settles it once the outcome is known:
+Markets don't close on their own — the person who **created** the market settles it once the outcome is known:
 
 ```
 /market resolve market:<pick> outcome:<yes|no|void>
 ```
 
 - **yes / no** — every winning share is paid 1 coin; losing shares pay 0.
-- **void** — if the question became unanswerable, every share (YES and NO) redeems at 0.5 coins. Nobody wins, nobody gets robbed.
+- **void** — if the question became unanswerable, everyone gets their stake back: whatever you spent on the market, minus anything you already took out by selling. Nobody wins, nobody gets robbed.
 
 Everyone holding a position is pinged with the results, so you'll know how your bet went even if you miss the resolve.
 
