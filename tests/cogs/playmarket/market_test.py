@@ -171,7 +171,28 @@ async def test_list_says_so_when_there_are_no_markets(cog, alice):
 async def test_list_shows_open_markets_with_their_price(cog, alice):
     market_id = await open_market(cog, alice)
     await cog.list_markets(alice, None)
-    assert f"**{market_id}**" in alice.send.call_args.args[0] and "YES 50%" in alice.send.call_args.args[0]
+    expected = discord.Embed(title="Open Markets", color=discord.Color.blurple())
+    expected.add_field(name=f"Market {market_id} — Will it happen?", value="YES 50%", inline=False)
+    alice.send.assert_called_with(embed=expected)
+
+
+async def test_list_shows_each_players_position(cog, alice, bob):
+    market_id = await open_market(cog, alice)
+    await cog.bet(alice, market_id, "yes", BET)
+    await cog.bet(bob, market_id, "no", BET)
+    await cog.list_markets(alice, None)
+    expected = discord.Embed(title="Open Markets", color=discord.Color.blurple())
+    expected.add_field(name=f"Market {market_id} — Will it happen?", value="YES 42.26%\nuser2 — 0 YES / 1,144 NO\nuser1 — 832 YES / 0 NO", inline=False)
+    alice.send.assert_called_with(embed=expected)
+
+
+async def test_list_filters_by_status(cog, alice):
+    market_id = await open_market(cog, alice)
+    await cog.resolve(alice, market_id, "yes")
+    await cog.list_markets(alice, "resolved")
+    expected = discord.Embed(title="Resolved Markets", color=discord.Color.blurple())
+    expected.add_field(name=f"Market {market_id} — Will it happen?", value="YES 50%", inline=False)
+    alice.send.assert_called_with(embed=expected)
 
 
 # --- create --------------------------------------------------------------
