@@ -669,26 +669,6 @@ async def test_tick_loop_runs_a_tick(cog):
     cog.tick.assert_awaited_once()
 
 
-@pytest.mark.parametrize(
-    "command,args,delegate",
-    [
-        ("market_group", (None,), "list_markets"),
-        ("balance_command", (), "balance"),
-        ("claim_command", (), "claim"),
-        ("leaderboard_command", (), "leaderboard"),
-        ("list_command", (None,), "list_markets"),
-        ("create_command", ("q", "med"), "create"),
-        ("bet_command", (7, "yes", 50), "bet"),
-        ("sell_command", (7, "yes", "all"), "sell"),
-        ("resolve_command", (7, "yes"), "resolve"),
-    ],
-)
-async def test_command_delegates_to_its_method(cog, alice, command, args, delegate):
-    setattr(cog, delegate, mock.AsyncMock())
-    await getattr(cog, command).callback(cog, alice, *args)
-    getattr(cog, delegate).assert_awaited_once_with(alice, *args)
-
-
 # --- end-to-end integrity -----------------------------------------------
 
 

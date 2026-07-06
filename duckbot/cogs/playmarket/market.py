@@ -59,13 +59,15 @@ class PlayMarket(commands.Cog):
 
     @commands.hybrid_group(name="market", description="Gamble your friendship away on play-money bets.", invoke_without_command=True)
     async def market_group(self, context: commands.Context, status: Optional[str] = None):
-        await self.list_markets(context, status)
+        async with context.typing():
+            await self.list_markets(context, status)
 
     # --- economy commands -------------------------------------------------
 
     @market_group.command(name="balance", description="Show your coin balance and active bets.")
     async def balance_command(self, context: commands.Context):
-        await self.balance(context)
+        async with context.typing():
+            await self.balance(context)
 
     async def balance(self, context: commands.Context):
         with self.db.session(Season) as session:
@@ -79,7 +81,8 @@ class PlayMarket(commands.Cog):
 
     @market_group.command(name="claim", description="Get a coin top-up when you're low and have no active bets.")
     async def claim_command(self, context: commands.Context):
-        await self.claim(context)
+        async with context.typing():
+            await self.claim(context)
 
     async def claim(self, context: commands.Context):
         with self.db.session(Season) as session:
@@ -99,7 +102,8 @@ class PlayMarket(commands.Cog):
 
     @market_group.command(name="leaderboard", description="See who's winning this season.")
     async def leaderboard_command(self, context: commands.Context):
-        await self.leaderboard(context)
+        async with context.typing():
+            await self.leaderboard(context)
 
     async def leaderboard(self, context: commands.Context):
         with self.db.session(Season) as session:
@@ -113,7 +117,8 @@ class PlayMarket(commands.Cog):
 
     @market_group.command(name="list", description="Browse markets and their current YES odds.")
     async def list_command(self, context: commands.Context, status: Optional[str] = None):
-        await self.list_markets(context, status)
+        async with context.typing():
+            await self.list_markets(context, status)
 
     async def list_markets(self, context: commands.Context, status: Optional[str]):
         with self.db.session(Market) as session:
@@ -129,7 +134,8 @@ class PlayMarket(commands.Cog):
 
     @market_group.command(name="create", description="Open a new question for people to bet on.")
     async def create_command(self, context: commands.Context, question: str, liquidity: Literal["low", "med", "high"] = "med"):
-        await self.create(context, question, liquidity)
+        async with context.typing():
+            await self.create(context, question, liquidity)
 
     async def create(self, context: commands.Context, question: str, liquidity: str):
         b = config.LIQUIDITY[liquidity]
@@ -145,7 +151,8 @@ class PlayMarket(commands.Cog):
 
     @market_group.command(name="bet", description="Bet coins on a market resolving YES or NO.")
     async def bet_command(self, context: commands.Context, market: int, side: Literal["yes", "no"], amount: int):
-        await self.bet(context, market, side, amount)
+        async with context.typing():
+            await self.bet(context, market, side, amount)
 
     async def bet(self, context: commands.Context, market_id: int, side: str, amount: int):
         cost = int(amount)
@@ -169,7 +176,8 @@ class PlayMarket(commands.Cog):
 
     @market_group.command(name="sell", description="Cash out some or all of your position in a market.")
     async def sell_command(self, context: commands.Context, market: int, side: Literal["yes", "no"], shares: str):
-        await self.sell(context, market, side, shares)
+        async with context.typing():
+            await self.sell(context, market, side, shares)
 
     async def sell(self, context: commands.Context, market_id: int, side: str, shares: str):
         with self.db.session(Market) as session:
@@ -193,7 +201,8 @@ class PlayMarket(commands.Cog):
 
     @market_group.command(name="resolve", description="Close your market with an outcome and pay out winners.")
     async def resolve_command(self, context: commands.Context, market: int, outcome: Literal["yes", "no", "void"]):
-        await self.resolve(context, market, outcome)
+        async with context.typing():
+            await self.resolve(context, market, outcome)
 
     async def resolve(self, context: commands.Context, market_id: int, outcome: str):
         with self.db.session(Market) as session:
