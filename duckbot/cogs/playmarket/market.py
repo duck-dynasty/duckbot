@@ -119,9 +119,13 @@ class PlayMarket(commands.Cog):
         with self.db.session(Market) as session:
             query = session.query(Market).filter(Market.status == (status.upper() if status else "OPEN"))
             markets = query.order_by(Market.id.desc()).all()
-        if not markets:
-            return await context.send("No markets. What, you hate fun?")
-        await context.send("\n".join(self._summary(m) for m in markets))
+            if not markets:
+                return await context.send("No markets. What, you hate fun?")
+            embed = Embed(title=f"{(status or 'open').title()} Markets", color=Color.blurple())
+            for market in markets:
+                value = "\n".join([f"YES {_pct(self._price(market))}"] + await self._holders(context, session, market))
+                embed.add_field(name=f"Market {market.id} — {market.question}", value=value, inline=False)
+        await context.send(embed=embed)
 
     @market_group.command(name="create", description="Open a new question for people to bet on.")
     async def create_command(self, context: commands.Context, question: str, liquidity: Literal["low", "med", "high"] = "med"):
@@ -334,8 +338,10 @@ class PlayMarket(commands.Cog):
     def _price(self, market) -> float:
         return lmsr.price_yes(float(market.q_yes), float(market.q_no), float(market.b))
 
-    def _summary(self, market) -> str:
-        return f"**{market.id}** [{market.status}] {market.question} — YES {_pct(self._price(market))}"
+    async def _holders(self, context, session, market) -> List[str]:
+        positions = session.query(Position).filter(Position.market_id == market.id, (Position.yes_shares > 0) | (Position.no_shares > 0)).all()
+        positions.sort(key=lambda p: p.yes_shares + p.no_shares, reverse=True)
+        return [f"{await self._name(context, p.user_id)} — {_coins(p.yes_shares)} YES / {_coins(p.no_shares)} NO" for p in positions]
 
     async def _resolve_embed(self, context, market, outcome: str, results) -> Embed:
         color = Color.green() if outcome == "yes" else Color.red() if outcome == "no" else Color.greyple()
@@ -357,9 +363,7 @@ class PlayMarket(commands.Cog):
 
     async def _trade_embed(self, context, session, market, action: str, side: str) -> Embed:
         embed = Embed(title=f"Market {market.id} — {market.question}", description=f"{action}\nYES is now {_pct(self._price(market))}.", color=Color.green() if side == "yes" else Color.red())
-        positions = session.query(Position).filter(Position.market_id == market.id, (Position.yes_shares > 0) | (Position.no_shares > 0)).all()
-        positions.sort(key=lambda p: p.yes_shares + p.no_shares, reverse=True)
-        holders = [f"{await self._name(context, p.user_id)} — {_coins(p.yes_shares)} YES / {_coins(p.no_shares)} NO" for p in positions]
+        holders = await self._holders(context, session, market)
         if holders:
             embed.add_field(name="Holders", value="\n".join(holders), inline=False)
         return embed
