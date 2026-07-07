@@ -126,6 +126,22 @@ async def test_set_default_location_location_not_saved(weather, session, context
     session.commit.assert_not_called()
 
 
+async def test_set_default_location_round_trip(bot, in_memory_db, context):
+    async def mock_search_location(context, city, country, index):
+        return Location(city, 1, 1, 1, country="CA")
+
+    clazz = Weather(bot, in_memory_db)
+    clazz.search_location = mock_search_location
+    context.author.id = 123
+    await clazz.set_default_location(context, "city", None, None)
+    await clazz.set_default_location(context, "new city", None, None)  # merge upserts on the same author id
+
+    with in_memory_db.session(SavedLocation) as session:
+        assert session.query(SavedLocation).count() == 1
+        saved = session.get(SavedLocation, 123)
+    assert (saved.name, saved.country, saved.latitude, saved.longitude) == ("new city", "CA", 1.0, 1.0)
+
+
 async def test_send_weather_no_default_no_args(weather, session, context):
     session.get.return_value = None
     await weather.send_weather(context, None, None, None)
