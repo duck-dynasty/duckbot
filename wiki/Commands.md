@@ -35,7 +35,7 @@ Every day in the 7am hour, DuckBot will announce to the general channel the curr
 
 ## Definitions
 
-DuckBot can define words, source data from the Oxford Dictionary. In the cases where a word has multiple possible root words, DuckBot will try to define all of them.
+DuckBot can define words, sourcing data from [Wordnik](https://www.wordnik.com/). Inflected words resolve to their root word where possible.
 
 ## Recipe Search
 
