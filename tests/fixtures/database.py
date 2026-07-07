@@ -43,4 +43,6 @@ class InMemoryDatabase:
 @pytest.fixture
 def in_memory_db():
     """Returns a real database backed by in-memory SQLite, for cogs whose logic is worth testing against real rows."""
-    return InMemoryDatabase()
+    database = InMemoryDatabase()
+    yield database
+    database.engine.dispose()
