@@ -2,6 +2,7 @@ import discord
 import pytest
 
 from duckbot.cogs.text import Wordnik
+from duckbot.util.embeds import MAX_FIELD_VALUE_LENGTH
 
 URL = "https://api.wordnik.com/v4/word.json"
 ATTRIBUTION = "from The American Heritage® Dictionary of the English Language, 5th Edition."
@@ -65,6 +66,30 @@ async def test_get_pronunciation_no_results(bot, responses):
     assert clazz.get_pronunciation("cat") == "screw flanders"
 
 
+async def test_define_truncates_long_field_value(bot, context, responses):
+    long_text = "a" * 2000
+    definitions = [{"sourceDictionary": "ahd-5", "attributionText": ATTRIBUTION, "word": "cow", "partOfSpeech": "noun", "text": long_text, "exampleUses": []}]
+    responses.add(responses.GET, f"{URL}/cow/definitions", json=definitions)
+    responses.add(responses.GET, f"{URL}/cow/pronunciations", json=cow_pronunciations())
+    clazz = Wordnik(bot)
+    await clazz.define(context, "cow")
+    sent_embed = context.send.call_args.kwargs["embed"]
+    assert len(sent_embed.fields[0].value) == MAX_FIELD_VALUE_LENGTH
+    assert sent_embed.fields[0].value.endswith("...")
+
+
+async def test_define_handles_null_example_uses(bot, context, responses):
+    definitions = [{"sourceDictionary": "ahd-5", "attributionText": ATTRIBUTION, "word": "cow", "partOfSpeech": "noun", "text": "A big animal.", "exampleUses": None}]
+    responses.add(responses.GET, f"{URL}/cow/definitions", json=definitions)
+    responses.add(responses.GET, f"{URL}/cow/pronunciations", json=cow_pronunciations())
+    clazz = Wordnik(bot)
+    await clazz.define(context, "cow")
+    embed = discord.Embed(title="cow")
+    embed.add_field(name="noun: **cow**  /kou/", value="1. A big animal.\n_this is where I'd use cow in a sentence... IF I HAD ONE_\n", inline=False)
+    embed.set_footer(text=ATTRIBUTION)
+    context.send.assert_called_once_with(embed=embed)
+
+
 def cow_definitions():
     ahd = {"sourceDictionary": "ahd-5", "attributionText": ATTRIBUTION, "word": "cow"}
     return [
@@ -72,7 +97,6 @@ def cow_definitions():
         dict(ahd, partOfSpeech="noun", text="The mature female of certain other large animals, such as elephants, moose, or whales.", exampleUses=[]),
         dict(ahd, partOfSpeech="noun", exampleUses=[]),  # cross-reference entry with no text
         dict(ahd, partOfSpeech="transitive verb", text="To frighten or subdue with threats or a show of force.", exampleUses=[{"text": "the intellectuals had been cowed into silence"}]),
-        {"sourceDictionary": "wordnet", "partOfSpeech": "noun", "text": "domesticated bovine animals as a group.", "word": "cow", "exampleUses": []},
     ]
 
 
