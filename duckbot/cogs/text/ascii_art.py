@@ -6,10 +6,7 @@ from duckbot.util.messages import MAX_MESSAGE_LENGTH
 
 class AsciiArt(commands.Cog):
     @commands.command(name="ascii")
-    async def ascii_command(self, context, *, text: str = "I need text, brother."):
-        await self.ascii(context, text)
-
-    async def ascii(self, context, text: str):
+    async def ascii(self, context, *, text: str = "I need text, brother."):
         art = str(pyfiglet.figlet_format(text.strip()))
         if len(art) < MAX_MESSAGE_LENGTH - 6:  # max-6 for the ``` characters
             await context.send(f"```{art}```")

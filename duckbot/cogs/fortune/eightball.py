@@ -9,13 +9,10 @@ from .eightball_phrases import joke_phrases, phrases
 
 class EightBall(commands.Cog):
     @commands.hybrid_command(name="eightball", aliases=["8ball"], description="Ask the magic 8 ball a question!")
-    async def eightball_command(self, context: commands.Context, *, question: str = None):
+    async def eightball(self, context: commands.Context, *, question: str = None):
         """
         :param question: The question to ask the magic 8 ball.
         """
-        await self.eightball(context, question)
-
-    async def eightball(self, context: commands.Context, question: str):
         if question is None:
             await context.send("You need to ask a question to get an answer. :unamused:")
         elif len(question.replace("?", "")) == 0:
