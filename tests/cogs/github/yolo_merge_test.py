@@ -14,6 +14,7 @@ from github.GithubException import UnknownObjectException
 
 from duckbot.cogs.github import YoloMerge
 from duckbot.cogs.github.yolo_merge import MergeConfirmation
+from tests.discord_test_ext import bind_commands
 
 
 @pytest.fixture
@@ -28,7 +29,7 @@ def gh(autospec) -> github.Github:
 
 @pytest.fixture
 def yolo(bot, gh) -> YoloMerge:
-    clazz = YoloMerge(bot)
+    clazz = bind_commands(YoloMerge(bot))
     clazz._github = gh
     return clazz
 

@@ -21,14 +21,11 @@ class WolframAlpha(commands.Cog):
         return self._wolfram
 
     @commands.command(name="calc")
-    async def calc_command(self, context: commands.Context, *, query: str = "charizard curve"):
+    async def calc(self, context: commands.Context, *, query: str = "charizard curve"):
         async with context.typing():
-            await self.calc(context, query)
-
-    async def calc(self, context: commands.Context, query: str):
-        result = await self.wolfram.aquery(query)
-        embeds = [self.as_embed(pod) for pod in itertools.islice(result.pods, 5)]
-        await context.send(f"https://www.wolframalpha.com/input/?i={urllib.parse.quote_plus(query)}", embeds=embeds)
+            result = await self.wolfram.aquery(query)
+            embeds = [self.as_embed(pod) for pod in itertools.islice(result.pods, 5)]
+            await context.send(f"https://www.wolframalpha.com/input/?i={urllib.parse.quote_plus(query)}", embeds=embeds)
 
     # see embed limits duckbot.util.embeds; some values are shorter here for legibility
     def as_embed(self, pod) -> discord.Embed:
