@@ -43,8 +43,5 @@ class Insights(commands.Cog):
         await self.bot.wait_until_ready()
 
     @commands.command(name="insight")
-    async def insight_command(self, context):
-        await self.insight(context)
-
     async def insight(self, context):
         await context.send(random.choice(responses))
