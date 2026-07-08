@@ -77,25 +77,40 @@ setup_nltk
 
 - **Don't shadow shared fixtures.** The global `db` fixture is a *mocked* session. For logic worth testing against real rows (balances, ledgers, etc.), use the shared `in_memory_db` fixture (real in-memory SQLite, in `tests/fixtures/database.py`) — don't redefine `db` locally.
 
-- To test a `@commands.command` or `@tasks.loop` method, delegate the logic to a separate method and test that directly, since the decorators change the method signature:
+- To test a `@commands.command` / `@commands.hybrid_command` (or a group subcommand), keep the command's logic **inline** in the decorated method — no separate wrapper/delegate — and invoke it directly through `Command.__call__`. Wire each command to its cog once in the fixture with `bind_commands` (`tests/discord_test_ext.py`) so `__call__` injects `self`, then call the command by name:
 
   ```python
-  # source
+  # source — logic inline, no foo_command/foo split
   class Foo(commands.Cog):
-      @command(name="foo")
-      async def foo_command(self, context):
-          await self.foo(context)
-
+      @commands.hybrid_command(name="foo")
       async def foo(self, context): ...
 
 
   # test
-  async def test_foo(bot, context):
-      clazz = Foo(bot)
+  from tests.discord_test_ext import bind_commands
+
+
+  @pytest.fixture
+  def clazz(bot) -> Foo:
+      return bind_commands(Foo(bot))  # sets .cog so __call__ works
+
+
+  async def test_foo(clazz, context):
       await clazz.foo(context)
   ```
 
-  If the delegate is a private `__foo`, call it name-mangled from the test: `await clazz._Foo__foo(context)`.
+  `bind_commands` walks nested group subcommands too, so `/foo bar` is tested with `await clazz.bar(context)`. Without the wiring a bare `Foo(bot)` leaves `command.cog` unset and `__call__` misbinds `self`.
+
+- A `@tasks.loop` is a `tasks.Loop`, not a `Command`, so the `__call__` trick doesn't apply — keep delegating the loop's body to a plain method and test that method directly:
+
+  ```python
+  @tasks.loop(hours=1)
+  async def foo_loop(self):
+      await self.foo()
+
+
+  async def foo(self): ...  # test: await clazz.foo()
+  ```
 
 ### Mocking Patterns
 
@@ -133,7 +148,7 @@ setup_nltk
   message.author.display_name = "TestUser"
   ```
 
-- Don't aim for 100% coverage — discord.py decorators make some methods hard to cover directly.
+- Don't aim for 100% coverage — some discord.py decorators (e.g. `@tasks.loop`, autocomplete/error handlers) still make certain methods hard to cover directly.
 
 ## Pull Requests
 
