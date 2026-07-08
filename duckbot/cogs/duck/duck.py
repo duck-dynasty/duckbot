@@ -44,20 +44,14 @@ class Duck(commands.Cog):
                 await message.add_reaction(regional_indicator(c))
 
     @commands.command(name="duck")
-    async def duck_command(self, context):
-        await self.github(context)
-
     async def github(self, context):
         await context.send("https://github.com/duck-dynasty/duckbot")
 
     @commands.command(name="help", aliases=["wiki"])
-    async def wiki_command(self, context):
-        await self.wiki(context)
-
     async def wiki(self, context):
         await context.send("https://github.com/duck-dynasty/duckbot/wiki")
 
-    @duck_command.after_invoke
-    @wiki_command.after_invoke
+    @github.after_invoke
+    @wiki.after_invoke
     async def delete_command_message(self, context):
         await try_delete(context.message)
