@@ -15,6 +15,7 @@ from duckbot.cogs.playmarket.models import (
     Season,
     SeasonResult,
 )
+from tests.discord_test_ext import bind_commands
 
 BET = 500
 STARTING = config.STARTING_BALANCE
@@ -43,9 +44,19 @@ def clock():
 
 @pytest.fixture
 def cog(bot, in_memory_db, clock):
-    market = PlayMarket(bot, in_memory_db)
+    market = bind_commands(PlayMarket(bot, in_memory_db))
     market.tick_loop.cancel()  # don't run the loop mid-test
     return market
+
+
+class _Typing:
+    """Async context manager stand-in for context.typing()."""
+
+    async def __aenter__(self):
+        return None
+
+    async def __aexit__(self, *exc):
+        return None
 
 
 def make_context(user_id):
@@ -54,6 +65,7 @@ def make_context(user_id):
     ctx.guild.get_member = lambda uid: mock.Mock(id=uid, display_name=f"user{uid}", mention=f"<@{uid}>")
     ctx.send = mock.AsyncMock()
     ctx.bot.is_owner = mock.AsyncMock(return_value=False)
+    ctx.typing.return_value = _Typing()
     return ctx
 
 
@@ -193,6 +205,19 @@ async def test_list_filters_by_status(cog, alice):
     expected = discord.Embed(title="Resolved Markets", color=discord.Color.blurple())
     expected.add_field(name=f"Market {market_id} — Will it happen?", value="YES 50%", inline=False)
     alice.send.assert_called_with(embed=expected)
+
+
+async def test_list_command_shows_markets(cog, alice):
+    market_id = await open_market(cog, alice)
+    await cog.list_command(alice, None)
+    expected = discord.Embed(title="Open Markets", color=discord.Color.blurple())
+    expected.add_field(name=f"Market {market_id} — Will it happen?", value="YES 50%", inline=False)
+    alice.send.assert_called_with(embed=expected)
+
+
+async def test_market_group_defaults_to_listing(cog, alice):
+    await cog.market_group(alice, None)
+    assert alice.send.call_args.args[0] == "No markets. What, you hate fun?"
 
 
 # --- create --------------------------------------------------------------
