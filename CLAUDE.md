@@ -77,10 +77,10 @@ setup_nltk
 
 - **Don't shadow shared fixtures.** The global `db` fixture is a *mocked* session. For logic worth testing against real rows (balances, ledgers, etc.), use the shared `in_memory_db` fixture (real in-memory SQLite, in `tests/fixtures/database.py`) — don't redefine `db` locally.
 
-- To test a `@commands.command` / `@commands.hybrid_command` (or a group subcommand), keep the command's logic **inline** in the decorated method — no separate wrapper/delegate — and invoke it directly through `Command.__call__`. Wire each command to its cog once in the fixture with `bind_commands` (`tests/discord_test_ext.py`) so `__call__` injects `self`, then call the command by name:
+- To test a `@commands.command` / `@commands.hybrid_command` (or a group subcommand), wire the cog's commands in the fixture with `bind_commands` (`tests/discord_test_ext.py`) so `Command.__call__` injects `self`, then call the command by name:
 
   ```python
-  # source — logic inline, no foo_command/foo split
+  # source
   class Foo(commands.Cog):
       @commands.hybrid_command(name="foo")
       async def foo(self, context): ...
@@ -92,16 +92,16 @@ setup_nltk
 
   @pytest.fixture
   def clazz(bot) -> Foo:
-      return bind_commands(Foo(bot))  # sets .cog so __call__ works
+      return bind_commands(Foo(bot))
 
 
   async def test_foo(clazz, context):
       await clazz.foo(context)
   ```
 
-  `bind_commands` walks nested group subcommands too, so `/foo bar` is tested with `await clazz.bar(context)`. Without the wiring a bare `Foo(bot)` leaves `command.cog` unset and `__call__` misbinds `self`.
+  `bind_commands` walks nested group subcommands too, so `/foo bar` is `await clazz.bar(context)`.
 
-- A `@tasks.loop` is a `tasks.Loop`, not a `Command`, so the `__call__` trick doesn't apply — keep delegating the loop's body to a plain method and test that method directly:
+- A `@tasks.loop` isn't a `Command`, so delegate its body to a plain method and test that:
 
   ```python
   @tasks.loop(hours=1)
