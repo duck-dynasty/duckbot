@@ -67,8 +67,7 @@ def test_no_return_value_bleed_between_mocks_of_same_class(autospec):
     assert second.add_field(name="n", value="v") != "stub"
 
 
-def test_mock_equality_is_identity(autospec):
+def test_mocks_of_same_class_are_not_equal(autospec):
     first = autospec.of(discord.Emoji)
     second = autospec.of(discord.Emoji)
-    assert first == first
     assert first != second

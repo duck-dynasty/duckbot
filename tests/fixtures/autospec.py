@@ -13,9 +13,10 @@ class SpecMock(mock.MagicMock):
     def _get_child_mock(self, /, **kw):
         name = kw.get("name")
         spec = self._spec_class
-        attr = inspect.getattr_static(spec, name, None) if spec and isinstance(name, str) and not name.startswith("__") else None
-        if inspect.isfunction(attr):
-            return mock.create_autospec(attr.__get__(mock.sentinel.self_), name=name)
+        if spec is not None and isinstance(name, str) and not name.startswith("__"):
+            attr = inspect.getattr_static(spec, name, None)
+            if inspect.isfunction(attr):
+                return mock.create_autospec(attr.__get__(mock.sentinel.self_), name=name)
         return super()._get_child_mock(**kw)
 
 
