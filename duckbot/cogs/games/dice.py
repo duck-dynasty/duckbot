@@ -11,13 +11,10 @@ CRIT_FAIL_FLAVOUR = ":skull: **Critical fail!**"
 
 class Dice(commands.Cog):
     @commands.hybrid_command(name="roll", aliases=["r"], description="Roll some Dungeons & Dragons style dice!")
-    async def roll_command(self, context: commands.Context, *, expression: str = "1d20"):
+    async def roll(self, context: commands.Context, *, expression: str = "1d20"):
         """
         :param expression: The number and type of dice to roll. Default is 1d20
         """
-        await self.roll(context, expression)
-
-    async def roll(self, context: commands.Context, expression: str):
         max_length = MAX_MESSAGE_LENGTH - 50  # max-50 as a buffer for the added text
         try:
             roller = self.make_roller(100_000)

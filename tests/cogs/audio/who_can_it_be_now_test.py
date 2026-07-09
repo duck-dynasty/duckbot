@@ -6,6 +6,12 @@ from discord.ext.commands import CommandError
 
 from duckbot.cogs.audio import WhoCanItBeNow
 from tests import async_value
+from tests.discord_test_ext import bind_commands
+
+
+@pytest.fixture
+def clazz(bot) -> WhoCanItBeNow:
+    return bind_commands(WhoCanItBeNow(bot))
 
 
 def play(*args, **kwargs):
@@ -18,7 +24,7 @@ async def test_task_loop_once(ffmpeg, vol, bot_spy, context, voice_client, skip_
     context.voice_client = None
     context.author.voice.channel.connect.return_value = async_value(voice_client)
     voice_client.play.side_effect = play
-    clazz = WhoCanItBeNow(bot_spy)
+    clazz = bind_commands(WhoCanItBeNow(bot_spy))
     await clazz.connect_to_voice(context)
     assert clazz.voice_client is not None
     await clazz.start(context)
@@ -44,7 +50,7 @@ async def test_task_loop_repeats(ffmpeg, vol, bot_spy, context, voice_client, sk
         play(*args, **kwargs)
 
     voice_client.play.side_effect = loop_first
-    clazz = WhoCanItBeNow(bot_spy)
+    clazz = bind_commands(WhoCanItBeNow(bot_spy))
     await clazz.connect_to_voice(context)
     assert clazz.voice_client is not None
     await clazz.start(context)
@@ -67,7 +73,7 @@ async def test_task_loop_repeats_max_times(ffmpeg, vol, bot_spy, context, voice_
     context.voice_client = None
     context.author.voice.channel.connect.return_value = async_value(voice_client)
     voice_client.play.side_effect = play
-    clazz = WhoCanItBeNow(bot_spy)
+    clazz = bind_commands(WhoCanItBeNow(bot_spy))
     await clazz.connect_to_voice(context)
     assert clazz.voice_client is not None
     await clazz.start(context)
@@ -84,40 +90,35 @@ async def test_task_loop_repeats_max_times(ffmpeg, vol, bot_spy, context, voice_
     context.send.assert_called_once_with(":musical_note: :saxophone:", delete_after=30)
 
 
-async def test_connect_to_voice_no_voice(bot, context):
+async def test_connect_to_voice_no_voice(clazz, context):
     context.voice_client = None
     delattr(context.author, "voice")
-    clazz = WhoCanItBeNow(bot)
     await clazz.connect_to_voice(context)
     context.send.assert_called_once_with("Music can only be played in a discord server, not a private channel.", delete_after=30)
 
 
-async def test_connect_to_voice_author_in_channel(bot, context, voice_client, skip_if_private_channel):
+async def test_connect_to_voice_author_in_channel(clazz, context, voice_client, skip_if_private_channel):
     context.voice_client = None
     context.author.voice.channel.connect.return_value = async_value(voice_client)
-    clazz = WhoCanItBeNow(bot)
     await clazz.connect_to_voice(context)
     assert clazz.voice_client == voice_client
 
 
-async def test_connect_to_voice_author_not_in_channel(bot, context):
+async def test_connect_to_voice_author_not_in_channel(clazz, context):
     context.voice_client = None
     context.author.voice = None
-    clazz = WhoCanItBeNow(bot)
     with pytest.raises(CommandError):
         await clazz.connect_to_voice(context)
     context.send.assert_called_once_with("Connect to a voice channel so I know where to `!start`.", delete_after=30)
 
 
-async def test_connect_to_voice_already_connected(bot, context, voice_client):
+async def test_connect_to_voice_already_connected(clazz, context, voice_client):
     context.voice_client = voice_client
-    clazz = WhoCanItBeNow(bot)
     await clazz.connect_to_voice(context)
     voice_client.stop.assert_called()
 
 
-async def test_start_already_started(bot, context):
-    clazz = WhoCanItBeNow(bot)
+async def test_start_already_started(clazz, bot, context):
     clazz.streaming = True
     await clazz.start(context)
     context.send.assert_called_once_with(":musical_note: :saxophone:", delete_after=30)
@@ -126,8 +127,7 @@ async def test_start_already_started(bot, context):
 
 @mock.patch("duckbot.cogs.audio.who_can_it_be_now.PCMVolumeTransformer", autospec=True)
 @mock.patch("duckbot.cogs.audio.who_can_it_be_now.FFmpegPCMAudio", autospec=True)
-async def test_stop_disconnects(ffmpeg, vol, bot, context, voice_client):
-    clazz = WhoCanItBeNow(bot)
+async def test_stop_disconnects(ffmpeg, vol, clazz, context, voice_client):
     clazz.streaming = True
     clazz.audio_task = asyncio.create_task(clazz.stream_audio())
     clazz.voice_client = voice_client
@@ -139,24 +139,27 @@ async def test_stop_disconnects(ffmpeg, vol, bot, context, voice_client):
     context.send.assert_called_once_with(":disappointed_relieved:", delete_after=30)
 
 
-async def test_stop_not_streaming(bot, context):
-    clazz = WhoCanItBeNow(bot)
+async def test_stop_not_streaming(clazz, context):
     clazz.streaming = False
     await clazz.stop(context)
     context.send.assert_called_once_with("Brother, no :musical_note: :saxophone: is active.", delete_after=30)
 
 
-async def test_stop_null_context_not_streaming(bot):
-    clazz = WhoCanItBeNow(bot)
+async def test_stop_command_not_streaming(clazz, context):
+    clazz.streaming = False
+    await clazz.stop_command(context)
+    context.send.assert_called_once_with("Brother, no :musical_note: :saxophone: is active.", delete_after=30)
+
+
+async def test_stop_null_context_not_streaming(clazz):
     clazz.streaming = False
     await clazz.stop()
 
 
 @mock.patch("duckbot.cogs.audio.who_can_it_be_now.PCMVolumeTransformer", autospec=True)
 @mock.patch("duckbot.cogs.audio.who_can_it_be_now.FFmpegPCMAudio", autospec=True)
-async def test_cog_unload_stops_streaming(ffmpeg, vol, bot, voice_client):
+async def test_cog_unload_stops_streaming(ffmpeg, vol, clazz, bot, voice_client):
     bot.loop = asyncio.get_event_loop()
-    clazz = WhoCanItBeNow(bot)
     clazz.voice_client = voice_client
     clazz.audio_task = bot.loop.create_task(clazz.stream_audio())
     clazz.streaming = True
@@ -167,7 +170,6 @@ async def test_cog_unload_stops_streaming(ffmpeg, vol, bot, voice_client):
     assert clazz.audio_task is None
 
 
-async def test_delete_command_message(bot, context):
-    clazz = WhoCanItBeNow(bot)
+async def test_delete_command_message(clazz, context):
     await clazz.delete_command_message(context)
     context.message.delete.assert_called()

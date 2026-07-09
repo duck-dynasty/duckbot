@@ -6,36 +6,38 @@ import pytest
 from duckbot.cogs.games import Dice
 from duckbot.cogs.games.dice import CRIT_FAIL_FLAVOUR, CRIT_HIT_FLAVOUR
 from duckbot.util.messages import MAX_MESSAGE_LENGTH
+from tests.discord_test_ext import bind_commands
+
+
+@pytest.fixture
+def clazz() -> Dice:
+    return bind_commands(Dice())
 
 
 @mock.patch("d20.Roller.roll", side_effect=[d20.RollValueError("ded")])
-async def test_roll_dice_error(roller, context):
-    clazz = Dice()
-    await clazz.roll(context, "1d-20")
+async def test_roll_dice_error(roller, clazz, context):
+    await clazz.roll(context, expression="1d-20")
     context.send.assert_called_once_with("Oh... :nauseated_face: I don't feel so good... :face_vomiting:\n```ded```", delete_after=30)
 
 
-async def test_roll_dice_too_many_dice(context):
-    clazz = Dice()
-    await clazz.roll(context, "100001d20")
+async def test_roll_dice_too_many_dice(clazz, context):
+    await clazz.roll(context, expression="100001d20")
     context.send.assert_called_once_with("I can only roll up to 100000 dice.", delete_after=30)
 
 
 @mock.patch("d20.Roller")
-async def test_roll_result_too_long_for_message(roller, context):
+async def test_roll_result_too_long_for_message(roller, clazz, context):
     roller.return_value.roll.return_value.result = "x" * MAX_MESSAGE_LENGTH
     roller.return_value.roll.return_value.total = 100
-    clazz = Dice()
-    await clazz.roll(context, "1d20")
+    await clazz.roll(context, expression="1d20")
     context.send.assert_called_once_with(f"**Rolls**: {'x' * (MAX_MESSAGE_LENGTH - 50)}...\n**Total**: 100")
 
 
 @mock.patch("d20.Roller")
-async def test_roll_sends_result(roller, context):
+async def test_roll_sends_result(roller, clazz, context):
     roller.return_value.roll.return_value.result = "results"
     roller.return_value.roll.return_value.total = 1
-    clazz = Dice()
-    await clazz.roll(context, "1d20")
+    await clazz.roll(context, expression="1d20")
     context.send.assert_called_once_with("**Rolls**: results\n**Total**: 1")
 
 
@@ -48,12 +50,11 @@ async def test_roll_sends_result(roller, context):
 )
 @mock.patch("duckbot.cogs.games.dice.Dice._crit_flavour")
 @mock.patch("d20.Roller")
-async def test_roll_includes_crit_flavour(roller, crit_flavour, flavour, expected_message, context):
+async def test_roll_includes_crit_flavour(roller, crit_flavour, flavour, expected_message, clazz, context):
     roller.return_value.roll.return_value.result = "results"
     roller.return_value.roll.return_value.total = 20
     crit_flavour.return_value = flavour
-    clazz = Dice()
-    await clazz.roll(context, "1d20")
+    await clazz.roll(context, expression="1d20")
     context.send.assert_called_once_with(expected_message)
 
 

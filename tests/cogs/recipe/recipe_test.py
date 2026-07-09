@@ -1,88 +1,86 @@
 import json
 
+import pytest
 from responses import RequestsMock, matchers
 
 from duckbot.cogs.recipe import Recipe
+from tests.discord_test_ext import bind_commands
 
 RECIPE_SEARCH_URI = "https://www.allrecipes.com/element-api/content-proxy/faceted-searches-load-more"
 
 
-async def test_search_recipes_returns_scraped_html(responses):
+@pytest.fixture
+def clazz() -> Recipe:
+    return bind_commands(Recipe())
+
+
+async def test_search_recipes_returns_scraped_html(clazz, responses):
     search_term = "test1"
     mock_data = get_mock_data(search_term, 5)
     setup_responses(responses, search_term, with_articles(mock_data))
-    clazz = Recipe()
     response = clazz.search_recipes(search_term)
     assert response == json_articles(mock_data)
     assert_requests(responses, search_term)
 
 
-async def test_parse_recipes_returns_articles():
+async def test_parse_recipes_returns_articles(clazz):
     mock_data = get_mock_data("test1", 5)
     expected_response = [get_mock_data("test1", 5) for _ in range(5)]
     html = json_articles(mock_data)
-    clazz = Recipe()
     response = clazz.parse_recipes(html)
     assert response == expected_response
 
 
-async def test_parse_recipes_returns_empty():
+async def test_parse_recipes_returns_empty(clazz):
     expected_response = []
     html = without_articles()
-    clazz = Recipe()
     response = clazz.parse_recipes(html)
     assert response == expected_response
 
 
-async def test_parse_recipes_no_content_returns_empty():
+async def test_parse_recipes_no_content_returns_empty(clazz):
     expected_response = []
     html = without_content()
-    clazz = Recipe()
     response = clazz.parse_recipes(html)
     assert response == expected_response
 
 
-async def test_select_recipes_with_one_return_one():
+async def test_select_recipes_with_one_return_one(clazz):
     recipe_list = [get_mock_data("test1", 5)]
-    clazz = Recipe()
     response = clazz.select_recipe(recipe_list)
     assert response == recipe_list[0]
 
 
-async def test_select_recipes_with_many_return_one():
+async def test_select_recipes_with_many_return_one(clazz):
     recipe_list = [get_mock_data("test1", 5), get_mock_data("test2", 4)]
-    clazz = Recipe()
     response = clazz.select_recipe(recipe_list)
     assert response in recipe_list
 
 
-async def test_recipe_with_content_return_recipe(context, responses):
+async def test_recipe_with_content_return_recipe(clazz, context, responses):
     search_term = "test1"
     mock_data = get_mock_data(search_term, 5)
     expected_response = f"How about a nice {mock_data['name']}. {mock_data['description']} This recipe has a {mock_data['rating']}/5 rating! {mock_data['url']}"
     setup_responses(responses, search_term, with_articles(mock_data))
-    clazz = Recipe()
-    await clazz.recipe(context, search_term)
+    await clazz.recipe(context, search_term=search_term)
     context.send.assert_called_once_with(expected_response)
     assert_requests(responses, search_term)
 
 
-async def test_recipe_without_articles_return_sorry(context, responses):
+async def test_recipe_without_articles_return_sorry(clazz, context, responses):
     search_term = "test1"
     expected_response = f"I am terribly sorry. There doesn't seem to be any recipes for {search_term}."
     setup_responses(responses, search_term, without_articles(), num_pages=1)
-    clazz = Recipe()
-    await clazz.recipe(context, search_term)
+    await clazz.recipe(context, search_term=search_term)
     context.send.assert_called_once_with(expected_response)
     assert_requests(responses, search_term, num_pages=1)
 
 
-async def test_recipe_without_content_return_sorry(context, responses):
+async def test_recipe_without_content_return_sorry(clazz, context, responses):
     search_term = "test1"
     expected_response = "I am terribly sorry. I am having problems reading All Recipes for you."
     setup_responses(responses, search_term, without_content(), num_pages=1)
-    clazz = Recipe()
-    await clazz.recipe(context, search_term)
+    await clazz.recipe(context, search_term=search_term)
     context.send.assert_called_once_with(expected_response)
     assert_requests(responses, search_term, num_pages=1)
 
