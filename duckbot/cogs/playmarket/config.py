@@ -3,7 +3,6 @@
 from datetime import timedelta
 
 STARTING_BALANCE = 10_000
-SETTLEMENT_GRACE = timedelta(days=7)
 
 TOPUP_THRESHOLD = 1_000
 TOPUP_TARGET = 2_000

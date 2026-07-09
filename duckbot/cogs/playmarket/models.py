@@ -34,7 +34,7 @@ class Season(Base):
     id = Column(BigInteger, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
     starts_at = Column(DateTime(timezone=True), nullable=False)
-    status = Column(String, nullable=False, default="active")  # active|settling|archived
+    status = Column(String, nullable=False, default="active")  # active|archived
     starting_balance = Column(BigInteger, nullable=False, default=10000)
 
     @property
