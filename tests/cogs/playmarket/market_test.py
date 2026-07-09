@@ -487,6 +487,120 @@ async def test_resolving_keeps_the_ledger_reconciled(cog, alice, bob, carol, in_
     assert reconciles(in_memory_db)
 
 
+# --- void a resolved market (admin correction) ----------------------------
+
+
+async def test_admin_void_claws_back_payouts_and_refunds_stakes(cog, alice, bob, carol, in_memory_db):
+    admin = make_context(config.ADMIN_IDS[0])
+    market_id = await open_market(cog, alice)
+    await cog.bet(bob, market_id, "yes", BET)
+    await cog.bet(carol, market_id, "no", BET)
+    await cog.resolve(alice, market_id, "yes")
+    await cog.resolve(admin, market_id, "void")
+    market = market_row(in_memory_db, market_id)
+    assert market.status == "VOID" and market.outcome == "void"
+    assert account(in_memory_db, 2).balance == STARTING
+    assert account(in_memory_db, 3).balance == STARTING
+
+
+async def test_admin_void_writes_void_ledger_rows(cog, alice, bob, carol, in_memory_db):
+    admin = make_context(config.ADMIN_IDS[0])
+    market_id = await open_market(cog, alice)
+    await cog.bet(bob, market_id, "yes", BET)
+    await cog.bet(carol, market_id, "no", BET)
+    await cog.resolve(alice, market_id, "yes")
+    await cog.resolve(admin, market_id, "void")
+    assert reasons(in_memory_db, 2) == ["season_grant", "bet", "payout", "void"]
+    assert reasons(in_memory_db, 3) == ["season_grant", "bet", "void"]
+
+
+async def test_admin_void_keeps_the_ledger_reconciled(cog, alice, bob, carol, in_memory_db):
+    admin = make_context(config.ADMIN_IDS[0])
+    market_id = await open_market(cog, alice)
+    await cog.bet(bob, market_id, "yes", BET)
+    await cog.bet(carol, market_id, "no", BET)
+    await cog.resolve(alice, market_id, "yes")
+    await cog.resolve(admin, market_id, "void")
+    assert reconciles(in_memory_db)
+
+
+async def test_admin_void_announces_the_corrections(cog, alice, bob, in_memory_db):
+    admin = make_context(config.ADMIN_IDS[0])
+    market_id = await open_market(cog, alice)
+    await cog.bet(bob, market_id, "yes", BET)
+    await cog.resolve(alice, market_id, "yes")
+    await cog.resolve(admin, market_id, "void")
+    expected = discord.Embed(title=f"Market {market_id} — Will it happen?", description="Resolution reversed — market **VOIDED** by an admin.", color=discord.Color.greyple())
+    expected.add_field(name="Corrections", value="user2 — clawed back 831, refunded 500 (-331)", inline=False)
+    admin.send.assert_called_with("<@2>", embed=expected)
+
+
+async def test_admin_void_can_push_a_spender_negative(cog, alice, bob, in_memory_db):
+    admin = make_context(config.ADMIN_IDS[0])
+    market_id = await open_market(cog, alice)
+    await cog.bet(bob, market_id, "yes", BET)
+    await cog.resolve(alice, market_id, "yes")
+    set_balance(in_memory_db, 2, 100)  # bob spent his winnings
+    await cog.resolve(admin, market_id, "void")
+    assert account(in_memory_db, 2).balance == 100 + BET - 831
+
+
+async def test_admin_void_refunds_a_seller_their_rounding_loss(cog, alice, bob, in_memory_db):
+    admin = make_context(config.ADMIN_IDS[0])
+    market_id = await open_market(cog, alice)
+    await cog.bet(bob, market_id, "yes", BET)
+    await cog.sell(bob, market_id, "yes", "all")  # gets back 499, house keeps 1
+    await cog.resolve(alice, market_id, "yes")
+    await cog.resolve(admin, market_id, "void")
+    assert account(in_memory_db, 2).balance == STARTING
+    assert reconciles(in_memory_db)
+
+
+async def test_admin_void_with_no_bettors_just_flips_the_status(cog, alice, in_memory_db):
+    admin = make_context(config.ADMIN_IDS[0])
+    market_id = await open_market(cog, alice)
+    await cog.resolve(alice, market_id, "yes")
+    await cog.resolve(admin, market_id, "void")
+    assert market_row(in_memory_db, market_id).status == "VOID"
+
+
+async def test_creator_cannot_void_a_resolved_market(cog, alice, in_memory_db):
+    market_id = await open_market(cog, alice)
+    await cog.resolve(alice, market_id, "yes")
+    await cog.resolve(alice, market_id, "void")
+    assert alice.send.call_args.args[0] == "Reversing a resolution is above your pay grade, brother."
+    assert market_row(in_memory_db, market_id).status == "RESOLVED"
+
+
+async def test_admin_cannot_re_resolve_to_yes_or_no(cog, alice, in_memory_db):
+    admin = make_context(config.ADMIN_IDS[0])
+    market_id = await open_market(cog, alice)
+    await cog.resolve(alice, market_id, "yes")
+    await cog.resolve(admin, market_id, "no")
+    assert admin.send.call_args.args[0] == "That one's already in the books, brother."
+    assert market_row(in_memory_db, market_id).status == "RESOLVED"
+
+
+async def test_voiding_an_already_void_market_is_rejected(cog, alice, in_memory_db):
+    admin = make_context(config.ADMIN_IDS[0])
+    market_id = await open_market(cog, alice)
+    await cog.resolve(alice, market_id, "void")
+    await cog.resolve(admin, market_id, "void")
+    assert admin.send.call_args.args[0] == "That one's already in the books, brother."
+
+
+async def test_admin_void_is_rejected_once_the_season_is_archived(cog, alice, bob, clock, in_memory_db):
+    admin = make_context(config.ADMIN_IDS[0])
+    market_id = await open_market(cog, alice)
+    await cog.bet(bob, market_id, "yes", BET)
+    await cog.resolve(alice, market_id, "yes")
+    clock.advance(days=190)
+    await cog.tick()  # archives the season
+    await cog.resolve(admin, market_id, "void")
+    assert admin.send.call_args.args[0] == "That season's ancient history, brother."
+    assert market_row(in_memory_db, market_id).status == "RESOLVED"
+
+
 # --- claim (need-based top-up) ------------------------------------------
 
 
