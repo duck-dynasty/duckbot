@@ -1,9 +1,17 @@
+import datetime
 from decimal import Decimal
 from types import SimpleNamespace
 
 import pytest
 
-from duckbot.cogs.playmarket.market import PlayMarket, _coins, _down, _pct, _whole
+from duckbot.cogs.playmarket.market import (
+    PlayMarket,
+    _coins,
+    _down,
+    _next_quarter_start,
+    _pct,
+    _whole,
+)
 
 
 @pytest.fixture
@@ -68,3 +76,20 @@ def test_coins_are_shown_as_whole_numbers(value, shown):
 @pytest.mark.parametrize("probability,shown", [(0.5, "50%"), (0.697, "69.7%"), (0.0, "0%"), (1.0, "100%"), (0.0193, "1.93%")])
 def test_prices_keep_a_few_decimal_places(probability, shown):
     assert _pct(probability) == shown
+
+
+# --- quarter alignment -----------------------------------------------------
+
+
+@pytest.mark.parametrize(
+    "dt,expected",
+    [
+        (datetime.datetime(2024, 1, 1, 12, 0), datetime.datetime(2024, 4, 1)),
+        (datetime.datetime(2024, 3, 31, 23, 59), datetime.datetime(2024, 4, 1)),
+        (datetime.datetime(2024, 4, 1, 0, 0), datetime.datetime(2024, 7, 1)),
+        (datetime.datetime(2024, 10, 15), datetime.datetime(2025, 1, 1)),
+        (datetime.datetime(2024, 12, 31, 23, 59), datetime.datetime(2025, 1, 1)),
+    ],
+)
+def test_next_quarter_start_lands_on_the_following_quarter(dt, expected):
+    assert _next_quarter_start(dt) == expected

@@ -28,7 +28,7 @@ Every command works as both a slash command (`/market bet`) and a prefix command
 
 ## Coins and seasons
 
-Everyone starts each **season** with **10,000 coins**. A season lasts about six months, after which balances reset and a fresh leaderboard begins — so a cold streak is never permanent and everyone re-levels.
+Everyone starts each **season** with **10,000 coins**. A season runs for a calendar quarter, resetting on the first day of January, April, July, and October, after which balances reset and a fresh leaderboard begins — so a cold streak is never permanent and everyone re-levels.
 
 - Coins are always **whole numbers**. (Share counts can be fractional under the hood — that's the market's internal accounting — but you bet and get paid in whole coins.)
 - Coins are spent placing bets and earned when your bets pay out.
@@ -140,7 +140,7 @@ Only the creator can resolve their own market — it's a friends-trust-friends "
 | Thing             | Value                                                    |
 | ----------------- | -------------------------------------------------------- |
 | Starting balance  | 10,000 coins per season                                  |
-| Season length     | ~6 months, then balances reset                           |
+| Season length     | 1 calendar quarter, then balances reset                  |
 | Need-based top-up | under 1,000 coins & no positions → back to 2,000, weekly |
 | Minimum bet       | 10 coins                                                 |
 | Resolution        | by the market's creator; auto-void at season end         |

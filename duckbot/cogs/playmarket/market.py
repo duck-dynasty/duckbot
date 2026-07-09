@@ -29,6 +29,14 @@ def _whole(value) -> int:
     return math.floor(value)
 
 
+def _next_quarter_start(dt):
+    """Midnight on the first day of the calendar quarter following dt."""
+    month = (dt.month - 1) // 3 * 3 + 4
+    year = dt.year + (month - 1) // 12
+    month = (month - 1) % 12 + 1
+    return dt.replace(year=year, month=month, day=1, hour=0, minute=0, second=0, microsecond=0)
+
+
 class PlayMarket(commands.Cog):
     def __init__(self, bot, db: Database):
         self.bot = bot
@@ -262,14 +270,15 @@ class PlayMarket(commands.Cog):
         for rank, account in enumerate(sorted(accounts, key=lambda a: a.balance, reverse=True), start=1):
             session.add(SeasonResult(season_id=season.id, user_id=account.id, final_balance=account.balance, rank=rank))
         season.status = "archived"
-        next_season = self._new_season(session)
+        next_season = self._new_season(session, starts_at=season.ends_at)  # keep the calendar alignment even if settlement ran late
         for account in accounts:
             account.balance = 0
             self._credit(session, next_season.id, account, None, config.STARTING_BALANCE, "season_grant")
 
-    def _new_season(self, session) -> Season:
+    def _new_season(self, session, starts_at=None) -> Season:
+        starts_at = starts_at or now()
         count = session.query(Season).count()
-        season = Season(name=f"Season {count + 1}", starts_at=now(), ends_at=now() + config.SEASON_LENGTH, status="active", starting_balance=config.STARTING_BALANCE)
+        season = Season(name=f"Season {count + 1}", starts_at=starts_at, ends_at=_next_quarter_start(starts_at), status="active", starting_balance=config.STARTING_BALANCE)
         session.add(season)
         session.flush()  # assign id
         return season
