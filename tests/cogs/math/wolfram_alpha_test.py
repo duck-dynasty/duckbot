@@ -4,6 +4,7 @@ import wolframalpha
 
 from duckbot.cogs.math import WolframAlpha
 from duckbot.util.embeds import MAX_EMBED_LENGTH, MAX_TITLE_LENGTH
+from tests.discord_test_ext import bind_commands
 
 
 @pytest.fixture
@@ -13,7 +14,7 @@ def wra_client(autospec) -> wolframalpha.Client:
 
 @pytest.fixture
 def wolfram(bot, wra_client) -> WolframAlpha:
-    clazz = WolframAlpha(bot)
+    clazz = bind_commands(WolframAlpha(bot))
     clazz._wolfram = wra_client
     return clazz
 
@@ -31,14 +32,14 @@ def test_wolfram_returns_cached_instance(wolfram, wra_client):
 
 async def test_calc_single_pod(wolfram, context, wra_client):
     wra_client.aquery.return_value = result([pod(subpods=[subpod(img=image())])])
-    await wolfram.calc(context, "query")
+    await wolfram.calc(context, query="query")
     embed = discord.Embed(title="title").set_image(url="src").add_field(name="subtitle", value="plaintext")
     context.send.assert_called_once_with("https://www.wolframalpha.com/input/?i=query", embeds=[embed])
 
 
 async def test_calc_single_pod_large_embed(wolfram, context, wra_client):
     wra_client.aquery.return_value = result([pod(title="p" * MAX_EMBED_LENGTH, subpods=[subpod(title="s" * MAX_EMBED_LENGTH, plaintext="t" * MAX_EMBED_LENGTH, img=image())])])
-    await wolfram.calc(context, "query")
+    await wolfram.calc(context, query="query")
     embed = discord.Embed(title="p" * MAX_TITLE_LENGTH).set_image(url="src").add_field(name="s" * 64, value="t" * 512)
     context.send.assert_called_once_with("https://www.wolframalpha.com/input/?i=query", embeds=[embed])
 
@@ -51,7 +52,7 @@ async def test_calc_multiple_pods_and_subpods(wolfram, context, wra_client):
             pod(title="pod3", subpods=[subpod(title=None, img=image(title="img", src="pod3.img"))]),
         ]
     )
-    await wolfram.calc(context, "query things")
+    await wolfram.calc(context, query="query things")
     embed1 = discord.Embed(title="pod1").set_image(url="2.img").add_field(name="1", value="plaintext").add_field(name="2", value="plaintext")
     embed2 = discord.Embed(title="pod2").add_field(name="3", value="plaintext")
     embed3 = discord.Embed(title="pod3").set_image(url="pod3.img").add_field(name="img", value="plaintext")

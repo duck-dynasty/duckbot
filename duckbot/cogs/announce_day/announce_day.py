@@ -76,7 +76,7 @@ class AnnounceDay(commands.Cog):
             await channel.send(random.choice(self.days[day]["gifs"]))
 
     @commands.command(name="day")
-    async def day_command(self, context):
+    async def day(self, context):
         await context.send(self.get_message())
 
     @tasks.loop(time=time(hour=10, minute=0, tzinfo=duckbot.util.datetime.timezone()))

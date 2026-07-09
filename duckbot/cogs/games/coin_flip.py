@@ -5,9 +5,6 @@ from discord.ext import commands
 
 class CoinFlip(commands.Cog):
     @commands.command(name="coin", aliases=["flip", "toss"])
-    async def coin_command(self, context):
-        await self.coin_flip(context)
-
     async def coin_flip(self, context):
         if random.random() < 1.0 / 6_000.0:
             await context.send(":coin: :coin: The Side! :coin: :coin:")

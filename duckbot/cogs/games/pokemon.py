@@ -56,13 +56,10 @@ class Pokemon(commands.Cog):
         return self._pokemon_names
 
     @commands.hybrid_command(name="pokemon", description="Show a Pokemon by name or ID. No args gives the Pokemon of the Day.")
-    async def pokemon_command(self, context: commands.Context, *, name_or_id: Optional[str] = None):
+    async def pokemon(self, context: commands.Context, *, name_or_id: Optional[str] = None):
         """
         :param name_or_id: The name or ID of the Pokemon to show.
         """
-        await self.pokemon(context, name_or_id)
-
-    async def pokemon(self, context: commands.Context, name_or_id: Optional[str]):
         async with context.typing():
             try:
                 if name_or_id is not None:
@@ -156,7 +153,7 @@ class Pokemon(commands.Cog):
 
         return embed
 
-    @pokemon_command.autocomplete("name_or_id")
+    @pokemon.autocomplete("name_or_id")
     async def pokemon_name_autocomplete(self, interaction: Interaction, current: str) -> List[Choice[str]]:
         if len(current) < 3:
             return []

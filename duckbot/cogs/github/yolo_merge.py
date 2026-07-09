@@ -39,16 +39,13 @@ class YoloMerge(commands.Cog):
 
     @commands.command(name="yolo")
     @commands.check(is_repository_admin)
-    async def yolo_command(self, context: commands.Context, pr_id: Optional[int] = None):
+    async def yolo(self, context: commands.Context, pr_id: Optional[int] = None):
         async with context.typing():
-            await self.yolo(context, pr_id)
-
-    async def yolo(self, context: commands.Context, pr_id: Optional[int]):
-        repo = self.github.get_repo("duck-dynasty/duckbot")
-        if pr_id is None:
-            await self.list(context, repo)
-        else:
-            await self.merge(context, repo, pr_id)
+            repo = self.github.get_repo("duck-dynasty/duckbot")
+            if pr_id is None:
+                await self.list(context, repo)
+            else:
+                await self.merge(context, repo, pr_id)
 
     async def list(self, context: commands.Context, repo: Repository):
         pulls = repo.get_pulls()

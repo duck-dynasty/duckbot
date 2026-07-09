@@ -1,4 +1,11 @@
-from discord.ext.commands import Bot
+from discord.ext.commands import Bot, Cog
+
+
+def bind_commands(cog: Cog) -> Cog:
+    """Wire each command to its cog so Command.__call__ injects self in tests."""
+    for cmd in cog.walk_commands():
+        cmd.cog = cog
+    return cog
 
 
 def assert_cog_added_of_type(bot: Bot, cog_type):

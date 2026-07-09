@@ -9,10 +9,7 @@ WRAPPERS = ["**", "*", "`"]
 
 class MockText(commands.Cog):
     @commands.command(name="mock")
-    async def mock_text_command(self, context: commands.Context, *, text: str = ""):
-        await self.mock_text(context, text)
-
-    async def mock_text(self, context: commands.Context, text: str):
+    async def mock_text(self, context: commands.Context, *, text: str = ""):
         if text == "":
             mocked_text = self.mockify(f"{context.message.author.display_name}, based on this, I should mock you... I need text dude.")
         else:
@@ -56,6 +53,6 @@ class MockText(commands.Cog):
 
         return "".join(parts)
 
-    @mock_text_command.after_invoke
+    @mock_text.after_invoke
     async def delete_command_message(self, context: commands.Context):
         await try_delete(context.message)

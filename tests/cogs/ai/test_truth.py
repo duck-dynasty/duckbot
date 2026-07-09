@@ -6,6 +6,7 @@ import pytest
 from discord.ext import commands
 
 from duckbot.cogs.ai import Truth
+from tests.discord_test_ext import bind_commands
 
 
 @pytest.fixture
@@ -18,7 +19,7 @@ def mock_ai_client(mock_groq):
 
 @pytest.fixture
 def truth(bot, mock_ai_client):
-    clazz = Truth(bot)
+    clazz = bind_commands(Truth(bot))
     clazz._ai_client = mock_ai_client
     return clazz
 
@@ -89,7 +90,7 @@ async def test_fact_check_exception(truth, message):
 
 
 async def test_truth_no_reference(truth, ctx):
-    await truth.truth.callback(truth, ctx)
+    await truth.truth(ctx)
     ctx.send.assert_called_once_with("⚠️ Please use this command as a reply to the message you want to fact-check. For example:\n`Reply to a message → !truth`")
 
 
@@ -104,7 +105,7 @@ async def test_truth_with_reference(truth, ctx):
 
     # Mock get_message_reference directly with the referenced message
     with mock.patch("duckbot.cogs.ai.truth.get_message_reference", new=mock.AsyncMock(return_value=referenced_message)):
-        await truth.truth.callback(truth, ctx)
+        await truth.truth(ctx)
 
     # Verify only that the referenced message got the reply
     referenced_message.reply.assert_called_once_with("Fact-checked response.")

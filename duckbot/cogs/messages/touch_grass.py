@@ -74,11 +74,7 @@ class TouchGrass(commands.Cog):
         await message.channel.send(phrase)
 
     @commands.hybrid_command(name="grass-stats", description="Show activity leaderboard for all tracked users.")
-    async def grass_stats_command(self, context: commands.Context):
-        """Show activity leaderboard for all tracked users."""
-        await self.show_activity_stats(context)
-
-    async def show_activity_stats(self, context):
+    async def show_activity_stats(self, context: commands.Context):
         """Show activity leaderboard with current message counts."""
         now = utcnow()
 
