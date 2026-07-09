@@ -4,14 +4,8 @@ from types import SimpleNamespace
 
 import pytest
 
-from duckbot.cogs.playmarket.market import (
-    PlayMarket,
-    _coins,
-    _down,
-    _next_quarter_start,
-    _pct,
-    _whole,
-)
+from duckbot.cogs.playmarket.market import PlayMarket, _coins, _down, _pct, _whole
+from duckbot.cogs.playmarket.models import _next_quarter_start
 
 
 @pytest.fixture

@@ -20,15 +20,27 @@ def _now() -> datetime:
     return datetime.now(timezone.utc)
 
 
+def _next_quarter_start(dt: datetime) -> datetime:
+    """Midnight on the first day of the calendar quarter following dt."""
+    month = (dt.month - 1) // 3 * 3 + 4
+    year = dt.year + (month - 1) // 12
+    month = (month - 1) % 12 + 1
+    return dt.replace(year=year, month=month, day=1, hour=0, minute=0, second=0, microsecond=0)
+
+
 class Season(Base):
     __tablename__ = "pm_seasons"
 
     id = Column(BigInteger, primary_key=True, autoincrement=True)
     name = Column(String, nullable=False)
     starts_at = Column(DateTime(timezone=True), nullable=False)
-    ends_at = Column(DateTime(timezone=True), nullable=False)
     status = Column(String, nullable=False, default="active")  # active|settling|archived
     starting_balance = Column(BigInteger, nullable=False, default=10000)
+
+    @property
+    def ends_at(self) -> datetime:
+        """A season always spans exactly one calendar quarter from its start."""
+        return _next_quarter_start(self.starts_at)
 
 
 class PlayerAccount(Base):
