@@ -242,11 +242,14 @@ async def test_create_sets_liquidity_and_subsidy_by_tier(cog, alice, in_memory_d
     assert market.subsidy == math.floor(b * math.log(2))
 
 
-async def test_create_is_blocked_once_the_season_is_settling(cog, alice, clock):
+async def test_create_after_season_end_rolls_over_first(cog, alice, clock, in_memory_db):
     await open_market(cog, alice)  # creates Season 1
-    clock.advance(days=183)  # past the season end
-    await cog.create(alice, "Q", "med")
-    assert alice.send.call_args.args[0] == "Season's wrapping up, no new markets. Pump the brakes."
+    clock.advance(days=91)  # past the season end (2024-01-01 -> next quarter start 2024-04-01)
+    market_id = await open_market(cog, alice)
+    with in_memory_db.session(Season) as session:
+        statuses = {s.name: s.status for s in session.query(Season).all()}
+    assert statuses == {"Season 1": "archived", "Season 2": "active"}
+    assert market_row(in_memory_db, market_id).season_id == 2
 
 
 # --- bet -----------------------------------------------------------------
@@ -684,7 +687,7 @@ async def test_standings_splits_cash_and_shares_value(cog, bob, in_memory_db):
 
 async def test_rollover_archives_the_season_and_starts_the_next(cog, alice, clock, in_memory_db):
     await open_market(cog, alice)
-    clock.advance(days=190)  # past the season end plus the 7-day grace
+    clock.advance(days=91)  # past the season end (2024-01-01 -> 2024-04-01)
     await cog.tick()
     with in_memory_db.session(Season) as session:
         statuses = {s.name: s.status for s in session.query(Season).all()}
@@ -695,7 +698,7 @@ async def test_rollover_resets_every_balance(cog, alice, bob, clock, in_memory_d
     market_id = await open_market(cog, alice)
     await cog.bet(alice, market_id, "yes", BET)
     await cog.balance(bob)
-    clock.advance(days=190)
+    clock.advance(days=91)
     await cog.tick()
     assert account(in_memory_db, 1).balance == STARTING
     assert account(in_memory_db, 2).balance == STARTING
@@ -704,7 +707,7 @@ async def test_rollover_resets_every_balance(cog, alice, bob, clock, in_memory_d
 async def test_rollover_force_voids_unsettled_markets(cog, alice, clock, in_memory_db):
     market_id = await open_market(cog, alice)
     await cog.bet(alice, market_id, "yes", BET)
-    clock.advance(days=190)
+    clock.advance(days=91)
     await cog.tick()
     assert market_row(in_memory_db, market_id).status == "VOID"
 
@@ -712,7 +715,7 @@ async def test_rollover_force_voids_unsettled_markets(cog, alice, clock, in_memo
 async def test_rollover_records_the_final_standings(cog, alice, bob, clock, in_memory_db):
     await cog.balance(alice)
     await cog.balance(bob)
-    clock.advance(days=190)
+    clock.advance(days=91)
     await cog.tick()
     with in_memory_db.session(Season) as session:
         season_one = session.query(Season).filter_by(name="Season 1").one()

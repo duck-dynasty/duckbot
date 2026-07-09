@@ -28,12 +28,12 @@ Every command works as both a slash command (`/market bet`) and a prefix command
 
 ## Coins and seasons
 
-Everyone starts each **season** with **10,000 coins**. A season lasts about six months, after which balances reset and a fresh leaderboard begins — so a cold streak is never permanent and everyone re-levels.
+Everyone starts each **season** with **10,000 coins**. A season runs for a calendar quarter, resetting on the first day of January, April, July, and October, after which balances reset and a fresh leaderboard begins — so a cold streak is never permanent and everyone re-levels.
 
 - Coins are always **whole numbers**. (Share counts can be fractional under the hood — that's the market's internal accounting — but you bet and get paid in whole coins.)
 - Coins are spent placing bets and earned when your bets pay out.
 - If you go broke (under 1,000 coins) **and** hold no open positions, `/market claim` tops you back up to 2,000 coins, once per week. It's the only faucet, so balances still track skill within a season.
-- At season end there's a 7-day grace period for open markets to resolve, then balances reset and the final standings are recorded in a hall of fame.
+- At season end any still-open markets are auto-voided, balances reset, and the final standings are recorded in a hall of fame.
 
 Use `/market balance` to see your coins and positions, and `/market leaderboard` for the standings (ranked by net worth = coins + the live value of your open positions).
 
@@ -144,7 +144,7 @@ If a market gets resolved wrong (fat finger, disputed call), a bot admin can voi
 | Thing             | Value                                                    |
 | ----------------- | -------------------------------------------------------- |
 | Starting balance  | 10,000 coins per season                                  |
-| Season length     | ~6 months, then balances reset                           |
+| Season length     | 1 calendar quarter, then balances reset                  |
 | Need-based top-up | under 1,000 coins & no positions → back to 2,000, weekly |
 | Minimum bet       | 10 coins                                                 |
 | Resolution        | by the market's creator; auto-void at season end         |

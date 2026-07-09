@@ -52,7 +52,6 @@ class PlayMarket(commands.Cog):
         """Roll the season over when its time comes; markets are resolved by their creators."""
         with self.db.session(Season) as session:
             self.active_season(session)
-            self.settle_season_if_due(session)
             session.commit()
 
     # --- command group ----------------------------------------------------
@@ -129,8 +128,6 @@ class PlayMarket(commands.Cog):
             b = config.LIQUIDITY[liquidity]
             with self.db.session(Season) as session:
                 season = self.active_season(session)
-                if season.status != "active":
-                    return await context.send("Season's wrapping up, no new markets. Pump the brakes.")
                 self.account(session, season.id, context.author.id)  # ensure creator has an account
                 market = Market(season_id=season.id, creator_id=context.author.id, question=question, b=b, subsidy=_whole(lmsr.subsidy(b)))
                 session.add(market)
@@ -259,33 +256,32 @@ class PlayMarket(commands.Cog):
     # --- season lifecycle -------------------------------------------------
 
     def active_season(self, session) -> Season:
-        """The active or settling season; creates Season 1 on first use, flips ended ones to settling."""
-        season = session.query(Season).filter(Season.status.in_(("active", "settling"))).order_by(Season.id.desc()).first()
+        """The active season; creates Season 1 on first use, rolling over an expired one immediately."""
+        season = session.query(Season).filter_by(status="active").order_by(Season.id.desc()).first()
         if season is None:
             return self._new_season(session)
-        if season.status == "active" and now() >= season.ends_at:
-            season.status = "settling"
+        if now() >= season.ends_at:
+            return self._rollover(session, season)
         return season
 
-    def settle_season_if_due(self, session):
-        """After the grace period, void unresolved markets and roll over to the next season."""
-        season = session.query(Season).filter_by(status="settling").first()
-        if season is None or now() < season.ends_at + config.SETTLEMENT_GRACE:
-            return
+    def _rollover(self, session, season) -> Season:
+        """Void unresolved markets, record final standings, archive the season, and start the next."""
         for market in session.query(Market).filter(Market.season_id == season.id, Market.status == "OPEN").all():
             self._resolve_market(session, market, "void")
         accounts = session.query(PlayerAccount).all()
         for rank, account in enumerate(sorted(accounts, key=lambda a: a.balance, reverse=True), start=1):
             session.add(SeasonResult(season_id=season.id, user_id=account.id, final_balance=account.balance, rank=rank))
         season.status = "archived"
-        next_season = self._new_season(session)
+        next_season = self._new_season(session, starts_at=season.ends_at)  # keep the calendar alignment
         for account in accounts:
             account.balance = 0
             self._credit(session, next_season.id, account, None, config.STARTING_BALANCE, "season_grant")
+        return next_season
 
-    def _new_season(self, session) -> Season:
+    def _new_season(self, session, starts_at=None) -> Season:
+        starts_at = starts_at or now()
         count = session.query(Season).count()
-        season = Season(name=f"Season {count + 1}", starts_at=now(), ends_at=now() + config.SEASON_LENGTH, status="active", starting_balance=config.STARTING_BALANCE)
+        season = Season(name=f"Season {count + 1}", starts_at=starts_at, status="active", starting_balance=config.STARTING_BALANCE)
         session.add(season)
         session.flush()  # assign id
         return season
