@@ -209,6 +209,8 @@ class PlayMarket(commands.Cog):
             market = self._lock_market(session, market_id)
             if market is None:
                 return await context.send("No such market, brother.")
+            if market.status == "RESOLVED" and outcome == "void":
+                return await self.void_resolved(context, session, market)
             if market.status != "OPEN":
                 return await context.send("That one's already in the books, brother.")
             if context.author.id != market.creator_id and not await self._is_admin(context):
@@ -223,6 +225,41 @@ class PlayMarket(commands.Cog):
             session.commit()
             mentions = " ".join([await self._name(context, r[0], mention=True) for r in results])
             await context.send(mentions or None, embed=await self._resolve_embed(context, market, outcome, results))
+
+    async def void_resolved(self, context: commands.Context, session, market):
+        """Admin correction: reverse a bad resolution, clawing back payouts and refunding stakes."""
+        if not await self._is_admin(context):
+            return await context.send("Reversing a resolution is above your pay grade, brother.")
+        if session.get(Season, market.season_id).status == "archived":
+            return await context.send("That season's ancient history, brother.")
+        results = self._void_resolved(session, market)
+        session.commit()
+        mentions = " ".join([await self._name(context, r[0], mention=True) for r in results])
+        await context.send(mentions or None, embed=await self._void_resolved_embed(context, market, results))
+
+    def _void_resolved(self, session, market):
+        """Positions are gone post-resolution; rebuild each user's stake and payout from the ledger."""
+        results = []
+        user_ids = [uid for (uid,) in session.query(LedgerEntry.user_id).filter_by(market_id=market.id).distinct().all()]
+        for user_id in user_ids:
+            clawback = sum(e.delta for e in session.query(LedgerEntry).filter_by(user_id=user_id, market_id=market.id, reason="payout").all())
+            refund = max(0, -self._invested(session, user_id, market.id))
+            if refund - clawback != 0:
+                self._credit(session, market.season_id, self._lock_account(session, user_id), market.id, refund - clawback, "void")
+            if clawback or refund:
+                results.append((user_id, clawback, refund))
+        market.status = "VOID"
+        market.outcome = "void"
+        return results
+
+    async def _void_resolved_embed(self, context, market, results) -> Embed:
+        embed = Embed(title=f"Market {market.id} — {market.question}", description="Resolution reversed — market **VOIDED** by an admin.", color=Color.greyple())
+        lines = []
+        for user_id, clawback, refund in sorted(results, key=lambda r: r[2] - r[1], reverse=True):
+            lines.append(f"{await self._name(context, user_id)} — clawed back {_coins(clawback)}, refunded {_coins(refund)} ({refund - clawback:+,})")
+        if lines:
+            embed.add_field(name="Corrections", value="\n".join(lines), inline=False)
+        return embed
 
     @market_group.autocomplete("status")
     @list_command.autocomplete("status")

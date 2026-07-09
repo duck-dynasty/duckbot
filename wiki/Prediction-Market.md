@@ -135,6 +135,10 @@ Everyone holding a position is pinged with the results, so you'll know how your 
 
 Only the creator can resolve their own market — it's a friends-trust-friends "prop bet" model. If a creator never resolves (or leaves the server), the market is automatically voided when the season ends, so no coins stay stranded.
 
+### Fixing a bad resolution
+
+If a market gets resolved wrong (fat finger, disputed call), a bot admin can void it after the fact: run `/market resolve` again on the resolved market with `outcome:void`. Payouts are clawed back, everyone's stake is refunded as if the market had been voided in the first place, and affected players are pinged. This only works while the season is still running — once a season is archived, its results are final. Fair warning: if you already spent the winnings, the clawback can put your balance in the red.
+
 ## Economy at a glance
 
 | Thing             | Value                                                    |
