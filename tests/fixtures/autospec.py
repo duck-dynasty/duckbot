@@ -1,5 +1,5 @@
-import copy
-from typing import Type, TypeVar, Union
+import inspect
+from typing import Type, TypeVar
 from unittest import mock
 
 import pytest
@@ -7,34 +7,26 @@ import pytest
 T = TypeVar("T")
 
 
-def qualified_name(spec: Type[T]) -> str:
-    """Returns the fully qualified name of the given class."""
-    module = spec.__module__
-    return spec.__qualname__ if module == "builtins" else f"{module}.{spec.__qualname__}"
+class SpecMock(mock.MagicMock):
+    """A spec'd mock whose children are created lazily. Method children enforce the real method's signature."""
+
+    def _get_child_mock(self, /, **kw):
+        name = kw.get("name")
+        spec = self._spec_class
+        if spec is not None and isinstance(name, str) and not name.startswith("__"):
+            attr = inspect.getattr_static(spec, name, None)
+            if inspect.isfunction(attr):
+                return mock.create_autospec(attr.__get__(mock.sentinel.self_), name=name)
+        return super()._get_child_mock(**kw)
 
 
 class AutoSpec:
-    def __init__(self):
-        self.cache = {}
-
-    def of(self, spec: Union[Type[T], str]) -> T:
-        """Returns an autospec'd mock of the class of the given type."""
-        name = spec if type(spec) is str else qualified_name(spec)
-
-        def build():
-            with mock.patch(name, autospec=True) as instance:
-                return instance
-
-        if name not in self.cache:
-            self.cache[name] = build()
-        try:  # try to clone; faster than building anew
-            return copy.deepcopy(self.cache[name])
-        except TypeError:  # some types aren't clone-able though
-            return build()
+    def of(self, spec: Type[T]) -> T:
+        """Returns a spec'd mock of the given class."""
+        return SpecMock(spec=spec)
 
 
 @pytest.fixture(scope="session")
 def autospec() -> AutoSpec:
-    """A fixture to cache autospec'd `mock.patch` invocations. Cannot be used with classes that were imported
-    using `from X import Y`, only those like `import X; X.Y`"""
+    """A fixture to create spec'd mocks of classes."""
     return AutoSpec()
