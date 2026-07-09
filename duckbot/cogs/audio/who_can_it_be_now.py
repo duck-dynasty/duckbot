@@ -21,10 +21,14 @@ class WhoCanItBeNow(commands.Cog):
             return self.bot.loop.create_task(self.stop())
 
     @commands.hybrid_command(name="start", description='Start playing "music" in whatever voice channel you are currently in.')
-    async def start_command(self, context: commands.Context):
-        await self.start(context)
+    async def start(self, context: commands.Context):
+        """Starts the music loop if it is not already playing."""
+        await context.send(":musical_note: :saxophone:", delete_after=30)
+        if not self.streaming:
+            self.streaming = True
+            self.audio_task = self.bot.loop.create_task(self.stream_audio())
 
-    @start_command.before_invoke
+    @start.before_invoke
     async def connect_to_voice(self, context: commands.Context):
         if context.voice_client is None:
             if not hasattr(context.author, "voice"):
@@ -36,13 +40,6 @@ class WhoCanItBeNow(commands.Cog):
                 raise commands.CommandError("`start` invoked when author not in voice channel")
         else:
             context.voice_client.stop()
-
-    async def start(self, context: commands.Context):
-        """Starts the music loop if it is not already playing."""
-        await context.send(":musical_note: :saxophone:", delete_after=30)
-        if not self.streaming:
-            self.streaming = True
-            self.audio_task = self.bot.loop.create_task(self.stream_audio())
 
     async def stream_audio(self):
         """The music loop. Connect to channel and stream. We await on `self.stream` to block on the song being played."""
@@ -85,7 +82,7 @@ class WhoCanItBeNow(commands.Cog):
         elif context is not None:
             await context.send("Brother, no :musical_note: :saxophone: is active.", delete_after=30)
 
-    @start_command.after_invoke
+    @start.after_invoke
     @stop_command.after_invoke
     async def delete_command_message(self, context: commands.Context):
         await try_delete(context.message)

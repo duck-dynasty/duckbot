@@ -19,19 +19,16 @@ class Wordnik(commands.Cog):
         self.api_key = os.getenv("WORDNIK_KEY")
 
     @commands.hybrid_command(name="define", description="Define a brother, word.")
-    async def define_command(self, context: commands.Context, *, word: str = "taco"):
+    async def define(self, context: commands.Context, *, word: str = "taco"):
         """
         :param word: The word to define.
         """
         async with context.typing():
-            await self.define(context, word)
-
-    async def define(self, context: commands.Context, word: str):
-        definitions = self.get_definitions(word.lower()) or self.get_definitions("why")
-        if definitions:
-            await context.send(embed=self.get_embed(definitions))
-        else:
-            await context.send("wordnik is all worded out, give it a minute")
+            definitions = self.get_definitions(word.lower()) or self.get_definitions("why")
+            if definitions:
+                await context.send(embed=self.get_embed(definitions))
+            else:
+                await context.send("wordnik is all worded out, give it a minute")
 
     def get_definitions(self, word: str) -> List[dict]:
         """Returns definitions from the most preferred source dictionary that has any; inflections resolve to their root word."""

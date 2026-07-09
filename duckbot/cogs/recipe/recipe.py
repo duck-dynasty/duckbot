@@ -49,31 +49,28 @@ class Recipe(commands.Cog):
 
         return html_content
 
-    async def recipe(self, context: commands.Context, search_term: str):
-        # clean up the arguments to make a valid recipe search
-        search_term = re.sub(r"[^\w\s]", "", search_term)
-
-        try:
-            # search for recipes on allrecipes.com
-            html_content = self.search_recipes(search_term)
-
-            # parse the html to get all recipes from the search
-            recipe_list = self.parse_recipes(html_content)
-
-            if len(recipe_list) == 0:
-                response = f"I am terribly sorry. There doesn't seem to be any recipes for {search_term}."
-            else:
-                recipe = self.select_recipe(recipe_list)
-                response = f"How about a nice {recipe['name']}. {recipe['description']} This recipe has a {recipe['rating']}/5 rating! {recipe['url']}"
-        except Exception:
-            response = "I am terribly sorry. I am having problems reading All Recipes for you."
-
-        await context.send(response)
-
     @commands.hybrid_command(name="recipe", description="Get a random recipe for something.")
-    async def recipe_command(self, context: commands.Context, *, search_term: str = ""):
+    async def recipe(self, context: commands.Context, *, search_term: str = ""):
         """
         :param search_term: Search terms for the recipe
         """
         async with context.typing():
-            await self.recipe(context, search_term)
+            # clean up the arguments to make a valid recipe search
+            search_term = re.sub(r"[^\w\s]", "", search_term)
+
+            try:
+                # search for recipes on allrecipes.com
+                html_content = self.search_recipes(search_term)
+
+                # parse the html to get all recipes from the search
+                recipe_list = self.parse_recipes(html_content)
+
+                if len(recipe_list) == 0:
+                    response = f"I am terribly sorry. There doesn't seem to be any recipes for {search_term}."
+                else:
+                    recipe = self.select_recipe(recipe_list)
+                    response = f"How about a nice {recipe['name']}. {recipe['description']} This recipe has a {recipe['rating']}/5 rating! {recipe['url']}"
+            except Exception:
+                response = "I am terribly sorry. I am having problems reading All Recipes for you."
+
+            await context.send(response)

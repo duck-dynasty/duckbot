@@ -10,11 +10,12 @@ from duckbot.cogs.games.satisfy.factory import Factory
 from duckbot.cogs.games.satisfy.item import Item
 from duckbot.cogs.games.satisfy.rates import Rates
 from duckbot.cogs.games.satisfy.recipe import ModifiedRecipe, all, as_slooped, default
+from tests.discord_test_ext import bind_commands
 
 
 @pytest.fixture
 def clazz(bot) -> Satisfy:
-    return Satisfy(bot)
+    return bind_commands(Satisfy(bot))
 
 
 @pytest.fixture
@@ -25,92 +26,92 @@ def default_factory(clazz, context) -> Factory:
 async def test_reset_destroys_factory(clazz, context):
     empty_factory = Factory(Rates(), [], Rates(), set())
     clazz.save(context, empty_factory)
-    await clazz.reset.callback(clazz, context)
+    await clazz.reset(context)
     assert clazz.factory_cache == {}
     context.send.assert_called_once_with(f":factory: :fire: Factory for {context.author.display_name} cleared. Bitch. :fire: :factory:", delete_after=60)
 
 
 async def test_factory_state_sends_something_i_guess(clazz, context):
-    await clazz.factory_state.callback(clazz, context)
+    await clazz.factory_state(context)
     context.send.assert_called_once()
 
 
 async def test_add_input_stores_input_rate(clazz, context, default_factory):
-    await clazz.add_input.callback(clazz, context, str(Item.IronOre), 30)
+    await clazz.add_input(context, str(Item.IronOre), 30)
     default_factory.inputs = Item.IronOre * 30
     assert clazz.factory(context) == default_factory
 
-    await clazz.add_input.callback(clazz, context, str(Item.IronIngot), 30)
+    await clazz.add_input(context, str(Item.IronIngot), 30)
     default_factory.inputs = Item.IronOre * 30 + Item.IronIngot * 30
     assert clazz.factory(context) == default_factory
 
 
 async def test_add_target_stores_output_rate(clazz, context, default_factory):
-    await clazz.add_target.callback(clazz, context, str(Item.IronOre), 30)
+    await clazz.add_target(context, str(Item.IronOre), 30)
     default_factory.targets = Item.IronOre * 30
     assert clazz.factory(context) == default_factory
 
-    await clazz.add_target.callback(clazz, context, str(Item.IronIngot), 30)
+    await clazz.add_target(context, str(Item.IronIngot), 30)
     default_factory.targets = Item.IronOre * 30 + Item.IronIngot * 30
     assert clazz.factory(context) == default_factory
 
 
 async def test_toggle_maximize_stores_maximizer(clazz, context, default_factory):
-    await clazz.toggle_maximize.callback(clazz, context, str(Item.IronOre))
+    await clazz.toggle_maximize(context, str(Item.IronOre))
     default_factory.maximize = {Item.IronOre}
     assert clazz.factory(context) == default_factory
 
-    await clazz.toggle_maximize.callback(clazz, context, str(Item.IronIngot))
+    await clazz.toggle_maximize(context, str(Item.IronIngot))
     default_factory.maximize = {Item.IronOre, Item.IronIngot}
     assert clazz.factory(context) == default_factory
 
 
 async def test_toggle_maximize_removes_already_maximized_item(clazz, context, default_factory):
-    await clazz.toggle_maximize.callback(clazz, context, str(Item.IronOre))
-    await clazz.toggle_maximize.callback(clazz, context, str(Item.IronOre))
+    await clazz.toggle_maximize(context, str(Item.IronOre))
+    await clazz.toggle_maximize(context, str(Item.IronOre))
     default_factory.maximize = set()
     assert clazz.factory(context) == default_factory
 
 
 async def test_toggle_maximize_removes_toggled_only(clazz, context, default_factory):
-    await clazz.toggle_maximize.callback(clazz, context, str(Item.IronOre))
-    await clazz.toggle_maximize.callback(clazz, context, str(Item.IronIngot))
-    await clazz.toggle_maximize.callback(clazz, context, str(Item.CopperOre))
-    await clazz.toggle_maximize.callback(clazz, context, str(Item.IronIngot))
+    await clazz.toggle_maximize(context, str(Item.IronOre))
+    await clazz.toggle_maximize(context, str(Item.IronIngot))
+    await clazz.toggle_maximize(context, str(Item.CopperOre))
+    await clazz.toggle_maximize(context, str(Item.IronIngot))
     default_factory.maximize = {Item.IronOre, Item.CopperOre}
     assert clazz.factory(context) == default_factory
 
 
 async def test_add_booster_power_shard(clazz, context, default_factory):
-    await clazz.add_booster.callback(clazz, context, str(Item.PowerShard), 10)
+    await clazz.add_booster(context, str(Item.PowerShard), 10)
     default_factory.power_shards = 10
     assert clazz.factory(context) == default_factory
 
 
 async def test_add_booster_sloops(clazz, context, default_factory):
-    await clazz.add_booster.callback(clazz, context, str(Item.Somersloop), 10)
+    await clazz.add_booster(context, str(Item.Somersloop), 10)
     default_factory.sloops = 10
     assert clazz.factory(context) == default_factory
 
 
 async def test_recipe_bank_stores_bank(clazz, context):
-    await clazz.recipe_bank.callback(clazz, context, "Default")
+    await clazz.recipe_bank(context, "Default")
     assert clazz.factory(context).recipe_bank == "Default"
 
 
 async def test_include_recipe_adds_include_no_boost(clazz, context):
-    await clazz.include_recipe.callback(clazz, context, str(Item.IronOre))
+    await clazz.include_recipe(context, str(Item.IronOre))
     assert clazz.factory(context).include_recipes == {r.name for r in sloop([r for r in all() if r.name in ["IronOre"]])}
 
-    await clazz.include_recipe.callback(clazz, context, str(Item.IronIngot))
+    await clazz.include_recipe(context, str(Item.IronIngot))
     assert clazz.factory(context).include_recipes == {r.name for r in sloop([r for r in all() if r.name in ["IronOre", "IronIngot"]])}
 
 
 async def test_include_recipe_adds_include_with_boost(clazz, context):
-    await clazz.include_recipe.callback(clazz, context, str(Item.IronIngot), 3, 1)
+    await clazz.include_recipe(context, str(Item.IronIngot), 3, 1)
     assert clazz.factory(context).include_recipes == {r.name for r in sloop(all()) if r.original_recipe.name == "IronIngot" and r.sloops == 1 and r.power_shards == 3}
 
-    await clazz.include_recipe.callback(clazz, context, str(Item.CopperIngot), 2, 0)
+    await clazz.include_recipe(context, str(Item.CopperIngot), 2, 0)
     assert clazz.factory(context).include_recipes == {
         r.name
         for r in sloop(all())
@@ -119,15 +120,15 @@ async def test_include_recipe_adds_include_with_boost(clazz, context):
 
 
 async def test_include_recipe_removes_exclusion(clazz, context):
-    await clazz.exclude_recipe.callback(clazz, context, str(Item.IronOre))
-    await clazz.include_recipe.callback(clazz, context, str(Item.IronOre))
+    await clazz.exclude_recipe(context, str(Item.IronOre))
+    await clazz.include_recipe(context, str(Item.IronOre))
     assert clazz.factory(context).include_recipes == set()
     assert clazz.factory(context).exclude_recipes == set()
 
 
 async def test_include_recipe_removes_boosted_exclusion(clazz, context):
-    await clazz.exclude_recipe.callback(clazz, context, str(Item.IronIngot), 3, 1)
-    await clazz.include_recipe.callback(clazz, context, str(Item.IronIngot))
+    await clazz.exclude_recipe(context, str(Item.IronIngot), 3, 1)
+    await clazz.include_recipe(context, str(Item.IronIngot))
     assert clazz.factory(context).include_recipes == set()
     assert clazz.factory(context).exclude_recipes == set()
 
@@ -135,22 +136,22 @@ async def test_include_recipe_removes_boosted_exclusion(clazz, context):
 @pytest.mark.parametrize("shards,sloops", [(None, 0), (0, None)])
 async def test_include_recipe_invalid_args(clazz, context, shards, sloops):
     with pytest.raises(ValueError):
-        await clazz.include_recipe.callback(clazz, context, str(Item.IronIngot), shards, sloops)
+        await clazz.include_recipe(context, str(Item.IronIngot), shards, sloops)
 
 
 async def test_exclude_recipe_adds_exclude_no_boost(clazz, context):
-    await clazz.exclude_recipe.callback(clazz, context, str(Item.IronOre))
+    await clazz.exclude_recipe(context, str(Item.IronOre))
     assert clazz.factory(context).exclude_recipes == {r.name for r in sloop([r for r in all() if r.name in ["IronOre"]])}
 
-    await clazz.exclude_recipe.callback(clazz, context, str(Item.IronIngot))
+    await clazz.exclude_recipe(context, str(Item.IronIngot))
     assert clazz.factory(context).exclude_recipes == {r.name for r in sloop([r for r in all() if r.name in ["IronOre", "IronIngot"]])}
 
 
 async def test_exclude_recipe_adds_include_with_boost(clazz, context):
-    await clazz.exclude_recipe.callback(clazz, context, str(Item.IronIngot), 3, 1)
+    await clazz.exclude_recipe(context, str(Item.IronIngot), 3, 1)
     assert clazz.factory(context).exclude_recipes == {r.name for r in sloop(all()) if r.original_recipe.name == "IronIngot" and r.sloops == 1 and r.power_shards == 3}
 
-    await clazz.exclude_recipe.callback(clazz, context, str(Item.CopperIngot), 2, 0)
+    await clazz.exclude_recipe(context, str(Item.CopperIngot), 2, 0)
     assert clazz.factory(context).exclude_recipes == {
         r.name
         for r in sloop(all())
@@ -159,15 +160,15 @@ async def test_exclude_recipe_adds_include_with_boost(clazz, context):
 
 
 async def test_exclude_recipe_removes_inclusion(clazz, context):
-    await clazz.include_recipe.callback(clazz, context, str(Item.IronOre))
-    await clazz.exclude_recipe.callback(clazz, context, str(Item.IronOre))
+    await clazz.include_recipe(context, str(Item.IronOre))
+    await clazz.exclude_recipe(context, str(Item.IronOre))
     assert clazz.factory(context).exclude_recipes == set()
     assert clazz.factory(context).include_recipes == set()
 
 
 async def test_exclude_recipe_removes_boosted_inclusion(clazz, context):
-    await clazz.include_recipe.callback(clazz, context, str(Item.IronIngot), 3, 1)
-    await clazz.exclude_recipe.callback(clazz, context, str(Item.IronIngot))
+    await clazz.include_recipe(context, str(Item.IronIngot), 3, 1)
+    await clazz.exclude_recipe(context, str(Item.IronIngot))
     assert clazz.factory(context).exclude_recipes == set()
     assert clazz.factory(context).include_recipes == set()
 
@@ -175,22 +176,22 @@ async def test_exclude_recipe_removes_boosted_inclusion(clazz, context):
 @pytest.mark.parametrize("shards,sloops", [(None, 0), (0, None)])
 async def test_exclude_recipe_invalid_args(clazz, context, shards, sloops):
     with pytest.raises(ValueError):
-        await clazz.exclude_recipe.callback(clazz, context, str(Item.IronIngot), shards, sloops)
+        await clazz.exclude_recipe(context, str(Item.IronIngot), shards, sloops)
 
 
 async def test_limit_recipe_adds_limit_no_boost(clazz, context, default_factory):
-    await clazz.limit_recipe.callback(clazz, context, str(Item.IronOre), 30)
+    await clazz.limit_recipe(context, str(Item.IronOre), 30)
     assert clazz.factory(context).limits == {x: 30 for x in sloop([r for r in all() if r.name in ["IronOre"]])}
 
-    await clazz.limit_recipe.callback(clazz, context, str(Item.IronIngot), 30)
+    await clazz.limit_recipe(context, str(Item.IronIngot), 30)
     assert clazz.factory(context).limits == {x: 30 for x in sloop([r for r in all() if r.name in ["IronOre", "IronIngot"]])}
 
 
 async def test_limit_recipe_adds_include_with_boost(clazz, context):
-    await clazz.limit_recipe.callback(clazz, context, str(Item.IronIngot), 30, 3, 1)
+    await clazz.limit_recipe(context, str(Item.IronIngot), 30, 3, 1)
     assert clazz.factory(context).limits == {r: 30 for r in sloop(all()) if r.original_recipe.name == "IronIngot" and r.sloops == 1 and r.power_shards == 3}
 
-    await clazz.limit_recipe.callback(clazz, context, str(Item.CopperIngot), 30, 2, 0)
+    await clazz.limit_recipe(context, str(Item.CopperIngot), 30, 2, 0)
     assert clazz.factory(context).limits == {
         r: 30
         for r in sloop(all())
@@ -199,26 +200,26 @@ async def test_limit_recipe_adds_include_with_boost(clazz, context):
 
 
 async def test_limit_recipe_adds_limit_with_boost(clazz, context, default_factory):
-    await clazz.limit_recipe.callback(clazz, context, str(Item.IronOre), 30)
+    await clazz.limit_recipe(context, str(Item.IronOre), 30)
     assert clazz.factory(context).limits == {x: 30 for x in sloop([r for r in all() if r.name in ["IronOre"]])}
 
-    await clazz.limit_recipe.callback(clazz, context, str(Item.IronIngot), 30)
+    await clazz.limit_recipe(context, str(Item.IronIngot), 30)
     assert clazz.factory(context).limits == {x: 30 for x in sloop([r for r in all() if r.name in ["IronOre", "IronIngot"]])}
 
 
 @pytest.mark.parametrize("shards,sloops", [(None, 0), (0, None)])
 async def test_limit_recipe_invalid_args(clazz, context, shards, sloops):
     with pytest.raises(ValueError):
-        await clazz.limit_recipe.callback(clazz, context, str(Item.IronIngot), 30, shards, sloops)
+        await clazz.limit_recipe(context, str(Item.IronIngot), 30, shards, sloops)
 
 
 async def test_solve_no_factory_rejects(clazz, context):
-    await clazz.solve.callback(clazz, context)
+    await clazz.solve(context)
     context.send.assert_called_once_with("No.", delete_after=60)
 
 
 async def test_solve_no_in_or_out(clazz, context, default_factory):
-    await clazz.solve.callback(clazz, context)
+    await clazz.solve(context)
     context.send.assert_called_once_with("No.", delete_after=60)
 
 
@@ -230,7 +231,7 @@ async def test_solve_all_defaults(opt, clazz, context, default_factory):
     expected.recipes = sloop(default())
 
     clazz.save(context, default_factory)
-    await clazz.solve.callback(clazz, context)
+    await clazz.solve(context)
     opt.assert_called_once_with(expected)
 
 
@@ -243,7 +244,7 @@ async def test_solve_different_recipe_bank(opt, clazz, context, default_factory)
     expected.recipes = sloop(all())
 
     clazz.save(context, default_factory)
-    await clazz.solve.callback(clazz, context)
+    await clazz.solve(context)
     opt.assert_called_once_with(expected)
 
 
@@ -257,7 +258,7 @@ async def test_solve_recipe_includes(opt, clazz, context, default_factory):
     expected.recipes = sloop(default() + [r for r in all() if r.name == "DilutedPackagedFuel"])
 
     clazz.save(context, default_factory)
-    await clazz.solve.callback(clazz, context)
+    await clazz.solve(context)
     opt.assert_called_once_with(expected)
 
 
@@ -270,7 +271,7 @@ async def test_solve_recipe_excludes(opt, clazz, context, default_factory):
     expected.recipes = sloop([r for r in default() if r.name == "IronIngot"])
 
     clazz.save(context, default_factory)
-    await clazz.solve.callback(clazz, context)
+    await clazz.solve(context)
     opt.assert_called_once_with(expected)
 
 
@@ -280,7 +281,7 @@ async def test_solve_sends_graph_file(mock_opt, mock_graph, clazz, context, defa
     default_factory.inputs = Item.IronOre * 30
     default_factory.maximize = {Item.IronIngot}
     clazz.save(context, default_factory)
-    await clazz.solve.callback(clazz, context)
+    await clazz.solve(context)
     last_call_kwargs = context.send.call_args_list[-1].kwargs
     assert "file" in last_call_kwargs
     assert isinstance(last_call_kwargs["file"], discord.File)

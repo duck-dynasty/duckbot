@@ -7,6 +7,7 @@ from pyowm.weatherapi30.weather import Weather as pyowmWeather
 
 from duckbot.cogs.weather import Weather
 from duckbot.cogs.weather.saved_location import SavedLocation
+from tests.discord_test_ext import bind_commands
 
 
 @pytest.fixture
@@ -24,7 +25,7 @@ def owm(o, geocoding):
 
 @pytest.fixture
 def weather(bot, owm, db):
-    clazz = Weather(bot, db)
+    clazz = bind_commands(Weather(bot, db))
     clazz._owm = owm
     owm.weather_manager.return_value.one_call = mock.MagicMock()
     return clazz
@@ -50,6 +51,12 @@ async def test_weather_get_failure(weather, owm, context):
     with pytest.raises(Exception):
         await weather.weather(context, "city", None, None)
     context.send.assert_called_once_with("Iunno. Figure it out.\nded")
+
+
+async def test_weather_group_defaults_to_get(weather, context):
+    weather.send_weather = mock.AsyncMock()
+    await weather.weather_command(context, "city", None, None)
+    weather.send_weather.assert_awaited_once_with(context, "city", None, None)
 
 
 async def test_search_location_no_args(weather, context):
@@ -130,7 +137,7 @@ async def test_set_default_location_round_trip(bot, in_memory_db, context):
     async def mock_search_location(context, city, country, index):
         return Location(city, 1, 1, 1, country="CA")
 
-    clazz = Weather(bot, in_memory_db)
+    clazz = bind_commands(Weather(bot, in_memory_db))
     clazz.search_location = mock_search_location
     context.author.id = 123
     await clazz.set_default_location(context, "city", None, None)

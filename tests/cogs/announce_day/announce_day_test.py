@@ -4,12 +4,18 @@ from unittest import mock
 import pytest
 
 from duckbot.cogs.announce_day import AnnounceDay
+from tests.discord_test_ext import bind_commands
 
 
 @pytest.fixture
 @mock.patch("duckbot.cogs.dogs.DogPhotos")
 def dog_photos(d):
     return d
+
+
+@pytest.fixture
+def clazz(bot, dog_photos) -> AnnounceDay:
+    return bind_commands(AnnounceDay(bot, dog_photos))
 
 
 async def test_before_loop_waits_for_bot(bot, dog_photos):
@@ -102,3 +108,10 @@ async def test_on_gandalf_not_oct24_does_nothing(now, bot, dog_photos, general_c
     clazz = AnnounceDay(bot, dog_photos)
     await clazz.on_gandalf()
     general_channel.send.assert_not_called()
+
+
+@mock.patch("random.choice", side_effect=["today", "tomorrow", "yesterday", "{today} {tomorrow} {yesterday}"])
+@mock.patch("duckbot.util.datetime.now", return_value=datetime.datetime(2002, 1, 21, hour=7))
+async def test_day_sends_message(now, choice, clazz, context):
+    await clazz.day(context)
+    context.send.assert_called_once_with("today tomorrow yesterday")

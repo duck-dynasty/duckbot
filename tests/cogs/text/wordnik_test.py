@@ -3,6 +3,7 @@ import pytest
 
 from duckbot.cogs.text import Wordnik
 from duckbot.util.embeds import MAX_FIELD_VALUE_LENGTH
+from tests.discord_test_ext import bind_commands
 
 URL = "https://api.wordnik.com/v4/word.json"
 ATTRIBUTION = "from The American Heritage® Dictionary of the English Language, 5th Edition."
@@ -13,11 +14,15 @@ def set_wordnik_key_env(monkeypatch):
     monkeypatch.setenv("WORDNIK_KEY", "wordnik-key")
 
 
-async def test_define_inflected_word(bot, context, responses):
+@pytest.fixture
+def clazz(bot) -> Wordnik:
+    return bind_commands(Wordnik(bot))
+
+
+async def test_define_inflected_word(clazz, context, responses):
     responses.add(responses.GET, f"{URL}/cows/definitions", json=cow_definitions())
     responses.add(responses.GET, f"{URL}/cow/pronunciations", json=cow_pronunciations())
-    clazz = Wordnik(bot)
-    await clazz.define(context, "Cows")
+    await clazz.define(context, word="Cows")
     embed = discord.Embed(title="cow")
     noun_lines = [
         "1. The mature female of cattle of the genus Bos.\n_this is where I'd use cow in a sentence... IF I HAD ONE_",
@@ -35,12 +40,11 @@ async def test_define_inflected_word(bot, context, responses):
     context.send.assert_called_once_with(embed=embed)
 
 
-async def test_define_unknown_word(bot, context, responses):
+async def test_define_unknown_word(clazz, context, responses):
     responses.add(responses.GET, f"{URL}/nothing/definitions", json={"statusCode": 404, "error": "Not Found", "message": "Not found"})
     responses.add(responses.GET, f"{URL}/why/definitions", json=why_definitions())
     responses.add(responses.GET, f"{URL}/why/pronunciations", json=[{"raw": "/hwaɪ/", "rawType": "IPA"}])
-    clazz = Wordnik(bot)
-    await clazz.define(context, "nothing")
+    await clazz.define(context, word="nothing")
     embed = discord.Embed(title="why")
     adverb_lines = [
         "1. For what purpose, reason, or cause.\n_why did he do it?_",
@@ -51,39 +55,35 @@ async def test_define_unknown_word(bot, context, responses):
     context.send.assert_called_once_with(embed=embed)
 
 
-async def test_define_rate_limited(bot, context, responses):
+async def test_define_rate_limited(clazz, context, responses):
     error = {"statusCode": 429, "error": "Too Many Requests", "message": "API rate limit exceeded"}
     responses.add(responses.GET, f"{URL}/nothing/definitions", json=error)
     responses.add(responses.GET, f"{URL}/why/definitions", json=error)
-    clazz = Wordnik(bot)
-    await clazz.define(context, "nothing")
+    await clazz.define(context, word="nothing")
     context.send.assert_called_once_with("wordnik is all worded out, give it a minute")
 
 
-async def test_get_pronunciation_no_results(bot, responses):
+async def test_get_pronunciation_no_results(clazz, responses):
     responses.add(responses.GET, f"{URL}/cat/pronunciations", json={"statusCode": 404, "error": "Not Found", "message": "Not found"})
-    clazz = Wordnik(bot)
     assert clazz.get_pronunciation("cat") == "screw flanders"
 
 
-async def test_define_truncates_long_field_value(bot, context, responses):
+async def test_define_truncates_long_field_value(clazz, context, responses):
     long_text = "a" * 2000
     definitions = [{"sourceDictionary": "ahd-5", "attributionText": ATTRIBUTION, "word": "cow", "partOfSpeech": "noun", "text": long_text, "exampleUses": []}]
     responses.add(responses.GET, f"{URL}/cow/definitions", json=definitions)
     responses.add(responses.GET, f"{URL}/cow/pronunciations", json=cow_pronunciations())
-    clazz = Wordnik(bot)
-    await clazz.define(context, "cow")
+    await clazz.define(context, word="cow")
     sent_embed = context.send.call_args.kwargs["embed"]
     assert len(sent_embed.fields[0].value) == MAX_FIELD_VALUE_LENGTH
     assert sent_embed.fields[0].value.endswith("...")
 
 
-async def test_define_handles_null_example_uses(bot, context, responses):
+async def test_define_handles_null_example_uses(clazz, context, responses):
     definitions = [{"sourceDictionary": "ahd-5", "attributionText": ATTRIBUTION, "word": "cow", "partOfSpeech": "noun", "text": "A big animal.", "exampleUses": None}]
     responses.add(responses.GET, f"{URL}/cow/definitions", json=definitions)
     responses.add(responses.GET, f"{URL}/cow/pronunciations", json=cow_pronunciations())
-    clazz = Wordnik(bot)
-    await clazz.define(context, "cow")
+    await clazz.define(context, word="cow")
     embed = discord.Embed(title="cow")
     embed.add_field(name="noun: **cow**  /kou/", value="1. A big animal.\n_this is where I'd use cow in a sentence... IF I HAD ONE_\n", inline=False)
     embed.set_footer(text=ATTRIBUTION)
