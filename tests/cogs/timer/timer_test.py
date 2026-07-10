@@ -14,7 +14,7 @@ def clazz() -> Timer:
     return bind_commands(Timer())
 
 
-@pytest.mark.parametrize("duration, seconds", [("10", 600), ("90s", 90), ("1h30m", 5400), ("2h", 7200)])
+@pytest.mark.parametrize("duration, seconds", [("10", 600), ("90s", 90), ("2h", 7200), ("1h30m", 5400), ("1h30s", 3630), ("30m30s", 1830), ("1h30m30s", 5430)])
 @mock.patch("asyncio.sleep", return_value=None)
 @mock.patch("duckbot.cogs.timer.timer.now", return_value=noon)
 async def test_timer_waits_for_duration(now, sleep, clazz, context, duration, seconds):
@@ -27,14 +27,14 @@ async def test_timer_waits_for_duration(now, sleep, clazz, context, duration, se
 @mock.patch("duckbot.cogs.timer.timer.now", return_value=noon)
 async def test_timer_pings_when_done(now, sleep, clazz, context):
     await clazz.timer(context, duration="10")
-    context.channel.send.assert_called_once_with(f":alarm_clock: {context.author.mention} timer is up!")
+    context.channel.send.assert_called_once_with(f":alarm_clock: {context.author.mention} your timer is up!")
 
 
 @mock.patch("asyncio.sleep", return_value=None)
 @mock.patch("duckbot.cogs.timer.timer.now", return_value=noon)
 async def test_timer_pings_with_label(now, sleep, clazz, context):
     await clazz.timer(context, duration="10", label="pizza")
-    context.channel.send.assert_called_once_with(f":alarm_clock: {context.author.mention} pizza is up!")
+    context.channel.send.assert_called_once_with(f":alarm_clock: {context.author.mention} your pizza timer is up!")
 
 
 @pytest.mark.parametrize("duration", ["duck", "0", "1x", "m"])

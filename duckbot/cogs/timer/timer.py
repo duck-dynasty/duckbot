@@ -40,4 +40,5 @@ class Timer(commands.Cog):
             else:
                 await context.send(f":timer: Timer set for {duration}.")
                 await asyncio.sleep(delta.total_seconds())
-                await context.channel.send(f":alarm_clock: {context.author.mention} {label or 'timer'} is up!")
+                name = f"{label} timer" if label else "timer"
+                await context.channel.send(f":alarm_clock: {context.author.mention} your {name} is up!")
