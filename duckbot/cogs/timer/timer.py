@@ -38,7 +38,7 @@ class Timer(commands.Cog):
             if now() + delta > bedtime:
                 await context.send("I'm asleep by then... screw flanders.")
             else:
-                await context.send(f":timer: Timer set for {duration}.")
+                await context.send(f":timer: Timer set for {duration}. If I die before then, you're on your own.")
                 await asyncio.sleep(delta.total_seconds())
                 name = f"{label} timer" if label else "timer"
                 await context.channel.send(f":alarm_clock: {context.author.mention} your {name} is up!")

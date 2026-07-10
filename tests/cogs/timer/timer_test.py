@@ -20,7 +20,7 @@ def clazz() -> Timer:
 async def test_timer_waits_for_duration(now, sleep, clazz, context, duration, seconds):
     await clazz.timer(context, duration=duration)
     sleep.assert_called_once_with(seconds)
-    context.send.assert_called_once_with(f":timer: Timer set for {duration}.")
+    context.send.assert_called_once_with(f":timer: Timer set for {duration}. If I die before then, you're on your own.")
 
 
 @mock.patch("asyncio.sleep", return_value=None)
