@@ -123,7 +123,7 @@ class FriendFacts(commands.Cog):
         lines = [header, "```", f"{'User':<24} {'Messages':>8}", "-" * 34]
         top = sorted(stats.items(), key=lambda x: x[1].messages, reverse=True)
         for user_id, user in top[:LEADERBOARD_SIZE]:
-            lines.append(f"{await self.display_name(guild, user_id):<24} {user.messages:>8}")
+            lines.append(f"{(await self.display_name(guild, user_id))[:24]:<24} {user.messages:>8}")
         lines.append("```")
         lines.append(f":pencil: {sum(u.messages for u in stats.values()):,} messages across {channels} channels")
         lines += await self.awards(guild, stats)

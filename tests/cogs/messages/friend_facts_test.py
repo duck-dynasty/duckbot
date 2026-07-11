@@ -236,6 +236,14 @@ async def test_format_report_truncates_leaderboard_to_top_ten(get_user, clazz, g
 
 
 @mock.patch("duckbot.cogs.messages.friend_facts.get_user")
+async def test_format_report_truncates_long_names_in_leaderboard(get_user, clazz, guild):
+    get_user.side_effect = lambda bot, user_id, guild: mock.Mock(display_name="a" * 32)
+    report = await clazz.format_report(guild, {1: UserStats(messages=5)}, [0] * 24, [0] * 7, 1, datetime.datetime(2026, 6, 1))
+    assert "a" * 24 + " " in report
+    assert "a" * 25 not in report
+
+
+@mock.patch("duckbot.cogs.messages.friend_facts.get_user")
 async def test_format_report_awards_require_minimum_messages(get_user, clazz, guild):
     get_user.side_effect = lambda bot, user_id, guild: mock.Mock(display_name=f"user{user_id}")
     stats = {1: UserStats(messages=1, words=50, capital_starts=1, questions=1), 2: UserStats(messages=25, words=25, capital_starts=5, questions=5)}
