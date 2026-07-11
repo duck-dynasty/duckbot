@@ -93,3 +93,7 @@ DuckBot is a robot, and as such does not like being humanized. DuckBot tells peo
 ## Day Announcements
 
 Every day in the 7am hour, DuckBot will announce to the general channel the current day of the week. If the day is also a statutory holiday, or an otherwise special day, DuckBot will announce that at the same time. You can run this on demand using the `!day` command.
+
+## Friend Facts
+
+On the first of each month, DuckBot posts a stats report to the general channel covering the prior month's messages: a message-count leaderboard plus awards like Grammar Police (% of messages starting with a capital), Wordiest, Most Inquisitive, Loudest, and Chief Link Dumper, along with the busiest hour and day. You can run this on demand using the `!friend-facts` command.

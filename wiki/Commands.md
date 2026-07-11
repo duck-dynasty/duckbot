@@ -11,6 +11,7 @@
 |              `!dog`               | displays a random dog photo                        |
 |              `!duck`              | gives a link to this repo                          |
 |            `!fortune`             | get a random fortune told to you by a cow          |
+| [`!friend-facts`](#friend-facts)  | post last month's server stats report              |
 |        `!help` or `!wiki`         | gives a link to this wiki                          |
 |              `!lmgt`              | generates a google search link for the given query |
 |  [`/market`](Prediction-Market)   | bet on prediction markets, balances, leaderboard   |
@@ -36,6 +37,10 @@ Every day in the 7am hour, DuckBot will announce to the general channel the curr
 ## Definitions
 
 DuckBot can define words, sourcing data from [Wordnik](https://www.wordnik.com/). Inflected words resolve to their root word where possible.
+
+## Friend Facts
+
+On the first of each month, DuckBot posts a stats report to the general channel covering the prior month's messages: a message-count leaderboard plus awards like Grammar Police (% of messages starting with a capital), Wordiest, Most Inquisitive, Loudest, and Chief Link Dumper, along with the busiest hour and day. Percentage awards require at least 25 messages. You can run the report on demand with `!friend-facts`.
 
 ## Recipe Search
 
