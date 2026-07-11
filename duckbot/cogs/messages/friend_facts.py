@@ -48,19 +48,18 @@ class FriendFacts(commands.Cog):
 
     async def on_month_start(self):
         if duckbot.util.datetime.now().day == 1:
-            await self.send_report()
+            await self.send_report(self.get_general_channel())
 
     @commands.command(name="friend-facts")
     async def friend_facts(self, context):
-        await self.send_report()
+        await self.send_report(context.channel)
 
     def prior_month_range(self):
         end = duckbot.util.datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         start = (end - timedelta(days=1)).replace(day=1)
         return start, end
 
-    async def send_report(self):
-        channel = self.get_general_channel()
+    async def send_report(self, channel):
         start, end = self.prior_month_range()
         stats, hours, days, channels = await self.gather_stats(channel.guild, start, end)
         await channel.send(await self.format_report(channel.guild, stats, hours, days, channels, start))

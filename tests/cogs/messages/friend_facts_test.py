@@ -73,10 +73,12 @@ async def test_on_month_start_not_first_of_month_does_nothing(now, clazz, bot):
 
 
 @mock.patch("duckbot.util.datetime.now", return_value=datetime.datetime(2026, 7, 1, hour=9))
-async def test_friend_facts_command_sends_report(now, clazz, guild, general_channel, context):
+async def test_friend_facts_command_sends_report_to_invoking_channel(now, clazz, guild, text_channel, context):
     guild.text_channels = []
+    text_channel.guild = guild
+    context.channel = text_channel
     await clazz.friend_facts(context)
-    general_channel.send.assert_called_once()
+    text_channel.send.assert_called_once()
 
 
 @pytest.mark.parametrize(
@@ -272,10 +274,10 @@ async def test_display_name_unknown_user(get_user, clazz, guild):
 
 
 @mock.patch("duckbot.util.datetime.now", return_value=datetime.datetime(2026, 7, 10, hour=13))
-async def test_send_report_posts_to_general_channel(now, clazz, guild, general_channel):
+async def test_send_report_posts_to_channel(now, clazz, guild, general_channel):
     guild.text_channels = [readable(general_channel, [make_message("Hello")])]
     with mock.patch("duckbot.cogs.messages.friend_facts.get_user", side_effect=lambda bot, user_id, g: mock.Mock(display_name=f"user{user_id}")):
-        await clazz.send_report()
+        await clazz.send_report(general_channel)
     general_channel.send.assert_called_once()
     report = general_channel.send.call_args.args[0]
     assert "**Friend Facts: June 2026**" in report
