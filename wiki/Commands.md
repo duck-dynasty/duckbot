@@ -40,7 +40,7 @@ DuckBot can define words, sourcing data from [Wordnik](https://www.wordnik.com/)
 
 ## Friend Facts
 
-On the first of each month, DuckBot posts a stats report to the general channel covering the prior month's messages: a message-count leaderboard plus awards like Grammar Police (% of messages starting with a capital), Wordiest, Most Inquisitive, Loudest, and Chief Link Dumper, along with the busiest hour and day. Percentage awards require at least 25 messages. You can run the report on demand with `!friend-facts`.
+On the first of each month, DuckBot posts a stats report to the general channel covering the prior month's messages: a message-count leaderboard plus awards like Grammar Police (% of messages starting with a capital), Wordiest, Most Inquisitive, Loudest, Chief Link Dumper, Golf Fanatic, Weather Obsessed, and Name Dropper, along with the busiest hour and day. Percentage awards require at least 25 messages. You can run the report on demand with `!friend-facts`.
 
 ## Recipe Search
 

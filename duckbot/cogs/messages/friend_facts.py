@@ -21,6 +21,9 @@ class UserStats:
     questions: int = 0
     shouts: int = 0
     links: int = 0
+    golf: int = 0
+    weather: int = 0
+    mentions: int = 0
 
 
 class FriendFacts(commands.Cog):
@@ -72,7 +75,9 @@ class FriendFacts(commands.Cog):
                 continue
             try:
                 async for message in channel.history(limit=None, after=start, before=end, oldest_first=True):
-                    if not message.author.bot:
+                    if message.author.bot:
+                        self.tally_slash_weather(stats, message)
+                    else:
                         self.tally(stats, hours, days, message)
                 channels += 1
             except Forbidden:
@@ -88,9 +93,26 @@ class FriendFacts(commands.Cog):
         user.questions += content.rstrip().endswith("?")
         user.shouts += content.isupper() and any(c.isalpha() for c in content)
         user.links += "http" in content
+        user.golf += content.lower().count("golf")
+        user.weather += content.lower().startswith("!weather")
+        user.mentions += self.mention_count(message)
         created = message.created_at.astimezone(duckbot.util.datetime.timezone())
         hours[created.hour] += 1
         days[created.weekday()] += 1
+
+    def tally_slash_weather(self, stats, message: Message):
+        """Slash invocations show up as bot messages; credit /weather to the invoker."""
+        interaction = message.interaction
+        if interaction and interaction.name.split()[0] == "weather":
+            stats.setdefault(interaction.user.id, UserStats()).weather += 1
+
+    def mention_count(self, message: Message):
+        mentioned = {user.id for user in message.mentions}
+        replied = message.reference.resolved if message.reference else None
+        if isinstance(replied, Message):
+            mentioned.add(replied.author.id)
+        mentioned.discard(message.author.id)
+        return len(mentioned)
 
     async def format_report(self, guild, stats, hours, days, channels, start):
         header = f"**Friend Facts: {start:%B %Y}** :bar_chart:"
@@ -116,13 +138,17 @@ class FriendFacts(commands.Cog):
             lines.append(f":books: Wordiest: {await self.display_name(guild, user_id)} — {user.words / user.messages:.1f} words per message")
             user_id, user = max(regulars.items(), key=lambda x: x[1].questions / x[1].messages)
             lines.append(f":question: Most Inquisitive: {await self.display_name(guild, user_id)} — {100 * user.questions // user.messages}% of messages are questions")
-        user_id, user = max(stats.items(), key=lambda x: x[1].shouts)
-        if user.shouts:
-            lines.append(f":loudspeaker: Loudest: {await self.display_name(guild, user_id)} — {user.shouts} ALL-CAPS messages")
-        user_id, user = max(stats.items(), key=lambda x: x[1].links)
-        if user.links:
-            lines.append(f":link: Chief Link Dumper: {await self.display_name(guild, user_id)} — {user.links} links shared")
+        lines += await self.count_award(guild, stats, "shouts", ":loudspeaker: Loudest: {name} — {count} ALL-CAPS messages")
+        lines += await self.count_award(guild, stats, "links", ":link: Chief Link Dumper: {name} — {count} links shared")
+        lines += await self.count_award(guild, stats, "golf", ":golf: Golf Fanatic: {name} — {count} golf mentions")
+        lines += await self.count_award(guild, stats, "weather", ":white_sun_small_cloud: Weather Obsessed: {name} — {count} weather checks")
+        lines += await self.count_award(guild, stats, "mentions", ":wave: Name Dropper: {name} — {count} people mentioned")
         return lines
+
+    async def count_award(self, guild, stats, attr, template):
+        user_id, user = max(stats.items(), key=lambda x: getattr(x[1], attr))
+        count = getattr(user, attr)
+        return [template.format(name=await self.display_name(guild, user_id), count=count)] if count else []
 
     async def display_name(self, guild, user_id):
         user = await get_user(self.bot, user_id, guild)

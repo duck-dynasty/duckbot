@@ -1,6 +1,7 @@
 import datetime
 from unittest import mock
 
+import discord
 import pytest
 from discord import Forbidden
 
@@ -15,13 +16,30 @@ def clazz(bot) -> FriendFacts:
     return bind_commands(FriendFacts(bot))
 
 
-def make_message(content="hi", author_id=1, is_bot=False, created_at=datetime.datetime(2026, 6, 15, 18, 30, tzinfo=datetime.timezone.utc)):
+def make_message(content="hi", author_id=1, is_bot=False, created_at=datetime.datetime(2026, 6, 15, 18, 30, tzinfo=datetime.timezone.utc), mentions=[], reference=None):
     message = mock.Mock()
     message.author.id = author_id
     message.author.bot = is_bot
     message.content = content
     message.created_at = created_at
+    message.mentions = mentions
+    message.reference = reference
+    message.interaction = None
     return message
+
+
+def make_user(user_id):
+    user = mock.Mock()
+    user.id = user_id
+    return user
+
+
+def make_reply_to(author_id):
+    replied = mock.Mock(spec=discord.Message)
+    replied.author.id = author_id
+    reference = mock.Mock()
+    reference.resolved = replied
+    return reference
 
 
 def readable(channel, messages):
@@ -91,6 +109,19 @@ async def test_gather_stats_skips_bot_messages(clazz, guild, text_channel):
     assert stats == {}
 
 
+async def test_gather_stats_credits_slash_weather_to_invoker(clazz, guild, text_channel):
+    invocation = make_message(is_bot=True)
+    invocation.interaction = mock.Mock()
+    invocation.interaction.name = "weather get"
+    invocation.interaction.user.id = 5
+    other = make_message(is_bot=True)
+    other.interaction = mock.Mock()
+    other.interaction.name = "market bet"
+    guild.text_channels = [readable(text_channel, [invocation, other])]
+    stats, _, _, _ = await clazz.gather_stats(guild, None, None)
+    assert stats == {5: UserStats(weather=1)}
+
+
 async def test_gather_stats_skips_unreadable_channels(clazz, guild, text_channel):
     text_channel.permissions_for.return_value.read_message_history = False
     guild.text_channels = [text_channel]
@@ -116,6 +147,37 @@ def test_tally_counts_each_stat(clazz):
     assert stats[1] == UserStats(messages=4, words=6, capital_starts=2, questions=1, shouts=1, links=1)
 
 
+def test_tally_counts_golf_mentions_case_insensitive(clazz):
+    stats, hours, days = {}, [0] * 24, [0] * 7
+    clazz.tally(stats, hours, days, make_message("GOLF golf golfing, hole in one"))
+    assert stats[1].golf == 3
+
+
+def test_tally_counts_weather_prefix_command(clazz):
+    stats, hours, days = {}, [0] * 24, [0] * 7
+    clazz.tally(stats, hours, days, make_message("!weather set london ca 2"))
+    clazz.tally(stats, hours, days, make_message("nice weather today"))
+    assert stats[1].weather == 1
+
+
+def test_tally_counts_mentions_and_replies_distinctly(clazz):
+    stats, hours, days = {}, [0] * 24, [0] * 7
+    clazz.tally(stats, hours, days, make_message("hi", mentions=[make_user(2), make_user(3)]))
+    clazz.tally(stats, hours, days, make_message("hi", reference=make_reply_to(2)))
+    clazz.tally(stats, hours, days, make_message("hi", mentions=[make_user(2)], reference=make_reply_to(2)))  # reply ping counts once
+    assert stats[1].mentions == 4
+
+
+def test_tally_mentions_excludes_self_and_deleted_replies(clazz):
+    stats, hours, days = {}, [0] * 24, [0] * 7
+    deleted = mock.Mock()
+    deleted.resolved = mock.Mock(spec=discord.DeletedReferencedMessage)
+    clazz.tally(stats, hours, days, make_message("hi", mentions=[make_user(1)]))
+    clazz.tally(stats, hours, days, make_message("hi", reference=make_reply_to(1)))
+    clazz.tally(stats, hours, days, make_message("hi", reference=deleted))
+    assert stats[1].mentions == 0
+
+
 def test_tally_buckets_hours_and_days_in_eastern_time(clazz):
     stats, hours, days = {}, [0] * 24, [0] * 7
     clazz.tally(stats, hours, days, make_message(created_at=datetime.datetime(2026, 6, 15, 18, 30, tzinfo=datetime.timezone.utc)))  # 2:30pm EDT, a Monday
@@ -133,8 +195,8 @@ async def test_format_report_empty_month(get_user, clazz, guild):
 async def test_format_report_leaderboard_and_awards(get_user, clazz, guild):
     get_user.side_effect = lambda bot, user_id, guild: mock.Mock(display_name=f"user{user_id}")
     stats = {
-        1: UserStats(messages=50, words=100, capital_starts=40, questions=5, shouts=3, links=7),
-        2: UserStats(messages=30, words=300, capital_starts=6, questions=15),
+        1: UserStats(messages=50, words=100, capital_starts=40, questions=5, shouts=3, links=7, golf=12),
+        2: UserStats(messages=30, words=300, capital_starts=6, questions=15, weather=9, mentions=21),
     }
     hours = [0] * 24
     hours[23] = 42
@@ -149,6 +211,9 @@ async def test_format_report_leaderboard_and_awards(get_user, clazz, guild):
     assert "Most Inquisitive: user2 — 50% of messages are questions" in report
     assert "Loudest: user1 — 3 ALL-CAPS messages" in report
     assert "Chief Link Dumper: user1 — 7 links shared" in report
+    assert "Golf Fanatic: user1 — 12 golf mentions" in report
+    assert "Weather Obsessed: user2 — 9 weather checks" in report
+    assert "Name Dropper: user2 — 21 people mentioned" in report
     assert "Busiest hour: 11pm · Busiest day: Saturday" in report
 
 
@@ -178,6 +243,9 @@ async def test_format_report_no_awards_for_zero_counts(get_user, clazz, guild):
     report = await clazz.format_report(guild, stats, [0] * 24, [0] * 7, 1, datetime.datetime(2026, 6, 1))
     assert "Loudest" not in report
     assert "Chief Link Dumper" not in report
+    assert "Golf Fanatic" not in report
+    assert "Weather Obsessed" not in report
+    assert "Name Dropper" not in report
 
 
 @mock.patch("duckbot.cogs.messages.friend_facts.get_user", return_value=None)
