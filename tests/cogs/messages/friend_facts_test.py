@@ -16,7 +16,7 @@ def clazz(bot) -> FriendFacts:
     return bind_commands(FriendFacts(bot))
 
 
-def make_message(content="hi", author_id=1, is_bot=False, created_at=datetime.datetime(2026, 6, 15, 18, 30, tzinfo=datetime.timezone.utc), mentions=[], reference=None):
+def make_message(content="hi", author_id=1, is_bot=False, created_at=datetime.datetime(2026, 6, 15, 18, 30, tzinfo=datetime.timezone.utc), mentions=[], reference=None, attachments=[]):
     message = mock.Mock()
     message.author.id = author_id
     message.author.bot = is_bot
@@ -25,6 +25,7 @@ def make_message(content="hi", author_id=1, is_bot=False, created_at=datetime.da
     message.mentions = mentions
     message.reference = reference
     message.interaction = None
+    message.attachments = attachments
     return message
 
 
@@ -160,6 +161,13 @@ def test_tally_counts_weather_prefix_command(clazz):
     assert stats[1].weather == 1
 
 
+def test_tally_counts_attachments(clazz):
+    stats, hours, days = {}, [0] * 24, [0] * 7
+    clazz.tally(stats, hours, days, make_message("look at these", attachments=[mock.Mock(), mock.Mock()]))
+    clazz.tally(stats, hours, days, make_message("no photos here"))
+    assert stats[1].attachments == 2
+
+
 def test_tally_counts_mentions_and_replies_distinctly(clazz):
     stats, hours, days = {}, [0] * 24, [0] * 7
     clazz.tally(stats, hours, days, make_message("hi", mentions=[make_user(2), make_user(3)]))
@@ -195,7 +203,7 @@ async def test_format_report_empty_month(get_user, clazz, guild):
 async def test_format_report_leaderboard_and_awards(get_user, clazz, guild):
     get_user.side_effect = lambda bot, user_id, guild: mock.Mock(display_name=f"user{user_id}")
     stats = {
-        1: UserStats(messages=50, words=100, capital_starts=40, questions=5, shouts=3, links=7, golf=12),
+        1: UserStats(messages=50, words=100, capital_starts=40, questions=5, shouts=3, links=7, golf=12, attachments=33),
         2: UserStats(messages=30, words=300, capital_starts=6, questions=15, weather=9, mentions=21),
     }
     hours = [0] * 24
@@ -214,6 +222,7 @@ async def test_format_report_leaderboard_and_awards(get_user, clazz, guild):
     assert "Golf Fanatic: user1 — 12 golf mentions" in report
     assert "Weather Obsessed: user2 — 9 weather checks" in report
     assert "Name Dropper: user2 — 21 people mentioned" in report
+    assert "Paparazzi: user1 — 33 attachments sent" in report
     assert "Busiest hour: 11pm · Busiest day: Saturday" in report
 
 
@@ -246,6 +255,7 @@ async def test_format_report_no_awards_for_zero_counts(get_user, clazz, guild):
     assert "Golf Fanatic" not in report
     assert "Weather Obsessed" not in report
     assert "Name Dropper" not in report
+    assert "Paparazzi" not in report
 
 
 @mock.patch("duckbot.cogs.messages.friend_facts.get_user", return_value=None)

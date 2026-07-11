@@ -24,6 +24,7 @@ class UserStats:
     golf: int = 0
     weather: int = 0
     mentions: int = 0
+    attachments: int = 0
 
 
 class FriendFacts(commands.Cog):
@@ -96,6 +97,7 @@ class FriendFacts(commands.Cog):
         user.golf += content.lower().count("golf")
         user.weather += content.lower().startswith("!weather")
         user.mentions += self.mention_count(message)
+        user.attachments += len(message.attachments)
         created = message.created_at.astimezone(duckbot.util.datetime.timezone())
         hours[created.hour] += 1
         days[created.weekday()] += 1
@@ -143,6 +145,7 @@ class FriendFacts(commands.Cog):
         lines += await self.count_award(guild, stats, "golf", ":golf: Golf Fanatic: {name} — {count} golf mentions")
         lines += await self.count_award(guild, stats, "weather", ":white_sun_small_cloud: Weather Obsessed: {name} — {count} weather checks")
         lines += await self.count_award(guild, stats, "mentions", ":wave: Name Dropper: {name} — {count} people mentioned")
+        lines += await self.count_award(guild, stats, "attachments", ":camera: Paparazzi: {name} — {count} attachments sent")
         return lines
 
     async def count_award(self, guild, stats, attr, template):
