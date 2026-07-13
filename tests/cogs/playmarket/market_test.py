@@ -153,15 +153,17 @@ async def test_first_interaction_creates_season_one(cog, alice, in_memory_db):
 
 async def test_balance_reports_coins(cog, alice):
     await cog.balance(alice)
-    assert "10,000 coins" in alice.send.call_args.args[0]
+    expected = discord.Embed(title="Balance", description="user1 — 10,000 coins (10,000 available)", color=discord.Color.blurple())
+    alice.send.assert_called_with(embed=expected)
 
 
 async def test_balance_lists_your_open_bets(cog, alice, in_memory_db):
     market_id = await open_market(cog, alice)
     await cog.bet(alice, market_id, "yes", BET)
     await cog.balance(alice)
-    message = alice.send.call_args.args[0]
-    assert f"**{market_id}**" in message and "832 YES" in message
+    expected = discord.Embed(title="Balance", description="user1 — 10,080 coins (9,500 available)", color=discord.Color.blurple())
+    expected.add_field(name=f"Market {market_id} — Will it happen?", value="YES 69.67%\nuser1 — 832 YES / 0 NO", inline=False)
+    alice.send.assert_called_with(embed=expected)
 
 
 async def test_balance_omits_resolved_bets(cog, alice, in_memory_db):
@@ -169,7 +171,18 @@ async def test_balance_omits_resolved_bets(cog, alice, in_memory_db):
     await cog.bet(alice, market_id, "yes", BET)
     await cog.resolve(alice, market_id, "yes")
     await cog.balance(alice)
-    assert f"**{market_id}**" not in alice.send.call_args.args[0]
+    expected = discord.Embed(title="Balance", description="user1 — 10,331 coins (10,331 available)", color=discord.Color.blurple())
+    alice.send.assert_called_with(embed=expected)
+
+
+async def test_balance_shows_only_your_positions(cog, alice, bob, in_memory_db):
+    market_id = await open_market(cog, alice)
+    await cog.bet(alice, market_id, "yes", BET)
+    await cog.bet(bob, market_id, "no", BET)
+    await cog.balance(alice)
+    expected = discord.Embed(title="Balance", description="user1 — 9,852 coins (9,500 available)", color=discord.Color.blurple())
+    expected.add_field(name=f"Market {market_id} — Will it happen?", value="YES 42.26%\nuser1 — 832 YES / 0 NO", inline=False)
+    alice.send.assert_called_with(embed=expected)
 
 
 # --- list ----------------------------------------------------------------
