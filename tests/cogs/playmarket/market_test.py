@@ -4,6 +4,7 @@ from unittest import mock
 
 import discord
 import pytest
+from discord.ext import commands
 
 from duckbot.cogs.playmarket import config
 from duckbot.cogs.playmarket.market import PlayMarket
@@ -644,6 +645,24 @@ async def test_claim_is_allowed_again_after_the_cooldown(cog, alice, clock, in_m
     set_balance(in_memory_db, 1, 10)
     await cog.claim(alice)
     assert account(in_memory_db, 1).balance == config.TOPUP_TARGET
+
+
+# --- guild-only writes -----------------------------------------------------
+
+
+@pytest.mark.parametrize("command", ["create", "bet", "sell", "claim", "resolve"])
+async def test_write_commands_are_rejected_outside_a_guild(cog, command):
+    context = make_context(1)
+    context.guild = None
+    with pytest.raises(commands.NoPrivateMessage):
+        any(check(context) for check in getattr(cog, command).checks)
+
+
+@pytest.mark.parametrize("command", ["balance", "leaderboard", "list_command"])
+async def test_read_commands_are_allowed_outside_a_guild(cog, command):
+    context = make_context(1)
+    context.guild = None
+    assert all(check(context) for check in getattr(cog, command).checks)
 
 
 # --- leaderboard ---------------------------------------------------------
