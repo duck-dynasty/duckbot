@@ -79,6 +79,7 @@ class PlayMarket(commands.Cog):
             await context.send(embed=embed)
 
     @market_group.command(name="claim", description="Get a coin top-up when you're low and have no active bets.")
+    @commands.guild_only()
     async def claim(self, context: commands.Context):
         async with context.typing():
             with self.db.session(Season) as session:
@@ -125,6 +126,7 @@ class PlayMarket(commands.Cog):
         await context.send(embed=embed)
 
     @market_group.command(name="create", description="Open a new question for people to bet on.")
+    @commands.guild_only()
     async def create(self, context: commands.Context, question: str, liquidity: Literal["low", "med", "high"] = "med"):
         async with context.typing():
             b = config.LIQUIDITY[liquidity]
@@ -137,6 +139,7 @@ class PlayMarket(commands.Cog):
                 await context.send(f"Market **{market.id}** is live: _{question}_ — YES 50%. Place your bets, degenerates.")
 
     @market_group.command(name="bet", description="Bet coins on a market resolving YES or NO.")
+    @commands.guild_only()
     async def bet(self, context: commands.Context, market: int, side: Literal["yes", "no"], amount: int):
         async with context.typing():
             cost = int(amount)
@@ -159,6 +162,7 @@ class PlayMarket(commands.Cog):
                 await context.send(embed=await self._trade_embed(context, session, market, action, side))
 
     @market_group.command(name="sell", description="Cash out some or all of your position in a market.")
+    @commands.guild_only()
     async def sell(self, context: commands.Context, market: int, side: Literal["yes", "no"], shares: str):
         async with context.typing():
             with self.db.session(Market) as session:
@@ -181,6 +185,7 @@ class PlayMarket(commands.Cog):
                 await context.send(embed=await self._trade_embed(context, session, market, action, side))
 
     @market_group.command(name="resolve", description="Close your market with an outcome and pay out winners.")
+    @commands.guild_only()
     async def resolve(self, context: commands.Context, market: int, outcome: Literal["yes", "no", "void"]):
         async with context.typing():
             with self.db.session(Market) as session:
