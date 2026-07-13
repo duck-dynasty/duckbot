@@ -69,11 +69,14 @@ class PlayMarket(commands.Cog):
             with self.db.session(Season) as session:
                 season = self.active_season(session)
                 account = self.account(session, season.id, context.author.id)
+                cash, shares_value = next((c, s) for uid, c, s in self._standings(session) if uid == account.id)
                 rows = session.query(Position, Market).join(Market, Position.market_id == Market.id).filter(Position.user_id == account.id, Market.status == "OPEN").order_by(Market.id.desc()).all()
+                embed = Embed(title="Balance", description=await self._worth(context, account.id, cash, shares_value), color=Color.blurple())
+                for position, market in rows:
+                    if position.yes_shares or position.no_shares:
+                        await self._add_market_field(context, session, embed, market, user_id=account.id)
                 session.commit()
-                lines = [f"**{await self._name(context, account.id)}** — {_coins(account.balance)} coins"]
-                lines += [f"**{m.id}** {m.question} — YES {_pct(self._price(m))} · you hold {_coins(p.yes_shares)} YES / {_coins(p.no_shares)} NO" for p, m in rows if p.yes_shares or p.no_shares]
-            await context.send("\n".join(lines))
+            await context.send(embed=embed)
 
     @market_group.command(name="claim", description="Get a coin top-up when you're low and have no active bets.")
     @commands.guild_only()
@@ -119,8 +122,7 @@ class PlayMarket(commands.Cog):
                 return await context.send("No markets. What, you hate fun?")
             embed = Embed(title=f"{(status or 'open').title()} Markets", color=Color.blurple())
             for market in markets:
-                value = "\n".join([f"YES {_pct(self._price(market))}"] + await self._holders(context, session, market))
-                embed.add_field(name=f"Market {market.id} — {market.question}", value=value, inline=False)
+                await self._add_market_field(context, session, embed, market)
         await context.send(embed=embed)
 
     @market_group.command(name="create", description="Open a new question for people to bet on.")
@@ -365,10 +367,15 @@ class PlayMarket(commands.Cog):
     def _price(self, market) -> float:
         return lmsr.price_yes(float(market.q_yes), float(market.q_no), float(market.b))
 
-    async def _holders(self, context, session, market) -> List[str]:
-        positions = session.query(Position).filter(Position.market_id == market.id, (Position.yes_shares > 0) | (Position.no_shares > 0)).all()
+    async def _holders(self, context, session, market, user_id=None) -> List[str]:
+        positions = session.query(Position).filter(Position.market_id == market.id, (Position.yes_shares > 0) | (Position.no_shares > 0))
+        positions = positions.filter_by(user_id=user_id).all() if user_id else positions.all()
         positions.sort(key=lambda p: p.yes_shares + p.no_shares, reverse=True)
         return [f"{await self._name(context, p.user_id)} — {_coins(p.yes_shares)} YES / {_coins(p.no_shares)} NO" for p in positions]
+
+    async def _add_market_field(self, context, session, embed, market, user_id=None):
+        value = "\n".join([f"YES {_pct(self._price(market))}"] + await self._holders(context, session, market, user_id))
+        embed.add_field(name=f"Market {market.id} — {market.question}", value=value, inline=False)
 
     async def _resolve_embed(self, context, market, outcome: str, results) -> Embed:
         color = Color.green() if outcome == "yes" else Color.red() if outcome == "no" else Color.greyple()
@@ -400,8 +407,10 @@ class PlayMarket(commands.Cog):
         return Embed(title="Leaderboard", description="\n".join(lines), color=Color.gold())
 
     async def _standing_line(self, context, rank, uid, cash, shares_value) -> str:
-        name = await self._name(context, uid)
-        return f"{MEDALS.get(rank, f'{rank}.')} {name} — {_coins(cash + shares_value)} coins ({_coins(cash)} available)"
+        return f"{MEDALS.get(rank, f'{rank}.')} {await self._worth(context, uid, cash, shares_value)}"
+
+    async def _worth(self, context, uid, cash, shares_value) -> str:
+        return f"{await self._name(context, uid)} — {_coins(cash + shares_value)} coins ({_coins(cash)} available)"
 
     async def _is_admin(self, context) -> bool:
         return await context.bot.is_owner(context.author) or context.author.id in config.ADMIN_IDS
