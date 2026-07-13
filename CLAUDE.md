@@ -20,6 +20,7 @@ setup_nltk
 - **Run with coverage**: `pytest --cov=duckbot --cov-branch --cov-report term-missing:skip-covered`
 - **Run the bot**: `python -m duckbot` (requires DISCORD_TOKEN env var at minimum)
 - **Run with database**: `docker-compose up --build`
+- **Run without docker**: `run_local` (SQLite file instead of Postgres; loads `.env` itself)
 
 ## Project Structure
 
