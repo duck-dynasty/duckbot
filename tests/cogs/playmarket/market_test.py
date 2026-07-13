@@ -2,8 +2,8 @@ import datetime
 import math
 from unittest import mock
 
-import discord
 import pytest
+from discord import Color, Embed
 from discord.ext import commands
 
 from duckbot.cogs.playmarket import config
@@ -154,7 +154,7 @@ async def test_first_interaction_creates_season_one(cog, alice, in_memory_db):
 
 async def test_balance_reports_coins(cog, alice):
     await cog.balance(alice)
-    expected = discord.Embed(title="Balance", description="user1 — 10,000 coins (10,000 available)", color=discord.Color.blurple())
+    expected = Embed(title="Balance", description="user1 — 10,000 coins (10,000 available)", color=Color.blurple())
     alice.send.assert_called_with(embed=expected)
 
 
@@ -162,7 +162,7 @@ async def test_balance_lists_your_open_bets(cog, alice, in_memory_db):
     market_id = await open_market(cog, alice)
     await cog.bet(alice, market_id, "yes", BET)
     await cog.balance(alice)
-    expected = discord.Embed(title="Balance", description="user1 — 10,080 coins (9,500 available)", color=discord.Color.blurple())
+    expected = Embed(title="Balance", description="user1 — 10,080 coins (9,500 available)", color=Color.blurple())
     expected.add_field(name=f"Market {market_id} — Will it happen?", value="YES 69.67%\nuser1 — 832 YES / 0 NO", inline=False)
     alice.send.assert_called_with(embed=expected)
 
@@ -172,7 +172,7 @@ async def test_balance_omits_resolved_bets(cog, alice, in_memory_db):
     await cog.bet(alice, market_id, "yes", BET)
     await cog.resolve(alice, market_id, "yes")
     await cog.balance(alice)
-    expected = discord.Embed(title="Balance", description="user1 — 10,331 coins (10,331 available)", color=discord.Color.blurple())
+    expected = Embed(title="Balance", description="user1 — 10,331 coins (10,331 available)", color=Color.blurple())
     alice.send.assert_called_with(embed=expected)
 
 
@@ -181,7 +181,7 @@ async def test_balance_shows_only_your_positions(cog, alice, bob, in_memory_db):
     await cog.bet(alice, market_id, "yes", BET)
     await cog.bet(bob, market_id, "no", BET)
     await cog.balance(alice)
-    expected = discord.Embed(title="Balance", description="user1 — 9,852 coins (9,500 available)", color=discord.Color.blurple())
+    expected = Embed(title="Balance", description="user1 — 9,852 coins (9,500 available)", color=Color.blurple())
     expected.add_field(name=f"Market {market_id} — Will it happen?", value="YES 42.26%\nuser1 — 832 YES / 0 NO", inline=False)
     alice.send.assert_called_with(embed=expected)
 
@@ -197,7 +197,7 @@ async def test_list_says_so_when_there_are_no_markets(cog, alice):
 async def test_list_shows_open_markets_with_their_price(cog, alice):
     market_id = await open_market(cog, alice)
     await cog.list_markets(alice, None)
-    expected = discord.Embed(title="Open Markets", color=discord.Color.blurple())
+    expected = Embed(title="Open Markets", color=Color.blurple())
     expected.add_field(name=f"Market {market_id} — Will it happen?", value="YES 50%", inline=False)
     alice.send.assert_called_with(embed=expected)
 
@@ -207,7 +207,7 @@ async def test_list_shows_each_players_position(cog, alice, bob):
     await cog.bet(alice, market_id, "yes", BET)
     await cog.bet(bob, market_id, "no", BET)
     await cog.list_markets(alice, None)
-    expected = discord.Embed(title="Open Markets", color=discord.Color.blurple())
+    expected = Embed(title="Open Markets", color=Color.blurple())
     expected.add_field(name=f"Market {market_id} — Will it happen?", value="YES 42.26%\nuser2 — 0 YES / 1,144 NO\nuser1 — 832 YES / 0 NO", inline=False)
     alice.send.assert_called_with(embed=expected)
 
@@ -216,7 +216,7 @@ async def test_list_filters_by_status(cog, alice):
     market_id = await open_market(cog, alice)
     await cog.resolve(alice, market_id, "yes")
     await cog.list_markets(alice, "resolved")
-    expected = discord.Embed(title="Resolved Markets", color=discord.Color.blurple())
+    expected = Embed(title="Resolved Markets", color=Color.blurple())
     expected.add_field(name=f"Market {market_id} — Will it happen?", value="YES 50%", inline=False)
     alice.send.assert_called_with(embed=expected)
 
@@ -224,7 +224,7 @@ async def test_list_filters_by_status(cog, alice):
 async def test_list_command_shows_markets(cog, alice):
     market_id = await open_market(cog, alice)
     await cog.list_command(alice, None)
-    expected = discord.Embed(title="Open Markets", color=discord.Color.blurple())
+    expected = Embed(title="Open Markets", color=Color.blurple())
     expected.add_field(name=f"Market {market_id} — Will it happen?", value="YES 50%", inline=False)
     alice.send.assert_called_with(embed=expected)
 
@@ -247,7 +247,7 @@ async def test_create_opens_a_market_at_fifty_percent(cog, alice, in_memory_db):
 async def test_create_announces_the_new_market(mock_choice, cog, alice):
     mock_choice.return_value = "Place your bets, degenerates."
     await cog.create(alice, "Rain?", "med")
-    expected = discord.Embed(title="New Market", description="Place your bets, degenerates.", color=discord.Color.gold())
+    expected = Embed(title="New Market", description="Place your bets, degenerates.", color=Color.gold())
     expected.add_field(name="Market 1 — Rain?", value="YES 50%", inline=False)
     alice.send.assert_called_with(embed=expected)
 
@@ -276,7 +276,7 @@ async def test_create_after_season_end_rolls_over_first(cog, alice, clock, in_me
 async def test_bet_buys_yes_shares_and_moves_the_price(cog, alice, in_memory_db):
     market_id = await open_market(cog, alice)
     await cog.bet(alice, market_id, "yes", BET)
-    expected = discord.Embed(title=f"Market {market_id} — Will it happen?", description="user1 bought 832 YES shares for 500 coins.\nYES is now 69.67%.", color=discord.Color.green())
+    expected = Embed(title=f"Market {market_id} — Will it happen?", description="user1 bought 832 YES shares for 500 coins.\nYES is now 69.67%.", color=Color.green())
     expected.add_field(name="Holders", value="user1 — 832 YES / 0 NO", inline=False)
     alice.send.assert_called_with(embed=expected)
 
@@ -285,7 +285,7 @@ async def test_bet_embed_lists_every_holder(cog, alice, bob, in_memory_db):
     market_id = await open_market(cog, alice)
     await cog.bet(alice, market_id, "yes", BET)
     await cog.bet(bob, market_id, "no", BET)
-    expected = discord.Embed(title=f"Market {market_id} — Will it happen?", description="user2 bought 1,144 NO shares for 500 coins.\nYES is now 42.26%.", color=discord.Color.red())
+    expected = Embed(title=f"Market {market_id} — Will it happen?", description="user2 bought 1,144 NO shares for 500 coins.\nYES is now 42.26%.", color=Color.red())
     expected.add_field(name="Holders", value="user2 — 0 YES / 1,144 NO\nuser1 — 832 YES / 0 NO", inline=False)
     bob.send.assert_called_with(embed=expected)
 
@@ -313,7 +313,7 @@ async def test_bet_on_no_lowers_the_yes_price(cog, alice, in_memory_db):
     await cog.bet(alice, market_id, "no", BET)
     assert float(market_row(in_memory_db, market_id).q_no) > 0
     assert cog._price(market_row(in_memory_db, market_id)) < 0.5
-    expected = discord.Embed(title=f"Market {market_id} — Will it happen?", description="user1 bought 832 NO shares for 500 coins.\nYES is now 30.33%.", color=discord.Color.red())
+    expected = Embed(title=f"Market {market_id} — Will it happen?", description="user1 bought 832 NO shares for 500 coins.\nYES is now 30.33%.", color=Color.red())
     expected.add_field(name="Holders", value="user1 — 0 YES / 832 NO", inline=False)
     alice.send.assert_called_with(embed=expected)
 
@@ -359,7 +359,7 @@ async def test_sell_all_clears_the_position(cog, alice, in_memory_db):
     await cog.bet(alice, market_id, "yes", BET)
     await cog.sell(alice, market_id, "yes", "all")
     assert position(in_memory_db, 1, market_id).yes_shares == 0
-    expected = discord.Embed(title=f"Market {market_id} — Will it happen?", description="user1 sold 832 YES shares for 499 coins.\nYES is now 50%.", color=discord.Color.green())
+    expected = Embed(title=f"Market {market_id} — Will it happen?", description="user1 sold 832 YES shares for 499 coins.\nYES is now 50%.", color=Color.green())
     alice.send.assert_called_with(embed=expected)
 
 
@@ -418,7 +418,7 @@ async def test_creator_can_resolve_their_market(cog, alice, in_memory_db):
     market_id = await open_market(cog, alice)
     await cog.resolve(alice, market_id, "yes")
     assert market_row(in_memory_db, market_id).status == "RESOLVED"
-    expected = discord.Embed(title=f"Market {market_id} — Will it happen?", description="Called **YES**.", color=discord.Color.green())
+    expected = Embed(title=f"Market {market_id} — Will it happen?", description="Called **YES**.", color=Color.green())
     alice.send.assert_called_with(None, embed=expected)
 
 
@@ -427,7 +427,7 @@ async def test_resolve_embed_shows_winners_and_losers(cog, alice, bob, carol, in
     await cog.bet(bob, market_id, "yes", BET)
     await cog.bet(carol, market_id, "no", BET)
     await cog.resolve(alice, market_id, "yes")
-    expected = discord.Embed(title=f"Market {market_id} — Will it happen?", description="Called **YES**.", color=discord.Color.green())
+    expected = Embed(title=f"Market {market_id} — Will it happen?", description="Called **YES**.", color=Color.green())
     expected.add_field(name="Results", value="user2 — 500 on YES, won 831 (+331)\nuser3 — 500 on NO, lost 500", inline=False)
     alice.send.assert_called_with("<@2> <@3>", embed=expected)
 
@@ -488,7 +488,7 @@ async def test_resolve_embed_shows_void_refunds(cog, alice, bob, in_memory_db):
     market_id = await open_market(cog, alice)
     await cog.bet(bob, market_id, "yes", 300)
     await cog.resolve(alice, market_id, "void")
-    expected = discord.Embed(title=f"Market {market_id} — Will it happen?", description="Called **VOID**.", color=discord.Color.greyple())
+    expected = Embed(title=f"Market {market_id} — Will it happen?", description="Called **VOID**.", color=Color.greyple())
     expected.add_field(name="Results", value="user2 — 300 on YES, refunded", inline=False)
     alice.send.assert_called_with("<@2>", embed=expected)
 
@@ -551,7 +551,7 @@ async def test_admin_void_announces_the_corrections(cog, alice, bob, in_memory_d
     await cog.bet(bob, market_id, "yes", BET)
     await cog.resolve(alice, market_id, "yes")
     await cog.resolve(admin, market_id, "void")
-    expected = discord.Embed(title=f"Market {market_id} — Will it happen?", description="Resolution reversed — market **VOIDED** by an admin.", color=discord.Color.greyple())
+    expected = Embed(title=f"Market {market_id} — Will it happen?", description="Resolution reversed — market **VOIDED** by an admin.", color=Color.greyple())
     expected.add_field(name="Corrections", value="user2 — clawed back 831, refunded 500 (-331)", inline=False)
     admin.send.assert_called_with("<@2>", embed=expected)
 
@@ -695,7 +695,7 @@ async def test_leaderboard_ranks_by_net_worth(cog, alice, bob, in_memory_db):
     market_id = await open_market(cog, bob)
     await cog.bet(bob, market_id, "yes", BET)  # bob's position is worth more than his spent coins
     await cog.leaderboard(alice)
-    expected = discord.Embed(title="Leaderboard", description="🥇 user2 — 10,080 coins (9,500 available)\n🥈 user1 — 10,000 coins (10,000 available)", color=discord.Color.gold())
+    expected = Embed(title="Leaderboard", description="🥇 user2 — 10,080 coins (9,500 available)\n🥈 user1 — 10,000 coins (10,000 available)", color=Color.gold())
     alice.send.assert_called_with(embed=expected)
 
 
