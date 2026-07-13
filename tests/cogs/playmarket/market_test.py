@@ -243,9 +243,13 @@ async def test_create_opens_a_market_at_fifty_percent(cog, alice, in_memory_db):
     assert market.status == "OPEN" and market.q_yes == 0 and market.q_no == 0
 
 
-async def test_create_announces_the_new_market(cog, alice):
+@mock.patch("random.choice")
+async def test_create_announces_the_new_market(mock_choice, cog, alice):
+    mock_choice.return_value = "Place your bets, degenerates."
     await cog.create(alice, "Rain?", "med")
-    assert "YES 50%" in alice.send.call_args.args[0]
+    expected = discord.Embed(title="New Market", description="Place your bets, degenerates.", color=discord.Color.gold())
+    expected.add_field(name="Market 1 — Rain?", value="YES 50%", inline=False)
+    alice.send.assert_called_with(embed=expected)
 
 
 @pytest.mark.parametrize("tier,b", [("low", 500), ("med", 1000), ("high", 2000)])
