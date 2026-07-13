@@ -67,6 +67,7 @@ cdk = [
 
 [project.scripts]
 format = "scripts.format:main"
+run_local = "scripts.run_local:main"
 setup_nltk = "scripts.setup_nltk:main"
 
 [tool.black]
