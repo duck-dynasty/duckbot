@@ -3,6 +3,7 @@ import datetime
 import re
 
 from discord.ext import commands
+from discord.utils import escape_mentions
 
 from duckbot.util.datetime import now
 
@@ -40,5 +41,5 @@ class Timer(commands.Cog):
             else:
                 await context.send(f":timer: Timer set for {duration}. If I die before then, you're on your own.")
                 await asyncio.sleep(delta.total_seconds())
-                name = f"{label} timer" if label else "timer"
+                name = f"{escape_mentions(label)} timer" if label else "timer"
                 await context.channel.send(f":alarm_clock: {context.author.mention} your {name} is up!")

@@ -37,6 +37,14 @@ async def test_timer_pings_with_label(now, sleep, clazz, context):
     context.channel.send.assert_called_once_with(f":alarm_clock: {context.author.mention} your pizza timer is up!")
 
 
+@mock.patch("asyncio.sleep", return_value=None)
+@mock.patch("duckbot.cogs.timer.timer.now", return_value=noon)
+async def test_timer_escapes_mentions_in_label(now, sleep, clazz, context):
+    await clazz.timer(context, duration="10", label="@everyone")
+    # expected string has a zero-width space after the @
+    context.channel.send.assert_called_once_with(f":alarm_clock: {context.author.mention} your @​everyone timer is up!")
+
+
 @pytest.mark.parametrize("duration", ["duck", "0", "1x", "m"])
 async def test_timer_invalid_duration(clazz, context, duration):
     await clazz.timer(context, duration=duration)
