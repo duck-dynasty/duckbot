@@ -47,6 +47,7 @@ def assert_extensions_loaded(bot_spy, additional_extensions=[]):
         "duckbot.cogs.recipe",
         "duckbot.cogs.robot",
         "duckbot.cogs.text",
+        "duckbot.cogs.timer",
         "duckbot.cogs.tito",
         "duckbot.cogs.weather",
     ]
