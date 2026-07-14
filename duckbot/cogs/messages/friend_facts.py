@@ -93,7 +93,7 @@ class FriendFacts(commands.Cog):
         user.questions += content.rstrip().endswith("?")
         user.shouts += content.isupper() and any(c.isalpha() for c in content)
         user.links += "http" in content
-        user.golf += content.lower().count("golf")
+        user.golf += content.lower().count("golf") + content.lower().count("gulf")
         user.weather += content.lower().startswith("!weather")
         user.mentions += self.mention_count(message)
         user.attachments += len(message.attachments)

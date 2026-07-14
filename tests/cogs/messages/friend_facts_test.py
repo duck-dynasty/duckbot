@@ -153,7 +153,8 @@ def test_tally_counts_each_stat(clazz):
 def test_tally_counts_golf_mentions_case_insensitive(clazz):
     stats, hours, days = {}, [0] * 24, [0] * 7
     clazz.tally(stats, hours, days, make_message("GOLF golf golfing, hole in one"))
-    assert stats[1].golf == 3
+    clazz.tally(stats, hours, days, make_message("GULF gulf engulfed"))
+    assert stats[1].golf == 6
 
 
 def test_tally_counts_weather_prefix_command(clazz):
