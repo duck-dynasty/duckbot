@@ -20,6 +20,7 @@
 |    [`!recipe`](#recipe-search)    | search for a random recipe                         |
 |         [`!roll`](#dice)          | rolls Dungeons and Dragons style dice              |
 |    [`!start`, `!stop`](#music)    | start or stop playing music                        |
+|        [`!timer`](#timer)         | set a timer, get pinged when it ends               |
 |        [`!truth`](#truth)         | fact checks a message when used in a reply         |
 |      [`!weather`](#weather)       | retrieve weather information                       |
 | [`/satisfy`](Satisfactory-Solver) | produce a factory for _Satisfactory_               |
@@ -68,6 +69,16 @@ DuckBot can provide information about Pokémon, because that matters. The comman
 ```
 /pokemon [name-or-id]
 ```
+
+## Timer
+
+DuckBot will set a timer for you and ping you when it's done. Durations can be plain minutes, or short forms like `90s` or `1h30m`. An optional label is echoed back in the ping.
+
+```
+!timer 10m pizza
+```
+
+Timers cannot run past DuckBot's bedtime, since the bot sleeps overnight.
 
 ## Truth
 
