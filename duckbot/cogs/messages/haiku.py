@@ -14,7 +14,6 @@ class Haiku(commands.Cog):
 
     @commands.Cog.listener("on_ready")
     async def build_syllable_dictionary(self):
-        # stream entries() to avoid materializing the full cmudict; first pronunciation wins
         self.syllables = {}
         for word, pronounce in cmudict.entries():
             if word not in self.syllables:
