@@ -8,8 +8,8 @@ from duckbot.cogs.messages import Haiku
 EMBED_NAME = ":cherry_blossom: **Haiku Detected** :cherry_blossom:"
 
 
-@mock.patch("nltk.corpus.cmudict.dict", return_value={"a": [["A1"]], "and": [["A1"], ["A1", "A1"]], "batman": [["A1", "A1"]]})
-async def test_build_syllable_dictionary_builds_table(cmu):
+@mock.patch("nltk.corpus.cmudict.entries", return_value=[("a", ["A1"]), ("and", ["A1"]), ("and", ["A1", "A1"]), ("batman", ["A1", "A1"])])
+async def test_build_syllable_dictionary_builds_table_first_pronunciation_wins(cmu):
     clazz = Haiku()
     await clazz.build_syllable_dictionary()
     assert clazz.syllables == {"a": 1, "and": 1, "batman": 2}
