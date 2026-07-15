@@ -14,9 +14,9 @@ _INPUT_COLOR = "#199e70"
 _RECIPE_COLOR = "#3987e5"
 _OUTPUT_COLOR = "#c98500"
 
-_GRAPH_ATTR = dict(rankdir="LR", bgcolor=_BG_COLOR, splines="polyline", nodesep="0.3", ranksep="0.6", pad="0.4", dpi="150")
-_NODE_ATTR = dict(shape="box", style="rounded,filled", fillcolor=_NODE_FILL, fontcolor=_TEXT_COLOR, fontname="Helvetica bold", fontsize="12", penwidth="2", margin="0.2,0.1")
-_EDGE_ATTR = dict(fontname="Helvetica", fontsize="10", fontcolor=_EDGE_LABEL_COLOR, penwidth="1.5", arrowsize="0.7")
+_GRAPH_ATTR = {"rankdir": "LR", "bgcolor": _BG_COLOR, "splines": "polyline", "nodesep": "0.3", "ranksep": "0.6", "pad": "0.4", "dpi": "150"}
+_NODE_ATTR = {"shape": "box", "style": "rounded,filled", "fillcolor": _NODE_FILL, "fontcolor": _TEXT_COLOR, "fontname": "Helvetica bold", "fontsize": "12", "penwidth": "2", "margin": "0.2,0.1"}
+_EDGE_ATTR = {"fontname": "Helvetica", "fontsize": "10", "fontcolor": _EDGE_LABEL_COLOR, "penwidth": "1.5", "arrowsize": "0.7"}
 
 
 def solution_graph(solution: dict[ModifiedRecipe, float]) -> io.BytesIO:
@@ -25,7 +25,7 @@ def solution_graph(solution: dict[ModifiedRecipe, float]) -> io.BytesIO:
 
 
 def _empty_graph() -> graphviz.Digraph:
-    graph = graphviz.Digraph(graph_attr=dict(bgcolor=_BG_COLOR, pad="0.5"))
+    graph = graphviz.Digraph(graph_attr={"bgcolor": _BG_COLOR, "pad": "0.5"})
     graph.node("empty", label="No solution", shape="plaintext", fontcolor=_TEXT_COLOR, fontname="Helvetica bold")
     return graph
 
