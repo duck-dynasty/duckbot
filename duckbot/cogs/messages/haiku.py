@@ -14,7 +14,10 @@ class Haiku(commands.Cog):
 
     @commands.Cog.listener("on_ready")
     async def build_syllable_dictionary(self):
-        self.syllables = {word: len([t for t in pronounce[0] if t[-1].isdigit()]) for word, pronounce in cmudict.dict().items()}
+        self.syllables = {}
+        for word, pronounce in cmudict.entries():
+            if word not in self.syllables:
+                self.syllables[word] = len([t for t in pronounce if t[-1].isdigit()])
 
     @commands.Cog.listener("on_message")
     async def detect_haiku(self, message):
