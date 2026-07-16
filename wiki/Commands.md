@@ -10,6 +10,7 @@
 |     [`!define`](#definitions)     | define a word                                      |
 |              `!dog`               | displays a random dog photo                        |
 |              `!duck`              | gives a link to this repo                          |
+| [`!epic`](Events#epic-free-games) | show the free games of the week on epic            |
 |            `!fortune`             | get a random fortune told to you by a cow          |
 | [`!friend-facts`](#friend-facts)  | post last month's server stats report              |
 |        `!help` or `!wiki`         | gives a link to this wiki                          |

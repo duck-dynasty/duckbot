@@ -97,3 +97,7 @@ Every day in the 7am hour, DuckBot will announce to the general channel the curr
 ## Friend Facts
 
 On the first of each month, DuckBot posts a stats report to the general channel covering the prior month's messages: a message-count leaderboard plus awards like Grammar Police (% of messages starting with a capital), Wordiest, Most Inquisitive, Loudest, Chief Link Dumper, Golf Fanatic, Weather Obsessed, Name Dropper, and Paparazzi, along with the busiest hour and day. You can run this on demand using the `!friend-facts` command.
+
+## Epic Free Games
+
+Every Thursday at noon, DuckBot will post the free games of the week from the [Epic Games Store](https://store.epicgames.com/en-CA/free-games) to the games channel. You can run this on demand using the `!epic` command.

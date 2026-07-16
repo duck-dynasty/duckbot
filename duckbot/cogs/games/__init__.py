@@ -2,6 +2,7 @@ from .aoe import AgeOfEmpires
 from .coin_flip import CoinFlip
 from .dice import Dice
 from .discord_activity import DiscordActivity
+from .epic_games import EpicGames
 from .office_hours import OfficeHours
 from .pokemon import Pokemon
 from .satisfy import setup as satisfy_setup
@@ -12,6 +13,7 @@ async def setup(bot):
     await bot.add_cog(AgeOfEmpires())
     await bot.add_cog(CoinFlip())
     await bot.add_cog(DiscordActivity(bot))
+    await bot.add_cog(EpicGames(bot))
     await bot.add_cog(OfficeHours(bot))
     await bot.add_cog(Pokemon(bot))
     await satisfy_setup(bot)
