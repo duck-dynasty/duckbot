@@ -782,7 +782,7 @@ async def test_season_history_shows_final_standings(cog, alice, bob, clock, in_m
     clock.advance(days=91)
     await cog.tick()
     await cog.season_history(alice)
-    expected = discord.Embed(title="Season 1 — 2024-01-01 to 2024-04-01", description="🥇 user1 — 12,000 coins\n🥈 user2 — 10,000 coins", color=discord.Color.gold())
+    expected = Embed(title="Season 1 — 2024-01-01 to 2024-04-01", description="🥇 user1 — 12,000 coins\n🥈 user2 — 10,000 coins", color=Color.gold())
     alice.send.assert_called_with(embeds=[expected])
 
 
@@ -793,8 +793,8 @@ async def test_season_history_lists_newest_season_first(cog, alice, clock):
     clock.advance(days=91)
     await cog.tick()
     await cog.season_history(alice)
-    season_two = discord.Embed(title="Season 2 — 2024-04-01 to 2024-07-01", description="🥇 user1 — 10,000 coins", color=discord.Color.gold())
-    season_one = discord.Embed(title="Season 1 — 2024-01-01 to 2024-04-01", description="🥇 user1 — 10,000 coins", color=discord.Color.gold())
+    season_two = Embed(title="Season 2 — 2024-04-01 to 2024-07-01", description="🥇 user1 — 10,000 coins", color=Color.gold())
+    season_one = Embed(title="Season 1 — 2024-01-01 to 2024-04-01", description="🥇 user1 — 10,000 coins", color=Color.gold())
     alice.send.assert_called_with(embeds=[season_two, season_one])
 
 
