@@ -3,6 +3,7 @@ from duckbot.cogs.games import (
     CoinFlip,
     Dice,
     DiscordActivity,
+    EpicGames,
     OfficeHours,
     Pokemon,
 )
@@ -17,6 +18,7 @@ async def test_setup(bot_spy):
     assert_cog_added_of_type(bot_spy, AgeOfEmpires)
     assert_cog_added_of_type(bot_spy, CoinFlip)
     assert_cog_added_of_type(bot_spy, DiscordActivity)
+    assert_cog_added_of_type(bot_spy, EpicGames)
     assert_cog_added_of_type(bot_spy, OfficeHours)
     assert_cog_added_of_type(bot_spy, Pokemon)
     assert_cog_added_of_type(bot_spy, Satisfy)
