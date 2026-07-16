@@ -1,4 +1,5 @@
 import math
+import random
 from decimal import ROUND_DOWN, Decimal
 from typing import List, Literal, Optional
 
@@ -17,6 +18,14 @@ from .models import LedgerEntry, Market, PlayerAccount, Position, Season, Season
 CENT = Decimal("0.000001")
 
 MEDALS = {1: "🥇", 2: "🥈", 3: "🥉"}
+
+BET_CALLS = [
+    "Place your bets, degenerates.",
+    "Get your coins in, cowards.",
+    "Easy money, brother. Probably.",
+    "The house always wins. Be the house.",
+    "Fifty-fifty. Those are rookie numbers — move that line.",
+]
 
 
 def _down(value: float) -> Decimal:
@@ -136,7 +145,9 @@ class PlayMarket(commands.Cog):
                 market = Market(season_id=season.id, creator_id=context.author.id, question=question, b=b, subsidy=_whole(lmsr.subsidy(b)))
                 session.add(market)
                 session.commit()
-                await context.send(f"Market **{market.id}** is live: _{question}_ — YES 50%. Place your bets, degenerates.")
+                embed = Embed(title="New Market", description=random.choice(BET_CALLS), color=Color.gold())
+                await self._add_market_field(context, session, embed, market)
+                await context.send(embed=embed)
 
     @market_group.command(name="bet", description="Bet coins on a market resolving YES or NO.")
     @commands.guild_only()
