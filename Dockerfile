@@ -18,11 +18,13 @@ FROM python:3.13-slim as prod
 # libpq-dev: postgres client libraries
 # libopenblas-dev: matplotlib dependencies
 # fortune/cowsay: for !fortune command
+# graphviz: for /satisfy solution graph rendering
 RUN apt-get update && apt-get -y install \
     ffmpeg \
     libpq-dev \
     libopenblas-dev \
     fortune-mod fortunes cowsay \
+    graphviz \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 ENV PATH "$PATH:/usr/games"
 ENV VIRTUAL_ENV "/opt/venv"
