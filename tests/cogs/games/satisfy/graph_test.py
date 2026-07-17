@@ -32,6 +32,17 @@ def test_solution_graph_chain_returns_png():
     assert result.read(4) == b"\x89PNG"
 
 
+def test_solution_graph_multiple_consumers_returns_png():
+    solution = {
+        recipe_by_name(Item.IronIngot): 2.0,
+        recipe_by_name(Item.IronPlate): 1.0,
+        recipe_by_name(Item.IronRod): 1.0,
+    }
+    result = solution_graph(solution)
+    assert isinstance(result, io.BytesIO)
+    assert result.read(4) == b"\x89PNG"
+
+
 def test_solution_graph_seek_position_is_zero():
     result = solution_graph({recipe_by_name(Item.IronIngot): 1.0})
     assert result.tell() == 0

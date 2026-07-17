@@ -25,6 +25,12 @@ runs:
     with:
       python-version: '3.13'
 
+  - name: Install Required Packages
+    shell: bash
+    run: |
+      sudo apt-get update
+      sudo apt-get install -y --no-install-recommends graphviz
+
   - name: Create path Output
     id: path
     shell: bash
