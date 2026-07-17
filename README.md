@@ -26,6 +26,12 @@ setup_nltk
 
 The `dev` extras will also install development dependencies, like `pytest`. The installation commands should be run whenever you merge from upstream. The `setup_nltk` post-install script is required to download the NLTK corpora for NLTK to work properly.
 
+You'll also need [graphviz](https://graphviz.org/) installed to render graphs and run the test suite.
+
+```sh
+sudo apt install graphviz
+```
+
 ### Run Tests & Formatter
 
 ```sh
