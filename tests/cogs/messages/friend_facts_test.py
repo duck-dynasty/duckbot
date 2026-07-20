@@ -4,6 +4,7 @@ from unittest import mock
 import discord
 import pytest
 from discord import Forbidden
+from discord.ext import commands
 
 from duckbot.cogs.messages import FriendFacts
 from duckbot.cogs.messages.friend_facts import UserStats
@@ -81,6 +82,12 @@ async def test_friend_facts_command_sends_report_to_invoking_channel(now, clazz,
     text_channel.send.assert_called_once()
 
 
+async def test_friend_facts_command_is_rejected_outside_a_guild(clazz, context):
+    context.guild = None
+    with pytest.raises(commands.NoPrivateMessage):
+        any(check(context) for check in clazz.friend_facts.checks)
+
+
 @pytest.mark.parametrize(
     "today, expected_start, expected_end",
     [
@@ -139,6 +146,33 @@ async def test_gather_stats_skips_forbidden_channels(clazz, guild, text_channel)
     guild.text_channels = [text_channel]
     stats, _, _, channels = await clazz.gather_stats(guild, None, None)
     assert stats == {} and channels == 0
+
+
+async def test_gather_stats_scans_active_and_archived_threads(clazz, guild, text_channel, thread):
+    active_thread = readable(thread, [make_message("from an active thread", author_id=2)])
+    active_thread.type = discord.ChannelType.public_thread
+    text_channel.threads = [active_thread]
+
+    archived_thread = readable(mock.Mock(spec=discord.Thread), [make_message("from an archived thread", author_id=3)])
+    text_channel.archived_threads.return_value = list_as_async_generator([archived_thread])
+
+    text_channel.history.return_value = list_as_async_generator([make_message("in the channel itself")])
+    text_channel.permissions_for.return_value.read_message_history = True
+    guild.text_channels = [text_channel]
+
+    stats, _, _, channels = await clazz.gather_stats(guild, None, None)
+    assert stats.keys() == {1, 2, 3}
+    assert channels == 3
+
+
+async def test_gather_stats_skips_forbidden_archived_threads(clazz, guild, text_channel):
+    text_channel.permissions_for.return_value.read_message_history = True
+    text_channel.history.return_value = list_as_async_generator([])
+    text_channel.threads = []
+    text_channel.archived_threads.side_effect = Forbidden(mock.Mock(status=403), "no")
+    guild.text_channels = [text_channel]
+    stats, _, _, channels = await clazz.gather_stats(guild, None, None)
+    assert stats == {} and channels == 1
 
 
 def test_tally_counts_each_stat(clazz):

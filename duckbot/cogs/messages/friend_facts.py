@@ -51,6 +51,7 @@ class FriendFacts(commands.Cog):
             await self.send_report(self.get_general_channel())
 
     @commands.command(name="friend-facts")
+    @commands.guild_only()
     async def friend_facts(self, context):
         await self.send_report(context.channel)
 
@@ -70,7 +71,7 @@ class FriendFacts(commands.Cog):
         hours = [0] * 24
         days = [0] * 7
         channels = 0
-        for channel in guild.text_channels:
+        async for channel in self.channels_to_scan(guild):
             if not channel.permissions_for(guild.me).read_message_history:
                 continue
             try:
@@ -83,6 +84,18 @@ class FriendFacts(commands.Cog):
             except Forbidden:
                 pass
         return stats, hours, days, channels
+
+    async def channels_to_scan(self, guild):
+        """Text channels plus their active and archived threads."""
+        for channel in guild.text_channels:
+            yield channel
+            for thread in channel.threads:
+                yield thread
+            try:
+                async for thread in channel.archived_threads(limit=None):
+                    yield thread
+            except Forbidden:
+                pass
 
     def tally(self, stats, hours, days, message: Message):
         user = stats.setdefault(message.author.id, UserStats())
