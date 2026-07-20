@@ -4,7 +4,7 @@ import graphviz
 
 from .item import Item
 from .pretty import build_consumption_map, rnd
-from .recipe import ModifiedRecipe
+from .recipe import ModifiedRecipe, raw
 
 _BG_COLOR = "#1e1e2e"
 _NODE_FILL = "#2a2a3d"
@@ -17,6 +17,8 @@ _OUTPUT_COLOR = "#c98500"
 _GRAPH_ATTR = {"rankdir": "LR", "bgcolor": _BG_COLOR, "splines": "polyline", "nodesep": "0.3", "ranksep": "0.6", "pad": "0.4", "dpi": "150"}
 _NODE_ATTR = {"shape": "box", "style": "rounded,filled", "fillcolor": _NODE_FILL, "fontcolor": _TEXT_COLOR, "fontname": "Helvetica bold", "fontsize": "12", "penwidth": "2", "margin": "0.2,0.1"}
 _EDGE_ATTR = {"fontname": "Helvetica", "fontsize": "10", "fontcolor": _EDGE_LABEL_COLOR, "penwidth": "1.5", "arrowsize": "0.7"}
+
+_RAW_RECIPE_NAMES = {r.name for r in raw()}
 
 
 def solution_graph(solution: dict[ModifiedRecipe, float]) -> io.BytesIO:
@@ -40,7 +42,7 @@ def _build_graph(solution: dict[ModifiedRecipe, float]) -> graphviz.Digraph:
     for item in input_items:
         graph.node(_item_id(item), label=str(item), color=_INPUT_COLOR)
     for recipe, count in solution.items():
-        graph.node(_recipe_id(recipe), label=f"{recipe.original_recipe.name}\\n×{rnd(count)}", color=_RECIPE_COLOR)
+        graph.node(_recipe_id(recipe), label=f"{recipe.original_recipe.name}\\n{recipe.building.name} ×{rnd(count)}", color=_recipe_color(recipe))
     for item in output_items:
         graph.node(_item_id(item), label=str(item), color=_OUTPUT_COLOR)
 
@@ -60,10 +62,14 @@ def _build_edges(solution: dict[ModifiedRecipe, float], input_items: set[Item], 
             consumer_rates = {name: rate for name, rate in consumption_map.get(item, []) if name != recipe.original_recipe.name}
             for other in solution:
                 if other.original_recipe.name in consumer_rates:
-                    edges.setdefault((_recipe_id(recipe), _recipe_id(other), _RECIPE_COLOR), []).append(f"{rnd(consumer_rates[other.original_recipe.name])}/min")
+                    edges.setdefault((_recipe_id(recipe), _recipe_id(other), _recipe_color(recipe)), []).append(f"{rnd(consumer_rates[other.original_recipe.name])}/min")
             if not consumer_rates and item in output_items:
                 edges.setdefault((_recipe_id(recipe), _item_id(item), _OUTPUT_COLOR), []).append(f"{rnd(recipe.outputs.get(item, 0) * count)}/min")
     return edges
+
+
+def _recipe_color(recipe: ModifiedRecipe) -> str:
+    return _INPUT_COLOR if recipe.original_recipe.name in _RAW_RECIPE_NAMES else _RECIPE_COLOR
 
 
 # ":" would be parsed as graphviz port syntax in edge endpoints
