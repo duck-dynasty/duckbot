@@ -63,7 +63,7 @@ async def test_define_rate_limited(clazz, context, responses):
     context.send.assert_called_once_with("wordnik is all worded out, give it a minute")
 
 
-async def test_get_pronunciation_no_results(clazz, responses):
+def test_get_pronunciation_no_results(clazz, responses):
     responses.add(responses.GET, f"{URL}/cat/pronunciations", json={"statusCode": 404, "error": "Not Found", "message": "Not found"})
     assert clazz.get_pronunciation("cat") == "screw flanders"
 

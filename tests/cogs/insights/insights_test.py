@@ -18,7 +18,7 @@ async def test_before_loop_waits_for_bot(clazz, bot):
     bot.wait_until_ready.assert_called()
 
 
-async def test_cog_unload_cancels_task(clazz):
+def test_cog_unload_cancels_task(clazz):
     clazz.cog_unload()
     clazz.check_should_respond_loop.cancel.assert_called()
 

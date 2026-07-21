@@ -668,7 +668,7 @@ async def test_claim_is_allowed_again_after_the_cooldown(cog, alice, clock, in_m
 
 
 @pytest.mark.parametrize("command", ["create", "bet", "sell", "claim", "resolve"])
-async def test_write_commands_are_rejected_outside_a_guild(cog, command):
+def test_write_commands_are_rejected_outside_a_guild(cog, command):
     context = make_context(1)
     context.guild = None
     with pytest.raises(commands.NoPrivateMessage):
@@ -676,7 +676,7 @@ async def test_write_commands_are_rejected_outside_a_guild(cog, command):
 
 
 @pytest.mark.parametrize("command", ["balance", "leaderboard", "list_command"])
-async def test_read_commands_are_allowed_outside_a_guild(cog, command):
+def test_read_commands_are_allowed_outside_a_guild(cog, command):
     context = make_context(1)
     context.guild = None
     assert all(check(context) for check in getattr(cog, command).checks)
