@@ -187,7 +187,7 @@ async def test_clean_old_messages_preserves_recent(mock_utcnow, clazz, message):
 
 
 @mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
-async def test_should_notify_returns_true_for_new_user(mock_utcnow, clazz, message):
+def test_should_notify_returns_true_for_new_user(mock_utcnow, clazz, message):
     """First notification for a user should be allowed."""
     base_time = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)
     mock_utcnow.return_value = base_time
@@ -198,7 +198,7 @@ async def test_should_notify_returns_true_for_new_user(mock_utcnow, clazz, messa
 
 
 @mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
-async def test_should_notify_returns_false_within_cooldown(mock_utcnow, clazz, message):
+def test_should_notify_returns_false_within_cooldown(mock_utcnow, clazz, message):
     """Notification within cooldown period should be blocked."""
     base_time = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)
     last_notification = base_time - datetime.timedelta(minutes=30)
@@ -209,7 +209,7 @@ async def test_should_notify_returns_false_within_cooldown(mock_utcnow, clazz, m
 
 
 @mock.patch("duckbot.cogs.messages.touch_grass.utcnow")
-async def test_should_notify_returns_true_after_cooldown(mock_utcnow, clazz, message):
+def test_should_notify_returns_true_after_cooldown(mock_utcnow, clazz, message):
     """Notification after cooldown expires should be allowed."""
     base_time = datetime.datetime(2024, 1, 1, 12, 0, 0, tzinfo=datetime.timezone.utc)
     last_notification = base_time - datetime.timedelta(hours=1, minutes=1)
@@ -388,7 +388,7 @@ async def test_show_activity_stats_unknown_user(mock_utcnow, mock_get_user, claz
     assert "5" in call_args
 
 
-async def test_is_work_hours_weekday_within_hours(clazz):
+def test_is_work_hours_weekday_within_hours(clazz):
     """Mon-Fri 8am-6pm EDT (12pm-10pm UTC) should be work hours."""
     # Monday 12:00 UTC
     assert clazz.is_work_hours(MONDAY_NOON) is True
@@ -398,7 +398,7 @@ async def test_is_work_hours_weekday_within_hours(clazz):
     assert clazz.is_work_hours(datetime.datetime(2024, 1, 1, 21, 59, 0, tzinfo=datetime.timezone.utc)) is True
 
 
-async def test_is_work_hours_weekday_outside_hours(clazz):
+def test_is_work_hours_weekday_outside_hours(clazz):
     """Before 12pm and at/after 10pm UTC on weekdays should not be work hours."""
     # Monday 11:59 UTC
     assert clazz.is_work_hours(datetime.datetime(2024, 1, 1, 11, 59, 0, tzinfo=datetime.timezone.utc)) is False
@@ -408,7 +408,7 @@ async def test_is_work_hours_weekday_outside_hours(clazz):
     assert clazz.is_work_hours(datetime.datetime(2024, 1, 1, 23, 0, 0, tzinfo=datetime.timezone.utc)) is False
 
 
-async def test_is_work_hours_weekend(clazz):
+def test_is_work_hours_weekend(clazz):
     """Weekends should not be work hours regardless of time."""
     # Saturday 12:00 UTC
     assert clazz.is_work_hours(SATURDAY_NOON) is False
