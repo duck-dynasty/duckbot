@@ -1,4 +1,5 @@
 import asyncio
+from contextlib import suppress
 from importlib.resources import path
 from typing import Optional
 
@@ -70,11 +71,9 @@ class WhoCanItBeNow(commands.Cog):
         if self.streaming:
             self.streaming = False
             await self.voice_client.disconnect()
-            try:
-                self.audio_task.cancel()
+            self.audio_task.cancel()
+            with suppress(asyncio.CancelledError):
                 await self.audio_task
-            except asyncio.CancelledError:
-                pass
             self.audio_task = None
             self.voice_client = None
             if context:
