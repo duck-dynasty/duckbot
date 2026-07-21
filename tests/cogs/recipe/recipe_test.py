@@ -14,7 +14,7 @@ def clazz() -> Recipe:
     return bind_commands(Recipe())
 
 
-async def test_search_recipes_returns_scraped_html(clazz, responses):
+def test_search_recipes_returns_scraped_html(clazz, responses):
     search_term = "test1"
     mock_data = get_mock_data(search_term, 5)
     setup_responses(responses, search_term, with_articles(mock_data))
@@ -23,7 +23,7 @@ async def test_search_recipes_returns_scraped_html(clazz, responses):
     assert_requests(responses, search_term)
 
 
-async def test_parse_recipes_returns_articles(clazz):
+def test_parse_recipes_returns_articles(clazz):
     mock_data = get_mock_data("test1", 5)
     expected_response = [get_mock_data("test1", 5) for _ in range(5)]
     html = json_articles(mock_data)
@@ -31,27 +31,27 @@ async def test_parse_recipes_returns_articles(clazz):
     assert response == expected_response
 
 
-async def test_parse_recipes_returns_empty(clazz):
+def test_parse_recipes_returns_empty(clazz):
     expected_response = []
     html = without_articles()
     response = clazz.parse_recipes(html)
     assert response == expected_response
 
 
-async def test_parse_recipes_no_content_returns_empty(clazz):
+def test_parse_recipes_no_content_returns_empty(clazz):
     expected_response = []
     html = without_content()
     response = clazz.parse_recipes(html)
     assert response == expected_response
 
 
-async def test_select_recipes_with_one_return_one(clazz):
+def test_select_recipes_with_one_return_one(clazz):
     recipe_list = [get_mock_data("test1", 5)]
     response = clazz.select_recipe(recipe_list)
     assert response == recipe_list[0]
 
 
-async def test_select_recipes_with_many_return_one(clazz):
+def test_select_recipes_with_many_return_one(clazz):
     recipe_list = [get_mock_data("test1", 5), get_mock_data("test2", 4)]
     response = clazz.select_recipe(recipe_list)
     assert response in recipe_list

@@ -57,43 +57,43 @@ async def test_mock_text_no_message_reply(get_message_reference, random_choice, 
 
 @mock.patch("duckbot.cogs.text.mock_text.random.randint", return_value=1)
 @mock.patch("duckbot.cogs.text.mock_text.random.choice", return_value="**")
-async def test_mockify_wraps_emphasis_span_with_bold(random_choice, random_randint, clazz):
+def test_mockify_wraps_emphasis_span_with_bold(random_choice, random_randint, clazz):
     assert clazz.mockify("hi") == "**H**i"
 
 
 @mock.patch("duckbot.cogs.text.mock_text.random.randint", return_value=1)
 @mock.patch("duckbot.cogs.text.mock_text.random.choice", return_value="*")
-async def test_mockify_wraps_emphasis_span_with_italic(random_choice, random_randint, clazz):
+def test_mockify_wraps_emphasis_span_with_italic(random_choice, random_randint, clazz):
     assert clazz.mockify("hi") == "*H*i"
 
 
 @mock.patch("duckbot.cogs.text.mock_text.random.randint", return_value=1)
 @mock.patch("duckbot.cogs.text.mock_text.random.choice", return_value="`")
-async def test_mockify_wraps_emphasis_span_with_code(random_choice, random_randint, clazz):
+def test_mockify_wraps_emphasis_span_with_code(random_choice, random_randint, clazz):
     assert clazz.mockify("hi") == "`H`i"
 
 
 @mock.patch("duckbot.cogs.text.mock_text.random.randint", return_value=1)
 @mock.patch("duckbot.cogs.text.mock_text.random.choice", side_effect=["**", "*"])
-async def test_mockify_alternates_emphasis_and_plain(random_choice, random_randint, clazz):
+def test_mockify_alternates_emphasis_and_plain(random_choice, random_randint, clazz):
     assert clazz.mockify("abc") == "**A**b*C*"
 
 
 @mock.patch("duckbot.cogs.text.mock_text.random.randint", return_value=4)
 @mock.patch("duckbot.cogs.text.mock_text.random.choice", return_value="**")
-async def test_mockify_spans_multiple_characters(random_choice, random_randint, clazz):
+def test_mockify_spans_multiple_characters(random_choice, random_randint, clazz):
     assert clazz.mockify("hello") == "**HeLl**O"
 
 
 @mock.patch("duckbot.cogs.text.mock_text.random.randint", return_value=1)
 @mock.patch("duckbot.cogs.text.mock_text.random.choice", return_value="**")
-async def test_mockify_does_not_wrap_punctuation_or_whitespace(random_choice, random_randint, clazz):
+def test_mockify_does_not_wrap_punctuation_or_whitespace(random_choice, random_randint, clazz):
     assert clazz.mockify("hi ... bye") == "**H**i ... **B**y**E**"
 
 
 @mock.patch("duckbot.cogs.text.mock_text.random.randint", return_value=1)
 @mock.patch("duckbot.cogs.text.mock_text.random.choice", return_value="**")
-async def test_mockify_does_not_offer_previous_wrapper_as_choice(random_choice, random_randint, clazz):
+def test_mockify_does_not_offer_previous_wrapper_as_choice(random_choice, random_randint, clazz):
     clazz.mockify("abcde")
     assert set(random_choice.call_args_list[1][0][0]) == set(WRAPPERS) - {"**"}
 
