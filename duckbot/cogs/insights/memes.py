@@ -6,10 +6,6 @@ from discord import ChannelType, Client, TextChannel
 from discord.ext import commands
 from discord.utils import get, utcnow
 
-HISTORY_LIMIT = 100  # discord caps `around` at 101
-ATTEMPTS = 5
-NO_MEME = "https://tenor.com/view/gnocchi-soup-gif-27425983"
-
 
 class Memes(commands.Cog):
     def __init__(self, bot: Client):
@@ -19,10 +15,10 @@ class Memes(commands.Cog):
     async def meme(self, context: commands.Context):
         channel = self.get_memes_channel()
         url = await self.find_meme(channel) if channel else None
-        await context.send(url if url else NO_MEME)
+        await context.send(url if url else "https://tenor.com/view/gnocchi-soup-gif-27425983")
 
     async def find_meme(self, channel: TextChannel) -> Optional[str]:
-        for _ in range(ATTEMPTS):
+        for _ in range(5):
             url = await self.random_attachment(channel)
             if url:
                 return url
@@ -32,7 +28,7 @@ class Memes(commands.Cog):
         return get(self.bot.get_all_channels(), guild__name="Friends Chat", name="toms-memes", type=ChannelType.text)
 
     async def random_attachment(self, channel: TextChannel) -> Optional[str]:
-        messages = [msg async for msg in channel.history(limit=HISTORY_LIMIT, around=self.random_time(channel))]
+        messages = [msg async for msg in channel.history(limit=100, around=self.random_time(channel))]  # discord caps `around` at 101
         memes = [msg for msg in messages if msg.attachments]
         return random.choice(random.choice(memes).attachments).url if memes else None
 

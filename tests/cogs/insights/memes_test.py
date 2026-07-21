@@ -5,7 +5,6 @@ import discord
 import pytest
 
 from duckbot.cogs.insights import Memes
-from duckbot.cogs.insights.memes import NO_MEME
 from tests import list_as_async_generator
 from tests.discord_test_ext import bind_commands
 
@@ -42,14 +41,14 @@ async def test_meme_sends_attachment_url(clazz, context, memes_channel, raw_mess
 async def test_meme_no_channel(clazz, bot, context):
     bot.get_all_channels.return_value = []
     await clazz.meme(context)
-    context.send.assert_called_once_with(NO_MEME)
+    context.send.assert_called_once_with("https://tenor.com/view/gnocchi-soup-gif-27425983")
 
 
 async def test_meme_no_attachments_in_any_window(clazz, context, memes_channel, raw_message):
     raw_message.attachments = []
     memes_channel.history.side_effect = lambda **kwargs: list_as_async_generator([raw_message])
     await clazz.meme(context)
-    context.send.assert_called_once_with(NO_MEME)
+    context.send.assert_called_once_with("https://tenor.com/view/gnocchi-soup-gif-27425983")
 
 
 async def test_meme_retries_until_attachment_found(clazz, context, memes_channel, raw_message, attachment):
