@@ -13,9 +13,10 @@ class Memes(commands.Cog):
 
     @commands.hybrid_command(name="meme", description="Show a random meme from the memes channel")
     async def meme(self, context: commands.Context):
-        channel = self.get_memes_channel()
-        url = await self.find_meme(channel) if channel else None
-        await context.send(url if url else "https://tenor.com/view/gnocchi-soup-gif-27425983")
+        async with context.typing():
+            channel = self.get_memes_channel()
+            url = await self.find_meme(channel) if channel else None
+            await context.send(url if url else "https://tenor.com/view/gnocchi-soup-gif-27425983")
 
     async def find_meme(self, channel: TextChannel) -> Optional[str]:
         for _ in range(5):
