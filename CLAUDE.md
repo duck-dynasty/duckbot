@@ -50,6 +50,7 @@ setup_nltk
 
 - **When a cog exposes multiple related commands, group them under one `@commands.hybrid_group`** (see `weather`, `games/satisfy`) — e.g. `/market bet`, `/market balance` — rather than adding many top-level commands to the global namespace. A group isn't required for a cog with a single command, and many cogs have no commands at all (pure event listeners).
 - **Admin/owner checks**: reuse the owner-id allowlist pattern from `duckbot/cogs/github/yolo_merge.py` (`is_repository_admin`) instead of inventing new permission logic.
+- **Wrap long-running command bodies with `async with context.typing():`** — Discord times out an interaction response after 3s and the reply will never send. Anything that does I/O (HTTP, DB, `channel.history`, LLM calls, etc.) before `context.send` needs the typing indicator. Examples: `duckbot/cogs/weather/weather.py`, `duckbot/cogs/playmarket/market.py`.
 - **Prefer the simplest design that works.** Fewer moving parts, fewer places things happen. Avoid speculative complexity (schedulers, multi-step flows, extra tables/state) when a simpler approach fits a small friend-group bot. Study how existing cogs solve a similar problem and match that before introducing a new pattern.
 
 ### Adding a New Cog

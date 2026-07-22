@@ -5,7 +5,7 @@ from discord import ChannelType, Client, TextChannel
 from discord.ext import commands, tasks
 from discord.utils import get, utcnow
 
-from .phrases import responses
+from .insight_phrases import responses
 
 
 class Insights(commands.Cog):

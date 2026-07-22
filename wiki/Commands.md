@@ -16,6 +16,7 @@
 |        `!help` or `!wiki`         | gives a link to this wiki                          |
 |              `!lmgt`              | generates a google search link for the given query |
 |  [`/market`](Prediction-Market)   | bet on prediction markets, balances, leaderboard   |
+|              `!meme`              | reposts a random meme from the memes channel       |
 |              `!mock`              | converts text into MoCkInG tExT                    |
 |      [`!pokemon`](#pokemon)       | gives information about pokemon                    |
 |    [`!recipe`](#recipe-search)    | search for a random recipe                         |
