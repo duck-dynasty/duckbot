@@ -1,4 +1,4 @@
-name: Set Up AWK Cloud Development Kit (CDK)
+name: Set Up AWS Cloud Development Kit (CDK)
 description: installs dependencies to be able to run cdk
 
 outputs:
