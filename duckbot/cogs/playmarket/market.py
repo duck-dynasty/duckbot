@@ -10,6 +10,7 @@ from sqlalchemy import String, cast, or_
 
 from duckbot.db import Database
 from duckbot.util.datetime import now
+from duckbot.util.embeds import group_by_max_length
 from duckbot.util.users import get_user
 
 from . import config, lmsr
@@ -115,6 +116,23 @@ class PlayMarket(commands.Cog):
             if not standings:
                 return await context.send("Nobody's played yet. Buncha cowards.")
             await context.send(embed=await self._leaderboard_embed(context, standings))
+
+    # --- season commands ----------------------------------------------------
+
+    @market_group.group(name="season", description="Season related commands.")
+    async def season(self, context: commands.Context):
+        pass
+
+    @season.command(name="history", description="Final standings from past seasons.")
+    async def season_history(self, context: commands.Context):
+        async with context.typing():
+            with self.db.session(Season) as session:
+                seasons = session.query(Season).filter_by(status="archived").order_by(Season.id.desc()).all()
+                if not seasons:
+                    return await context.send("No seasons in the books yet, brother.")
+                embeds = [await self._season_embed(context, session, season) for season in seasons]
+            for batch in group_by_max_length(embeds):
+                await context.send(embeds=batch)
 
     # --- market commands --------------------------------------------------
 
@@ -416,6 +434,11 @@ class PlayMarket(commands.Cog):
     async def _leaderboard_embed(self, context, standings) -> Embed:
         lines = [await self._standing_line(context, i, uid, cash, shares_value) for i, (uid, cash, shares_value) in enumerate(standings, start=1)]
         return Embed(title="Leaderboard", description="\n".join(lines), color=Color.gold())
+
+    async def _season_embed(self, context, session, season) -> Embed:
+        results = session.query(SeasonResult).filter_by(season_id=season.id).order_by(SeasonResult.rank).all()
+        lines = [f"{MEDALS.get(r.rank, f'{r.rank}.')} {await self._name(context, r.user_id)} — {_coins(r.final_balance)} coins" for r in results]
+        return Embed(title=f"{season.name} — {season.starts_at:%Y-%m-%d} to {season.ends_at:%Y-%m-%d}", description="\n".join(lines), color=Color.gold())
 
     async def _standing_line(self, context, rank, uid, cash, shares_value) -> str:
         return f"{MEDALS.get(rank, f'{rank}.')} {await self._worth(context, uid, cash, shares_value)}"
