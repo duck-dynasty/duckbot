@@ -26,6 +26,12 @@ setup_nltk
 
 The `dev` extras will also install development dependencies, like `pytest`. The installation commands should be run whenever you merge from upstream. The `setup_nltk` post-install script is required to download the NLTK corpora for NLTK to work properly.
 
+You'll also need [graphviz](https://graphviz.org/) installed to render graphs and run the test suite.
+
+```sh
+sudo apt install graphviz
+```
+
 ### Run Tests & Formatter
 
 ```sh
@@ -51,17 +57,16 @@ DISCORD_TOKEN=thesecrettoken
 OPENWEATHER_TOKEN=thesecrettoken
 BOT_GITHUB_TOKEN=somesecrettoken
 WOLFRAM_ALPHA_TOKEN=broitssecret
-OXFORD_DICTIONARY_ID=icanttellyou
-OXFORD_DICTIONARY_KEY=itsasecret
-ANTHROPIC_API_KEY=itsasecret
+WORDNIK_KEY=icanttellyou
+GROQ_API_KEY=itsasecret
 ```
 
 - Discord tokens available from [Discord Developer](https://discord.com/developers/applications)
 - You can get an [openweather api token](https://openweathermap.org/api) for free as well
 - The github token is a [personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token)
 - The wolfram alpha token is available from their [api page](https://products.wolframalpha.com/api/)
-- The oxford dictionary tokens are available from their [developer page](https://developer.oxforddictionaries.com/)
-- The Anthropic token can be generated for your personal account in the [settings page](https://console.anthropic.com/settings/keys)
+- The wordnik key is available from their [developer page](https://developer.wordnik.com/)
+- The Groq token can be generated for your personal account in the [API keys page](https://console.groq.com/keys)
 
 You only _need_ the discord token. DuckBot will still function without the others, but features that use the tokens won't work. With your tokens available, you can jam them into your shell environment, so you can run DuckBot. You may want to put this into your bashrc for convenience.
 
@@ -100,13 +105,6 @@ To add new secrets (like tokens), [`app.py`](.aws/app.py) needs to be modified. 
 - `parameter_name`: the name of the AWS Systems Manager parameter, must start with `/duckbot`
 
 Make sure you also update the [`docker-compose`](docker-compose.yml) file, and this [readme](#run-duckbot) to include information on how developers can get their own copy of the secrets.
-
-### Note About Secrets and Deployments
-
-CDK is just python code at the end of the day, we take advantage of that to make sure the deployment process actually creates the secrets that DuckBot would use in prod.
-In [`app.py`](.aws/app.py), there's logic which creates the secrets via API calls, taking the value from the current environment. Those same secrets are passed to the stack, which are used to inject the secrets into the duckbot container.
-
-Actually saving the secrets is disabled by default, but is enabled for the GitHub actions deploy step. Writing secrets can be enabled by passing `--context write_secrets=true` to a `cdk` command.
 
 ## Using CDK
 

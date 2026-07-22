@@ -7,6 +7,7 @@ from pyowm.weatherapi30.weather import Weather as pyowmWeather
 
 from duckbot.cogs.weather import Weather
 from duckbot.cogs.weather.saved_location import SavedLocation
+from tests.discord_test_ext import bind_commands
 
 
 @pytest.fixture
@@ -24,7 +25,7 @@ def owm(o, geocoding):
 
 @pytest.fixture
 def weather(bot, owm, db):
-    clazz = Weather(bot, db)
+    clazz = bind_commands(Weather(bot, db))
     clazz._owm = owm
     owm.weather_manager.return_value.one_call = mock.MagicMock()
     return clazz
@@ -47,9 +48,15 @@ def test_owm_returns_cached_instance(weather, owm):
 
 async def test_weather_get_failure(weather, owm, context):
     owm.weather_manager.return_value.one_call.side_effect = Exception("ded")
-    with pytest.raises(Exception):
+    with pytest.raises(Exception, match="ded"):
         await weather.weather(context, "city", None, None)
     context.send.assert_called_once_with("Iunno. Figure it out.\nded")
+
+
+async def test_weather_group_defaults_to_get(weather, context):
+    weather.send_weather = mock.AsyncMock()
+    await weather.weather_command(context, "city", None, None)
+    weather.send_weather.assert_awaited_once_with(context, "city", None, None)
 
 
 async def test_search_location_no_args(weather, context):
@@ -124,6 +131,22 @@ async def test_set_default_location_location_not_saved(weather, session, context
     await weather.set_default_location(context, None, None, None)
     session.merge.assert_not_called()
     session.commit.assert_not_called()
+
+
+async def test_set_default_location_round_trip(bot, in_memory_db, context):
+    async def mock_search_location(context, city, country, index):
+        return Location(city, 1, 1, 1, country="CA")
+
+    clazz = bind_commands(Weather(bot, in_memory_db))
+    clazz.search_location = mock_search_location
+    context.author.id = 123
+    await clazz.set_default_location(context, "city", None, None)
+    await clazz.set_default_location(context, "new city", None, None)  # merge upserts on the same author id
+
+    with in_memory_db.session(SavedLocation) as session:
+        assert session.query(SavedLocation).count() == 1
+        saved = session.get(SavedLocation, 123)
+    assert (saved.name, saved.country, saved.latitude, saved.longitude) == ("new city", "CA", 1.0, 1.0)
 
 
 async def test_send_weather_no_default_no_args(weather, session, context):

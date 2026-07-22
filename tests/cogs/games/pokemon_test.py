@@ -2,33 +2,39 @@ import random
 from datetime import date
 from unittest.mock import patch
 
+import pytest
+
 from duckbot.cogs.games.pokemon import ANCHOR_DATE, POTD_SEED, Pokemon
+from tests.discord_test_ext import bind_commands
 
 POKEMON_API = "https://pokeapi.co/api/v2/pokemon"
 SPECIES_API = "https://pokeapi.co/api/v2/pokemon-species"
 
 
-async def test_pokemon_by_name(bot, context, responses):
+@pytest.fixture
+def clazz(bot) -> Pokemon:
+    return bind_commands(Pokemon(bot))
+
+
+async def test_pokemon_by_name(clazz, context, responses):
     responses.add(responses.GET, f"{POKEMON_API}/pikachu", json=build_pokemon_data())
     responses.add(responses.GET, f"{SPECIES_API}/25/", json=build_species_data())
-    clazz = Pokemon(bot)
-    await clazz.pokemon(context, "pikachu")
+    await clazz.pokemon(context, name_or_id="pikachu")
     context.send.assert_called_once()
     embed = context.send.call_args.kwargs["embed"]
-    assert embed.title == "#25 \u2014 Pikachu"
+    assert embed.title == "#25 — Pikachu"
 
 
-async def test_pokemon_by_id(bot, context, responses):
+async def test_pokemon_by_id(clazz, context, responses):
     responses.add(responses.GET, f"{POKEMON_API}/25", json=build_pokemon_data())
     responses.add(responses.GET, f"{SPECIES_API}/25/", json=build_species_data())
-    clazz = Pokemon(bot)
-    await clazz.pokemon(context, "25")
+    await clazz.pokemon(context, name_or_id="25")
     context.send.assert_called_once()
     embed = context.send.call_args.kwargs["embed"]
-    assert embed.title == "#25 \u2014 Pikachu"
+    assert embed.title == "#25 — Pikachu"
 
 
-async def test_pokemon_no_args_shows_potd(bot, context, responses):
+async def test_pokemon_no_args_shows_potd(clazz, context, responses):
     n = 10
     ids = list(range(1, n + 1))
     random.Random(POTD_SEED).shuffle(ids)
@@ -36,29 +42,25 @@ async def test_pokemon_no_args_shows_potd(bot, context, responses):
     responses.add(responses.GET, f"{SPECIES_API}?limit=1", json={"count": n})
     responses.add(responses.GET, f"{POKEMON_API}/{potd_id}", json=build_pokemon_data(name="testmon", pokemon_id=potd_id))
     responses.add(responses.GET, f"{SPECIES_API}/{potd_id}/", json=build_species_data(pokemon_id=potd_id))
-    clazz = Pokemon(bot)
-    with patch("duckbot.cogs.games.pokemon.date") as mock_date:
-        mock_date.today.return_value = ANCHOR_DATE
-        mock_date.side_effect = lambda *a, **kw: date(*a, **kw)
-        await clazz.pokemon(context, None)
+    with patch("duckbot.cogs.games.pokemon.now") as mock_now:
+        mock_now.return_value.date.return_value = ANCHOR_DATE
+        await clazz.pokemon(context, name_or_id=None)
     context.send.assert_called_once()
     embed = context.send.call_args.kwargs["embed"]
     assert "Pokemon of the Day:" in embed.title
 
 
-async def test_pokemon_not_found(bot, context, responses):
+async def test_pokemon_not_found(clazz, context, responses):
     responses.add(responses.GET, f"{POKEMON_API}/fakemon", status=404)
-    clazz = Pokemon(bot)
-    await clazz.pokemon(context, "fakemon")
+    await clazz.pokemon(context, name_or_id="fakemon")
     context.send.assert_called_once_with("Could not find a Pokemon named 'fakemon'.")
 
 
-def test_build_embed_has_correct_fields(bot):
-    clazz = Pokemon(bot)
+def test_build_embed_has_correct_fields(clazz):
     data = build_pokemon_data()
     species = build_species_data()
     embed = clazz.build_embed(data, species)
-    assert embed.title == "#25 \u2014 Pikachu"
+    assert embed.title == "#25 — Pikachu"
     assert "Mouse Pokemon" in embed.description
     assert "A Pokemon. It is cool." in embed.description
     assert len(embed.fields) == 3
@@ -71,16 +73,14 @@ def test_build_embed_has_correct_fields(bot):
     assert embed.thumbnail.url == "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/25.png"
 
 
-def test_build_embed_potd_title(bot):
-    clazz = Pokemon(bot)
+def test_build_embed_potd_title(clazz):
     data = build_pokemon_data()
     species = build_species_data()
     embed = clazz.build_embed(data, species, is_potd=True)
-    assert embed.title == "Pokemon of the Day: #25 \u2014 Pikachu"
+    assert embed.title == "Pokemon of the Day: #25 — Pikachu"
 
 
-def test_build_embed_dual_type(bot):
-    clazz = Pokemon(bot)
+def test_build_embed_dual_type(clazz):
     types = [{"slot": 1, "type": {"name": "fire"}}, {"slot": 2, "type": {"name": "flying"}}]
     data = build_pokemon_data(name="charizard", pokemon_id=6, types=types)
     species = build_species_data(pokemon_id=6)
@@ -89,8 +89,7 @@ def test_build_embed_dual_type(bot):
     assert embed.color.value == 0xEE8130
 
 
-def test_build_embed_color_from_primary_type(bot):
-    clazz = Pokemon(bot)
+def test_build_embed_color_from_primary_type(clazz):
     data = build_pokemon_data()
     species = build_species_data()
     embed = clazz.build_embed(data, species)
@@ -134,69 +133,60 @@ def test_get_genus_no_english_returns_empty():
     assert result == ""
 
 
-def test_potd_deterministic(bot):
-    clazz = Pokemon(bot)
+def test_potd_deterministic(clazz):
     clazz._pokemon_count = 1025
-    with patch("duckbot.cogs.games.pokemon.date") as mock_date:
-        mock_date.today.return_value = date(2025, 6, 15)
-        mock_date.side_effect = lambda *a, **kw: date(*a, **kw)
+    with patch("duckbot.cogs.games.pokemon.now") as mock_now:
+        mock_now.return_value.date.return_value = date(2025, 6, 15)
         id1 = clazz._get_pokemon_of_the_day_id()
         id2 = clazz._get_pokemon_of_the_day_id()
     assert id1 == id2
     assert 1 <= id1 <= 1025
 
 
-def test_potd_different_days_give_different_pokemon(bot):
-    clazz = Pokemon(bot)
+def test_potd_different_days_give_different_pokemon(clazz):
     clazz._pokemon_count = 1025
-    with patch("duckbot.cogs.games.pokemon.date") as mock_date:
-        mock_date.side_effect = lambda *a, **kw: date(*a, **kw)
-        mock_date.today.return_value = date(2025, 6, 15)
+    with patch("duckbot.cogs.games.pokemon.now") as mock_now:
+        mock_now.return_value.date.return_value = date(2025, 6, 15)
         id1 = clazz._get_pokemon_of_the_day_id()
-        mock_date.today.return_value = date(2025, 6, 16)
+        mock_now.return_value.date.return_value = date(2025, 6, 16)
         id2 = clazz._get_pokemon_of_the_day_id()
     assert id1 != id2
 
 
-def test_pokemon_count_cached(bot, responses):
+def test_pokemon_count_cached(clazz, responses):
     responses.add(responses.GET, f"{SPECIES_API}?limit=1", json={"count": 1025})
-    clazz = Pokemon(bot)
     count1 = clazz.pokemon_count
     count2 = clazz.pokemon_count
     assert count1 == count2 == 1025
     assert len(responses.calls) == 1
 
 
-def test_pokemon_names_cached(bot, responses):
+def test_pokemon_names_cached(clazz, responses):
     responses.add(responses.GET, f"{SPECIES_API}?limit=1", json={"count": 3})
     responses.add(responses.GET, f"{SPECIES_API}?limit=3", json={"results": [{"name": "bulbasaur"}, {"name": "ivysaur"}, {"name": "venusaur"}]})
-    clazz = Pokemon(bot)
     names1 = clazz.pokemon_names
     names2 = clazz.pokemon_names
     assert names1 == names2 == ["bulbasaur", "ivysaur", "venusaur"]
     assert len(responses.calls) == 2  # one for count, one for names
 
 
-async def test_autocomplete_returns_matches(bot, responses):
+async def test_autocomplete_returns_matches(clazz, responses):
     responses.add(responses.GET, f"{SPECIES_API}?limit=1", json={"count": 3})
     responses.add(responses.GET, f"{SPECIES_API}?limit=3", json={"results": [{"name": "pikachu"}, {"name": "pichu"}, {"name": "bulbasaur"}]})
-    clazz = Pokemon(bot)
     results = await clazz.pokemon_name_autocomplete(None, "pik")
     assert len(results) == 1
     assert results[0].name == "pikachu"
 
 
-async def test_autocomplete_short_input_returns_empty(bot):
-    clazz = Pokemon(bot)
+async def test_autocomplete_short_input_returns_empty(clazz):
     results = await clazz.pokemon_name_autocomplete(None, "pi")
     assert results == []
 
 
-async def test_autocomplete_max_25_results(bot, responses):
+async def test_autocomplete_max_25_results(clazz, responses):
     responses.add(responses.GET, f"{SPECIES_API}?limit=1", json={"count": 30})
     names = [{"name": f"pokemon{i}"} for i in range(30)]
     responses.add(responses.GET, f"{SPECIES_API}?limit=30", json={"results": names})
-    clazz = Pokemon(bot)
     results = await clazz.pokemon_name_autocomplete(None, "pok")
     assert len(results) == 25
 

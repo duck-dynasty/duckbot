@@ -7,7 +7,7 @@ from .item import Item
 
 
 class Rates:
-    def __init__(self, rates: dict[Item, float] = dict()):
+    def __init__(self, rates: dict[Item, float] = {}):
         self.rates = dict(rates)
 
     def items(self):
@@ -28,7 +28,7 @@ class Rates:
     def singleton_rate(self) -> float:
         if len(self.rates) != 1:
             raise AssertionError(f"{self} is not a singleton")
-        return next(x for x in self.items())[1]
+        return next(iter(self.items()))[1]
 
     def __bool__(self) -> bool:
         return bool(self.rates)
@@ -37,7 +37,7 @@ class Rates:
         if not isinstance(rhs, Rates) or set(self.rates.keys()) != set(rhs.rates.keys()):
             return False
         else:
-            return all([isclose(l, rhs.rates[i]) for i, l in self.items()])
+            return all(isclose(l, rhs.rates[i]) for i, l in self.items())
 
     def __add__(self, rates: Rates) -> Rates:
         return Rates(self.rates | rates.rates)
@@ -46,7 +46,7 @@ class Rates:
         return (self, output)
 
     def __mul__(self, scale_factor: float) -> Rates:
-        return Rates(dict((i, r * scale_factor) for i, r in self.items()))
+        return Rates({i: r * scale_factor for i, r in self.items()})
 
     def __str__(self) -> str:
         return f"Rates({str(self.rates)})"

@@ -30,12 +30,12 @@ def factory(*, input: Rates, target: Rates = Rates(), maximize: Set[Item] = set(
 
 
 def test_optimize_empty_factory_returns_empty():
-    assert optimize(factory(input=Rates())) == dict()
+    assert optimize(factory(input=Rates())) == {}
 
 
 def test_optimize_trivial_factory_returns_empty():
     rates = Item.IronOre * 30
-    assert optimize(factory(input=rates, target=rates)) == dict()
+    assert optimize(factory(input=rates, target=rates)) == {}
 
 
 def test_optimize_infeasible_returns_none():
@@ -46,47 +46,47 @@ def test_optimize_infeasible_returns_none():
 def test_optimize_simple_factory_target_returns_recipe():
     f = factory(input=Item.IronOre * 30, target=Item.IronIngot * 30, recipes=default_with_raw)
     recipe = recipe_by_name("IronIngot")
-    assert optimize(f) == dict([(recipe, approx(1))])
+    assert optimize(f) == {recipe: approx(1)}
 
 
 def test_optimize_simple_factory_maximize_returns_recipe():
-    f = factory(input=Item.IronOre * 30, maximize=set([Item.IronIngot]), recipes=default_no_raw)
+    f = factory(input=Item.IronOre * 30, maximize={Item.IronIngot}, recipes=default_no_raw)
     recipe = recipe_by_name("IronIngot")
-    assert optimize(f) == dict([(recipe, approx(1))])
+    assert optimize(f) == {recipe: approx(1)}
 
 
 def test_optimize_simple_sloop_target_returns_recipe():
     f = factory(input=Item.IronOre * 30, target=Item.IronIngot * 60, sloops=1, recipes=default_no_raw)
     recipe = recipe_by_name("IronIngot", sloops=1)
-    assert optimize(f) == dict([(recipe, approx(1))])
+    assert optimize(f) == {recipe: approx(1)}
 
 
 def test_optimize_simple_sloop_maximize_returns_recipe():
-    f = factory(input=Item.IronOre * 30, maximize=set([Item.IronIngot]), sloops=1, recipes=default_no_raw)
+    f = factory(input=Item.IronOre * 30, maximize={Item.IronIngot}, sloops=1, recipes=default_no_raw)
     recipe = recipe_by_name("IronIngot", sloops=1)
-    assert optimize(f) == dict([(recipe, approx(1))])
+    assert optimize(f) == {recipe: approx(1)}
 
 
 def test_optimize_limit_recipe():
-    f = factory(input=Item.IronOre * 30 + Item.Water * 1000, maximize=set([Item.IronIngot]), recipes=all_no_raw, limits={recipe_by_name("PureIronIngot"): 0.5})
+    f = factory(input=Item.IronOre * 30 + Item.Water * 1000, maximize={Item.IronIngot}, recipes=all_no_raw, limits={recipe_by_name("PureIronIngot"): 0.5})
     pure = recipe_by_name("PureIronIngot")
     smelt = recipe_by_name("IronIngot")
-    assert optimize(f) == dict([(pure, approx(0.5)), (smelt, approx(0.41666))])
+    assert optimize(f) == {pure: approx(0.5), smelt: approx(0.41666)}
 
 
 def test_optimize_limit_boosted_recipe():
-    f = factory(input=Item.IronOre * 30 + Item.Water * 1000, maximize=set([Item.IronIngot]), recipes=default_no_raw, limits={recipe_by_name("PureIronIngot", 1, 2): 0.5}, power_shards=10, sloops=2)
+    f = factory(input=Item.IronOre * 30 + Item.Water * 1000, maximize={Item.IronIngot}, recipes=default_no_raw, limits={recipe_by_name("PureIronIngot", 1, 2): 0.5}, power_shards=10, sloops=2)
     pure = recipe_by_name("PureIronIngot")
     pure_slooped = recipe_by_name("PureIronIngot", 1, 2)
     f.recipes = f.recipes + [pure, pure_slooped]  # exclude other pure irons so it's forced to use unslooped
-    assert optimize(f) == dict([(pure_slooped, approx(0.5)), (pure, approx(3.75 / 35))])
+    assert optimize(f) == {pure_slooped: approx(0.5), pure: approx(3.75 / 35)}
 
 
 def test_optimize_create_resources_returns_target():
     f = factory(input=Rates(), target=Item.IronIngot * 30, recipes=default_with_raw)
     ore = recipe_by_name("IronOre")
     ingot = recipe_by_name("IronIngot")
-    assert optimize(f) == dict([(ore, approx(0.5)), (ingot, approx(1))])
+    assert optimize(f) == {ore: approx(0.5), ingot: approx(1)}
 
 
 def test_optimize_create_resources_minimal_inputs_used():
@@ -96,15 +96,13 @@ def test_optimize_create_resources_minimal_inputs_used():
     wire = recipe_by_name("IronWire")
     plate = recipe_by_name("IronPlate")
     super_plate = recipe_by_name("StitchedIronPlate")
-    assert optimize(f) == dict(
-        [
-            (ore, approx(48.958 / 60.0)),
-            (ingot, approx(48.958 / 30.0)),
-            (wire, approx(1.0 + 2.0 / 3.0)),
-            (plate, approx(18.75 / 20.0)),
-            (super_plate, approx(1)),
-        ]
-    )
+    assert optimize(f) == {
+        ore: approx(48.958 / 60.0),
+        ingot: approx(48.958 / 30.0),
+        wire: approx(1.0 + 2.0 / 3.0),
+        plate: approx(18.75 / 20.0),
+        super_plate: approx(1),
+    }
 
 
 def test_optimize_create_resources_with_inputs_minimizes_inputs_used():
@@ -112,13 +110,11 @@ def test_optimize_create_resources_with_inputs_minimizes_inputs_used():
     ore = recipe_by_name(Item.IronOre)
     ingot = recipe_by_name(Item.IronIngot)
     plate = recipe_by_name(Item.IronPlate)
-    assert optimize(f) == dict(
-        [
-            (ore, approx(30.0 / 60.0)),
-            (ingot, approx(1.0)),
-            (plate, approx(2.0)),
-        ]
-    )
+    assert optimize(f) == {
+        ore: approx(30.0 / 60.0),
+        ingot: approx(1.0),
+        plate: approx(2.0),
+    }
 
 
 def test_optimize_create_resources_with_inputs_issue_995():
@@ -143,74 +139,70 @@ def test_optimize_create_cheap_resources_with_inputs():
 
 
 def test_optimize_maximize_oversupplied_minimizes_inputs_used():
-    f = factory(input=Item.Coal * 120 + Item.IronOre * 120 + Item.Limestone * 270, maximize=set([Item.EncasedIndustrialBeam]), recipes=all_no_raw)
+    f = factory(input=Item.Coal * 120 + Item.IronOre * 120 + Item.Limestone * 270, maximize={Item.EncasedIndustrialBeam}, recipes=all_no_raw)
     ingot = recipe_by_name("IronIngot")
     steel = recipe_by_name("SolidSteelIngot")
     concrete = recipe_by_name("Concrete")
     pipe = recipe_by_name("SteelPipe")
     butter = recipe_by_name("EncasedIndustrialPipe")
-    assert optimize(f) == dict(
-        [
-            (concrete, approx(6)),
-            (ingot, approx(3.6)),
-            (pipe, approx(5.4)),
-            (butter, approx(4.5)),
-            (steel, approx(2.7)),
-        ]
-    )
+    assert optimize(f) == {
+        concrete: approx(6),
+        ingot: approx(3.6),
+        pipe: approx(5.4),
+        butter: approx(4.5),
+        steel: approx(2.7),
+    }
 
 
 def test_optimize_two_step_returns_chain():
-    f = factory(input=Item.IronOre * 30, maximize=set([Item.IronPlate]), recipes=default_no_raw)
+    f = factory(input=Item.IronOre * 30, maximize={Item.IronPlate}, recipes=default_no_raw)
     ignot = recipe_by_name("IronIngot")
     plate = recipe_by_name("IronPlate")
-    assert optimize(f) == dict([(ignot, approx(1)), (plate, approx(1))])
+    assert optimize(f) == {ignot: approx(1), plate: approx(1)}
 
 
 def test_optimize_two_step_single_sloop_returns_chain():
-    f = factory(input=Item.IronOre * 30, maximize=set([Item.IronPlate]), sloops=1, recipes=default_no_raw)
+    f = factory(input=Item.IronOre * 30, maximize={Item.IronPlate}, sloops=1, recipes=default_no_raw)
     ignot = recipe_by_name("IronIngot")
     plate = recipe_by_name("IronPlate", sloops=1)
-    assert optimize(f) == dict([(ignot, approx(1)), (plate, approx(1))])
+    assert optimize(f) == {ignot: approx(1), plate: approx(1)}
 
 
 def test_optimize_two_step_many_sloop_returns_chain():
-    f = factory(input=Item.IronOre * 30, maximize=set([Item.IronPlate]), sloops=10, recipes=default_no_raw)
+    f = factory(input=Item.IronOre * 30, maximize={Item.IronPlate}, sloops=10, recipes=default_no_raw)
     ignot = recipe_by_name("IronIngot", sloops=1)
     plate = recipe_by_name("IronPlate", sloops=1)
-    assert optimize(f) == dict([(ignot, approx(1)), (plate, approx(2))])
+    assert optimize(f) == {ignot: approx(1), plate: approx(2)}
 
 
 def test_optimize_two_step_many_sloop_and_power_shards_returns_chain():
-    f = factory(input=Item.IronOre * 30, maximize=set([Item.IronPlate]), sloops=10, power_shards=10, recipes=default_no_raw)
+    f = factory(input=Item.IronOre * 30, maximize={Item.IronPlate}, sloops=10, power_shards=10, recipes=default_no_raw)
     ignot = recipe_by_name("IronIngot", sloops=1)
     plate = recipe_by_name("IronPlate", sloops=1, power_shards=2)
-    assert optimize(f) == dict([(ignot, approx(1)), (plate, approx(1))])
+    assert optimize(f) == {ignot: approx(1), plate: approx(1)}
 
 
 def test_optimize_fluid_excess_is_made_sinkable():
     f = factory(input=Item.CrudeOil * 30, target=Item.Plastic * 20, recipes=default_with_raw)
     plastic = recipe_by_name("Plastic")
     coke = recipe_by_name("PetroleumCoke")
-    assert optimize(f) == dict([(plastic, approx(1)), (coke, approx(0.25))])
+    assert optimize(f) == {plastic: approx(1), coke: approx(0.25)}
 
 
 def test_optimize_raw_resources_are_bound_by_map_limits():
-    f = factory(input=Rates(), maximize=set([Item.IronOre]), recipes=all())
+    f = factory(input=Rates(), maximize={Item.IronOre}, recipes=all())
     ore = recipe_by_name("IronOre")
     lime = recipe_by_name("Limestone")
     sam = recipe_by_name("Sam")
     reanimate = recipe_by_name("ReanimatedSam")
     convert = recipe_by_name("IronOre#Limestone")
-    assert optimize(f) == dict(
-        [
-            (ore, approx(92_100.0 / 60.0)),
-            (lime, approx(61_200.0 / 60.0)),
-            (sam, approx(10_200.0 / 60.0)),
-            (reanimate, approx(85)),
-            (convert, approx(255)),
-        ]
-    )
+    assert optimize(f) == {
+        ore: approx(92_100.0 / 60.0),
+        lime: approx(61_200.0 / 60.0),
+        sam: approx(10_200.0 / 60.0),
+        reanimate: approx(85),
+        convert: approx(255),
+    }
 
 
 def test_optimize_recycled_bois_returns_chain():
@@ -222,17 +214,15 @@ def test_optimize_recycled_bois_returns_chain():
     residual = recipe_by_name("ResidualRubber")
     plastic = recipe_by_name("RecycledPlastic")
     rubber = recipe_by_name("RecycledRubber")
-    assert optimize(f) == dict(
-        [
-            (goo, approx(0.9)),
-            (dilute, approx(1.2)),
-            (wudder, approx(1.2)),
-            (fuel, approx(1.2)),
-            (residual, approx(0.45)),
-            (plastic, approx(1.7)),
-            (rubber, approx(0.7)),
-        ]
-    )
+    assert optimize(f) == {
+        goo: approx(0.9),
+        dilute: approx(1.2),
+        wudder: approx(1.2),
+        fuel: approx(1.2),
+        residual: approx(0.45),
+        plastic: approx(1.7),
+        rubber: approx(0.7),
+    }
 
 
 def test_optimize_heavy_modular_frame_returns_chain():
@@ -248,21 +238,19 @@ def test_optimize_heavy_modular_frame_returns_chain():
     steel_pipe = recipe_by_name("SteelPipe")
     steel_rod = recipe_by_name("SteelRod")
     stitched_iron_plate = recipe_by_name("StitchedIronPlate")
-    assert optimize(f) == dict(
-        [
-            (concrete, approx(3.2)),
-            (encased_industrial_pipe, approx(1.6667)),
-            (heavy_encased_frame, approx(0.7111)),
-            (iron_ingot, approx(3.7926)),
-            (iron_wire, approx(2.3704)),
-            (modular_frame, approx(2.6667)),
-            (solid_steel_ingot, approx(1.8815)),
-            (steel_cast_plate, approx(0.5926)),
-            (steel_pipe, approx(3.2)),
-            (steel_rod, approx(0.6667)),
-            (stitched_iron_plate, approx(1.4222)),
-        ]
-    )
+    assert optimize(f) == {
+        concrete: approx(3.2),
+        encased_industrial_pipe: approx(1.6667),
+        heavy_encased_frame: approx(0.7111),
+        iron_ingot: approx(3.7926),
+        iron_wire: approx(2.3704),
+        modular_frame: approx(2.6667),
+        solid_steel_ingot: approx(1.8815),
+        steel_cast_plate: approx(0.5926),
+        steel_pipe: approx(3.2),
+        steel_rod: approx(0.6667),
+        stitched_iron_plate: approx(1.4222),
+    }
 
 
 def recipe_by_name(name: str | Item, power_shards: int = 0, sloops: int = 0) -> ModifiedRecipe:

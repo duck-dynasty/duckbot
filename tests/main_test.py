@@ -1,5 +1,3 @@
-from unittest.mock import call
-
 import pytest
 
 import duckbot.util.connection_test
@@ -31,6 +29,7 @@ def assert_extensions_loaded(bot_spy, additional_extensions=[]):
         "duckbot.logs",
         "duckbot.health",
         "duckbot.slash",
+        "duckbot.cogs.ai",
         "duckbot.cogs.announce_day",
         "duckbot.cogs.audio",
         "duckbot.cogs.corrections",
@@ -44,10 +43,13 @@ def assert_extensions_loaded(bot_spy, additional_extensions=[]):
         "duckbot.cogs.insights",
         "duckbot.cogs.math",
         "duckbot.cogs.messages",
+        "duckbot.cogs.playmarket",
         "duckbot.cogs.recipe",
         "duckbot.cogs.robot",
         "duckbot.cogs.text",
+        "duckbot.cogs.timer",
         "duckbot.cogs.tito",
         "duckbot.cogs.weather",
     ]
-    bot_spy.load_extension.assert_has_calls([call(x) for x in extensions + additional_extensions], any_order=True)
+    loaded = [c.args[0] for c in bot_spy.load_extension.call_args_list]
+    assert sorted(loaded) == sorted(extensions + additional_extensions)

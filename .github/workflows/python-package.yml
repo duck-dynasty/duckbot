@@ -13,7 +13,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Set up Python Environment
       id: venv
       uses: ./.github/actions/setup-python-venv
@@ -26,7 +26,7 @@ jobs:
         pytest --cov=duckbot --cov-branch --cov-report xml --cov-report term-missing:skip-covered
     - name: Report Code Coverage
       if: ${{ always() }}
-      uses: codecov/codecov-action@v6
+      uses: codecov/codecov-action@v7
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
 
@@ -38,7 +38,7 @@ jobs:
   sanity:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Test Connection to Discord
       run: |
         docker compose run --build --rm \
@@ -49,7 +49,7 @@ jobs:
   synthesize:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Set up CDK
       id: cdk
       uses: ./.github/actions/setup-aws-cdk
@@ -78,7 +78,7 @@ jobs:
           echo "::error::Deployments are disabled between 10pm and 7am. Retry later."
           exit 1
         fi
-    - uses: actions/checkout@v6
+    - uses: actions/checkout@v7
     - name: Build and Push Docker Image
       id: image
       uses: ./.github/actions/build-push-docker-image
@@ -99,7 +99,7 @@ jobs:
       uses: ./.github/actions/setup-aws-cdk
 
     - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v6.1.0
+      uses: aws-actions/configure-aws-credentials@v6.2.1
       with:
         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

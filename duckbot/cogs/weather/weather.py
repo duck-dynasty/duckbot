@@ -36,18 +36,15 @@ class Weather(commands.Cog):
 
     @commands.hybrid_group(name="weather", invoke_without_command=True)
     async def weather_command(self, context: commands.Context, city: Optional[str] = None, country: Optional[str] = None, index: Optional[int] = None):
-        await self.weather_get_command(context, city, country, index)
+        await self.weather(context, city, country, index)
 
     @weather_command.command(name="get", description="Gives weather information for your default location or the provided city.")
-    async def weather_get_command(self, context: commands.Context, city: Optional[str] = None, country: Optional[str] = None, index: Optional[int] = None):
+    async def weather(self, context: commands.Context, city: Optional[str] = None, country: Optional[str] = None, index: Optional[int] = None) -> None:
         """
         :param city: The city name to get the weather for.
         :param country: The two letter country code (eg CA for Canada), or two letter US state code.
         :param index: Index to disambiguate city when city/country are not enough.
         """
-        await self.weather(context, city, country, index)
-
-    async def weather(self, context: commands.Context, city: Optional[str], country: Optional[str], index: Optional[int]) -> None:
         async with context.typing():
             try:
                 return await self.send_weather(context, city, country, index)
@@ -56,15 +53,12 @@ class Weather(commands.Cog):
                 raise e
 
     @weather_command.command(name="set", description="Updates your default location for /weather get")
-    async def weather_set_command(self, context: commands.Context, city: Optional[str] = None, country: Optional[str] = None, index: Optional[int] = None):
+    async def set_default_location(self, context: commands.Context, city: Optional[str] = None, country: Optional[str] = None, index: Optional[int] = None) -> None:
         """
         :param city: The city name to get the weather for.
         :param country: The two letter country code (eg CA for Canada), or two letter US state code.
         :param index: Index to disambiguate city when city/country are not enough.
         """
-        await self.set_default_location(context, city, country, index)
-
-    async def set_default_location(self, context: commands.Context, city: Optional[str], country: Optional[str], index: Optional[int]) -> None:
         location = await self.search_location(context, city, country, index)
         if location is not None:
             saved_location = SavedLocation(id=context.author.id, name=location.name, country=location.country, latitude=location.lat, longitude=location.lon)
@@ -189,4 +183,5 @@ class Weather(commands.Cog):
         plt.setp(left_axis.get_xticklabels(), rotation=30, horizontalalignment="right")
         figure.tight_layout()
         plt.savefig("weather.png", facecolor="ghostwhite")
+        plt.close(figure)
         return "weather.png"

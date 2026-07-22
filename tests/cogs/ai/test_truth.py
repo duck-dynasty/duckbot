@@ -6,19 +6,20 @@ import pytest
 from discord.ext import commands
 
 from duckbot.cogs.ai import Truth
+from tests.discord_test_ext import bind_commands
 
 
 @pytest.fixture
-@mock.patch("anthropic.Anthropic")
-def mock_ai_client(mock_anthropic):
-    instance = mock_anthropic.return_value
-    instance.messages.create.return_value = mock.Mock(content=[mock.Mock(text="Fact-checked response.")])
+@mock.patch("groq.Groq")
+def mock_ai_client(mock_groq):
+    instance = mock_groq.return_value
+    instance.chat.completions.create.return_value = mock.Mock(choices=[mock.Mock(message=mock.Mock(content="Fact-checked response."))])
     return instance
 
 
 @pytest.fixture
 def truth(bot, mock_ai_client):
-    clazz = Truth(bot)
+    clazz = bind_commands(Truth(bot))
     clazz._ai_client = mock_ai_client
     return clazz
 
@@ -65,7 +66,7 @@ async def mock_get_message_reference():
 
 
 def test_create_client(bot, monkeypatch):
-    monkeypatch.setenv("ANTHROPIC_API_KEY", "fake_key")
+    monkeypatch.setenv("GROQ_API_KEY", "fake_key")
     clazz = Truth(bot)
     assert clazz._ai_client is None
     assert clazz.ai_client == clazz._ai_client
@@ -83,13 +84,13 @@ async def test_fact_check_response(truth, message):
 
 
 async def test_fact_check_exception(truth, message):
-    truth.ai_client.messages.create.side_effect = Exception("we ran out of GPUs")
+    truth.ai_client.chat.completions.create.side_effect = Exception("we ran out of GPUs")
     response = await truth.fact_check(message)
     assert response == "The robot uprising has been postponed due to the following error: we ran out of GPUs"
 
 
 async def test_truth_no_reference(truth, ctx):
-    await truth.truth.callback(truth, ctx)
+    await truth.truth(ctx)
     ctx.send.assert_called_once_with("⚠️ Please use this command as a reply to the message you want to fact-check. For example:\n`Reply to a message → !truth`")
 
 
@@ -104,7 +105,7 @@ async def test_truth_with_reference(truth, ctx):
 
     # Mock get_message_reference directly with the referenced message
     with mock.patch("duckbot.cogs.ai.truth.get_message_reference", new=mock.AsyncMock(return_value=referenced_message)):
-        await truth.truth.callback(truth, ctx)
+        await truth.truth(ctx)
 
     # Verify only that the referenced message got the reply
     referenced_message.reply.assert_called_once_with("Fact-checked response.")
@@ -122,6 +123,6 @@ async def test_fact_check_uses_edited_timestamp_when_available(truth):
     await truth.fact_check(message)
 
     # Verify the AI client was called with the edited date
-    call_args = truth.ai_client.messages.create.call_args
-    prompt_text = call_args.kwargs["messages"][0]["content"][0]["text"]
+    call_args = truth.ai_client.chat.completions.create.call_args
+    prompt_text = call_args.kwargs["messages"][0]["content"]
     assert "January 16, 2024" in prompt_text  # Should use edited date, not created date

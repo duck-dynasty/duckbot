@@ -16,7 +16,7 @@ def intents() -> Intents:
 
 class DuckBot(commands.Bot):
     def __init__(self):
-        super().__init__(command_prefix="!", help_command=None, intents=intents())
+        super().__init__(command_prefix="!", help_command=None, intents=intents(), max_messages=100)
 
     async def setup_hook(self):
         print("DuckBot online")

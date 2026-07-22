@@ -8,6 +8,8 @@ from discord import Interaction
 from discord.app_commands import Choice
 from discord.ext import commands
 
+from duckbot.util.datetime import now
+
 ANCHOR_DATE = date(2020, 12, 3)
 POTD_SEED = 80081355
 
@@ -54,13 +56,10 @@ class Pokemon(commands.Cog):
         return self._pokemon_names
 
     @commands.hybrid_command(name="pokemon", description="Show a Pokemon by name or ID. No args gives the Pokemon of the Day.")
-    async def pokemon_command(self, context: commands.Context, *, name_or_id: Optional[str] = None):
+    async def pokemon(self, context: commands.Context, *, name_or_id: Optional[str] = None):
         """
         :param name_or_id: The name or ID of the Pokemon to show.
         """
-        await self.pokemon(context, name_or_id)
-
-    async def pokemon(self, context: commands.Context, name_or_id: Optional[str]):
         async with context.typing():
             try:
                 if name_or_id is not None:
@@ -81,7 +80,7 @@ class Pokemon(commands.Cog):
         ids = list(range(1, n + 1))
         rng = random.Random(POTD_SEED)
         rng.shuffle(ids)
-        days_since_anchor = (date.today() - ANCHOR_DATE).days
+        days_since_anchor = (now().date() - ANCHOR_DATE).days
         return ids[days_since_anchor % n]
 
     def get_pokemon(self, name_or_id: str) -> dict:
@@ -154,7 +153,7 @@ class Pokemon(commands.Cog):
 
         return embed
 
-    @pokemon_command.autocomplete("name_or_id")
+    @pokemon.autocomplete("name_or_id")
     async def pokemon_name_autocomplete(self, interaction: Interaction, current: str) -> List[Choice[str]]:
         if len(current) < 3:
             return []
