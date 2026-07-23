@@ -5,7 +5,7 @@ RUN python -m venv $VIRTUAL_ENV
 ENV PATH "$VIRTUAL_ENV/bin:$PATH"
 WORKDIR /pip-dependencies
 # install openblas for numpy (matplotlib dependency)
-RUN apt-get update && apt-get -y install \
+RUN apt-get update && apt-get -y install --no-install-recommends \
     libopenblas-dev \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
 COPY scripts/ ./scripts
@@ -19,7 +19,7 @@ FROM python:3.13-slim AS prod
 # libopenblas-dev: matplotlib dependencies
 # fortune/cowsay: for !fortune command
 # graphviz: for /satisfy solution graph rendering
-RUN apt-get update && apt-get -y install \
+RUN apt-get update && apt-get -y install --no-install-recommends \
     ffmpeg \
     libpq-dev \
     libopenblas-dev \
