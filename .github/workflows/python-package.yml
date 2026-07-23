@@ -39,9 +39,37 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v7
+    - name: Build Image
+      id: build
+      run: docker compose build duckbot
+    - name: Verify fortune
+      if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+      run: docker run --rm --entrypoint fortune duckdynasty/duckbot:latest -a
+    - name: Verify cowsay
+      if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+      run: docker run --rm --entrypoint cowsay duckdynasty/duckbot:latest moo
+    - name: Verify ffmpeg
+      if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+      run: docker run --rm --entrypoint ffmpeg duckdynasty/duckbot:latest -version
+    - name: Verify fortune command
+      if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+      run: docker run --rm --entrypoint sh duckdynasty/duckbot:latest -ec 'fortune -a | cowsay -f "$(ls /usr/share/cowsay/cows/ | shuf -n1)"'
+    - name: Verify duckbot imports
+      if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+      run: docker run --rm --entrypoint python duckdynasty/duckbot:latest -c 'import duckbot'
+    - name: Verify graphviz
+      if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+      run: docker run --rm --entrypoint python duckdynasty/duckbot:latest -c 'from duckbot.cogs.games.satisfy.graph import solution_graph; assert solution_graph({}).getbuffer().nbytes > 0'
+    - name: Verify matplotlib
+      if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+      run: docker run --rm --entrypoint python duckdynasty/duckbot:latest -c 'import io, matplotlib; matplotlib.use("Agg"); import matplotlib.pyplot as plt; fig, ax = plt.subplots(); ax.plot([0, 1, 2], [2, 1, 0]); buf = io.BytesIO(); fig.savefig(buf, format="png"); assert buf.getbuffer().nbytes > 0'
+    - name: Verify mip
+      if: ${{ !cancelled() && steps.build.outcome == 'success' }}
+      run: docker run --rm --entrypoint python duckdynasty/duckbot:latest -c 'from mip import Model, maximize, INTEGER, OptimizationStatus as S; m = Model(); x = m.add_var(var_type=INTEGER); m.objective = maximize(x); m += x <= 3; assert m.optimize() == S.OPTIMAL and round(x.x) == 3'
     - name: Test Connection to Discord
+      if: ${{ !cancelled() && steps.build.outcome == 'success' }}
       run: |
-        docker compose run --build --rm \
+        docker compose run --rm \
           -e 'CONNECTION_TEST=true' \
           -e "DISCORD_TOKEN=$(cat .github/workflows/test-token.txt | base64 --decode)" \
           duckbot
