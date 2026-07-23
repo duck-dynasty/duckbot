@@ -1,4 +1,4 @@
-name: Set Up AWK Cloud Development Kit (CDK)
+name: Set Up AWS Cloud Development Kit (CDK)
 description: installs dependencies to be able to run cdk
 
 outputs:
@@ -21,7 +21,7 @@ runs:
   - name: Set up Node.js
     uses: actions/setup-node@v6
     with:
-      node-version: 20.x
+      node-version: 24.x
 
   - name: Install CDK
     shell: bash
