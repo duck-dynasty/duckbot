@@ -54,7 +54,7 @@ class WhoCanItBeNow(commands.Cog):
             play_count += 1
             await asyncio.sleep(0)  # give up timeslice for `trigger_next_song`
             await self.stream.wait()
-        if self.streaming and not play_count < 75:
+        if self.streaming and play_count >= 75:
             await self.stop()
 
     def trigger_next_song(self, error=None):

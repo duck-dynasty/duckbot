@@ -1,3 +1,5 @@
+import asyncio
+
 import requests
 from discord import ChannelType
 from discord.ext import commands, tasks
@@ -18,7 +20,8 @@ class OfficeHours(commands.Cog):
         await self.check_if_streaming()
 
     async def check_if_streaming(self):
-        page = requests.get("https://www.twitch.tv/conlabx", timeout=(3.05, 27)).text
+        response = await asyncio.to_thread(requests.get, "https://www.twitch.tv/conlabx", timeout=(3.05, 27))
+        page = response.text
         streaming = "isLiveBroadcast" in page
         if streaming != self.streaming:
             self.streaming = streaming
