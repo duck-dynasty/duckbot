@@ -1,33 +1,34 @@
 ## Command Overview
 
-|              Command              | Summary                                            |
-| :-------------------------------: | -------------------------------------------------- |
-|             `!8ball`              | get a magic eight ball style fortune               |
-|             `!ascii`              | renders text as ascii art                          |
-|     [`!calc`](#wolfram-alpha)     | search for something on wolfram alpha              |
-|              `!coin`              | flips a coin in real life                          |
-|   [`!day`](#day-announcements)    | announces the current day of the week              |
-|     [`!define`](#definitions)     | define a word                                      |
-|              `!dog`               | displays a random dog photo                        |
-|              `!duck`              | gives a link to this repo                          |
-| [`!epic`](Events#epic-free-games) | show the free games of the week on epic            |
-|            `!fortune`             | get a random fortune told to you by a cow          |
-| [`!friend-facts`](#friend-facts)  | post last month's server stats report              |
-|        `!help` or `!wiki`         | gives a link to this wiki                          |
-|              `!lmgt`              | generates a google search link for the given query |
-|  [`/market`](Prediction-Market)   | bet on prediction markets, balances, leaderboard   |
-|              `!meme`              | reposts a random meme from the memes channel       |
-|              `!mock`              | converts text into MoCkInG tExT                    |
-|      [`!pokemon`](#pokemon)       | gives information about pokemon                    |
-|    [`!recipe`](#recipe-search)    | search for a random recipe                         |
-|         [`!roll`](#dice)          | rolls Dungeons and Dragons style dice              |
-|    [`!start`, `!stop`](#music)    | start or stop playing music                        |
-|        [`!timer`](#timer)         | set a timer, get pinged when it ends               |
-|        [`!truth`](#truth)         | fact checks a message when used in a reply         |
-|      [`!weather`](#weather)       | retrieve weather information                       |
-| [`/satisfy`](Satisfactory-Solver) | produce a factory for _Satisfactory_               |
-|  [`/grass-stats`](#touch-grass)   | show activity leaderboard for the last hour        |
-|  [`!yolo`](#yolo-pull-requests)   | list open pull requests in this repo               |
+|               Command               | Summary                                            |
+| :---------------------------------: | -------------------------------------------------- |
+|              `!8ball`               | get a magic eight ball style fortune               |
+|              `!ascii`               | renders text as ascii art                          |
+|      [`!calc`](#wolfram-alpha)      | search for something on wolfram alpha              |
+|               `!coin`               | flips a coin in real life                          |
+|    [`!day`](#day-announcements)     | announces the current day of the week              |
+|      [`!define`](#definitions)      | define a word                                      |
+|               `!dog`                | displays a random dog photo                        |
+|               `!duck`               | gives a link to this repo                          |
+|  [`!epic`](Events#epic-free-games)  | show the free games of the week on epic            |
+|             `!fortune`              | get a random fortune told to you by a cow          |
+|  [`!friend-facts`](#friend-facts)   | post last month's server stats report              |
+|         `!help` or `!wiki`          | gives a link to this wiki                          |
+|               `!lmgt`               | generates a google search link for the given query |
+|   [`/market`](Prediction-Market)    | bet on prediction markets, balances, leaderboard   |
+|               `!meme`               | reposts a random meme from the memes channel       |
+|               `!mock`               | converts text into MoCkInG tExT                    |
+| [`!pg`](#database-dump-and-restore) | dump or restore the bot's database                 |
+|       [`!pokemon`](#pokemon)        | gives information about pokemon                    |
+|     [`!recipe`](#recipe-search)     | search for a random recipe                         |
+|          [`!roll`](#dice)           | rolls Dungeons and Dragons style dice              |
+|     [`!start`, `!stop`](#music)     | start or stop playing music                        |
+|         [`!timer`](#timer)          | set a timer, get pinged when it ends               |
+|         [`!truth`](#truth)          | fact checks a message when used in a reply         |
+|       [`!weather`](#weather)        | retrieve weather information                       |
+|  [`/satisfy`](Satisfactory-Solver)  | produce a factory for _Satisfactory_               |
+|   [`/grass-stats`](#touch-grass)    | show activity leaderboard for the last hour        |
+|   [`!yolo`](#yolo-pull-requests)    | list open pull requests in this repo               |
 
 ## Wolfram Alpha
 
@@ -137,6 +138,18 @@ Here's an example usage:
 DuckBot monitors message activity and will tell you to touch grass if you're sending too many messages. During work hours (Mon-Fri 8am-6pm EDT / 12pm-10pm UTC) the threshold is 40 messages per hour; outside work hours it's 120 messages per hour. Notifications have a 1-hour cooldown per user.
 
 Use `/grass-stats` to see the activity leaderboard showing message counts for all tracked users in the last 60 minutes.
+
+## Database Dump and Restore
+
+The bot owner or one of the repository owners can back up DuckBot's database with `!pg dump`. DuckBot sends the gzipped dump to you in a direct message rather than posting it in the channel, since it holds everyone's saved weather locations.
+
+> Human: !pg dump\
+> DuckBot: Sent it to your DMs, brother.
+
+Attach a dump to `!pg restore` to load it back in. This drops whatever is in the database and replaces it with the contents of the dump.
+
+> Human: !pg restore (+duckbot.sql.gz)\
+> DuckBot: Restored, brother.
 
 ## Yolo Pull Requests
 

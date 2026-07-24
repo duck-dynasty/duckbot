@@ -16,12 +16,14 @@ RUN setup_nltk
 FROM python:3.13-slim AS prod
 # ffmpeg: for discord audio
 # libpq-dev: postgres client libraries
+# postgresql-client: pg_dump/psql for !pg dump and !pg restore; keep the server pinned to the same major
 # libopenblas-dev: matplotlib dependencies
 # fortune/cowsay: for !fortune command
 # graphviz: for /satisfy solution graph rendering
 RUN apt-get update && apt-get -y install --no-install-recommends \
     ffmpeg \
     libpq-dev \
+    postgresql-client \
     libopenblas-dev \
     fortune-mod fortunes cowsay \
     graphviz \
