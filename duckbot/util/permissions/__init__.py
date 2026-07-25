@@ -1,1 +1,1 @@
-from .is_repository_admin import is_repository_admin
+from .is_repository_admin import REPOSITORY_ADMINS, is_repository_admin
