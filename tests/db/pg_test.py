@@ -4,6 +4,7 @@ from unittest import mock
 
 import discord
 import pytest
+from discord.ext import commands
 from sqlalchemy.engine import make_url
 
 from duckbot.db.pg import Pg
@@ -26,13 +27,13 @@ def attachment(autospec) -> discord.Attachment:
     return a
 
 
-def completed(returncode: int = 0, stdout: bytes = b"", stderr: bytes = b"") -> subprocess.CompletedProcess:
-    return subprocess.CompletedProcess(args=[], returncode=returncode, stdout=stdout, stderr=stderr)
+def completed(stdout: bytes = b"") -> subprocess.CompletedProcess:
+    return subprocess.CompletedProcess(args=[], returncode=0, stdout=stdout)
 
 
-async def test_pg_without_subcommand(clazz, context):
+async def test_pg_without_subcommand_does_nothing(clazz, context):
     await clazz.pg(context)
-    context.send.assert_called_once_with("`!pg dump`, or `!pg restore` with the dump attached, brother.")
+    context.send.assert_not_called()
 
 
 @mock.patch("duckbot.db.pg.subprocess.run")
@@ -40,6 +41,7 @@ async def test_dump_runs_pg_dump_against_the_bot_database(run, clazz, context):
     run.return_value = completed(stdout=b"-- dump")
     await clazz.dump(context)
     assert run.call_args.args[0] == ["pg_dump", "--clean", "--if-exists"] + ARGS
+    assert run.call_args.kwargs["check"] is True
     assert run.call_args.kwargs["env"]["PGPASSWORD"] == "pond"
 
 
@@ -51,14 +53,6 @@ async def test_dump_sends_archive_to_author(run, clazz, context):
     assert archive.filename == "duckbot.sql.gz"
     assert gzip.decompress(archive.fp.read()) == b"-- dump"
     context.send.assert_called_once_with("Sent it to your DMs, brother.")
-
-
-@mock.patch("duckbot.db.pg.subprocess.run")
-async def test_dump_failed(run, clazz, context):
-    run.return_value = completed(returncode=1, stderr=b"could not connect\n")
-    await clazz.dump(context)
-    context.author.send.assert_not_called()
-    context.send.assert_called_once_with("`pg_dump` fell over, brother:\n```could not connect```")
 
 
 async def test_restore_without_attachment(clazz, context):
@@ -87,9 +81,12 @@ async def test_restore_gunzips_archive(run, clazz, context, attachment):
     assert run.call_args.kwargs["input"] == b"-- dump"
 
 
-@mock.patch("duckbot.db.pg.subprocess.run")
-async def test_restore_failed(run, clazz, context, attachment):
-    run.return_value = completed(returncode=1, stderr=b"syntax error\n")
-    context.message.attachments = [attachment]
-    await clazz.restore(context)
-    context.send.assert_called_once_with("`psql` fell over, brother:\n```syntax error```")
+async def test_on_error_reports_subprocess_failure(clazz, context):
+    failure = subprocess.CalledProcessError(1, ["pg_dump"], stderr=b"could not connect\n")
+    await clazz.on_error(context, commands.CommandInvokeError(failure))
+    context.send.assert_called_once_with("`pg_dump` fell over, brother:\n```could not connect```")
+
+
+async def test_on_error_ignores_other_errors(clazz, context):
+    await clazz.on_error(context, commands.MissingPermissions(["repository admin"]))
+    context.send.assert_not_called()

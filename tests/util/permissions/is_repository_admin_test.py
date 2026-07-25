@@ -3,7 +3,7 @@ from unittest import mock
 import pytest
 from discord.ext import commands
 
-from duckbot.cogs.github.yolo_merge import is_repository_admin
+from duckbot.util.permissions import is_repository_admin
 
 
 @mock.patch("discord.ext.commands.Context")
