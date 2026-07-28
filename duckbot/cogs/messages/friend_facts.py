@@ -150,34 +150,37 @@ class FriendFacts(commands.Cog):
             lines.append(f"{(await self.display_name(guild, user_id))[:24]:<24} {user.messages:>8}")
         lines.append("```")
         lines.append(f":pencil: {sum(u.messages for u in stats.values()):,} messages across {channels} channels")
-        lines += await self.awards(guild, stats)
+        lines += self.awards(stats)
         lines.append(f":crescent_moon: Busiest hour: {self.hour_name(hours.index(max(hours)))} · Busiest day: {calendar.day_name[days.index(max(days))]}")
         return "\n".join(lines)
 
-    async def awards(self, guild, stats):
+    def awards(self, stats):
         lines = []
         regulars = {k: v for k, v in stats.items() if v.messages >= MIN_MESSAGES_FOR_AWARD}
         if regulars:
             user_id, user = max(regulars.items(), key=lambda x: x[1].capital_starts / x[1].messages)
-            lines.append(f":tophat: Grammar Police: {await self.display_name(guild, user_id)} — {100 * user.capital_starts // user.messages}% of messages start with a capital")
+            lines.append(f":tophat: Grammar Police: {self.mention(user_id)} — {100 * user.capital_starts // user.messages}% of messages start with a capital")
             user_id, user = max(regulars.items(), key=lambda x: x[1].words / x[1].messages)
-            lines.append(f":books: Wordiest: {await self.display_name(guild, user_id)} — {user.words / user.messages:.1f} words per message")
+            lines.append(f":books: Wordiest: {self.mention(user_id)} — {user.words / user.messages:.1f} words per message")
             user_id, user = max(regulars.items(), key=lambda x: x[1].questions / x[1].messages)
-            lines.append(f":question: Most Inquisitive: {await self.display_name(guild, user_id)} — {100 * user.questions // user.messages}% of messages are questions")
-        lines += await self.count_award(guild, stats, "shouts", ":loudspeaker: Loudest: {name} — {count} ALL-CAPS messages")
-        lines += await self.count_award(guild, stats, "links", ":link: Chief Link Dumper: {name} — {count} links shared")
-        lines += await self.count_award(guild, stats, "golf", ":golf: Golf Fanatic: {name} — {count} golf mentions")
-        lines += await self.count_award(guild, stats, "weather", ":white_sun_small_cloud: Weather Obsessed: {name} — {count} weather checks")
-        lines += await self.count_award(guild, stats, "mentions", ":wave: Name Dropper: {name} — {count} people mentioned")
-        lines += await self.count_award(guild, stats, "attachments", ":camera: Paparazzi: {name} — {count} attachments sent")
-        lines += await self.count_award(guild, stats, "reactions_given", ":clap: Serial Reactor: {name} — {count} reactions added")
-        lines += await self.count_award(guild, stats, "reactions_received", ":star: Crowd Pleaser: {name} — {count} reactions received")
+            lines.append(f":question: Most Inquisitive: {self.mention(user_id)} — {100 * user.questions // user.messages}% of messages are questions")
+        lines += self.count_award(stats, "shouts", ":loudspeaker: Loudest: {name} — {count} ALL-CAPS messages")
+        lines += self.count_award(stats, "links", ":link: Chief Link Dumper: {name} — {count} links shared")
+        lines += self.count_award(stats, "golf", ":golf: Golf Fanatic: {name} — {count} golf mentions")
+        lines += self.count_award(stats, "weather", ":white_sun_small_cloud: Weather Obsessed: {name} — {count} weather checks")
+        lines += self.count_award(stats, "mentions", ":wave: Name Dropper: {name} — {count} people mentioned")
+        lines += self.count_award(stats, "attachments", ":camera: Paparazzi: {name} — {count} attachments sent")
+        lines += self.count_award(stats, "reactions_given", ":clap: Serial Reactor: {name} — {count} reactions added")
+        lines += self.count_award(stats, "reactions_received", ":star: Crowd Pleaser: {name} — {count} reactions received")
         return lines
 
-    async def count_award(self, guild, stats, attr, template):
+    def count_award(self, stats, attr, template):
         user_id, user = max(stats.items(), key=lambda x: getattr(x[1], attr))
         count = getattr(user, attr)
-        return [template.format(name=await self.display_name(guild, user_id), count=count)] if count else []
+        return [template.format(name=self.mention(user_id), count=count)] if count else []
+
+    def mention(self, user_id):
+        return f"<@{user_id}>"
 
     async def display_name(self, guild, user_id):
         user = await get_user(self.bot, user_id, guild)

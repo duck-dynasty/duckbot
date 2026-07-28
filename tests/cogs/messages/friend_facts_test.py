@@ -287,17 +287,17 @@ async def test_format_report_leaderboard_and_awards(get_user, clazz, guild):
     assert "**Friend Facts: June 2026**" in report
     assert report.index("user1 ") < report.index("user2 ")
     assert ":pencil: 80 messages across 4 channels" in report
-    assert "Grammar Police: user1 — 80% of messages start with a capital" in report
-    assert "Wordiest: user2 — 10.0 words per message" in report
-    assert "Most Inquisitive: user2 — 50% of messages are questions" in report
-    assert "Loudest: user1 — 3 ALL-CAPS messages" in report
-    assert "Chief Link Dumper: user1 — 7 links shared" in report
-    assert "Golf Fanatic: user1 — 12 golf mentions" in report
-    assert "Weather Obsessed: user2 — 9 weather checks" in report
-    assert "Name Dropper: user2 — 21 people mentioned" in report
-    assert "Paparazzi: user1 — 33 attachments sent" in report
-    assert "Serial Reactor: user2 — 17 reactions added" in report
-    assert "Crowd Pleaser: user1 — 64 reactions received" in report
+    assert "Grammar Police: <@1> — 80% of messages start with a capital" in report
+    assert "Wordiest: <@2> — 10.0 words per message" in report
+    assert "Most Inquisitive: <@2> — 50% of messages are questions" in report
+    assert "Loudest: <@1> — 3 ALL-CAPS messages" in report
+    assert "Chief Link Dumper: <@1> — 7 links shared" in report
+    assert "Golf Fanatic: <@1> — 12 golf mentions" in report
+    assert "Weather Obsessed: <@2> — 9 weather checks" in report
+    assert "Name Dropper: <@2> — 21 people mentioned" in report
+    assert "Paparazzi: <@1> — 33 attachments sent" in report
+    assert "Serial Reactor: <@2> — 17 reactions added" in report
+    assert "Crowd Pleaser: <@1> — 64 reactions received" in report
     assert "Busiest hour: 11pm · Busiest day: Saturday" in report
 
 
@@ -323,9 +323,9 @@ async def test_format_report_awards_require_minimum_messages(get_user, clazz, gu
     get_user.side_effect = lambda bot, user_id, guild: mock.Mock(display_name=f"user{user_id}")
     stats = {1: UserStats(messages=1, words=50, capital_starts=1, questions=1), 2: UserStats(messages=25, words=25, capital_starts=5, questions=5)}
     report = await clazz.format_report(guild, stats, [0] * 24, [0] * 7, 1, datetime.datetime(2026, 6, 1))
-    assert "Grammar Police: user2" in report
-    assert "Wordiest: user2" in report
-    assert "Most Inquisitive: user2" in report
+    assert "Grammar Police: <@2>" in report
+    assert "Wordiest: <@2>" in report
+    assert "Most Inquisitive: <@2>" in report
 
 
 @mock.patch("duckbot.cogs.messages.friend_facts.get_user")
