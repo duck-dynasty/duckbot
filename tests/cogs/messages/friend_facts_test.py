@@ -17,7 +17,7 @@ def clazz(bot) -> FriendFacts:
     return bind_commands(FriendFacts(bot))
 
 
-def make_message(content="hi", author_id=1, is_bot=False, created_at=datetime.datetime(2026, 6, 15, 18, 30, tzinfo=datetime.timezone.utc), mentions=[], reference=None, attachments=[]):
+def make_message(content="hi", author_id=1, is_bot=False, created_at=datetime.datetime(2026, 6, 15, 18, 30, tzinfo=datetime.timezone.utc), mentions=[], reference=None, attachments=[], reactions=[]):
     message = mock.Mock()
     message.author.id = author_id
     message.author.bot = is_bot
@@ -27,13 +27,21 @@ def make_message(content="hi", author_id=1, is_bot=False, created_at=datetime.da
     message.reference = reference
     message.interaction = None
     message.attachments = attachments
+    message.reactions = reactions
     return message
 
 
-def make_user(user_id):
+def make_user(user_id, is_bot=False):
     user = mock.Mock()
     user.id = user_id
+    user.bot = is_bot
     return user
+
+
+def make_reaction(*users):
+    reaction = mock.Mock()
+    reaction.users.return_value = list_as_async_generator(list(users))
+    return reaction
 
 
 def make_reply_to(author_id):
@@ -223,6 +231,34 @@ def test_tally_mentions_excludes_self_and_deleted_replies(clazz):
     assert stats[1].mentions == 0
 
 
+async def test_tally_reactions_credits_giver_and_receiver(clazz):
+    stats = {}
+    message = make_message(author_id=1, reactions=[make_reaction(make_user(2), make_user(3)), make_reaction(make_user(2))])
+    await clazz.tally_reactions(stats, message)
+    assert stats[1] == UserStats(reactions_received=3)
+    assert stats[2] == UserStats(reactions_given=2)
+    assert stats[3] == UserStats(reactions_given=1)
+
+
+async def test_tally_reactions_ignores_bot_reactors(clazz):
+    stats = {}
+    await clazz.tally_reactions(stats, make_message(author_id=1, reactions=[make_reaction(make_user(2, is_bot=True))]))
+    assert stats == {}
+
+
+async def test_tally_reactions_on_bot_messages_credits_only_the_giver(clazz):
+    stats = {}
+    await clazz.tally_reactions(stats, make_message(author_id=1, is_bot=True, reactions=[make_reaction(make_user(2))]))
+    assert stats == {2: UserStats(reactions_given=1)}
+
+
+async def test_gather_stats_counts_reactions(clazz, guild, text_channel):
+    guild.text_channels = [readable(text_channel, [make_message("hello", author_id=1, reactions=[make_reaction(make_user(2))])])]
+    stats, _, _, _ = await clazz.gather_stats(guild, None, None)
+    assert stats[1] == UserStats(messages=1, words=1, reactions_received=1)
+    assert stats[2] == UserStats(reactions_given=1)
+
+
 def test_tally_buckets_hours_and_days_in_eastern_time(clazz):
     stats, hours, days = {}, [0] * 24, [0] * 7
     clazz.tally(stats, hours, days, make_message(created_at=datetime.datetime(2026, 6, 15, 18, 30, tzinfo=datetime.timezone.utc)))  # 2:30pm EDT, a Monday
@@ -240,8 +276,8 @@ async def test_format_report_empty_month(get_user, clazz, guild):
 async def test_format_report_leaderboard_and_awards(get_user, clazz, guild):
     get_user.side_effect = lambda bot, user_id, guild: mock.Mock(display_name=f"user{user_id}")
     stats = {
-        1: UserStats(messages=50, words=100, capital_starts=40, questions=5, shouts=3, links=7, golf=12, attachments=33),
-        2: UserStats(messages=30, words=300, capital_starts=6, questions=15, weather=9, mentions=21),
+        1: UserStats(messages=50, words=100, capital_starts=40, questions=5, shouts=3, links=7, golf=12, attachments=33, reactions_received=64),
+        2: UserStats(messages=30, words=300, capital_starts=6, questions=15, weather=9, mentions=21, reactions_given=17),
     }
     hours = [0] * 24
     hours[23] = 42
@@ -251,15 +287,17 @@ async def test_format_report_leaderboard_and_awards(get_user, clazz, guild):
     assert "**Friend Facts: June 2026**" in report
     assert report.index("user1 ") < report.index("user2 ")
     assert ":pencil: 80 messages across 4 channels" in report
-    assert "Grammar Police: user1 — 80% of messages start with a capital" in report
-    assert "Wordiest: user2 — 10.0 words per message" in report
-    assert "Most Inquisitive: user2 — 50% of messages are questions" in report
-    assert "Loudest: user1 — 3 ALL-CAPS messages" in report
-    assert "Chief Link Dumper: user1 — 7 links shared" in report
-    assert "Golf Fanatic: user1 — 12 golf mentions" in report
-    assert "Weather Obsessed: user2 — 9 weather checks" in report
-    assert "Name Dropper: user2 — 21 people mentioned" in report
-    assert "Paparazzi: user1 — 33 attachments sent" in report
+    assert "Grammar Police: <@1> — 80% of messages start with a capital" in report
+    assert "Wordiest: <@2> — 10.0 words per message" in report
+    assert "Most Inquisitive: <@2> — 50% of messages are questions" in report
+    assert "Loudest: <@1> — 3 ALL-CAPS messages" in report
+    assert "Chief Link Dumper: <@1> — 7 links shared" in report
+    assert "Golf Fanatic: <@1> — 12 golf mentions" in report
+    assert "Weather Obsessed: <@2> — 9 weather checks" in report
+    assert "Name Dropper: <@2> — 21 people mentioned" in report
+    assert "Paparazzi: <@1> — 33 attachments sent" in report
+    assert "Serial Reactor: <@2> — 17 reactions added" in report
+    assert "Crowd Pleaser: <@1> — 64 reactions received" in report
     assert "Busiest hour: 11pm · Busiest day: Saturday" in report
 
 
@@ -285,9 +323,9 @@ async def test_format_report_awards_require_minimum_messages(get_user, clazz, gu
     get_user.side_effect = lambda bot, user_id, guild: mock.Mock(display_name=f"user{user_id}")
     stats = {1: UserStats(messages=1, words=50, capital_starts=1, questions=1), 2: UserStats(messages=25, words=25, capital_starts=5, questions=5)}
     report = await clazz.format_report(guild, stats, [0] * 24, [0] * 7, 1, datetime.datetime(2026, 6, 1))
-    assert "Grammar Police: user2" in report
-    assert "Wordiest: user2" in report
-    assert "Most Inquisitive: user2" in report
+    assert "Grammar Police: <@2>" in report
+    assert "Wordiest: <@2>" in report
+    assert "Most Inquisitive: <@2>" in report
 
 
 @mock.patch("duckbot.cogs.messages.friend_facts.get_user")
@@ -301,6 +339,8 @@ async def test_format_report_no_awards_for_zero_counts(get_user, clazz, guild):
     assert "Weather Obsessed" not in report
     assert "Name Dropper" not in report
     assert "Paparazzi" not in report
+    assert "Serial Reactor" not in report
+    assert "Crowd Pleaser" not in report
 
 
 @mock.patch("duckbot.cogs.messages.friend_facts.get_user", return_value=None)
