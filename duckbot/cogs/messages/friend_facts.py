@@ -25,6 +25,8 @@ class UserStats:
     weather: int = 0
     mentions: int = 0
     attachments: int = 0
+    reactions_given: int = 0
+    reactions_received: int = 0
 
 
 class FriendFacts(commands.Cog):
@@ -53,7 +55,8 @@ class FriendFacts(commands.Cog):
     @commands.command(name="friend-facts")
     @commands.guild_only()
     async def friend_facts(self, context):
-        await self.send_report(context.channel)
+        async with context.typing():
+            await self.send_report(context.channel)
 
     def prior_month_range(self):
         end = duckbot.util.datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
@@ -80,6 +83,7 @@ class FriendFacts(commands.Cog):
                         self.tally_slash_weather(stats, message)
                     else:
                         self.tally(stats, hours, days, message)
+                    await self.tally_reactions(stats, message)
                 channels += 1
             except Forbidden:
                 pass
@@ -120,6 +124,14 @@ class FriendFacts(commands.Cog):
         if interaction and interaction.name.split()[0] == "weather":
             stats.setdefault(interaction.user.id, UserStats()).weather += 1
 
+    async def tally_reactions(self, stats, message: Message):
+        for reaction in message.reactions:
+            async for user in reaction.users():
+                if not user.bot:
+                    stats.setdefault(user.id, UserStats()).reactions_given += 1
+                    if not message.author.bot:
+                        stats.setdefault(message.author.id, UserStats()).reactions_received += 1
+
     def mention_count(self, message: Message):
         mentioned = {user.id for user in message.mentions}
         replied = message.reference.resolved if message.reference else None
@@ -158,6 +170,8 @@ class FriendFacts(commands.Cog):
         lines += await self.count_award(guild, stats, "weather", ":white_sun_small_cloud: Weather Obsessed: {name} — {count} weather checks")
         lines += await self.count_award(guild, stats, "mentions", ":wave: Name Dropper: {name} — {count} people mentioned")
         lines += await self.count_award(guild, stats, "attachments", ":camera: Paparazzi: {name} — {count} attachments sent")
+        lines += await self.count_award(guild, stats, "reactions_given", ":clap: Serial Reactor: {name} — {count} reactions added")
+        lines += await self.count_award(guild, stats, "reactions_received", ":star: Crowd Pleaser: {name} — {count} reactions received")
         return lines
 
     async def count_award(self, guild, stats, attr, template):
