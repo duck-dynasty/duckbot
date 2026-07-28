@@ -413,13 +413,14 @@ class PlayMarket(commands.Cog):
         for user_id, yes_shares, no_shares, invested, payout in sorted(results, key=lambda r: r[3] + r[4], reverse=True):
             name = await self._name(context, user_id)
             net = payout + invested
-            side = "YES" if yes_shares >= no_shares else "NO"
+            held = " / ".join(f"{_coins(shares)} {side}" for side, shares in (("YES", yes_shares), ("NO", no_shares)) if shares)
+            line = f"{name} — {held}, staked {_coins(-invested)}"
             if net > 0:
-                lines.append(f"{name} — {_coins(-invested)} on {side}, won {_coins(payout)} (+{_coins(net)})")
+                lines.append(f"{line}, won {_coins(payout)} (+{_coins(net)})")
             elif net < 0:
-                lines.append(f"{name} — {_coins(-invested)} on {side}, lost {_coins(-net)}")
+                lines.append(f"{line}, lost {_coins(-net)}")
             else:
-                lines.append(f"{name} — {_coins(-invested)} on {side}, refunded")
+                lines.append(f"{line}, refunded")
         if lines:
             embed.add_field(name="Results", value="\n".join(lines), inline=False)
         return embed
