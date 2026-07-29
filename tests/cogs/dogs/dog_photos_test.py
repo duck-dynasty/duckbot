@@ -89,6 +89,25 @@ async def test_dog_unknown_breed(clazz, context, responses):
     assert responses.calls[1].request.url == RANDOM_IMAGE_URI
 
 
+async def test_breed_autocomplete_narrows_to_matches(clazz, responses):
+    responses.add(responses.GET, LIST_BREEDS_URI, json=build_breeds(success=True))
+    result = await clazz.breed_autocomplete(None, "col")
+    assert [c.value for c in result] == ["collie", "border collie"]
+
+
+async def test_breed_autocomplete_no_input_returns_everything(clazz, responses):
+    responses.add(responses.GET, LIST_BREEDS_URI, json=build_breeds(success=True))
+    result = await clazz.breed_autocomplete(None, "")
+    assert [c.value for c in result] == ["collie", "border collie", "dog"]
+
+
+async def test_breed_autocomplete_fetches_breeds_once(clazz, responses):
+    responses.add(responses.GET, LIST_BREEDS_URI, json=build_breeds(success=True))
+    await clazz.breed_autocomplete(None, "c")
+    await clazz.breed_autocomplete(None, "co")
+    assert len(responses.calls) == 1
+
+
 def build_dog(img, success):
     return {"message": img, "status": "success" if success else "failure"}
 
