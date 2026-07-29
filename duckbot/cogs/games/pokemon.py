@@ -156,4 +156,4 @@ class Pokemon(commands.Cog):
 
     @pokemon.autocomplete("name_or_id")
     async def pokemon_name_autocomplete(self, interaction: Interaction, current: str) -> List[Choice[str]]:
-        return choices(self.pokemon_names, current, in_order=False) if len(current) >= 3 else []
+        return choices(self.pokemon_names, current, min_characters=3, in_order=False)
