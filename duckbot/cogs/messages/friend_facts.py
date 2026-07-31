@@ -7,7 +7,7 @@ from discord.ext import commands, tasks
 from discord.utils import get
 
 import duckbot.util.datetime
-from duckbot.cogs.weather.weather import CHART_FILE
+from duckbot.cogs.weather import CHART_FILE
 from duckbot.util.users import get_user
 
 LEADERBOARD_SIZE = 10
