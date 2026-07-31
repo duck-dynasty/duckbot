@@ -7,6 +7,7 @@ from discord.ext import commands, tasks
 from discord.utils import get
 
 import duckbot.util.datetime
+from duckbot.cogs.weather.weather import CHART_FILE
 from duckbot.util.users import get_user
 
 LEADERBOARD_SIZE = 10
@@ -119,9 +120,9 @@ class FriendFacts(commands.Cog):
         days[created.weekday()] += 1
 
     def tally_slash_weather(self, stats, message: Message):
-        """Slash invocations show up as bot messages; credit /weather to the invoker."""
-        interaction = message.interaction
-        if interaction and interaction.name.split()[0] == "weather":
+        """Slash replies only name the invoker; the chart attachment identifies /weather."""
+        interaction = message.interaction_metadata
+        if interaction and any(a.filename == CHART_FILE for a in message.attachments):
             stats.setdefault(interaction.user.id, UserStats()).weather += 1
 
     async def tally_reactions(self, stats, message: Message):
