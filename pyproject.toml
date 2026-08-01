@@ -18,7 +18,7 @@ dependencies = [
     "beautifulsoup4==4.15.0",
     "requests==2.34.2",
     "timezonefinder==8.2.4",
-    "tzdata==2026.2",
+    "tzdata==2026.3",
     "holidays==0.99",
     "pyowm==3.5.0",
     "psycopg2==2.9.12",
