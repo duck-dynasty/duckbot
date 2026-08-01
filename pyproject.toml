@@ -17,7 +17,7 @@ dependencies = [
     "discord.py[voice]==2.7.1",
     "beautifulsoup4==4.15.0",
     "requests==2.34.2",
-    "timezonefinder==8.2.4",
+    "timezonefinder==8.2.5",
     "tzdata==2026.3",
     "holidays==0.101",
     "pyowm==3.5.0",
