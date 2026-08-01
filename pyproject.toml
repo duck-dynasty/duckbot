@@ -25,7 +25,7 @@ dependencies = [
     "SQLAlchemy==2.0.51",
     "d20==1.1.2",
     "nltk==3.10.0",
-    "textblob==0.20.0",
+    "textblob==0.20.1",
     "pyfiglet==1.0.4",
     "matplotlib==3.11.1",
     "graphviz==0.21",
