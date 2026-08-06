@@ -1,4 +1,4 @@
-from .weather import Weather
+from .weather import CHART_FILE, Weather
 
 
 async def setup(bot):
