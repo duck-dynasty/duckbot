@@ -25,7 +25,7 @@ def make_message(content="hi", author_id=1, is_bot=False, created_at=datetime.da
     message.created_at = created_at
     message.mentions = mentions
     message.reference = reference
-    message.interaction = None
+    message.interaction_metadata = None
     message.attachments = attachments
     message.reactions = reactions
     return message
@@ -36,6 +36,12 @@ def make_user(user_id, is_bot=False):
     user.id = user_id
     user.bot = is_bot
     return user
+
+
+def make_attachment(filename):
+    attachment = mock.Mock()
+    attachment.filename = filename
+    return attachment
 
 
 def make_reaction(*users):
@@ -128,13 +134,11 @@ async def test_gather_stats_skips_bot_messages(clazz, guild, text_channel):
 
 
 async def test_gather_stats_credits_slash_weather_to_invoker(clazz, guild, text_channel):
-    invocation = make_message(is_bot=True)
-    invocation.interaction = mock.Mock()
-    invocation.interaction.name = "weather get"
-    invocation.interaction.user.id = 5
-    other = make_message(is_bot=True)
-    other.interaction = mock.Mock()
-    other.interaction.name = "market bet"
+    invocation = make_message(is_bot=True, attachments=[make_attachment("weather.png")])
+    invocation.interaction_metadata = mock.Mock()
+    invocation.interaction_metadata.user.id = 5
+    other = make_message(is_bot=True, attachments=[make_attachment("cat.png")])
+    other.interaction_metadata = mock.Mock()
     guild.text_channels = [readable(text_channel, [invocation, other])]
     stats, _, _, _, _ = await clazz.gather_stats(guild, None, None)
     assert stats == {5: UserStats(weather=1)}
