@@ -19,6 +19,7 @@ from duckbot.db import Database
 from .saved_location import SavedLocation
 
 degrees = "\N{DEGREE SIGN}C"
+CHART_FILE = "weather.png"
 
 
 class Weather(commands.Cog):
@@ -182,6 +183,6 @@ class Weather(commands.Cog):
         left_axis.set_xlim(min(hours) - one_hour, max(hours) + one_hour)
         plt.setp(left_axis.get_xticklabels(), rotation=30, horizontalalignment="right")
         figure.tight_layout()
-        plt.savefig("weather.png", facecolor="ghostwhite")
+        plt.savefig(CHART_FILE, facecolor="ghostwhite")
         plt.close(figure)
-        return "weather.png"
+        return CHART_FILE
