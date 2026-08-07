@@ -66,8 +66,8 @@ class FriendFacts(commands.Cog):
 
     async def send_report(self, channel):
         start, end = self.prior_month_range()
-        stats, hours, days, channels = await self.gather_stats(channel.guild, start, end)
-        await channel.send(await self.format_report(channel.guild, stats, hours, days, channels, start))
+        stats, hours, days, channels, threads = await self.gather_stats(channel.guild, start, end)
+        await channel.send(await self.format_report(channel.guild, stats, hours, days, channels, threads, start))
 
     async def gather_stats(self, guild, start, end):
         """Streams message history into counters; messages are never kept in memory."""
@@ -75,6 +75,7 @@ class FriendFacts(commands.Cog):
         hours = [0] * 24
         days = [0] * 7
         channels = 0
+        threads = 0
         async for channel in self.channels_to_scan(guild):
             if not channel.permissions_for(guild.me).read_message_history:
                 continue
@@ -85,10 +86,13 @@ class FriendFacts(commands.Cog):
                     else:
                         self.tally(stats, hours, days, message)
                     await self.tally_reactions(stats, message)
-                channels += 1
+                if channel.type is ChannelType.text:
+                    channels += 1
+                else:
+                    threads += 1
             except Forbidden:
                 pass
-        return stats, hours, days, channels
+        return stats, hours, days, channels, threads
 
     async def channels_to_scan(self, guild):
         """Text channels plus their active and archived threads."""
@@ -141,7 +145,7 @@ class FriendFacts(commands.Cog):
         mentioned.discard(message.author.id)
         return len(mentioned)
 
-    async def format_report(self, guild, stats, hours, days, channels, start):
+    async def format_report(self, guild, stats, hours, days, channels, threads, start):
         header = f"**Friend Facts: {start:%B %Y}** :bar_chart:"
         if not stats:
             return f"{header}\nNobody said anything last month. :duck:"
@@ -150,7 +154,7 @@ class FriendFacts(commands.Cog):
         for user_id, user in top[:LEADERBOARD_SIZE]:
             lines.append(f"{(await self.display_name(guild, user_id))[:24]:<24} {user.messages:>8}")
         lines.append("```")
-        lines.append(f":pencil: {sum(u.messages for u in stats.values()):,} messages across {channels} channels")
+        lines.append(f":pencil: {sum(u.messages for u in stats.values()):,} messages across {channels} channels and {threads} threads")
         lines += self.awards(stats)
         lines.append(f":crescent_moon: Busiest hour: {self.hour_name(hours.index(max(hours)))} · Busiest day: {calendar.day_name[days.index(max(days))]}")
         return "\n".join(lines)
