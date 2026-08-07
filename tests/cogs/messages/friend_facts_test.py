@@ -120,16 +120,16 @@ def test_prior_month_range(now, clazz, today, expected_start, expected_end):
 
 async def test_gather_stats_streams_counters(clazz, guild, text_channel):
     guild.text_channels = [readable(text_channel, [make_message("Hello there friend"), make_message("are you ok?", author_id=2)])]
-    stats, hours, days, channels = await clazz.gather_stats(guild, None, None)
+    stats, hours, days, channels, threads = await clazz.gather_stats(guild, None, None)
     assert stats[1] == UserStats(messages=1, words=3, capital_starts=1)
     assert stats[2] == UserStats(messages=1, words=3, questions=1)
     assert sum(hours) == 2 and sum(days) == 2
-    assert channels == 1
+    assert channels == 1 and threads == 0
 
 
 async def test_gather_stats_skips_bot_messages(clazz, guild, text_channel):
     guild.text_channels = [readable(text_channel, [make_message(is_bot=True)])]
-    stats, _, _, _ = await clazz.gather_stats(guild, None, None)
+    stats, _, _, _, _ = await clazz.gather_stats(guild, None, None)
     assert stats == {}
 
 
@@ -140,15 +140,15 @@ async def test_gather_stats_credits_slash_weather_to_invoker(clazz, guild, text_
     other = make_message(is_bot=True, attachments=[make_attachment("cat.png")])
     other.interaction_metadata = mock.Mock()
     guild.text_channels = [readable(text_channel, [invocation, other])]
-    stats, _, _, _ = await clazz.gather_stats(guild, None, None)
+    stats, _, _, _, _ = await clazz.gather_stats(guild, None, None)
     assert stats == {5: UserStats(weather=1)}
 
 
 async def test_gather_stats_skips_unreadable_channels(clazz, guild, text_channel):
     text_channel.permissions_for.return_value.read_message_history = False
     guild.text_channels = [text_channel]
-    stats, _, _, channels = await clazz.gather_stats(guild, None, None)
-    assert stats == {} and channels == 0
+    stats, _, _, channels, threads = await clazz.gather_stats(guild, None, None)
+    assert stats == {} and channels == 0 and threads == 0
     text_channel.history.assert_not_called()
 
 
@@ -156,8 +156,8 @@ async def test_gather_stats_skips_forbidden_channels(clazz, guild, text_channel)
     text_channel.permissions_for.return_value.read_message_history = True
     text_channel.history.side_effect = Forbidden(mock.Mock(status=403), "no")
     guild.text_channels = [text_channel]
-    stats, _, _, channels = await clazz.gather_stats(guild, None, None)
-    assert stats == {} and channels == 0
+    stats, _, _, channels, threads = await clazz.gather_stats(guild, None, None)
+    assert stats == {} and channels == 0 and threads == 0
 
 
 async def test_gather_stats_scans_active_and_archived_threads(clazz, guild, text_channel, thread):
@@ -166,15 +166,16 @@ async def test_gather_stats_scans_active_and_archived_threads(clazz, guild, text
     text_channel.threads = [active_thread]
 
     archived_thread = readable(mock.Mock(spec=discord.Thread), [make_message("from an archived thread", author_id=3)])
+    archived_thread.type = discord.ChannelType.public_thread
     text_channel.archived_threads.return_value = list_as_async_generator([archived_thread])
 
     text_channel.history.return_value = list_as_async_generator([make_message("in the channel itself")])
     text_channel.permissions_for.return_value.read_message_history = True
     guild.text_channels = [text_channel]
 
-    stats, _, _, channels = await clazz.gather_stats(guild, None, None)
+    stats, _, _, channels, threads = await clazz.gather_stats(guild, None, None)
     assert stats.keys() == {1, 2, 3}
-    assert channels == 3
+    assert channels == 1 and threads == 2
 
 
 async def test_gather_stats_skips_forbidden_archived_threads(clazz, guild, text_channel):
@@ -183,8 +184,8 @@ async def test_gather_stats_skips_forbidden_archived_threads(clazz, guild, text_
     text_channel.threads = []
     text_channel.archived_threads.side_effect = Forbidden(mock.Mock(status=403), "no")
     guild.text_channels = [text_channel]
-    stats, _, _, channels = await clazz.gather_stats(guild, None, None)
-    assert stats == {} and channels == 1
+    stats, _, _, channels, threads = await clazz.gather_stats(guild, None, None)
+    assert stats == {} and channels == 1 and threads == 0
 
 
 def test_tally_counts_each_stat(clazz):
@@ -258,7 +259,7 @@ async def test_tally_reactions_on_bot_messages_credits_only_the_giver(clazz):
 
 async def test_gather_stats_counts_reactions(clazz, guild, text_channel):
     guild.text_channels = [readable(text_channel, [make_message("hello", author_id=1, reactions=[make_reaction(make_user(2))])])]
-    stats, _, _, _ = await clazz.gather_stats(guild, None, None)
+    stats, _, _, _, _ = await clazz.gather_stats(guild, None, None)
     assert stats[1] == UserStats(messages=1, words=1, reactions_received=1)
     assert stats[2] == UserStats(reactions_given=1)
 
@@ -272,7 +273,7 @@ def test_tally_buckets_hours_and_days_in_eastern_time(clazz):
 
 @mock.patch("duckbot.cogs.messages.friend_facts.get_user")
 async def test_format_report_empty_month(get_user, clazz, guild):
-    report = await clazz.format_report(guild, {}, [0] * 24, [0] * 7, 0, datetime.datetime(2026, 6, 1))
+    report = await clazz.format_report(guild, {}, [0] * 24, [0] * 7, 0, 0, datetime.datetime(2026, 6, 1))
     assert report == "**Friend Facts: June 2026** :bar_chart:\nNobody said anything last month. :duck:"
 
 
@@ -287,10 +288,10 @@ async def test_format_report_leaderboard_and_awards(get_user, clazz, guild):
     hours[23] = 42
     days = [0] * 7
     days[5] = 42
-    report = await clazz.format_report(guild, stats, hours, days, 4, datetime.datetime(2026, 6, 1))
+    report = await clazz.format_report(guild, stats, hours, days, 4, 2, datetime.datetime(2026, 6, 1))
     assert "**Friend Facts: June 2026**" in report
     assert report.index("user1 ") < report.index("user2 ")
-    assert ":pencil: 80 messages across 4 channels" in report
+    assert ":pencil: 80 messages across 4 channels and 2 threads" in report
     assert "Grammar Police: <@1> — 80% of messages start with a capital" in report
     assert "Wordiest: <@2> — 10.0 words per message" in report
     assert "Most Inquisitive: <@2> — 50% of messages are questions" in report
@@ -309,7 +310,7 @@ async def test_format_report_leaderboard_and_awards(get_user, clazz, guild):
 async def test_format_report_truncates_leaderboard_to_top_ten(get_user, clazz, guild):
     get_user.side_effect = lambda bot, user_id, guild: mock.Mock(display_name=f"user{user_id}")
     stats = {i: UserStats(messages=100 - i) for i in range(1, 12)}
-    report = await clazz.format_report(guild, stats, [0] * 24, [0] * 7, 1, datetime.datetime(2026, 6, 1))
+    report = await clazz.format_report(guild, stats, [0] * 24, [0] * 7, 1, 0, datetime.datetime(2026, 6, 1))
     assert "user10 " in report
     assert "user11 " not in report
 
@@ -317,7 +318,7 @@ async def test_format_report_truncates_leaderboard_to_top_ten(get_user, clazz, g
 @mock.patch("duckbot.cogs.messages.friend_facts.get_user")
 async def test_format_report_truncates_long_names_in_leaderboard(get_user, clazz, guild):
     get_user.side_effect = lambda bot, user_id, guild: mock.Mock(display_name="a" * 32)
-    report = await clazz.format_report(guild, {1: UserStats(messages=5)}, [0] * 24, [0] * 7, 1, datetime.datetime(2026, 6, 1))
+    report = await clazz.format_report(guild, {1: UserStats(messages=5)}, [0] * 24, [0] * 7, 1, 0, datetime.datetime(2026, 6, 1))
     assert "a" * 24 + " " in report
     assert "a" * 25 not in report
 
@@ -326,7 +327,7 @@ async def test_format_report_truncates_long_names_in_leaderboard(get_user, clazz
 async def test_format_report_awards_require_minimum_messages(get_user, clazz, guild):
     get_user.side_effect = lambda bot, user_id, guild: mock.Mock(display_name=f"user{user_id}")
     stats = {1: UserStats(messages=1, words=50, capital_starts=1, questions=1), 2: UserStats(messages=25, words=25, capital_starts=5, questions=5)}
-    report = await clazz.format_report(guild, stats, [0] * 24, [0] * 7, 1, datetime.datetime(2026, 6, 1))
+    report = await clazz.format_report(guild, stats, [0] * 24, [0] * 7, 1, 0, datetime.datetime(2026, 6, 1))
     assert "Grammar Police: <@2>" in report
     assert "Wordiest: <@2>" in report
     assert "Most Inquisitive: <@2>" in report
@@ -336,7 +337,7 @@ async def test_format_report_awards_require_minimum_messages(get_user, clazz, gu
 async def test_format_report_no_awards_for_zero_counts(get_user, clazz, guild):
     get_user.side_effect = lambda bot, user_id, guild: mock.Mock(display_name=f"user{user_id}")
     stats = {1: UserStats(messages=5, words=10)}
-    report = await clazz.format_report(guild, stats, [0] * 24, [0] * 7, 1, datetime.datetime(2026, 6, 1))
+    report = await clazz.format_report(guild, stats, [0] * 24, [0] * 7, 1, 0, datetime.datetime(2026, 6, 1))
     assert "Loudest" not in report
     assert "Chief Link Dumper" not in report
     assert "Golf Fanatic" not in report
