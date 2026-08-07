@@ -29,6 +29,7 @@ def assert_extensions_loaded(bot_spy, additional_extensions=[]):
         "duckbot.logs",
         "duckbot.health",
         "duckbot.slash",
+        "duckbot.db",
         "duckbot.cogs.ai",
         "duckbot.cogs.announce_day",
         "duckbot.cogs.audio",

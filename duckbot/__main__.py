@@ -5,6 +5,7 @@ import pkgutil
 from discord.ext import commands
 
 import duckbot.cogs
+import duckbot.db
 import duckbot.health
 import duckbot.logs
 import duckbot.slash
@@ -21,6 +22,7 @@ async def run_duckbot(bot: commands.Bot):
 
     await bot.load_extension(duckbot.health.__name__)
     await bot.load_extension(duckbot.slash.__name__)
+    await bot.load_extension(duckbot.db.__name__)
 
     for extension in (x for x in pkgutil.iter_modules(duckbot.cogs.__path__) if x.ispkg):
         await bot.load_extension(f"{duckbot.cogs.__name__}.{extension.name}")

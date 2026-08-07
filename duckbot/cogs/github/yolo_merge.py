@@ -10,19 +10,11 @@ from discord.utils import utcnow
 from github.PullRequest import PullRequest
 from github.Repository import Repository
 
+from duckbot.util.permissions import is_repository_admin
+
 CHECK_PASSED = ":white_check_mark:"
 CHECK_FAILED = ":x:"
 CHECK_PENDING = ":coffee:"
-
-
-async def is_repository_admin(context: commands.Context):
-    """Disallow !yolo to be used outside of a server, and only allow the bot owner or
-    repository owners to use it."""
-    if context.guild is None:
-        raise commands.NoPrivateMessage()
-    if not await context.bot.is_owner(context.author) and context.author.id not in [368038054558171141, 776607982472921088, 375024417358479380]:
-        raise commands.MissingPermissions(["repository admin"])
-    return True
 
 
 class YoloMerge(commands.Cog):
