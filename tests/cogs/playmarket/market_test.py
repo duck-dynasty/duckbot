@@ -428,8 +428,18 @@ async def test_resolve_embed_shows_winners_and_losers(cog, alice, bob, carol, in
     await cog.bet(carol, market_id, "no", BET)
     await cog.resolve(alice, market_id, "yes")
     expected = Embed(title=f"Market {market_id} — Will it happen?", description="Called **YES**.", color=Color.green())
-    expected.add_field(name="Results", value="user2 — 500 on YES, won 831 (+331)\nuser3 — 500 on NO, lost 500", inline=False)
+    expected.add_field(name="Results", value="user2 — 832 YES, staked 500, won 831 (+331)\nuser3 — 1,144 NO, staked 500, lost 500", inline=False)
     alice.send.assert_called_with("<@2> <@3>", embed=expected)
+
+
+async def test_resolve_embed_shows_both_sides_when_one_player_holds_both(cog, alice, bob, in_memory_db):
+    market_id = await open_market(cog, alice)
+    await cog.bet(bob, market_id, "yes", BET)
+    await cog.bet(bob, market_id, "no", BET)
+    await cog.resolve(alice, market_id, "no")
+    expected = Embed(title=f"Market {market_id} — Will it happen?", description="Called **NO**.", color=Color.red())
+    expected.add_field(name="Results", value="user2 — 832 YES / 1,144 NO, staked 1,000, won 1,143 (+143)", inline=False)
+    alice.send.assert_called_with("<@2>", embed=expected)
 
 
 async def test_a_non_creator_non_admin_cannot_resolve(cog, alice, bob, in_memory_db):
@@ -489,7 +499,7 @@ async def test_resolve_embed_shows_void_refunds(cog, alice, bob, in_memory_db):
     await cog.bet(bob, market_id, "yes", 300)
     await cog.resolve(alice, market_id, "void")
     expected = Embed(title=f"Market {market_id} — Will it happen?", description="Called **VOID**.", color=Color.greyple())
-    expected.add_field(name="Results", value="user2 — 300 on YES, refunded", inline=False)
+    expected.add_field(name="Results", value="user2 — 530 YES, staked 300, refunded", inline=False)
     alice.send.assert_called_with("<@2>", embed=expected)
 
 
