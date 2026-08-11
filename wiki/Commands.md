@@ -8,7 +8,7 @@
 |              `!coin`              | flips a coin in real life                          |
 |   [`!day`](#day-announcements)    | announces the current day of the week              |
 |     [`!define`](#definitions)     | define a word                                      |
-|              `!dog`               | displays a random dog photo                        |
+|          [`!dog`](#dogs)          | displays a random dog photo                        |
 |              `!duck`              | gives a link to this repo                          |
 | [`!epic`](Events#epic-free-games) | show the free games of the week on epic            |
 |            `!fortune`             | get a random fortune told to you by a cow          |
@@ -51,6 +51,14 @@ Do you crave a particular food but want an arbitrary recipe?
 
 - Run the `!recipe` command with an argument to search for a specific recipe with a random result.
 - Run the `!recipe` command with no argument to blindly return any recipe.
+
+## Dogs
+
+DuckBot shows you a dog. Give a breed to narrow it down -- the slash command autocompletes the breeds it knows, including sub-breeds like `border collie`. An unknown breed just gets you any old dog.
+
+```
+/dog [breed]
+```
 
 ## Dice
 

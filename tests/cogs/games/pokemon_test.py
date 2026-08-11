@@ -178,7 +178,9 @@ async def test_autocomplete_returns_matches(clazz, responses):
     assert results[0].name == "pikachu"
 
 
-async def test_autocomplete_short_input_returns_empty(clazz):
+async def test_autocomplete_short_input_returns_empty(clazz, responses):
+    responses.add(responses.GET, f"{SPECIES_API}?limit=1", json={"count": 1})
+    responses.add(responses.GET, f"{SPECIES_API}?limit=1", json={"results": [{"name": "pikachu"}]})
     results = await clazz.pokemon_name_autocomplete(None, "pi")
     assert results == []
 
