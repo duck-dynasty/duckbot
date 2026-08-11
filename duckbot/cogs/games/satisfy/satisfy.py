@@ -5,6 +5,7 @@ from discord import Interaction
 from discord.app_commands import Choice
 from discord.ext.commands import Cog, Context, hybrid_group
 
+from duckbot.util.choices import choices
 from duckbot.util.embeds import group_by_max_length
 
 from .factory import Factory
@@ -161,11 +162,11 @@ class Satisfy(Cog):
 
     @add_booster.autocomplete("boost_item")
     async def boost_items(self, interaction: Interaction, current: str) -> List[Choice[str]]:
-        return choices(boost_item_names, current, threshold=0)
+        return choices(boost_item_names, current, min_characters=0)
 
     @recipe_bank.autocomplete("recipe_bank")
     async def recipe_banks(self, interaction: Interaction, current: str) -> List[Choice[str]]:
-        return choices(recipe_banks.keys(), current, threshold=0)
+        return choices(recipe_banks.keys(), current, min_characters=0)
 
     @include_recipe.autocomplete("recipe")
     @exclude_recipe.autocomplete("recipe")
@@ -205,16 +206,3 @@ def recipes_matching(recipe_name: str, power_shards: Optional[int], sloops: Opti
     r = recipes_by_name[recipe_name]
     slooped = as_slooped(r)
     return slooped if power_shards is None and sloops is None else [r for r in slooped if r.power_shards == power_shards and r.sloops == sloops]
-
-
-def choices(pool: List[str], needle: str, threshold: int = 3) -> List[Choice[str]]:
-    def match(needle: str, haystack: str) -> bool:
-        import builtins
-
-        it = iter(haystack)
-        return builtins.all(any(next_letter == ch for next_letter in it) for ch in needle)
-
-    if len(needle) < threshold:
-        return []
-    else:
-        return [Choice(name=i, value=i) for i in pool if match(needle.lower(), i.lower())][:25]

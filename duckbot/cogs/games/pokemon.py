@@ -8,6 +8,7 @@ from discord import Interaction
 from discord.app_commands import Choice
 from discord.ext import commands
 
+from duckbot.util.choices import choices
 from duckbot.util.datetime import now
 
 ANCHOR_DATE = date(2020, 12, 3)
@@ -155,7 +156,4 @@ class Pokemon(commands.Cog):
 
     @pokemon.autocomplete("name_or_id")
     async def pokemon_name_autocomplete(self, interaction: Interaction, current: str) -> List[Choice[str]]:
-        if len(current) < 3:
-            return []
-        lower = current.lower()
-        return [Choice(name=n, value=n) for n in self.pokemon_names if lower in n][:25]
+        return choices(self.pokemon_names, current, min_characters=3, in_order=False)
