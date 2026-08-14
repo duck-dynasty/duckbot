@@ -1,10 +1,18 @@
 import datetime
 from decimal import Decimal
 from types import SimpleNamespace
+from unittest import mock
 
 import pytest
 
-from duckbot.cogs.playmarket.market import PlayMarket, _coins, _down, _pct, _whole
+from duckbot.cogs.playmarket.market import (
+    PlayMarket,
+    _coins,
+    _down,
+    _pct,
+    _season_footer,
+    _whole,
+)
 from duckbot.cogs.playmarket.models import _next_quarter_start
 
 
@@ -87,3 +95,18 @@ def test_prices_keep_a_few_decimal_places(probability, shown):
 )
 def test_next_quarter_start_lands_on_the_following_quarter(dt, expected):
     assert _next_quarter_start(dt) == expected
+
+
+@pytest.mark.parametrize(
+    "today,footer",
+    [
+        (datetime.datetime(2024, 1, 1), "Ends on April 1, 2024 · 91 days left"),
+        (datetime.datetime(2024, 3, 31), "Ends on April 1, 2024 · 1 day left"),
+        (datetime.datetime(2024, 3, 31, 12, 0), "Ends today"),
+        (datetime.datetime(2024, 4, 1), "Ends today"),
+    ],
+)
+@mock.patch("duckbot.cogs.playmarket.market.now")
+def test_season_footer_counts_down_to_the_end_date(mock_now, today, footer):
+    mock_now.return_value = today
+    assert _season_footer(SimpleNamespace(ends_at=datetime.datetime(2024, 4, 1))) == footer
