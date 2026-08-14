@@ -1,5 +1,6 @@
 import math
 import random
+from collections import Counter
 from decimal import ROUND_DOWN, Decimal
 from typing import List, Literal, Optional
 
@@ -37,6 +38,23 @@ def _down(value: float) -> Decimal:
 def _whole(value) -> int:
     """Floor a coin amount to a whole coin (house keeps the fraction)."""
     return math.floor(value)
+
+
+def _staked(entry) -> int:
+    """Coins a bet put in; bet deltas are stored negative."""
+    return -entry.delta
+
+
+def _plural(count: int, noun: str) -> str:
+    return f"{count} {noun}" if count == 1 else f"{count} {noun}s"
+
+
+def _totals(entries, key, value=lambda entry: entry.delta):
+    """(key, total) pairs of summed ledger values, biggest first."""
+    totals = Counter()
+    for entry in entries:
+        totals[key(entry)] += value(entry)
+    return totals.most_common()
 
 
 class PlayMarket(commands.Cog):
@@ -133,6 +151,19 @@ class PlayMarket(commands.Cog):
                 embeds = [await self._season_embed(context, session, season) for season in seasons]
             for batch in group_by_max_length(embeds):
                 await context.send(embeds=batch)
+
+    @season.command(name="stats", description="Fun numbers from the season so far.")
+    async def season_stats(self, context: commands.Context):
+        async with context.typing():
+            with self.db.session(Season) as session:
+                season = self.active_season(session)
+                session.commit()
+                markets = session.query(Market).filter_by(season_id=season.id).all()
+                if markets:
+                    entries = session.query(LedgerEntry).filter_by(season_id=season.id).all()
+                    await context.send(embed=await self._season_stats_embed(context, season, markets, entries))
+                else:
+                    await context.send("Nothing's happened this season. Riveting.")
 
     # --- market commands --------------------------------------------------
 
@@ -440,6 +471,48 @@ class PlayMarket(commands.Cog):
         results = session.query(SeasonResult).filter_by(season_id=season.id).order_by(SeasonResult.rank).all()
         lines = [f"{MEDALS.get(r.rank, f'{r.rank}.')} {await self._name(context, r.user_id)} — {_coins(r.final_balance)} coins" for r in results]
         return Embed(title=f"{season.name} — {season.starts_at:%Y-%m-%d} to {season.ends_at:%Y-%m-%d}", description="\n".join(lines), color=Color.gold())
+
+    async def _season_stats_embed(self, context, season, markets, entries) -> Embed:
+        bets = [e for e in entries if e.reason == "bet"]
+        topups = [e for e in entries if e.reason == "topup"]
+        status = Counter(m.status for m in markets)
+        outcomes = Counter(m.outcome for m in markets if m.status == "RESOLVED")
+        paid_out = sum(e.delta for e in entries if e.reason == "payout")
+        lines = [
+            f"**Wagered** — {_coins(sum(_staked(e) for e in bets))} coins across {_plural(len(bets), 'bet')} by {_plural(len({e.user_id for e in bets}), 'player')}",
+            f"**Markets** — {len(markets)} created, {status['RESOLVED']} resolved ({outcomes['yes']} YES / {outcomes['no']} NO), {status['VOID']} voided, {status['OPEN']} still open",
+            f"**Paid out** — {_coins(paid_out)} coins",
+        ]
+        if topups:
+            lines.append(f"**Charity** — {_plural(len(topups), 'top-up')} claimed")
+        embed = Embed(title=f"{season.name} Stats", description="\n".join(lines), color=Color.gold())
+        embed.add_field(name="Standouts", value="\n".join(await self._standout_lines(context, markets, entries)), inline=False)
+        return embed
+
+    async def _standout_lines(self, context, markets, entries) -> List[str]:
+        """One line per superlative, each skipped when the season has nothing to fill it."""
+        labels = {m.id: f"Market {m.id} — {m.question}"[:100] for m in markets}
+        bets = [e for e in entries if e.reason == "bet"]
+        payouts = [e for e in entries if e.reason == "payout"]
+        lines = []
+        if bets:
+            market_id, wagered = _totals(bets, lambda e: e.market_id, _staked)[0]
+            lines.append(f"**Hottest market** — {labels[market_id]} ({_coins(wagered)} coins)")
+            biggest = max(bets, key=_staked)
+            lines.append(f"**Biggest bet** — {await self._name(context, biggest.user_id)}, {_coins(_staked(biggest))} coins on {labels[biggest.market_id]}")
+            user_id, wagered = _totals(bets, lambda e: e.user_id, _staked)[0]
+            lines.append(f"**Most active** — {await self._name(context, user_id)}, {_plural(sum(1 for e in bets if e.user_id == user_id), 'bet')} for {_coins(wagered)} coins")
+        if payouts:
+            biggest = max(payouts, key=lambda e: e.delta)
+            lines.append(f"**Biggest payout** — {await self._name(context, biggest.user_id)}, {_coins(biggest.delta)} coins on {labels[biggest.market_id]}")
+        creator_id, created = Counter(m.creator_id for m in markets).most_common(1)[0]
+        lines.append(f"**Market maker** — {await self._name(context, creator_id)}, {_plural(created, 'market')} created")
+        nets = _totals([e for e in entries if e.market_id], lambda e: e.user_id)  # market P&L, ignoring grants and top-ups
+        if nets and nets[0][1] > 0:
+            lines.append(f"**Up the most** — {await self._name(context, nets[0][0])}, +{_coins(nets[0][1])} coins")
+        if nets and nets[-1][1] < 0:
+            lines.append(f"**Down the most** — {await self._name(context, nets[-1][0])}, {_coins(nets[-1][1])} coins")
+        return lines
 
     async def _standing_line(self, context, rank, uid, cash, shares_value) -> str:
         return f"{MEDALS.get(rank, f'{rank}.')} {await self._worth(context, uid, cash, shares_value)}"
