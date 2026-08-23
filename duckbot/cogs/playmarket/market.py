@@ -112,11 +112,13 @@ class PlayMarket(commands.Cog):
     async def leaderboard(self, context: commands.Context):
         async with context.typing():
             with self.db.session(Season) as session:
+                season = self.active_season(session)
                 standings = self._standings(session)
                 session.commit()
-            if not standings:
-                return await context.send("Nobody's played yet. Buncha cowards.")
-            await context.send(embed=await self._leaderboard_embed(context, standings))
+                if not standings:
+                    return await context.send("Nobody's played yet. Buncha cowards.")
+                embed = await self._leaderboard_embed(context, season, standings)
+            await context.send(embed=embed)
 
     # --- season commands ----------------------------------------------------
 
@@ -433,9 +435,9 @@ class PlayMarket(commands.Cog):
             embed.add_field(name="Holders", value="\n".join(holders), inline=False)
         return embed
 
-    async def _leaderboard_embed(self, context, standings) -> Embed:
+    async def _leaderboard_embed(self, context, season, standings) -> Embed:
         lines = [await self._standing_line(context, i, uid, cash, shares_value) for i, (uid, cash, shares_value) in enumerate(standings, start=1)]
-        return Embed(title="Leaderboard", description="\n".join(lines), color=Color.gold())
+        return Embed(title=f"{season.name} Leaderboard", description="\n".join(lines), color=Color.gold()).set_footer(text=_season_footer(season))
 
     async def _season_embed(self, context, session, season) -> Embed:
         results = session.query(SeasonResult).filter_by(season_id=season.id).order_by(SeasonResult.rank).all()
@@ -454,6 +456,13 @@ class PlayMarket(commands.Cog):
     async def _name(self, context, user_id, mention=False) -> str:
         user = await get_user(self.bot, user_id, context.guild)
         return (user.mention if mention else user.display_name) if user else str(user_id)
+
+
+def _season_footer(season) -> str:
+    days = (season.ends_at - now()).days
+    if days <= 0:
+        return "Ends today"
+    return f"Ends on {season.ends_at:%B %-d, %Y} · {days} day{'' if days == 1 else 's'} left"
 
 
 def _coins(value) -> str:

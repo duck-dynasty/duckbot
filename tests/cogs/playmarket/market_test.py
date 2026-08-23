@@ -706,19 +706,38 @@ async def test_leaderboard_ranks_by_net_worth(cog, alice, bob, in_memory_db):
     market_id = await open_market(cog, bob)
     await cog.bet(bob, market_id, "yes", BET)  # bob's position is worth more than his spent coins
     await cog.leaderboard(alice)
-    expected = Embed(title="Leaderboard", description="🥇 user2 — 10,080 coins (9,500 available)\n🥈 user1 — 10,000 coins (10,000 available)", color=Color.gold())
+    expected = Embed(title="Season 1 Leaderboard", description="🥇 user2 — 10,080 coins (9,500 available)\n🥈 user1 — 10,000 coins (10,000 available)", color=Color.gold())
+    expected.set_footer(text="Ends on April 1, 2024 · 90 days left")
     alice.send.assert_called_with(embed=expected)
 
 
-async def test_leaderboard_medals_the_top_three_then_falls_back_to_numbers(cog, alice):
+async def test_leaderboard_medals_the_top_three_then_falls_back_to_numbers(cog, alice, in_memory_db):
     standings = [(1, 100, 0), (2, 90, 0), (3, 80, 0), (4, 70, 0)]
-    embed = await cog._leaderboard_embed(alice, standings)
+    with in_memory_db.session(Season) as session:
+        embed = await cog._leaderboard_embed(alice, cog.active_season(session), standings)
     assert embed.description.splitlines() == [
         "🥇 user1 — 100 coins (100 available)",
         "🥈 user2 — 90 coins (90 available)",
         "🥉 user3 — 80 coins (80 available)",
         "4. user4 — 70 coins (70 available)",
     ]
+
+
+async def test_leaderboard_counts_down_to_the_season_end(cog, alice, clock):
+    await cog.balance(alice)
+    clock.advance(days=60)
+    await cog.leaderboard(alice)
+    assert alice.send.call_args.kwargs["embed"].footer.text == "Ends on April 1, 2024 · 30 days left"
+
+
+async def test_leaderboard_rolls_the_season_over_when_it_has_ended(cog, alice, bob, clock, in_memory_db):
+    market_id = await open_market(cog, alice)
+    await cog.bet(alice, market_id, "yes", BET)
+    clock.advance(days=91)
+    await cog.leaderboard(bob)
+    expected = Embed(title="Season 2 Leaderboard", description="🥇 user1 — 10,000 coins (10,000 available)", color=Color.gold())
+    expected.set_footer(text="Ends on July 1, 2024 · 90 days left")
+    bob.send.assert_called_with(embed=expected)
 
 
 async def test_standings_splits_cash_and_shares_value(cog, bob, in_memory_db):
