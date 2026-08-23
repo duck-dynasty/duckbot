@@ -24,6 +24,8 @@ def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
     model = Model()
     model.threads = -1
     model.verbose = 0
+    model.max_mip_gap = 1e-12
+    model.max_mip_gap_abs = 1e-12
 
     recipes = limit_recipes(factory.recipes, factory.power_shards, factory.sloops)
 
