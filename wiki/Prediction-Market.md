@@ -39,7 +39,7 @@ Everyone starts each **season** with **10,000 coins**. A season runs for a calen
 
 Use `/market balance` to see your net worth, available coins and positions, and `/market leaderboard` for the standings (ranked by net worth = coins + the live value of your open positions). The leaderboard also shows the remaining time in the season.
 
-`/market season stats` prints the current season's numbers: total coins wagered, how the markets shook out, the hottest market, the biggest single bet and payout, the busiest gambler, who has created the most markets, and who is up and down the most on their bets.
+`/market season stats` prints the current season's numbers: total coins wagered, how the markets shook out, the hottest market, the biggest single bet and payout, who has placed the most bets, who has wagered the most coins, who has created the most markets, and who is up and down the most on settled markets — open bets are still in play, so they don't count towards profit and loss. Everyone tied for a superlative is named.
 
 ## How prices work
 

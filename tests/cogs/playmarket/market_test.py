@@ -852,7 +852,8 @@ async def test_season_stats_reports_the_season(cog, alice, bob, carol):
             [
                 f"**Hottest market** — Market {market_id} — Will it happen? (1,300 coins)",
                 f"**Biggest bet** — user3, 800 coins on Market {market_id} — Will it happen?",
-                "**Most active** — user3, 1 bet for 800 coins",
+                "**Most active** — user2, user3, 1 bet placed",
+                "**Biggest spender** — user3, 800 coins wagered",
                 f"**Biggest payout** — user2, 831 coins on Market {market_id} — Will it happen?",
                 "**Market maker** — user1, 1 market created",
                 "**Up the most** — user2, +331 coins",
@@ -879,14 +880,36 @@ async def test_season_stats_omits_superlatives_with_no_data(cog, alice, bob):
             [
                 f"**Hottest market** — Market {market_id} — Will it happen? (500 coins)",
                 f"**Biggest bet** — user2, 500 coins on Market {market_id} — Will it happen?",
-                "**Most active** — user2, 1 bet for 500 coins",
+                "**Most active** — user2, 1 bet placed",
+                "**Biggest spender** — user2, 500 coins wagered",
                 "**Market maker** — user1, 1 market created",
-                "**Down the most** — user2, -500 coins",
             ]
         ),
         inline=False,
     )
     alice.send.assert_called_with(embed=expected)
+
+
+async def test_season_stats_leaves_open_bets_out_of_the_profit_and_loss(cog, alice, bob, carol):
+    settled = await open_market(cog, alice)
+    await cog.bet(bob, settled, "yes", BET)
+    await cog.resolve(alice, settled, "yes")
+    still_open = await open_market(cog, alice)
+    await cog.bet(carol, still_open, "no", 800)
+    await cog.season_stats(alice)
+    lines = alice.send.call_args.kwargs["embed"].fields[0].value.splitlines()
+    assert [line for line in lines if line.startswith(("**Up", "**Down"))] == ["**Up the most** — user2, +331 coins"]
+
+
+async def test_season_stats_names_everyone_tied_for_a_superlative(cog, alice, bob, carol):
+    market_id = await open_market(cog, alice)
+    await cog.bet(bob, market_id, "yes", BET)
+    await cog.bet(carol, market_id, "no", BET)
+    await cog.season_stats(alice)
+    lines = alice.send.call_args.kwargs["embed"].fields[0].value.splitlines()
+    assert lines[1] == f"**Biggest bet** — user2, 500 coins on Market {market_id} — Will it happen? · user3, 500 coins on Market {market_id} — Will it happen?"
+    assert lines[2] == "**Most active** — user2, user3, 1 bet placed"
+    assert lines[3] == "**Biggest spender** — user2, user3, 500 coins wagered"
 
 
 async def test_season_stats_counts_top_ups(cog, alice, bob, in_memory_db):

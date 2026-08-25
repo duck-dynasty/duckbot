@@ -57,6 +57,13 @@ def _totals(entries, key, value=lambda entry: entry.delta):
     return totals.most_common()
 
 
+def _leaders(entries, key, value=lambda entry: entry.delta):
+    """(keys, total) of everyone tied at the top; keys is empty when there is nothing to rank."""
+    totals = _totals(entries, key, value)
+    best = totals[0][1] if totals else 0
+    return [k for k, total in totals if total == best], best
+
+
 class PlayMarket(commands.Cog):
     def __init__(self, bot, db: Database):
         self.bot = bot
@@ -494,27 +501,34 @@ class PlayMarket(commands.Cog):
     async def _standout_lines(self, context, markets, entries) -> List[str]:
         """One line per superlative, each skipped when the season has nothing to fill it."""
         labels = {m.id: f"Market {m.id} — {m.question}"[:100] for m in markets}
+        settled = {m.id for m in markets if m.status != "OPEN"}
         bets = [e for e in entries if e.reason == "bet"]
         payouts = [e for e in entries if e.reason == "payout"]
         lines = []
         if bets:
-            market_id, wagered = _totals(bets, lambda e: e.market_id, _staked)[0]
-            lines.append(f"**Hottest market** — {labels[market_id]} ({_coins(wagered)} coins)")
-            biggest = max(bets, key=_staked)
-            lines.append(f"**Biggest bet** — {await self._name(context, biggest.user_id)}, {_coins(_staked(biggest))} coins on {labels[biggest.market_id]}")
-            user_id, wagered = _totals(bets, lambda e: e.user_id, _staked)[0]
-            lines.append(f"**Most active** — {await self._name(context, user_id)}, {_plural(sum(1 for e in bets if e.user_id == user_id), 'bet')} for {_coins(wagered)} coins")
+            market_ids, wagered = _leaders(bets, lambda e: e.market_id, _staked)
+            lines.append(f"**Hottest market** — {', '.join(labels[i] for i in market_ids)} ({_coins(wagered)} coins)")
+            lines.append(f"**Biggest bet** — {await self._biggest_line(context, bets, labels, _staked)}")
+            user_ids, count = _leaders(bets, lambda e: e.user_id, lambda e: 1)
+            lines.append(f"**Most active** — {await self._names(context, user_ids)}, {_plural(count, 'bet')} placed")
+            user_ids, wagered = _leaders(bets, lambda e: e.user_id, _staked)
+            lines.append(f"**Biggest spender** — {await self._names(context, user_ids)}, {_coins(wagered)} coins wagered")
         if payouts:
-            biggest = max(payouts, key=lambda e: e.delta)
-            lines.append(f"**Biggest payout** — {await self._name(context, biggest.user_id)}, {_coins(biggest.delta)} coins on {labels[biggest.market_id]}")
-        creator_id, created = Counter(m.creator_id for m in markets).most_common(1)[0]
-        lines.append(f"**Market maker** — {await self._name(context, creator_id)}, {_plural(created, 'market')} created")
-        nets = _totals([e for e in entries if e.market_id], lambda e: e.user_id)  # market P&L, ignoring grants and top-ups
-        if nets and nets[0][1] > 0:
-            lines.append(f"**Up the most** — {await self._name(context, nets[0][0])}, +{_coins(nets[0][1])} coins")
-        if nets and nets[-1][1] < 0:
-            lines.append(f"**Down the most** — {await self._name(context, nets[-1][0])}, {_coins(nets[-1][1])} coins")
+            lines.append(f"**Biggest payout** — {await self._biggest_line(context, payouts, labels, lambda e: e.delta)}")
+        creator_ids, created = _leaders(markets, lambda m: m.creator_id, lambda m: 1)
+        lines.append(f"**Market maker** — {await self._names(context, creator_ids)}, {_plural(created, 'market')} created")
+        nets = [e for e in entries if e.market_id in settled]  # open bets are still in play, so they sit out of P&L
+        winners, up = _leaders(nets, lambda e: e.user_id)
+        if up > 0:
+            lines.append(f"**Up the most** — {await self._names(context, winners)}, +{_coins(up)} coins")
+        losers, down = _leaders(nets, lambda e: e.user_id, lambda e: -e.delta)
+        if down > 0:
+            lines.append(f"**Down the most** — {await self._names(context, losers)}, -{_coins(down)} coins")
         return lines
+
+    async def _biggest_line(self, context, entries, labels, value) -> str:
+        best = max(value(e) for e in entries)
+        return " · ".join([f"{await self._name(context, e.user_id)}, {_coins(value(e))} coins on {labels[e.market_id]}" for e in entries if value(e) == best])
 
     async def _standing_line(self, context, rank, uid, cash, shares_value) -> str:
         return f"{MEDALS.get(rank, f'{rank}.')} {await self._worth(context, uid, cash, shares_value)}"
@@ -528,6 +542,9 @@ class PlayMarket(commands.Cog):
     async def _name(self, context, user_id, mention=False) -> str:
         user = await get_user(self.bot, user_id, context.guild)
         return (user.mention if mention else user.display_name) if user else str(user_id)
+
+    async def _names(self, context, user_ids) -> str:
+        return ", ".join([await self._name(context, user_id) for user_id in user_ids])
 
 
 def _season_footer(season) -> str:
