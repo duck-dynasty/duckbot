@@ -1,5 +1,6 @@
 import math
 import random
+from collections import Counter
 from decimal import ROUND_DOWN, Decimal
 from typing import List, Literal, Optional
 
@@ -38,6 +39,30 @@ def _down(value: float) -> Decimal:
 def _whole(value) -> int:
     """Floor a coin amount to a whole coin (house keeps the fraction)."""
     return math.floor(value)
+
+
+def _staked(entry) -> int:
+    """Coins a bet put in; bet deltas are stored negative."""
+    return -entry.delta
+
+
+def _plural(count: int, noun: str) -> str:
+    return f"{count} {noun}" if count == 1 else f"{count} {noun}s"
+
+
+def _totals(entries, key, value=lambda entry: entry.delta):
+    """(key, total) pairs of summed ledger values, biggest first."""
+    totals = Counter()
+    for entry in entries:
+        totals[key(entry)] += value(entry)
+    return totals.most_common()
+
+
+def _leaders(entries, key, value=lambda entry: entry.delta):
+    """(keys, total) of everyone tied at the top; keys is empty when there is nothing to rank."""
+    totals = _totals(entries, key, value)
+    best = totals[0][1] if totals else 0
+    return [k for k, total in totals if total == best], best
 
 
 class PlayMarket(commands.Cog):
@@ -136,6 +161,19 @@ class PlayMarket(commands.Cog):
                 embeds = [await self._season_embed(context, session, season) for season in seasons]
             for batch in group_by_max_length(embeds):
                 await context.send(embeds=batch)
+
+    @season.command(name="stats", description="Fun numbers from the season so far.")
+    async def season_stats(self, context: commands.Context):
+        async with context.typing():
+            with self.db.session(Season) as session:
+                season = self.active_season(session)
+                session.commit()
+                markets = session.query(Market).filter_by(season_id=season.id).all()
+                if markets:
+                    entries = session.query(LedgerEntry).filter_by(season_id=season.id).all()
+                    await context.send(embed=await self._season_stats_embed(context, season, markets, entries))
+                else:
+                    await context.send("Nothing's happened this season. Riveting.")
 
     # --- market commands --------------------------------------------------
 
@@ -444,6 +482,55 @@ class PlayMarket(commands.Cog):
         lines = [f"{MEDALS.get(r.rank, f'{r.rank}.')} {await self._name(context, r.user_id)} — {_coins(r.final_balance)} coins" for r in results]
         return Embed(title=f"{season.name} — {season.starts_at:%Y-%m-%d} to {season.ends_at:%Y-%m-%d}", description="\n".join(lines), color=Color.gold())
 
+    async def _season_stats_embed(self, context, season, markets, entries) -> Embed:
+        bets = [e for e in entries if e.reason == "bet"]
+        topups = [e for e in entries if e.reason == "topup"]
+        status = Counter(m.status for m in markets)
+        outcomes = Counter(m.outcome for m in markets if m.status == "RESOLVED")
+        paid_out = sum(e.delta for e in entries if e.reason == "payout")
+        lines = [
+            f"**Wagered** — {_coins(sum(_staked(e) for e in bets))} coins across {_plural(len(bets), 'bet')} by {_plural(len({e.user_id for e in bets}), 'player')}",
+            f"**Markets** — {len(markets)} created, {status['RESOLVED']} resolved ({outcomes['yes']} YES / {outcomes['no']} NO), {status['VOID']} voided, {status['OPEN']} still open",
+            f"**Paid out** — {_coins(paid_out)} coins",
+        ]
+        if topups:
+            lines.append(f"**Charity** — {_plural(len(topups), 'top-up')} claimed")
+        embed = Embed(title=f"{season.name} Stats", description="\n".join(lines), color=Color.gold())
+        embed.add_field(name="Standouts", value="\n".join(await self._standout_lines(context, markets, entries)), inline=False)
+        return embed
+
+    async def _standout_lines(self, context, markets, entries) -> List[str]:
+        """One line per superlative, each skipped when the season has nothing to fill it."""
+        labels = {m.id: f"Market {m.id} — {m.question}"[:100] for m in markets}
+        settled = {m.id for m in markets if m.status != "OPEN"}
+        bets = [e for e in entries if e.reason == "bet"]
+        payouts = [e for e in entries if e.reason == "payout"]
+        lines = []
+        if bets:
+            market_ids, wagered = _leaders(bets, lambda e: e.market_id, _staked)
+            lines.append(f"**Hottest market** — {', '.join(labels[i] for i in market_ids)} ({_coins(wagered)} coins)")
+            lines.append(f"**Biggest bet** — {await self._biggest_line(context, bets, labels, _staked)}")
+            user_ids, count = _leaders(bets, lambda e: e.user_id, lambda e: 1)
+            lines.append(f"**Most active** — {await self._names(context, user_ids)}, {_plural(count, 'bet')} placed")
+            user_ids, wagered = _leaders(bets, lambda e: e.user_id, _staked)
+            lines.append(f"**Biggest spender** — {await self._names(context, user_ids)}, {_coins(wagered)} coins wagered")
+        if payouts:
+            lines.append(f"**Biggest payout** — {await self._biggest_line(context, payouts, labels, lambda e: e.delta)}")
+        creator_ids, created = _leaders(markets, lambda m: m.creator_id, lambda m: 1)
+        lines.append(f"**Market maker** — {await self._names(context, creator_ids)}, {_plural(created, 'market')} created")
+        nets = [e for e in entries if e.market_id in settled]  # open bets are still in play, so they sit out of P&L
+        winners, up = _leaders(nets, lambda e: e.user_id)
+        if up > 0:
+            lines.append(f"**Up the most** — {await self._names(context, winners)}, +{_coins(up)} coins")
+        losers, down = _leaders(nets, lambda e: e.user_id, lambda e: -e.delta)
+        if down > 0:
+            lines.append(f"**Down the most** — {await self._names(context, losers)}, -{_coins(down)} coins")
+        return lines
+
+    async def _biggest_line(self, context, entries, labels, value) -> str:
+        best = max(value(e) for e in entries)
+        return " · ".join([f"{await self._name(context, e.user_id)}, {_coins(value(e))} coins on {labels[e.market_id]}" for e in entries if value(e) == best])
+
     async def _standing_line(self, context, rank, uid, cash, shares_value) -> str:
         return f"{MEDALS.get(rank, f'{rank}.')} {await self._worth(context, uid, cash, shares_value)}"
 
@@ -456,6 +543,9 @@ class PlayMarket(commands.Cog):
     async def _name(self, context, user_id, mention=False) -> str:
         user = await get_user(self.bot, user_id, context.guild)
         return (user.mention if mention else user.display_name) if user else str(user_id)
+
+    async def _names(self, context, user_ids) -> str:
+        return ", ".join([await self._name(context, user_id) for user_id in user_ids])
 
 
 def _season_footer(season) -> str:

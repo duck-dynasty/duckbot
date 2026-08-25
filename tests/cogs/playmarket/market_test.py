@@ -828,6 +828,100 @@ async def test_season_history_lists_newest_season_first(cog, alice, clock):
     alice.send.assert_called_with(embeds=[season_two, season_one])
 
 
+# --- season stats ----------------------------------------------------------
+
+
+async def test_season_stats_with_nothing_going_on(cog, alice):
+    await cog.season_stats(alice)
+    alice.send.assert_called_once_with("Nothing's happened this season. Riveting.")
+
+
+async def test_season_stats_reports_the_season(cog, alice, bob, carol):
+    market_id = await open_market(cog, alice)
+    await cog.bet(bob, market_id, "yes", BET)
+    await cog.bet(carol, market_id, "no", 800)
+    await cog.resolve(alice, market_id, "yes")
+    await cog.season_stats(alice)
+    expected = Embed(
+        title="Season 1 Stats",
+        description="**Wagered** — 1,300 coins across 2 bets by 2 players\n**Markets** — 1 created, 1 resolved (1 YES / 0 NO), 0 voided, 0 still open\n**Paid out** — 831 coins",
+        color=Color.gold(),
+    )
+    expected.add_field(
+        name="Standouts",
+        value="\n".join(
+            [
+                f"**Hottest market** — Market {market_id} — Will it happen? (1,300 coins)",
+                f"**Biggest bet** — user3, 800 coins on Market {market_id} — Will it happen?",
+                "**Most active** — user2, user3, 1 bet placed",
+                "**Biggest spender** — user3, 800 coins wagered",
+                f"**Biggest payout** — user2, 831 coins on Market {market_id} — Will it happen?",
+                "**Market maker** — user1, 1 market created",
+                "**Up the most** — user2, +331 coins",
+                "**Down the most** — user3, -800 coins",
+            ]
+        ),
+        inline=False,
+    )
+    alice.send.assert_called_with(embed=expected)
+
+
+async def test_season_stats_omits_superlatives_with_no_data(cog, alice, bob):
+    market_id = await open_market(cog, alice)
+    await cog.bet(bob, market_id, "yes", BET)
+    await cog.season_stats(alice)
+    expected = Embed(
+        title="Season 1 Stats",
+        description="**Wagered** — 500 coins across 1 bet by 1 player\n**Markets** — 1 created, 0 resolved (0 YES / 0 NO), 0 voided, 1 still open\n**Paid out** — 0 coins",
+        color=Color.gold(),
+    )
+    expected.add_field(
+        name="Standouts",
+        value="\n".join(
+            [
+                f"**Hottest market** — Market {market_id} — Will it happen? (500 coins)",
+                f"**Biggest bet** — user2, 500 coins on Market {market_id} — Will it happen?",
+                "**Most active** — user2, 1 bet placed",
+                "**Biggest spender** — user2, 500 coins wagered",
+                "**Market maker** — user1, 1 market created",
+            ]
+        ),
+        inline=False,
+    )
+    alice.send.assert_called_with(embed=expected)
+
+
+async def test_season_stats_leaves_open_bets_out_of_the_profit_and_loss(cog, alice, bob, carol):
+    settled = await open_market(cog, alice)
+    await cog.bet(bob, settled, "yes", BET)
+    await cog.resolve(alice, settled, "yes")
+    still_open = await open_market(cog, alice)
+    await cog.bet(carol, still_open, "no", 800)
+    await cog.season_stats(alice)
+    lines = alice.send.call_args.kwargs["embed"].fields[0].value.splitlines()
+    assert [line for line in lines if line.startswith(("**Up", "**Down"))] == ["**Up the most** — user2, +331 coins"]
+
+
+async def test_season_stats_names_everyone_tied_for_a_superlative(cog, alice, bob, carol):
+    market_id = await open_market(cog, alice)
+    await cog.bet(bob, market_id, "yes", BET)
+    await cog.bet(carol, market_id, "no", BET)
+    await cog.season_stats(alice)
+    lines = alice.send.call_args.kwargs["embed"].fields[0].value.splitlines()
+    assert lines[1] == f"**Biggest bet** — user2, 500 coins on Market {market_id} — Will it happen? · user3, 500 coins on Market {market_id} — Will it happen?"
+    assert lines[2] == "**Most active** — user2, user3, 1 bet placed"
+    assert lines[3] == "**Biggest spender** — user2, user3, 500 coins wagered"
+
+
+async def test_season_stats_counts_top_ups(cog, alice, bob, in_memory_db):
+    await open_market(cog, alice)
+    await cog.balance(bob)
+    set_balance(in_memory_db, 2, 100)
+    await cog.claim(bob)
+    await cog.season_stats(alice)
+    assert alice.send.call_args.kwargs["embed"].description.splitlines()[-1] == "**Charity** — 1 top-up claimed"
+
+
 # --- market autocomplete -------------------------------------------------
 
 
