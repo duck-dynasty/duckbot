@@ -16,6 +16,7 @@ from duckbot.cogs.playmarket.models import (
     Season,
     SeasonResult,
 )
+from duckbot.util.permissions import REPOSITORY_ADMINS
 from tests.discord_test_ext import bind_commands
 
 BET = 500
@@ -450,7 +451,7 @@ async def test_a_non_creator_non_admin_cannot_resolve(cog, alice, bob, in_memory
 
 
 async def test_an_admin_can_resolve_any_market(cog, alice, in_memory_db):
-    admin = make_context(config.ADMIN_IDS[0])
+    admin = make_context(REPOSITORY_ADMINS[0])
     market_id = await open_market(cog, alice)
     await cog.resolve(admin, market_id, "yes")
     assert market_row(in_memory_db, market_id).status == "RESOLVED"
@@ -522,7 +523,7 @@ async def test_resolving_keeps_the_ledger_reconciled(cog, alice, bob, carol, in_
 
 
 async def test_admin_void_claws_back_payouts_and_refunds_stakes(cog, alice, bob, carol, in_memory_db):
-    admin = make_context(config.ADMIN_IDS[0])
+    admin = make_context(REPOSITORY_ADMINS[0])
     market_id = await open_market(cog, alice)
     await cog.bet(bob, market_id, "yes", BET)
     await cog.bet(carol, market_id, "no", BET)
@@ -535,7 +536,7 @@ async def test_admin_void_claws_back_payouts_and_refunds_stakes(cog, alice, bob,
 
 
 async def test_admin_void_writes_void_ledger_rows(cog, alice, bob, carol, in_memory_db):
-    admin = make_context(config.ADMIN_IDS[0])
+    admin = make_context(REPOSITORY_ADMINS[0])
     market_id = await open_market(cog, alice)
     await cog.bet(bob, market_id, "yes", BET)
     await cog.bet(carol, market_id, "no", BET)
@@ -546,7 +547,7 @@ async def test_admin_void_writes_void_ledger_rows(cog, alice, bob, carol, in_mem
 
 
 async def test_admin_void_keeps_the_ledger_reconciled(cog, alice, bob, carol, in_memory_db):
-    admin = make_context(config.ADMIN_IDS[0])
+    admin = make_context(REPOSITORY_ADMINS[0])
     market_id = await open_market(cog, alice)
     await cog.bet(bob, market_id, "yes", BET)
     await cog.bet(carol, market_id, "no", BET)
@@ -556,7 +557,7 @@ async def test_admin_void_keeps_the_ledger_reconciled(cog, alice, bob, carol, in
 
 
 async def test_admin_void_announces_the_corrections(cog, alice, bob, in_memory_db):
-    admin = make_context(config.ADMIN_IDS[0])
+    admin = make_context(REPOSITORY_ADMINS[0])
     market_id = await open_market(cog, alice)
     await cog.bet(bob, market_id, "yes", BET)
     await cog.resolve(alice, market_id, "yes")
@@ -567,7 +568,7 @@ async def test_admin_void_announces_the_corrections(cog, alice, bob, in_memory_d
 
 
 async def test_admin_void_can_push_a_spender_negative(cog, alice, bob, in_memory_db):
-    admin = make_context(config.ADMIN_IDS[0])
+    admin = make_context(REPOSITORY_ADMINS[0])
     market_id = await open_market(cog, alice)
     await cog.bet(bob, market_id, "yes", BET)
     await cog.resolve(alice, market_id, "yes")
@@ -577,7 +578,7 @@ async def test_admin_void_can_push_a_spender_negative(cog, alice, bob, in_memory
 
 
 async def test_admin_void_refunds_a_seller_their_rounding_loss(cog, alice, bob, in_memory_db):
-    admin = make_context(config.ADMIN_IDS[0])
+    admin = make_context(REPOSITORY_ADMINS[0])
     market_id = await open_market(cog, alice)
     await cog.bet(bob, market_id, "yes", BET)
     await cog.sell(bob, market_id, "yes", "all")  # gets back 499, house keeps 1
@@ -588,7 +589,7 @@ async def test_admin_void_refunds_a_seller_their_rounding_loss(cog, alice, bob, 
 
 
 async def test_admin_void_with_no_bettors_just_flips_the_status(cog, alice, in_memory_db):
-    admin = make_context(config.ADMIN_IDS[0])
+    admin = make_context(REPOSITORY_ADMINS[0])
     market_id = await open_market(cog, alice)
     await cog.resolve(alice, market_id, "yes")
     await cog.resolve(admin, market_id, "void")
@@ -604,7 +605,7 @@ async def test_creator_cannot_void_a_resolved_market(cog, alice, in_memory_db):
 
 
 async def test_admin_cannot_re_resolve_to_yes_or_no(cog, alice, in_memory_db):
-    admin = make_context(config.ADMIN_IDS[0])
+    admin = make_context(REPOSITORY_ADMINS[0])
     market_id = await open_market(cog, alice)
     await cog.resolve(alice, market_id, "yes")
     await cog.resolve(admin, market_id, "no")
@@ -613,7 +614,7 @@ async def test_admin_cannot_re_resolve_to_yes_or_no(cog, alice, in_memory_db):
 
 
 async def test_voiding_an_already_void_market_is_rejected(cog, alice, in_memory_db):
-    admin = make_context(config.ADMIN_IDS[0])
+    admin = make_context(REPOSITORY_ADMINS[0])
     market_id = await open_market(cog, alice)
     await cog.resolve(alice, market_id, "void")
     await cog.resolve(admin, market_id, "void")
@@ -621,7 +622,7 @@ async def test_voiding_an_already_void_market_is_rejected(cog, alice, in_memory_
 
 
 async def test_admin_void_is_rejected_once_the_season_is_archived(cog, alice, bob, clock, in_memory_db):
-    admin = make_context(config.ADMIN_IDS[0])
+    admin = make_context(REPOSITORY_ADMINS[0])
     market_id = await open_market(cog, alice)
     await cog.bet(bob, market_id, "yes", BET)
     await cog.resolve(alice, market_id, "yes")

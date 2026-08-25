@@ -161,12 +161,9 @@ async def test_gather_stats_skips_forbidden_channels(clazz, guild, text_channel)
 
 
 async def test_gather_stats_scans_active_and_archived_threads(clazz, guild, text_channel, thread):
-    active_thread = readable(thread, [make_message("from an active thread", author_id=2)])
-    active_thread.type = discord.ChannelType.public_thread
-    text_channel.threads = [active_thread]
+    text_channel.threads = [readable(thread, [make_message("from an active thread", author_id=2)])]
 
     archived_thread = readable(mock.Mock(spec=discord.Thread), [make_message("from an archived thread", author_id=3)])
-    archived_thread.type = discord.ChannelType.public_thread
     text_channel.archived_threads.return_value = list_as_async_generator([archived_thread])
 
     text_channel.history.return_value = list_as_async_generator([make_message("in the channel itself")])
@@ -185,7 +182,30 @@ async def test_gather_stats_skips_forbidden_archived_threads(clazz, guild, text_
     text_channel.archived_threads.side_effect = Forbidden(mock.Mock(status=403), "no")
     guild.text_channels = [text_channel]
     stats, _, _, channels, threads = await clazz.gather_stats(guild, None, None)
+    assert stats == {} and channels == 0 and threads == 0
+
+
+async def test_gather_stats_ignores_channels_without_messages(clazz, guild, text_channel, thread):
+    text_channel.threads = [readable(thread, [])]
+    guild.text_channels = [readable(text_channel, [])]
+    stats, _, _, channels, threads = await clazz.gather_stats(guild, None, None)
+    assert stats == {} and channels == 0 and threads == 0
+
+
+async def test_gather_stats_counts_channels_with_only_bot_messages(clazz, guild, text_channel):
+    guild.text_channels = [readable(text_channel, [make_message(is_bot=True)])]
+    stats, _, _, channels, threads = await clazz.gather_stats(guild, None, None)
     assert stats == {} and channels == 1 and threads == 0
+
+
+async def test_gather_stats_counts_announcement_channels_as_channels(clazz, guild):
+    announcements = readable(mock.Mock(spec=discord.TextChannel), [make_message("news!")])
+    announcements.type = discord.ChannelType.news
+    announcements.threads = []
+    announcements.archived_threads.return_value = list_as_async_generator([])
+    guild.text_channels = [announcements]
+    _, _, _, channels, threads = await clazz.gather_stats(guild, None, None)
+    assert channels == 1 and threads == 0
 
 
 def test_tally_counts_each_stat(clazz):

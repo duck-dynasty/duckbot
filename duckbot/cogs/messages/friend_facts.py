@@ -2,7 +2,7 @@ import calendar
 from dataclasses import dataclass
 from datetime import time, timedelta
 
-from discord import ChannelType, Forbidden, Message
+from discord import ChannelType, Forbidden, Message, Thread
 from discord.ext import commands, tasks
 from discord.utils import get
 
@@ -80,16 +80,19 @@ class FriendFacts(commands.Cog):
             if not channel.permissions_for(guild.me).read_message_history:
                 continue
             try:
+                active = False
                 async for message in channel.history(limit=None, after=start, before=end, oldest_first=True):
+                    active = True
                     if message.author.bot:
                         self.tally_slash_weather(stats, message)
                     else:
                         self.tally(stats, hours, days, message)
                     await self.tally_reactions(stats, message)
-                if channel.type is ChannelType.text:
-                    channels += 1
-                else:
-                    threads += 1
+                if active:
+                    if isinstance(channel, Thread):
+                        threads += 1
+                    else:
+                        channels += 1
             except Forbidden:
                 pass
         return stats, hours, days, channels, threads

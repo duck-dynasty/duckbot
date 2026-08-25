@@ -12,6 +12,7 @@ from sqlalchemy import String, cast, or_
 from duckbot.db import Database
 from duckbot.util.datetime import now
 from duckbot.util.embeds import group_by_max_length
+from duckbot.util.permissions import REPOSITORY_ADMINS
 from duckbot.util.users import get_user
 
 from . import config, lmsr
@@ -537,7 +538,7 @@ class PlayMarket(commands.Cog):
         return f"{await self._name(context, uid)} — {_coins(cash + shares_value)} coins ({_coins(cash)} available)"
 
     async def _is_admin(self, context) -> bool:
-        return await context.bot.is_owner(context.author) or context.author.id in config.ADMIN_IDS
+        return await context.bot.is_owner(context.author) or context.author.id in REPOSITORY_ADMINS
 
     async def _name(self, context, user_id, mention=False) -> str:
         user = await get_user(self.bot, user_id, context.guild)
