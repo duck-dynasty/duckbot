@@ -35,11 +35,11 @@ services:
         order: stop-first
 
   postgres:
-    image: postgres:13.2
+    image: postgres:17
     environment:
       POSTGRES_USER: duckbot
       POSTGRES_PASSWORD: pond
-      PGDATA: /data/postgres
+      PGDATA: /data/postgres/pg17
     volumes:
     - duckbot_dbdata:/data/postgres
     healthcheck:

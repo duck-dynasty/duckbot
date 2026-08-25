@@ -37,12 +37,12 @@ class DuckBotStack(cdk.Stack):
         postgres = task_definition.add_container(
             "postgres",
             container_name="postgres",
-            image=ecs.ContainerImage.from_registry("postgres:13.2"),
+            image=ecs.ContainerImage.from_registry("postgres:17"),
             essential=False,
             environment={
                 "POSTGRES_USER": "duckbot",
                 "POSTGRES_PASSWORD": "pond",
-                "PGDATA": postgres_data_path,
+                "PGDATA": f"{postgres_data_path}/pg17",
             },
             health_check=ecs.HealthCheck(
                 command=["CMD", "pg_isready", "-U", "duckbot"],
