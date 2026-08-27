@@ -34,7 +34,7 @@ dependencies = [
     "yfinance==1.5.2",
     "mip==1.17.6",
     "groq==1.6.0",
-    "alembic==1.18.5",
+    "alembic==1.19.1",
 ]
 
 [project.optional-dependencies]
