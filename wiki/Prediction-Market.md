@@ -35,7 +35,8 @@ Everyone starts each **season** with **10,000 coins**. A season runs for a calen
 - Coins are always **whole numbers**. (Share counts can be fractional under the hood — that's the market's internal accounting — but you bet and get paid in whole coins.)
 - Coins are spent placing bets and earned when your bets pay out.
 - If you go broke (under 1,000 coins) **and** hold no open positions, `/market claim` tops you back up to 2,000 coins, once per week. It's the only faucet, so balances still track skill within a season.
-- At season end any still-open markets are auto-voided, balances reset, and the final standings are recorded in a hall of fame — browse it with `/market season history`.
+- At season end your balance resets to 10,000 and the final standings are recorded in a hall of fame — browse it with `/market season history`. Standings are ranked by net worth, so coins parked in an open bet still count towards where you finish.
+- **Open markets ride into the next season, and so do your positions.** What you spent on them stays committed rather than being handed back: your new 10,000 comes with the cost of your carried bets already deducted. Bet 1,000 on a market that survives the reset and you open the next season with 9,000 coins and the position, whatever the odds have done since — you're never charged for a gain you haven't cashed in. Sell to free the coins back up.
 
 Use `/market balance` to see your net worth, available coins and positions, and `/market leaderboard` for the standings (ranked by net worth = coins + the live value of your open positions). The leaderboard also shows the remaining time in the season.
 
@@ -137,20 +138,20 @@ Markets don't close on their own — the person who **created** the market settl
 
 Everyone holding a position is pinged with the results, so you'll know how your bet went even if you miss the resolve.
 
-Only the creator can resolve their own market — it's a friends-trust-friends "prop bet" model. If a creator never resolves (or leaves the server), the market is automatically voided when the season ends, so no coins stay stranded.
+Only the creator can resolve their own market — it's a friends-trust-friends "prop bet" model. A market that nobody resolves simply stays open, carrying from season to season until it's called; if the creator has gone quiet for good, ask a bot admin to void it.
 
 ### Fixing a bad resolution
 
-If a market gets resolved wrong (fat finger, disputed call), a bot admin can void it after the fact: run `/market resolve` again on the resolved market with `outcome:void`. Payouts are clawed back, everyone's stake is refunded as if the market had been voided in the first place, and affected players are pinged. This only works while the season is still running — once a season is archived, its results are final. Fair warning: if you already spent the winnings, the clawback can put your balance in the red.
+If a market gets resolved wrong (fat finger, disputed call), a bot admin can void it after the fact: run `/market resolve` again on the resolved market with `outcome:void`. Payouts are clawed back, everyone's stake is refunded as if the market had been voided in the first place, and affected players are pinged. This only works while the market's season is still running — once a season is archived, its results are final. A carried market belongs to the current season, so it stays correctable. Fair warning: if you already spent the winnings, the clawback can put your balance in the red.
 
 ## Economy at a glance
 
-| Thing             | Value                                                    |
-| ----------------- | -------------------------------------------------------- |
-| Starting balance  | 10,000 coins per season                                  |
-| Season length     | 1 calendar quarter, then balances reset                  |
-| Need-based top-up | under 1,000 coins & no positions → back to 2,000, weekly |
-| Minimum bet       | 10 coins                                                 |
-| Resolution        | by the market's creator; auto-void at season end         |
-| Trading fee       | 0% — the house funds the markets                         |
-| Liquidity tiers   | low `b=500`, med `b=1,000`, high `b=2,000`               |
+| Thing             | Value                                                      |
+| ----------------- | ---------------------------------------------------------- |
+| Starting balance  | 10,000 coins per season                                    |
+| Season length     | 1 calendar quarter, then balances reset                    |
+| Need-based top-up | under 1,000 coins & no positions → back to 2,000, weekly   |
+| Minimum bet       | 10 coins                                                   |
+| Resolution        | by the market's creator; open markets carry to next season |
+| Trading fee       | 0% — the house funds the markets                           |
+| Liquidity tiers   | low `b=500`, med `b=1,000`, high `b=2,000`                 |

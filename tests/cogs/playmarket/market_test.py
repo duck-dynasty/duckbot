@@ -106,11 +106,13 @@ def ledger(in_memory_db, user_id):
         return session.query(LedgerEntry).filter_by(user_id=user_id).all()
 
 
-def reconciles(in_memory_db):
-    """Each player's balance equals their ledger sum."""
+def reconciles(in_memory_db, season_name=None):
+    """Each player's balance equals their ledger sum, optionally scoped to one season."""
     with in_memory_db.session(PlayerAccount) as session:
+        season_id = session.query(Season).filter_by(name=season_name).one().id if season_name else None
         for player in session.query(PlayerAccount).all():
-            total = sum((e.delta for e in session.query(LedgerEntry).filter_by(user_id=player.id).all()), 0)
+            entries = session.query(LedgerEntry).filter_by(user_id=player.id)
+            total = sum((e.delta for e in (entries.filter_by(season_id=season_id) if season_id else entries).all()), 0)
             if player.balance != total:
                 return False
     return True
@@ -735,7 +737,7 @@ async def test_leaderboard_rolls_the_season_over_when_it_has_ended(cog, alice, b
     await cog.bet(alice, market_id, "yes", BET)
     clock.advance(days=91)
     await cog.leaderboard(bob)
-    expected = Embed(title="Season 2 Leaderboard", description="🥇 user1 — 10,000 coins (10,000 available)", color=Color.gold())
+    expected = Embed(title="Season 2 Leaderboard", description="🥇 user1 — 10,080 coins (9,500 available)", color=Color.gold())  # stake carried, shares marked
     expected.set_footer(text="Ends on July 1, 2024 · 90 days left")
     bob.send.assert_called_with(embed=expected)
 
@@ -766,16 +768,95 @@ async def test_rollover_resets_every_balance(cog, alice, bob, clock, in_memory_d
     await cog.balance(bob)
     clock.advance(days=91)
     await cog.tick()
-    assert account(in_memory_db, 1).balance == STARTING
+    assert account(in_memory_db, 1).balance == STARTING - BET  # alice's stake rides forward
     assert account(in_memory_db, 2).balance == STARTING
 
 
-async def test_rollover_force_voids_unsettled_markets(cog, alice, clock, in_memory_db):
+async def test_rollover_carries_unsettled_markets_into_the_next_season(cog, alice, clock, in_memory_db):
     market_id = await open_market(cog, alice)
     await cog.bet(alice, market_id, "yes", BET)
     clock.advance(days=91)
     await cog.tick()
+    with in_memory_db.session(Season) as session:
+        season_two = session.query(Season).filter_by(name="Season 2").one()
+    market = market_row(in_memory_db, market_id)
+    assert market.status == "OPEN"
+    assert market.season_id == season_two.id
+
+
+async def test_rollover_leaves_the_position_intact(cog, alice, clock, in_memory_db):
+    market_id = await open_market(cog, alice)
+    await cog.bet(alice, market_id, "yes", BET)
+    before = position(in_memory_db, 1, market_id).yes_shares
+    clock.advance(days=91)
+    await cog.tick()
+    assert position(in_memory_db, 1, market_id).yes_shares == before
+
+
+async def test_rollover_charges_the_carry_at_cost_not_at_market(cog, alice, bob, clock, in_memory_db):
+    market_id = await open_market(cog, alice)
+    await cog.bet(alice, market_id, "yes", BET)
+    await cog.bet(bob, market_id, "yes", 5000)  # shoves alice's shares well above what she paid
+    clock.advance(days=91)
+    await cog.tick()
+    assert account(in_memory_db, 1).balance == STARTING - BET
+
+
+async def test_rollover_carries_a_partly_sold_position_at_its_net_cost(cog, alice, clock, in_memory_db):
+    market_id = await open_market(cog, alice)
+    await cog.bet(alice, market_id, "yes", BET)
+    held = position(in_memory_db, 1, market_id).yes_shares
+    await cog.sell(alice, market_id, "yes", str(held / 2))
+    cost = STARTING - account(in_memory_db, 1).balance
+    clock.advance(days=91)
+    await cog.tick()
+    assert account(in_memory_db, 1).balance == STARTING - cost
+
+
+async def test_rollover_carries_nothing_for_a_fully_sold_position(cog, alice, clock, in_memory_db):
+    market_id = await open_market(cog, alice)
+    await cog.bet(alice, market_id, "yes", BET)
+    await cog.sell(alice, market_id, "yes", "all")
+    clock.advance(days=91)
+    await cog.tick()
+    assert account(in_memory_db, 1).balance == STARTING
+    assert "carry" not in reasons(in_memory_db, 1)
+
+
+async def test_a_carried_market_pays_out_in_the_new_season(cog, alice, clock, in_memory_db):
+    market_id = await open_market(cog, alice)
+    await cog.bet(alice, market_id, "yes", BET)
+    clock.advance(days=91)
+    await cog.tick()
+    await cog.resolve(alice, market_id, "yes")
+    assert account(in_memory_db, 1).balance > STARTING
+    assert reconciles(in_memory_db, "Season 2")  # grant - carry + payout
+
+
+async def test_an_admin_can_reverse_a_resolution_on_a_carried_market(cog, alice, clock, in_memory_db):
+    admin = make_context(REPOSITORY_ADMINS[0])
+    market_id = await open_market(cog, alice)
+    await cog.bet(alice, market_id, "yes", BET)
+    clock.advance(days=91)
+    await cog.tick()
+    await cog.resolve(alice, market_id, "yes")
+    await cog.resolve(admin, market_id, "void")  # the carried market is in the live season, so this lands
     assert market_row(in_memory_db, market_id).status == "VOID"
+    assert account(in_memory_db, 1).balance == STARTING
+
+
+async def test_a_market_carried_twice_is_charged_each_season(cog, alice, clock, in_memory_db):
+    market_id = await open_market(cog, alice)
+    await cog.bet(alice, market_id, "yes", BET)
+    clock.advance(days=91)
+    await cog.tick()
+    clock.advance(days=91)
+    await cog.tick()
+    with in_memory_db.session(Season) as session:
+        assert session.query(Season).filter_by(name="Season 3").one().status == "active"
+    assert account(in_memory_db, 1).balance == STARTING - BET
+    await cog.resolve(alice, market_id, "void")
+    assert account(in_memory_db, 1).balance == STARTING
 
 
 async def test_rollover_records_the_final_standings(cog, alice, bob, clock, in_memory_db):
@@ -787,6 +868,20 @@ async def test_rollover_records_the_final_standings(cog, alice, bob, clock, in_m
         season_one = session.query(Season).filter_by(name="Season 1").one()
         ranks = {r.rank for r in session.query(SeasonResult).filter_by(season_id=season_one.id).all()}
     assert ranks == {1, 2}
+
+
+async def test_rollover_records_standings_at_net_worth(cog, alice, bob, clock, in_memory_db):
+    market_id = await open_market(cog, alice)
+    await cog.bet(alice, market_id, "yes", BET)
+    await cog.balance(bob)
+    set_balance(in_memory_db, 2, STARTING - 1)  # bob leads on cash, trails once alice's shares count
+    clock.advance(days=91)
+    await cog.tick()
+    with in_memory_db.session(Season) as session:
+        season_one = session.query(Season).filter_by(name="Season 1").one()
+        results = {r.user_id: r for r in session.query(SeasonResult).filter_by(season_id=season_one.id).all()}
+    assert results[1].rank == 1 and results[1].final_balance > STARTING - BET
+    assert results[2].rank == 2
 
 
 async def test_tick_does_nothing_before_the_season_ends(cog, alice, in_memory_db):
