@@ -163,8 +163,8 @@ async def test_balance_lists_your_open_bets(cog, alice, in_memory_db):
     market_id = await open_market(cog, alice)
     await cog.bet(alice, market_id, "yes", BET)
     await cog.balance(alice)
-    expected = Embed(title="Balance", description="user1 — 10,080 coins (9,500 available)", color=Color.blurple())
-    expected.add_field(name=f"Market {market_id} — Will it happen?", value="YES 69.67%\nuser1 — 832 YES / 0 NO", inline=False)
+    expected = Embed(title="Balance", description="user1 — 10,023 coins (9,500 available)", color=Color.blurple())
+    expected.add_field(name=f"Market {market_id} — Will it happen?", value="YES 54.76%\nuser1 — 955 YES / 0 NO", inline=False)
     alice.send.assert_called_with(embed=expected)
 
 
@@ -173,7 +173,7 @@ async def test_balance_omits_resolved_bets(cog, alice, in_memory_db):
     await cog.bet(alice, market_id, "yes", BET)
     await cog.resolve(alice, market_id, "yes")
     await cog.balance(alice)
-    expected = Embed(title="Balance", description="user1 — 10,331 coins (10,331 available)", color=Color.blurple())
+    expected = Embed(title="Balance", description="user1 — 10,454 coins (10,454 available)", color=Color.blurple())
     alice.send.assert_called_with(embed=expected)
 
 
@@ -182,8 +182,8 @@ async def test_balance_shows_only_your_positions(cog, alice, bob, in_memory_db):
     await cog.bet(alice, market_id, "yes", BET)
     await cog.bet(bob, market_id, "no", BET)
     await cog.balance(alice)
-    expected = Embed(title="Balance", description="user1 — 9,852 coins (9,500 available)", color=Color.blurple())
-    expected.add_field(name=f"Market {market_id} — Will it happen?", value="YES 42.26%\nuser1 — 832 YES / 0 NO", inline=False)
+    expected = Embed(title="Balance", description="user1 — 9,973 coins (9,500 available)", color=Color.blurple())
+    expected.add_field(name=f"Market {market_id} — Will it happen?", value="YES 49.55%\nuser1 — 955 YES / 0 NO", inline=False)
     alice.send.assert_called_with(embed=expected)
 
 
@@ -209,7 +209,7 @@ async def test_list_shows_each_players_position(cog, alice, bob):
     await cog.bet(bob, market_id, "no", BET)
     await cog.list_markets(alice, None)
     expected = Embed(title="Open Markets", color=Color.blurple())
-    expected.add_field(name=f"Market {market_id} — Will it happen?", value="YES 42.26%\nuser2 — 0 YES / 1,144 NO\nuser1 — 832 YES / 0 NO", inline=False)
+    expected.add_field(name=f"Market {market_id} — Will it happen?", value="YES 49.55%\nuser2 — 0 YES / 1,045 NO\nuser1 — 955 YES / 0 NO", inline=False)
     alice.send.assert_called_with(embed=expected)
 
 
@@ -253,7 +253,7 @@ async def test_create_announces_the_new_market(mock_choice, cog, alice):
     alice.send.assert_called_with(embed=expected)
 
 
-@pytest.mark.parametrize("tier,b", [("low", 500), ("med", 1000), ("high", 2000)])
+@pytest.mark.parametrize("tier,b", [("low", 2000), ("med", 5000), ("high", 10000)])
 async def test_create_sets_liquidity_and_subsidy_by_tier(cog, alice, in_memory_db, tier, b):
     market_id = await open_market(cog, alice, liquidity=tier)
     market = market_row(in_memory_db, market_id)
@@ -277,8 +277,8 @@ async def test_create_after_season_end_rolls_over_first(cog, alice, clock, in_me
 async def test_bet_buys_yes_shares_and_moves_the_price(cog, alice, in_memory_db):
     market_id = await open_market(cog, alice)
     await cog.bet(alice, market_id, "yes", BET)
-    expected = Embed(title=f"Market {market_id} — Will it happen?", description="user1 bought 832 YES shares for 500 coins.\nYES is now 69.67%.", color=Color.green())
-    expected.add_field(name="Holders", value="user1 — 832 YES / 0 NO", inline=False)
+    expected = Embed(title=f"Market {market_id} — Will it happen?", description="user1 bought 955 YES shares for 500 coins.\nYES is now 54.76%.", color=Color.green())
+    expected.add_field(name="Holders", value="user1 — 955 YES / 0 NO", inline=False)
     alice.send.assert_called_with(embed=expected)
 
 
@@ -286,15 +286,15 @@ async def test_bet_embed_lists_every_holder(cog, alice, bob, in_memory_db):
     market_id = await open_market(cog, alice)
     await cog.bet(alice, market_id, "yes", BET)
     await cog.bet(bob, market_id, "no", BET)
-    expected = Embed(title=f"Market {market_id} — Will it happen?", description="user2 bought 1,144 NO shares for 500 coins.\nYES is now 42.26%.", color=Color.red())
-    expected.add_field(name="Holders", value="user2 — 0 YES / 1,144 NO\nuser1 — 832 YES / 0 NO", inline=False)
+    expected = Embed(title=f"Market {market_id} — Will it happen?", description="user2 bought 1,045 NO shares for 500 coins.\nYES is now 49.55%.", color=Color.red())
+    expected.add_field(name="Holders", value="user2 — 0 YES / 1,045 NO\nuser1 — 955 YES / 0 NO", inline=False)
     bob.send.assert_called_with(embed=expected)
 
 
 async def test_bet_records_the_position(cog, alice, in_memory_db):
     market_id = await open_market(cog, alice)
     await cog.bet(alice, market_id, "yes", BET)
-    assert float(position(in_memory_db, 1, market_id).yes_shares) == pytest.approx(831.8, abs=1)
+    assert float(position(in_memory_db, 1, market_id).yes_shares) == pytest.approx(954.5, abs=1)
 
 
 async def test_bet_debits_exactly_the_budget(cog, alice, in_memory_db):
@@ -314,8 +314,8 @@ async def test_bet_on_no_lowers_the_yes_price(cog, alice, in_memory_db):
     await cog.bet(alice, market_id, "no", BET)
     assert float(market_row(in_memory_db, market_id).q_no) > 0
     assert cog._price(market_row(in_memory_db, market_id)) < 0.5
-    expected = Embed(title=f"Market {market_id} — Will it happen?", description="user1 bought 832 NO shares for 500 coins.\nYES is now 30.33%.", color=Color.red())
-    expected.add_field(name="Holders", value="user1 — 0 YES / 832 NO", inline=False)
+    expected = Embed(title=f"Market {market_id} — Will it happen?", description="user1 bought 955 NO shares for 500 coins.\nYES is now 45.24%.", color=Color.red())
+    expected.add_field(name="Holders", value="user1 — 0 YES / 955 NO", inline=False)
     alice.send.assert_called_with(embed=expected)
 
 
@@ -360,7 +360,7 @@ async def test_sell_all_clears_the_position(cog, alice, in_memory_db):
     await cog.bet(alice, market_id, "yes", BET)
     await cog.sell(alice, market_id, "yes", "all")
     assert position(in_memory_db, 1, market_id).yes_shares == 0
-    expected = Embed(title=f"Market {market_id} — Will it happen?", description="user1 sold 832 YES shares for 499 coins.\nYES is now 50%.", color=Color.green())
+    expected = Embed(title=f"Market {market_id} — Will it happen?", description="user1 sold 955 YES shares for 499 coins.\nYES is now 50%.", color=Color.green())
     alice.send.assert_called_with(embed=expected)
 
 
@@ -376,7 +376,7 @@ async def test_sell_reduces_the_market_quantity(cog, alice, in_memory_db):
     market_id = await open_market(cog, alice)
     await cog.bet(alice, market_id, "yes", BET)
     await cog.sell(alice, market_id, "yes", "200")
-    assert float(market_row(in_memory_db, market_id).q_yes) == pytest.approx(631.8, abs=1)
+    assert float(market_row(in_memory_db, market_id).q_yes) == pytest.approx(754.5, abs=1)
 
 
 async def test_sell_more_than_held_is_rejected(cog, alice, in_memory_db):
@@ -429,7 +429,7 @@ async def test_resolve_embed_shows_winners_and_losers(cog, alice, bob, carol, in
     await cog.bet(carol, market_id, "no", BET)
     await cog.resolve(alice, market_id, "yes")
     expected = Embed(title=f"Market {market_id} — Will it happen?", description="Called **YES**.", color=Color.green())
-    expected.add_field(name="Results", value="user2 — 832 YES, staked 500, won 831 (+331)\nuser3 — 1,144 NO, staked 500, lost 500", inline=False)
+    expected.add_field(name="Results", value="user2 — 955 YES, staked 500, won 954 (+454)\nuser3 — 1,045 NO, staked 500, lost 500", inline=False)
     alice.send.assert_called_with("<@2> <@3>", embed=expected)
 
 
@@ -439,7 +439,7 @@ async def test_resolve_embed_shows_both_sides_when_one_player_holds_both(cog, al
     await cog.bet(bob, market_id, "no", BET)
     await cog.resolve(alice, market_id, "no")
     expected = Embed(title=f"Market {market_id} — Will it happen?", description="Called **NO**.", color=Color.red())
-    expected.add_field(name="Results", value="user2 — 832 YES / 1,144 NO, staked 1,000, won 1,143 (+143)", inline=False)
+    expected.add_field(name="Results", value="user2 — 955 YES / 1,045 NO, staked 1,000, won 1,045 (+45)", inline=False)
     alice.send.assert_called_with("<@2>", embed=expected)
 
 
@@ -500,7 +500,7 @@ async def test_resolve_embed_shows_void_refunds(cog, alice, bob, in_memory_db):
     await cog.bet(bob, market_id, "yes", 300)
     await cog.resolve(alice, market_id, "void")
     expected = Embed(title=f"Market {market_id} — Will it happen?", description="Called **VOID**.", color=Color.greyple())
-    expected.add_field(name="Results", value="user2 — 530 YES, staked 300, refunded", inline=False)
+    expected.add_field(name="Results", value="user2 — 583 YES, staked 300, refunded", inline=False)
     alice.send.assert_called_with("<@2>", embed=expected)
 
 
@@ -563,7 +563,7 @@ async def test_admin_void_announces_the_corrections(cog, alice, bob, in_memory_d
     await cog.resolve(alice, market_id, "yes")
     await cog.resolve(admin, market_id, "void")
     expected = Embed(title=f"Market {market_id} — Will it happen?", description="Resolution reversed — market **VOIDED** by an admin.", color=Color.greyple())
-    expected.add_field(name="Corrections", value="user2 — clawed back 831, refunded 500 (-331)", inline=False)
+    expected.add_field(name="Corrections", value="user2 — clawed back 954, refunded 500 (-454)", inline=False)
     admin.send.assert_called_with("<@2>", embed=expected)
 
 
@@ -574,7 +574,7 @@ async def test_admin_void_can_push_a_spender_negative(cog, alice, bob, in_memory
     await cog.resolve(alice, market_id, "yes")
     set_balance(in_memory_db, 2, 100)  # bob spent his winnings
     await cog.resolve(admin, market_id, "void")
-    assert account(in_memory_db, 2).balance == 100 + BET - 831
+    assert account(in_memory_db, 2).balance == 100 + BET - 954
 
 
 async def test_admin_void_refunds_a_seller_their_rounding_loss(cog, alice, bob, in_memory_db):
@@ -706,7 +706,7 @@ async def test_leaderboard_ranks_by_net_worth(cog, alice, bob, in_memory_db):
     market_id = await open_market(cog, bob)
     await cog.bet(bob, market_id, "yes", BET)  # bob's position is worth more than his spent coins
     await cog.leaderboard(alice)
-    expected = Embed(title="Season 1 Leaderboard", description="🥇 user2 — 10,080 coins (9,500 available)\n🥈 user1 — 10,000 coins (10,000 available)", color=Color.gold())
+    expected = Embed(title="Season 1 Leaderboard", description="🥇 user2 — 10,023 coins (9,500 available)\n🥈 user1 — 10,000 coins (10,000 available)", color=Color.gold())
     expected.set_footer(text="Ends on April 1, 2024 · 90 days left")
     alice.send.assert_called_with(embed=expected)
 
@@ -844,7 +844,7 @@ async def test_season_stats_reports_the_season(cog, alice, bob, carol):
     await cog.season_stats(alice)
     expected = Embed(
         title="Season 1 Stats",
-        description="**Wagered** — 1,300 coins across 2 bets by 2 players\n**Markets** — 1 created, 1 resolved (1 YES / 0 NO), 0 voided, 0 still open\n**Paid out** — 831 coins",
+        description="**Wagered** — 1,300 coins across 2 bets by 2 players\n**Markets** — 1 created, 1 resolved (1 YES / 0 NO), 0 voided, 0 still open\n**Paid out** — 954 coins",
         color=Color.gold(),
     )
     expected.add_field(
@@ -855,9 +855,9 @@ async def test_season_stats_reports_the_season(cog, alice, bob, carol):
                 f"**Biggest bet** — user3, 800 coins on Market {market_id} — Will it happen?",
                 "**Most active** — user2, user3, 1 bet placed",
                 "**Biggest spender** — user3, 800 coins wagered",
-                f"**Biggest payout** — user2, 831 coins on Market {market_id} — Will it happen?",
+                f"**Biggest payout** — user2, 954 coins on Market {market_id} — Will it happen?",
                 "**Market maker** — user1, 1 market created",
-                "**Up the most** — user2, +331 coins",
+                "**Up the most** — user2, +454 coins",
                 "**Down the most** — user3, -800 coins",
             ]
         ),
@@ -899,7 +899,7 @@ async def test_season_stats_leaves_open_bets_out_of_the_profit_and_loss(cog, ali
     await cog.bet(carol, still_open, "no", 800)
     await cog.season_stats(alice)
     lines = alice.send.call_args.kwargs["embed"].fields[0].value.splitlines()
-    assert [line for line in lines if line.startswith(("**Up", "**Down"))] == ["**Up the most** — user2, +331 coins"]
+    assert [line for line in lines if line.startswith(("**Up", "**Down"))] == ["**Up the most** — user2, +454 coins"]
 
 
 async def test_season_stats_names_everyone_tied_for_a_superlative(cog, alice, bob, carol):

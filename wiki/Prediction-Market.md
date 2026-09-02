@@ -6,8 +6,8 @@ Prices are set by an automated market maker (an LMSR — see [How prices work](#
 
 > Human: /market create question:"Will it rain Saturday?"\
 > DuckBot: Market **7** open: _Will it rain Saturday?_ — YES 50%. Resolve it with `/market resolve 7 <yes|no>` when you know the outcome.\
-> Human: /market bet market:7 side:yes amount:500\
-> DuckBot: Bought 832 YES shares for 500 coins. YES is now 70%.
+> Human: /market bet market:7 side:yes amount:1000\
+> DuckBot: Bought 1,833 YES shares for 1,000 coins. YES is now 59%.
 
 When the outcome is known, the market's creator resolves it and everyone's winning shares are paid out.
 
@@ -82,14 +82,14 @@ When a market is created, the house (the bot) pre-funds it with a **subsidy** eq
 subsidy = b · ln(2)
 ```
 
-That's about 346 coins for a low-liquidity market, 693 for medium, 1,386 for high. It can be shown that the pool of coins collected always covers the winning payout, no matter how lopsided the betting gets — so DuckBot can never owe coins it can't pay. Market creation is therefore free and risk-free: anyone can open one.
+That's about 1,386 coins for a low-liquidity market, 3,466 for medium, 6,931 for high. It can be shown that the pool of coins collected always covers the winning payout, no matter how lopsided the betting gets — so DuckBot can never owe coins it can't pay. Market creation is therefore free and risk-free: anyone can open one.
 
 ### A worked example
 
 > Start: YES is 50%.\
-> **Alice bets 500 coins on YES.** She gets ~832 shares; YES jumps to ~70%.\
-> **Bob thinks that's too high and bets 500 coins on NO.** He gets ~1,144 shares; YES falls to ~42%.\
-> **The market resolves YES.** Alice's ~832 shares pay 831 coins (a +331 profit on her 500). Bob's NO shares pay nothing (−500). The house comes out slightly ahead.
+> **Alice bets 1,000 coins on YES.** She gets ~1,833 shares; YES rises to ~59%.\
+> **Bob thinks that's too high and bets 1,000 coins on NO.** He gets ~2,162 shares; YES falls to ~48%.\
+> **The market resolves YES.** Alice's ~1,833 shares pay 1,832 coins (a +832 profit on her 1,000). Bob's NO shares pay nothing (−1,000). The house comes out slightly ahead.
 
 ## Creating a market
 
@@ -101,11 +101,11 @@ That's about 346 coins for a low-liquidity market, 693 for medium, 1,386 for hig
 
 - **liquidity** — how deep the market is (defaults to `med`):
 
-  | Tier   | `b`   | Price sensitivity        | House subsidy |
-  | ------ | ----- | ------------------------ | ------------- |
-  | `low`  | 500   | swings hard per bet      | ~346 coins    |
-  | `med`  | 1,000 | a ~600-coin bet ≈ 20 pts | ~693 coins    |
-  | `high` | 2,000 | barely budges per bet    | ~1,386 coins  |
+  | Tier   | `b`    | Price sensitivity         | House subsidy |
+  | ------ | ------ | ------------------------- | ------------- |
+  | `low`  | 2,000  | a 1,000-coin bet ≈ 20 pts | ~1,386 coins  |
+  | `med`  | 5,000  | a 1,000-coin bet ≈ 9 pts  | ~3,466 coins  |
+  | `high` | 10,000 | a 1,000-coin bet ≈ 5 pts  | ~6,931 coins  |
 
 Anyone can create a market; the house funds the subsidy, so it costs you nothing.
 
@@ -153,4 +153,4 @@ If a market gets resolved wrong (fat finger, disputed call), a bot admin can voi
 | Minimum bet       | 10 coins                                                 |
 | Resolution        | by the market's creator; auto-void at season end         |
 | Trading fee       | 0% — the house funds the markets                         |
-| Liquidity tiers   | low `b=500`, med `b=1,000`, high `b=2,000`               |
+| Liquidity tiers   | low `b=2,000`, med `b=5,000`, high `b=10,000`            |

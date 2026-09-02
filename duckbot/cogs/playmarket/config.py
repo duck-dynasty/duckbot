@@ -10,4 +10,4 @@ TOPUP_COOLDOWN = timedelta(days=7)
 
 MIN_BET = 10
 
-LIQUIDITY = {"low": 500, "med": 1_000, "high": 2_000}  # creator's choice of `b`
+LIQUIDITY = {"low": 2_000, "med": 5_000, "high": 10_000}  # creator's choice of `b`
