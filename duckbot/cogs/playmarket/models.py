@@ -93,5 +93,5 @@ class LedgerEntry(Base):
     user_id = Column(BigInteger, ForeignKey("pm_users.id"), nullable=False)
     market_id = Column(BigInteger, ForeignKey("pm_markets.id"), nullable=True)  # null for grants/top-ups
     delta = Column(BigInteger, nullable=False)
-    reason = Column(String, nullable=False)  # season_grant|bet|sell|payout|refund|topup
+    reason = Column(String, nullable=False)  # season_grant|bet|sell|payout|refund|topup|carry|void
     created_at = Column(DateTime(timezone=True), default=_now)

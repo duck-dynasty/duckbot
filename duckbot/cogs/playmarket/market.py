@@ -342,18 +342,27 @@ class PlayMarket(commands.Cog):
         return season
 
     def _rollover(self, session, season) -> Season:
-        """Void unresolved markets, record final standings, archive the season, and start the next."""
-        for market in session.query(Market).filter(Market.season_id == season.id, Market.status == "OPEN").all():
-            self._resolve_market(session, market, "void")
-        accounts = session.query(PlayerAccount).all()
-        for rank, account in enumerate(sorted(accounts, key=lambda a: a.balance, reverse=True), start=1):
-            session.add(SeasonResult(season_id=season.id, user_id=account.id, final_balance=account.balance, rank=rank))
+        """Record final standings, archive the season, and start the next; open markets ride forward with their positions."""
+        carried = self._carry_costs(session, season)
+        for rank, (user_id, cash, shares_value) in enumerate(self._standings(session), start=1):
+            session.add(SeasonResult(season_id=season.id, user_id=user_id, final_balance=_whole(cash + shares_value), rank=rank))
         season.status = "archived"
         next_season = self._new_season(session, starts_at=season.ends_at)  # keep the calendar alignment
-        for account in accounts:
+        for market in session.query(Market).filter(Market.season_id == season.id, Market.status == "OPEN").all():
+            market.season_id = next_season.id
+        for account in session.query(PlayerAccount).all():
             account.balance = 0
             self._credit(session, next_season.id, account, None, config.STARTING_BALANCE, "season_grant")
+        for user_id, market_id, cost in carried:
+            self._credit(session, next_season.id, self._lock_account(session, user_id), market_id, -cost, "carry")
         return next_season
+
+    def _carry_costs(self, session, season):
+        """(user, market, cost) per live position; what a void would refund is charged forward instead."""
+        rows = session.query(Position, Market).join(Market, Position.market_id == Market.id)
+        rows = rows.filter(Market.season_id == season.id, Market.status == "OPEN", (Position.yes_shares > 0) | (Position.no_shares > 0)).all()
+        costs = [(position.user_id, market.id, max(0, -self._invested(session, position.user_id, market.id))) for position, market in rows]
+        return [row for row in costs if row[2]]
 
     def _new_season(self, session, starts_at=None) -> Season:
         starts_at = starts_at or now()
