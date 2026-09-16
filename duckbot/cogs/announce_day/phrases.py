@@ -124,4 +124,5 @@ templates = [
     "Today was {yesterday}. But, that's over.",
     "Fek, figure it out.",
     "Tuesday? I think?",
+    "wtf it's {today}",
 ]
