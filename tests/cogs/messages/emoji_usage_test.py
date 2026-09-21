@@ -24,15 +24,15 @@ def make_emoji(autospec, id, name, animated=False):
     return emoji
 
 
-def make_message(content="", reactions=[]):
-    message = mock.Mock()
+def make_message(autospec, content="", reactions=[]):
+    message = autospec.of(discord.Message)
     message.content = content
     message.reactions = reactions
     return message
 
 
-def make_reaction(emoji, count=1):
-    reaction = mock.Mock()
+def make_reaction(autospec, emoji, count=1):
+    reaction = autospec.of(discord.Reaction)
     reaction.emoji = emoji
     reaction.count = count
     return reaction
@@ -56,7 +56,7 @@ async def test_emoji_usage_command_is_rejected_outside_a_guild(clazz, context):
 async def test_emoji_usage_sends_report(clazz, guild, text_channel, context, autospec):
     duck = make_emoji(autospec, 1, "duck")
     guild.emojis = [duck]
-    guild.channels = [readable(text_channel, [make_message(f"{duck} hello")])]
+    guild.channels = [readable(text_channel, [make_message(autospec, f"{duck} hello")])]
     context.guild = guild
     await clazz.emoji_usage(context)
     context.send.assert_called_once_with(embed=Embed(title="Emoji Usage \N{MIDDLE DOT} last 90 days", description=f"{duck} 1"))
@@ -74,7 +74,7 @@ async def test_gather_counts_counts_emojis_in_content(clazz, guild, text_channel
     duck = make_emoji(autospec, 1, "duck")
     dance = make_emoji(autospec, 2, "dance", animated=True)
     guild.emojis = [duck, dance]
-    guild.channels = [readable(text_channel, [make_message(f"{duck} {duck} {dance}"), make_message(f"no emoji here")])]
+    guild.channels = [readable(text_channel, [make_message(autospec, f"{duck} {duck} {dance}"), make_message(autospec, f"no emoji here")])]
     counts = await clazz.gather_counts(guild, 90)
     assert counts == {duck: 2, dance: 1}
 
@@ -83,7 +83,7 @@ async def test_gather_counts_ignores_unicode_and_foreign_emojis(clazz, guild, te
     duck = make_emoji(autospec, 1, "duck")
     other_guild = make_emoji(autospec, 99, "elsewhere")
     guild.emojis = [duck]
-    guild.channels = [readable(text_channel, [make_message(f":duck: \N{DUCK} {other_guild}", reactions=[make_reaction("\N{DUCK}"), make_reaction(other_guild)])])]
+    guild.channels = [readable(text_channel, [make_message(autospec, f":duck: \N{DUCK} {other_guild}", reactions=[make_reaction(autospec, "\N{DUCK}"), make_reaction(autospec, other_guild)])])]
     counts = await clazz.gather_counts(guild, 90)
     assert counts == {duck: 0}
 
@@ -91,7 +91,7 @@ async def test_gather_counts_ignores_unicode_and_foreign_emojis(clazz, guild, te
 async def test_gather_counts_counts_reactions(clazz, guild, text_channel, autospec):
     duck = make_emoji(autospec, 1, "duck")
     guild.emojis = [duck]
-    guild.channels = [readable(text_channel, [make_message(reactions=[make_reaction(duck, count=3)])])]
+    guild.channels = [readable(text_channel, [make_message(autospec, reactions=[make_reaction(autospec, duck, count=3)])])]
     counts = await clazz.gather_counts(guild, 90)
     assert counts == {duck: 3}
 
@@ -99,9 +99,9 @@ async def test_gather_counts_counts_reactions(clazz, guild, text_channel, autosp
 async def test_gather_counts_scans_active_and_archived_threads(clazz, guild, text_channel, thread, autospec):
     duck = make_emoji(autospec, 1, "duck")
     guild.emojis = [duck]
-    archived = readable(mock.Mock(spec=discord.Thread), [make_message(str(duck))])
-    readable(text_channel, [make_message(str(duck))])
-    text_channel.threads = [readable(thread, [make_message(str(duck))])]
+    archived = readable(autospec.of(discord.Thread), [make_message(autospec, str(duck))])
+    readable(text_channel, [make_message(autospec, str(duck))])
+    text_channel.threads = [readable(thread, [make_message(autospec, str(duck))])]
     text_channel.archived_threads.return_value = list_as_async_generator([archived])
     guild.channels = [text_channel]
     counts = await clazz.gather_counts(guild, 90)
