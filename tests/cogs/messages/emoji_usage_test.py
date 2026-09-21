@@ -18,8 +18,6 @@ def clazz() -> EmojiUsage:
 
 @pytest.fixture
 def make_emoji(autospec):
-    """Returns a factory for custom emojis of the given id and name."""
-
     def make(id, name, animated=False) -> discord.Emoji:
         emoji = autospec.of(discord.Emoji)
         emoji.id = id
@@ -32,8 +30,6 @@ def make_emoji(autospec):
 
 @pytest.fixture
 def make_message(autospec):
-    """Returns a factory for messages with the given content and reactions."""
-
     def make(content="", reactions=[]) -> discord.Message:
         message = autospec.of(discord.Message)
         message.content = content
@@ -45,8 +41,6 @@ def make_message(autospec):
 
 @pytest.fixture
 def make_reaction(autospec):
-    """Returns a factory for reactions of the given emoji."""
-
     def make(emoji, count=1) -> discord.Reaction:
         reaction = autospec.of(discord.Reaction)
         reaction.emoji = emoji

@@ -10,8 +10,6 @@ from tests.async_mock_ext import list_as_async_generator
 
 @pytest.fixture
 def make_text_channel(autospec):
-    """Returns a factory for text channels holding the given threads."""
-
     def make(threads=[], archived=[], readable=True) -> discord.TextChannel:
         channel = autospec.of(discord.TextChannel)
         channel.permissions_for.return_value.read_message_history = readable
