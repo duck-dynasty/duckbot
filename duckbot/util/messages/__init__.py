@@ -1,4 +1,4 @@
-from .channels_and_threads import channels_and_threads
+from .accessible_channels import accessible_channels
 from .get_message_reference import get_message_reference
 from .try_delete import try_delete
 

@@ -4,7 +4,7 @@ from discord import Embed, Forbidden, Guild, Message
 from discord.ext import commands
 
 from duckbot.util.datetime import now
-from duckbot.util.messages import channels_and_threads
+from duckbot.util.messages import accessible_channels
 
 
 class EmojiUsage(commands.Cog):
@@ -18,9 +18,7 @@ class EmojiUsage(commands.Cog):
     async def gather_counts(self, guild: Guild, days: int):
         counts = {emoji: 0 for emoji in guild.emojis}
         after = now() - timedelta(days=days)
-        async for channel in channels_and_threads(guild):
-            if not channel.permissions_for(guild.me).read_message_history:
-                continue
+        async for channel in accessible_channels(guild):
             try:
                 async for message in channel.history(limit=None, after=after):
                     self.tally(counts, message)

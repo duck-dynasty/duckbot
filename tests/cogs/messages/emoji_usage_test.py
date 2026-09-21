@@ -110,14 +110,6 @@ async def test_gather_counts_scans_active_and_archived_threads(clazz, guild, tex
     assert counts == {duck: 3}
 
 
-async def test_gather_counts_skips_unreadable_channels(clazz, guild, text_channel):
-    guild.emojis = []
-    text_channel.permissions_for.return_value.read_message_history = False
-    guild.channels = [text_channel]
-    assert await clazz.gather_counts(guild, 90) == {}
-    text_channel.history.assert_not_called()
-
-
 async def test_gather_counts_skips_forbidden_channels(clazz, guild, text_channel):
     duck = make_emoji(1, "duck")
     guild.emojis = [duck]

@@ -8,7 +8,7 @@ from discord.utils import get
 
 import duckbot.util.datetime
 from duckbot.cogs.weather import CHART_FILE
-from duckbot.util.messages import channels_and_threads
+from duckbot.util.messages import accessible_channels
 from duckbot.util.users import get_user
 
 LEADERBOARD_SIZE = 10
@@ -77,9 +77,7 @@ class FriendFacts(commands.Cog):
         days = [0] * 7
         channels = 0
         threads = 0
-        async for channel in channels_and_threads(guild):
-            if not channel.permissions_for(guild.me).read_message_history:
-                continue
+        async for channel in accessible_channels(guild):
             try:
                 active = False
                 async for message in channel.history(limit=None, after=start, before=end, oldest_first=True):

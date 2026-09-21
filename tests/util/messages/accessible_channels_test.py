@@ -3,12 +3,13 @@ from unittest import mock
 import discord
 from discord import Forbidden
 
-from duckbot.util.messages import channels_and_threads
+from duckbot.util.messages import accessible_channels
 from tests.async_mock_ext import list_as_async_generator
 
 
-def channel(spec, threads=[], archived=[]):
+def channel(spec, threads=[], archived=[], readable=True):
     mocked = mock.Mock(spec=spec)
+    mocked.permissions_for.return_value.read_message_history = readable
     if hasattr(mocked, "archived_threads"):
         mocked.threads = threads
         mocked.archived_threads.return_value = list_as_async_generator(archived)
@@ -16,7 +17,7 @@ def channel(spec, threads=[], archived=[]):
 
 
 async def collect(guild):
-    return [channel async for channel in channels_and_threads(guild)]
+    return [channel async for channel in accessible_channels(guild)]
 
 
 async def test_yields_messageable_channels(guild):
@@ -44,3 +45,8 @@ async def test_skips_forbidden_archived_threads(guild):
     text.archived_threads.side_effect = Forbidden(mock.Mock(status=403), "no")
     guild.channels = [text]
     assert await collect(guild) == [text]
+
+
+async def test_skips_channels_the_bot_cannot_read(guild, thread):
+    guild.channels = [channel(discord.TextChannel, threads=[thread], readable=False)]
+    assert await collect(guild) == []
