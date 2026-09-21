@@ -16,13 +16,11 @@ def clazz() -> EmojiUsage:
     return bind_commands(EmojiUsage())
 
 
-def make_emoji(id, name, animated=False):
-    emoji = mock.Mock(spec=discord.Emoji)
+def make_emoji(autospec, id, name, animated=False):
+    emoji = autospec.of(discord.Emoji)
     emoji.id = id
     emoji.name = name
-    emoji.__str__ = lambda self: f"<{'a' if animated else ''}:{self.name}:{self.id}>"
-    emoji.__hash__ = lambda self: self.id
-    emoji.__eq__ = lambda self, other: getattr(other, "id", None) == self.id
+    emoji.__str__ = lambda x: f"<{'a' if animated else ''}:{name}:{id}>"
     return emoji
 
 
@@ -55,8 +53,8 @@ async def test_emoji_usage_command_is_rejected_outside_a_guild(clazz, context):
         any(check(context) for check in clazz.emoji_usage.checks)
 
 
-async def test_emoji_usage_sends_report(clazz, guild, text_channel, context):
-    duck = make_emoji(1, "duck")
+async def test_emoji_usage_sends_report(clazz, guild, text_channel, context, autospec):
+    duck = make_emoji(autospec, 1, "duck")
     guild.emojis = [duck]
     guild.channels = [readable(text_channel, [make_message(f"{duck} hello")])]
     context.guild = guild
@@ -72,34 +70,34 @@ async def test_gather_counts_looks_back_the_given_days(now, clazz, guild, text_c
     text_channel.history.assert_called_once_with(limit=None, after=datetime.datetime(2026, 9, 14, tzinfo=datetime.timezone.utc))
 
 
-async def test_gather_counts_counts_emojis_in_content(clazz, guild, text_channel):
-    duck = make_emoji(1, "duck")
-    dance = make_emoji(2, "dance", animated=True)
+async def test_gather_counts_counts_emojis_in_content(clazz, guild, text_channel, autospec):
+    duck = make_emoji(autospec, 1, "duck")
+    dance = make_emoji(autospec, 2, "dance", animated=True)
     guild.emojis = [duck, dance]
     guild.channels = [readable(text_channel, [make_message(f"{duck} {duck} {dance}"), make_message(f"no emoji here")])]
     counts = await clazz.gather_counts(guild, 90)
     assert counts == {duck: 2, dance: 1}
 
 
-async def test_gather_counts_ignores_unicode_and_foreign_emojis(clazz, guild, text_channel):
-    duck = make_emoji(1, "duck")
-    other_guild = make_emoji(99, "elsewhere")
+async def test_gather_counts_ignores_unicode_and_foreign_emojis(clazz, guild, text_channel, autospec):
+    duck = make_emoji(autospec, 1, "duck")
+    other_guild = make_emoji(autospec, 99, "elsewhere")
     guild.emojis = [duck]
     guild.channels = [readable(text_channel, [make_message(f":duck: \N{DUCK} {other_guild}", reactions=[make_reaction("\N{DUCK}"), make_reaction(other_guild)])])]
     counts = await clazz.gather_counts(guild, 90)
     assert counts == {duck: 0}
 
 
-async def test_gather_counts_counts_reactions(clazz, guild, text_channel):
-    duck = make_emoji(1, "duck")
+async def test_gather_counts_counts_reactions(clazz, guild, text_channel, autospec):
+    duck = make_emoji(autospec, 1, "duck")
     guild.emojis = [duck]
     guild.channels = [readable(text_channel, [make_message(reactions=[make_reaction(duck, count=3)])])]
     counts = await clazz.gather_counts(guild, 90)
     assert counts == {duck: 3}
 
 
-async def test_gather_counts_scans_active_and_archived_threads(clazz, guild, text_channel, thread):
-    duck = make_emoji(1, "duck")
+async def test_gather_counts_scans_active_and_archived_threads(clazz, guild, text_channel, thread, autospec):
+    duck = make_emoji(autospec, 1, "duck")
     guild.emojis = [duck]
     archived = readable(mock.Mock(spec=discord.Thread), [make_message(str(duck))])
     readable(text_channel, [make_message(str(duck))])
@@ -110,8 +108,8 @@ async def test_gather_counts_scans_active_and_archived_threads(clazz, guild, tex
     assert counts == {duck: 3}
 
 
-async def test_gather_counts_skips_forbidden_channels(clazz, guild, text_channel):
-    duck = make_emoji(1, "duck")
+async def test_gather_counts_skips_forbidden_channels(clazz, guild, text_channel, autospec):
+    duck = make_emoji(autospec, 1, "duck")
     guild.emojis = [duck]
     readable(text_channel, [])
     text_channel.history.side_effect = Forbidden(mock.Mock(status=403), "no")
@@ -119,7 +117,7 @@ async def test_gather_counts_skips_forbidden_channels(clazz, guild, text_channel
     assert await clazz.gather_counts(guild, 90) == {duck: 0}
 
 
-def test_report_ranks_most_used_first(clazz):
-    duck, dance, dead = make_emoji(1, "duck"), make_emoji(2, "dance"), make_emoji(3, "dead")
+def test_report_ranks_most_used_first(clazz, autospec):
+    duck, dance, dead = make_emoji(autospec, 1, "duck"), make_emoji(autospec, 2, "dance"), make_emoji(autospec, 3, "dead")
     embed = clazz.report({duck: 2, dead: 0, dance: 9}, 30)
     assert embed == Embed(title="Emoji Usage \N{MIDDLE DOT} last 30 days", description=f"{dance} 9\n{duck} 2\n{dead} 0")
