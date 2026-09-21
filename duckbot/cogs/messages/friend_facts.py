@@ -8,6 +8,7 @@ from discord.utils import get
 
 import duckbot.util.datetime
 from duckbot.cogs.weather import CHART_FILE
+from duckbot.util.messages import channels_and_threads
 from duckbot.util.users import get_user
 
 LEADERBOARD_SIZE = 10
@@ -76,7 +77,7 @@ class FriendFacts(commands.Cog):
         days = [0] * 7
         channels = 0
         threads = 0
-        async for channel in self.channels_to_scan(guild):
+        async for channel in channels_and_threads(guild):
             if not channel.permissions_for(guild.me).read_message_history:
                 continue
             try:
@@ -96,18 +97,6 @@ class FriendFacts(commands.Cog):
             except Forbidden:
                 pass
         return stats, hours, days, channels, threads
-
-    async def channels_to_scan(self, guild):
-        """Text channels plus their active and archived threads."""
-        for channel in guild.text_channels:
-            yield channel
-            for thread in channel.threads:
-                yield thread
-            try:
-                async for thread in channel.archived_threads(limit=None):
-                    yield thread
-            except Forbidden:
-                pass
 
     def tally(self, stats, hours, days, message: Message):
         user = stats.setdefault(message.author.id, UserStats())
