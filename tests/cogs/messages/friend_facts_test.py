@@ -76,7 +76,7 @@ def test_cog_unload_cancels_task(clazz):
 
 @mock.patch("duckbot.util.datetime.now", return_value=datetime.datetime(2026, 7, 1, hour=9))
 async def test_on_month_start_first_of_month_sends_report(now, clazz, guild, general_channel):
-    guild.channels = []
+    guild.text_channels = []
     await clazz.on_month_start()
     general_channel.send.assert_called_once()
 
@@ -89,7 +89,7 @@ async def test_on_month_start_not_first_of_month_does_nothing(now, clazz, bot):
 
 @mock.patch("duckbot.util.datetime.now", return_value=datetime.datetime(2026, 7, 1, hour=9))
 async def test_friend_facts_command_sends_report_to_invoking_channel(now, clazz, guild, text_channel, context):
-    guild.channels = []
+    guild.text_channels = []
     text_channel.guild = guild
     context.channel = text_channel
     await clazz.friend_facts(context)
@@ -119,7 +119,7 @@ def test_prior_month_range(now, clazz, today, expected_start, expected_end):
 
 
 async def test_gather_stats_streams_counters(clazz, guild, text_channel):
-    guild.channels = [readable(text_channel, [make_message("Hello there friend"), make_message("are you ok?", author_id=2)])]
+    guild.text_channels = [readable(text_channel, [make_message("Hello there friend"), make_message("are you ok?", author_id=2)])]
     stats, hours, days, channels, threads = await clazz.gather_stats(guild, None, None)
     assert stats[1] == UserStats(messages=1, words=3, capital_starts=1)
     assert stats[2] == UserStats(messages=1, words=3, questions=1)
@@ -128,7 +128,7 @@ async def test_gather_stats_streams_counters(clazz, guild, text_channel):
 
 
 async def test_gather_stats_skips_bot_messages(clazz, guild, text_channel):
-    guild.channels = [readable(text_channel, [make_message(is_bot=True)])]
+    guild.text_channels = [readable(text_channel, [make_message(is_bot=True)])]
     stats, _, _, _, _ = await clazz.gather_stats(guild, None, None)
     assert stats == {}
 
@@ -139,14 +139,14 @@ async def test_gather_stats_credits_slash_weather_to_invoker(clazz, guild, text_
     invocation.interaction_metadata.user.id = 5
     other = make_message(is_bot=True, attachments=[make_attachment("cat.png")])
     other.interaction_metadata = mock.Mock()
-    guild.channels = [readable(text_channel, [invocation, other])]
+    guild.text_channels = [readable(text_channel, [invocation, other])]
     stats, _, _, _, _ = await clazz.gather_stats(guild, None, None)
     assert stats == {5: UserStats(weather=1)}
 
 
 async def test_gather_stats_skips_unreadable_channels(clazz, guild, text_channel):
     text_channel.permissions_for.return_value.read_message_history = False
-    guild.channels = [text_channel]
+    guild.text_channels = [text_channel]
     stats, _, _, channels, threads = await clazz.gather_stats(guild, None, None)
     assert stats == {} and channels == 0 and threads == 0
     text_channel.history.assert_not_called()
@@ -155,7 +155,7 @@ async def test_gather_stats_skips_unreadable_channels(clazz, guild, text_channel
 async def test_gather_stats_skips_forbidden_channels(clazz, guild, text_channel):
     text_channel.permissions_for.return_value.read_message_history = True
     text_channel.history.side_effect = Forbidden(mock.Mock(status=403), "no")
-    guild.channels = [text_channel]
+    guild.text_channels = [text_channel]
     stats, _, _, channels, threads = await clazz.gather_stats(guild, None, None)
     assert stats == {} and channels == 0 and threads == 0
 
@@ -168,7 +168,7 @@ async def test_gather_stats_scans_active_and_archived_threads(clazz, guild, text
 
     text_channel.history.return_value = list_as_async_generator([make_message("in the channel itself")])
     text_channel.permissions_for.return_value.read_message_history = True
-    guild.channels = [text_channel]
+    guild.text_channels = [text_channel]
 
     stats, _, _, channels, threads = await clazz.gather_stats(guild, None, None)
     assert stats.keys() == {1, 2, 3}
@@ -180,20 +180,20 @@ async def test_gather_stats_skips_forbidden_archived_threads(clazz, guild, text_
     text_channel.history.return_value = list_as_async_generator([])
     text_channel.threads = []
     text_channel.archived_threads.side_effect = Forbidden(mock.Mock(status=403), "no")
-    guild.channels = [text_channel]
+    guild.text_channels = [text_channel]
     stats, _, _, channels, threads = await clazz.gather_stats(guild, None, None)
     assert stats == {} and channels == 0 and threads == 0
 
 
 async def test_gather_stats_ignores_channels_without_messages(clazz, guild, text_channel, thread):
     text_channel.threads = [readable(thread, [])]
-    guild.channels = [readable(text_channel, [])]
+    guild.text_channels = [readable(text_channel, [])]
     stats, _, _, channels, threads = await clazz.gather_stats(guild, None, None)
     assert stats == {} and channels == 0 and threads == 0
 
 
 async def test_gather_stats_counts_channels_with_only_bot_messages(clazz, guild, text_channel):
-    guild.channels = [readable(text_channel, [make_message(is_bot=True)])]
+    guild.text_channels = [readable(text_channel, [make_message(is_bot=True)])]
     stats, _, _, channels, threads = await clazz.gather_stats(guild, None, None)
     assert stats == {} and channels == 1 and threads == 0
 
@@ -203,7 +203,7 @@ async def test_gather_stats_counts_announcement_channels_as_channels(clazz, guil
     announcements.type = discord.ChannelType.news
     announcements.threads = []
     announcements.archived_threads.return_value = list_as_async_generator([])
-    guild.channels = [announcements]
+    guild.text_channels = [announcements]
     _, _, _, channels, threads = await clazz.gather_stats(guild, None, None)
     assert channels == 1 and threads == 0
 
@@ -278,7 +278,7 @@ async def test_tally_reactions_on_bot_messages_credits_only_the_giver(clazz):
 
 
 async def test_gather_stats_counts_reactions(clazz, guild, text_channel):
-    guild.channels = [readable(text_channel, [make_message("hello", author_id=1, reactions=[make_reaction(make_user(2))])])]
+    guild.text_channels = [readable(text_channel, [make_message("hello", author_id=1, reactions=[make_reaction(make_user(2))])])]
     stats, _, _, _, _ = await clazz.gather_stats(guild, None, None)
     assert stats[1] == UserStats(messages=1, words=1, reactions_received=1)
     assert stats[2] == UserStats(reactions_given=1)
@@ -375,7 +375,7 @@ async def test_display_name_unknown_user(get_user, clazz, guild):
 
 @mock.patch("duckbot.util.datetime.now", return_value=datetime.datetime(2026, 7, 10, hour=13))
 async def test_send_report_posts_to_channel(now, clazz, guild, general_channel):
-    guild.channels = [readable(general_channel, [make_message("Hello")])]
+    guild.text_channels = [readable(general_channel, [make_message("Hello")])]
     with mock.patch("duckbot.cogs.messages.friend_facts.get_user", side_effect=lambda bot, user_id, g: mock.Mock(display_name=f"user{user_id}")):
         await clazz.send_report(general_channel)
     general_channel.send.assert_called_once()
