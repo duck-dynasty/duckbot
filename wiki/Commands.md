@@ -10,6 +10,7 @@
 |     [`!define`](#definitions)     | define a word                                      |
 |          [`!dog`](#dogs)          | displays a random dog photo                        |
 |              `!duck`              | gives a link to this repo                          |
+|  [`!emoji-usage`](#emoji-usage)   | count how often each custom emoji is used          |
 | [`!epic`](Events#epic-free-games) | show the free games of the week on epic            |
 |            `!fortune`             | get a random fortune told to you by a cow          |
 | [`!friend-facts`](#friend-facts)  | post last month's server stats report              |
@@ -44,6 +45,10 @@ DuckBot can define words, sourcing data from [Wordnik](https://www.wordnik.com/)
 ## Friend Facts
 
 On the first of each month, DuckBot posts a stats report to the general channel covering the prior month's messages: a message-count leaderboard plus awards like Grammar Police (% of messages starting with a capital), Wordiest, Most Inquisitive, Loudest, Chief Link Dumper, Golf Fanatic, Weather Obsessed, Name Dropper, Paparazzi, Serial Reactor (most reactions added), and Crowd Pleaser (most reactions received), along with the busiest hour and day. Percentage awards require at least 25 messages. You can run the report on demand with `!friend-facts`.
+
+## Emoji Usage
+
+Runs through the server's message and reaction history and reports how many times each custom emoji was used, most used first. Handy for finding dead emojis when you're out of emoji slots. Takes an optional number of days to look back, defaulting to 90: `!emoji-usage 365`. Scanning a long window takes a while.
 
 ## Recipe Search
 
