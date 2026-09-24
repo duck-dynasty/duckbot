@@ -1106,24 +1106,19 @@ def test_tick_loop_retries_on_database_errors(cog):
 # --- error handling ------------------------------------------------------
 
 
-async def test_command_errors_are_echoed(cog, alice):
-    await cog.cog_command_error(alice, commands.CommandInvokeError(ValueError("kaboom")))
-    alice.send.assert_called_once_with("The market fell over, brother:\n```kaboom```")
-
-
 async def test_slash_command_errors_are_unwrapped(cog, alice):
     error = commands.HybridCommandError(app_commands.CommandInvokeError(mock.Mock(), ValueError("kaboom")))
-    await cog.cog_command_error(alice, error)
+    await cog.on_error(alice, error)
     alice.send.assert_called_once_with("The market fell over, brother:\n```kaboom```")
 
 
 async def test_unwrapped_errors_are_echoed_as_is(cog, alice):
-    await cog.cog_command_error(alice, commands.NoPrivateMessage())
+    await cog.on_error(alice, commands.NoPrivateMessage())
     alice.send.assert_called_once_with("The market fell over, brother:\n```This command cannot be used in private messages.```")
 
 
 async def test_long_errors_are_trimmed_to_fit_a_message(cog, alice):
-    await cog.cog_command_error(alice, commands.CommandInvokeError(ValueError("x" * 2000)))
+    await cog.on_error(alice, commands.CommandInvokeError(ValueError("x" * 2000)))
     alice.send.assert_called_once_with(f"The market fell over, brother:\n```{'x' * 1800}```")
 
 

@@ -76,11 +76,6 @@ class PlayMarket(commands.Cog):
     def cog_unload(self):
         self.tick_loop.cancel()
 
-    async def cog_command_error(self, context: commands.Context, error):
-        while hasattr(error, "original"):
-            error = error.original
-        await context.send(f"The market fell over, brother:\n```{str(error)[:1800]}```")
-
     # --- background season rollover ---------------------------------------
 
     @tasks.loop(hours=6)
@@ -336,6 +331,23 @@ class PlayMarket(commands.Cog):
             matches = matches.filter(Market.status == "OPEN", or_(Market.question.ilike(needle), cast(Market.id, String).ilike(needle)))
             matches = matches.order_by(Market.id.desc()).limit(25).all()  # Discord caps options at 25
         return [Choice(name=f"{mid}: {q}"[:100], value=mid) for mid, q in matches]
+
+    @market_group.error
+    @balance.error
+    @claim.error
+    @leaderboard.error
+    @season.error
+    @season_history.error
+    @season_stats.error
+    @list_command.error
+    @create.error
+    @bet.error
+    @sell.error
+    @resolve.error
+    async def on_error(self, context: commands.Context, error):
+        while hasattr(error, "original"):
+            error = error.original
+        await context.send(f"The market fell over, brother:\n```{str(error)[:1800]}```")
 
     # --- season lifecycle -------------------------------------------------
 
