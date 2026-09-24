@@ -3,8 +3,9 @@ import math
 from unittest import mock
 
 import pytest
-from discord import Color, Embed
+from discord import Color, Embed, app_commands
 from discord.ext import commands
+from sqlalchemy.exc import OperationalError
 
 from duckbot.cogs.playmarket import config
 from duckbot.cogs.playmarket.market import PlayMarket
@@ -1096,6 +1097,34 @@ async def test_tick_loop_runs_a_tick(cog):
     cog.tick = mock.AsyncMock()
     await PlayMarket.tick_loop.coro(cog)
     cog.tick.assert_awaited_once()
+
+
+def test_tick_loop_retries_on_database_errors(cog):
+    assert cog.tick_loop.remove_exception_type(OperationalError)
+
+
+# --- error handling ------------------------------------------------------
+
+
+async def test_command_errors_are_echoed(cog, alice):
+    await cog.cog_command_error(alice, commands.CommandInvokeError(ValueError("kaboom")))
+    alice.send.assert_called_once_with("The market fell over, brother:\n```kaboom```")
+
+
+async def test_slash_command_errors_are_unwrapped(cog, alice):
+    error = commands.HybridCommandError(app_commands.CommandInvokeError(mock.Mock(), ValueError("kaboom")))
+    await cog.cog_command_error(alice, error)
+    alice.send.assert_called_once_with("The market fell over, brother:\n```kaboom```")
+
+
+async def test_unwrapped_errors_are_echoed_as_is(cog, alice):
+    await cog.cog_command_error(alice, commands.NoPrivateMessage())
+    alice.send.assert_called_once_with("The market fell over, brother:\n```This command cannot be used in private messages.```")
+
+
+async def test_long_errors_are_trimmed_to_fit_a_message(cog, alice):
+    await cog.cog_command_error(alice, commands.CommandInvokeError(ValueError("x" * 2000)))
+    alice.send.assert_called_once_with(f"The market fell over, brother:\n```{'x' * 1800}```")
 
 
 # --- end-to-end integrity -----------------------------------------------

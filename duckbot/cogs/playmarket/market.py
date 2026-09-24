@@ -8,6 +8,7 @@ from discord import Color, Embed, Interaction
 from discord.app_commands import Choice
 from discord.ext import commands, tasks
 from sqlalchemy import String, cast, or_
+from sqlalchemy.exc import OperationalError
 
 from duckbot.db import Database
 from duckbot.util.datetime import now
@@ -69,10 +70,16 @@ class PlayMarket(commands.Cog):
     def __init__(self, bot, db: Database):
         self.bot = bot
         self.db = db
+        self.tick_loop.add_exception_type(OperationalError)
         self.tick_loop.start()
 
     def cog_unload(self):
         self.tick_loop.cancel()
+
+    async def cog_command_error(self, context: commands.Context, error):
+        while hasattr(error, "original"):
+            error = error.original
+        await context.send(f"The market fell over, brother:\n```{str(error)[:1800]}```")
 
     # --- background season rollover ---------------------------------------
 
