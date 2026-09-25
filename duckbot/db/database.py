@@ -36,5 +36,5 @@ class Database:
     @property
     def db(self):
         if self._db is None:
-            self._db = create_engine("postgresql+psycopg2://duckbot:pond@postgres/duckbot", pool_pre_ping=True, pool_size=1, max_overflow=2)
+            self._db = create_engine("postgresql+psycopg2://duckbot:pond@postgres/duckbot", pool_pre_ping=True, pool_size=1, max_overflow=2, connect_args={"options": "-c lock_timeout=1s"})
         return self._db
