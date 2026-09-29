@@ -2,17 +2,42 @@ from datetime import datetime
 from unittest import mock
 
 import discord
+import groq
+import httpx
 import pytest
 from discord.ext import commands
+from groq.types import Model
 
 from duckbot.cogs.ai import Truth
 from tests.discord_test_ext import bind_commands
+
+
+def model(id, created, **fields):
+    return Model(id=id, created=created, object="model", owned_by="test", **fields)
+
+
+def chat_model(id, created):
+    return model(id, created, active=True, output_modalities=["text"], supported_features=["tools"])
+
+
+def rate_limited(*model_ids):
+    def create(model, **kwargs):
+        if model in model_ids:
+            raise groq.RateLimitError("rate limited", response=httpx.Response(429, request=httpx.Request("POST", "https://api.groq.com")), body=None)
+        return mock.DEFAULT
+
+    return create
+
+
+def completion_call(model):
+    return mock.call(model=model, max_tokens=2000, temperature=0, messages=[{"role": "user", "content": mock.ANY}])
 
 
 @pytest.fixture
 @mock.patch("groq.Groq")
 def mock_ai_client(mock_groq):
     instance = mock_groq.return_value
+    instance.models.list.return_value.data = [chat_model("chat", 1)]
     instance.chat.completions.create.return_value = mock.Mock(choices=[mock.Mock(message=mock.Mock(content="Fact-checked response."))])
     return instance
 
@@ -83,10 +108,31 @@ async def test_fact_check_response(truth, message):
     assert response == "Fact-checked response."
 
 
-async def test_fact_check_exception(truth, message):
-    truth.ai_client.chat.completions.create.side_effect = Exception("we ran out of GPUs")
-    response = await truth.fact_check(message)
-    assert response == "The robot uprising has been postponed due to the following error: we ran out of GPUs"
+async def test_fact_check_uses_newest_chat_model(truth, message):
+    truth.ai_client.models.list.return_value.data = [
+        chat_model("old-chat", 1),
+        chat_model("new-chat", 2),
+        model("whisper", 3, active=True, output_modalities=["transcription"]),
+        model("guard", 4, active=True, output_modalities=["text"]),
+        model("allam", 5, active=True, output_modalities=["text"], supported_features=["json_mode"]),
+        model("inactive", 6, active=False, output_modalities=["text"], supported_features=["tools"]),
+    ]
+    await truth.fact_check(message)
+    truth.ai_client.chat.completions.create.assert_called_once_with(model="new-chat", max_tokens=2000, temperature=0, messages=[{"role": "user", "content": mock.ANY}])
+
+
+async def test_fact_check_falls_back_to_next_model_when_rate_limited(truth, message):
+    truth.ai_client.models.list.return_value.data = [chat_model("old-chat", 1), chat_model("new-chat", 2)]
+    truth.ai_client.chat.completions.create.side_effect = rate_limited("new-chat")
+    assert await truth.fact_check(message) == "Fact-checked response."
+    truth.ai_client.chat.completions.create.assert_has_calls([completion_call("new-chat"), completion_call("old-chat")])
+
+
+async def test_fact_check_raises_when_every_model_is_rate_limited(truth, message):
+    truth.ai_client.models.list.return_value.data = [chat_model("old-chat", 1), chat_model("new-chat", 2)]
+    truth.ai_client.chat.completions.create.side_effect = rate_limited("old-chat", "new-chat")
+    with pytest.raises(RuntimeError, match="every Groq chat model is rate limited or unavailable"):
+        await truth.fact_check(message)
 
 
 async def test_truth_no_reference(truth, ctx):
