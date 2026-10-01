@@ -76,6 +76,14 @@ DuckBot will attempt to correct typos a user's previous message when they send _
 >
 > There, I fixed it for you, @Human!
 
+## Explain
+
+Reply to a confusing message with _what_ (or _wut_, _wat_, _wuh_, _huh_, with or without a `?`) and DuckBot will ask an AI to explain it, using the few messages before it as context.
+
+> Human: Because orange Cheeto man is making new corporate daddy setup a shell MFG facility in 2 weeks to dodge tariffs.\
+> Human 2 (replying): huh?\
+> DuckBot: The president is pressuring a big company to set up a token manufacturing plant so it can avoid paying tariffs.
+
 ## DuckBoard
 
 DuckBot has a very small chance to react to any message with 🦆 .
