@@ -42,7 +42,7 @@ dev = [
     "pytest==9.1.1",
     "pytest-asyncio==1.4.0",
     "pytest-xdist[psutil]==3.8.0",
-    "flake8==7.3.0",
+    "flake8==7.4.1",
     "flake8-pyproject==1.2.4",
     "black==26.5.1",
     "flake8-black==0.4.0",
