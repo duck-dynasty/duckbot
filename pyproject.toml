@@ -27,7 +27,7 @@ dependencies = [
     "nltk==3.10.3",
     "textblob==0.20.1",
     "pyfiglet==1.0.4",
-    "matplotlib==3.11.1",
+    "matplotlib==3.11.2",
     "graphviz==0.21",
     "PyGithub==2.10.0",
     "wolframalpha==5.1.3",
