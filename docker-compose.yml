@@ -35,7 +35,7 @@ services:
         order: stop-first
 
   postgres:
-    image: postgres:17
+    image: postgres:18
     environment:
       POSTGRES_USER: duckbot
       POSTGRES_PASSWORD: pond
