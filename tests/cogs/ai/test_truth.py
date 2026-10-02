@@ -43,8 +43,8 @@ def mock_ai_client(mock_groq):
 
 
 @pytest.fixture
-def truth(bot, mock_ai_client):
-    clazz = bind_commands(Truth(bot))
+def truth(mock_ai_client):
+    clazz = bind_commands(Truth())
     clazz._ai_client = mock_ai_client
     return clazz
 
@@ -90,9 +90,9 @@ async def mock_get_message_reference():
         yield
 
 
-def test_create_client(bot, monkeypatch):
+def test_create_client(monkeypatch):
     monkeypatch.setenv("GROQ_API_KEY", "fake_key")
-    clazz = Truth(bot)
+    clazz = Truth()
     assert clazz._ai_client is None
     assert clazz.ai_client == clazz._ai_client
     assert clazz._ai_client is not None
