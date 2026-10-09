@@ -101,7 +101,7 @@ class PlayMarket(commands.Cog):
         channel = get(self.bot.get_all_channels(), guild__name="Friends Chat", name="gainz", type=ChannelType.text)
         if channel is None:
             return
-        message = f"{season.name}'s in the books, brother. {next_season.name} starts now, everyone's back to {_coins(config.STARTING_BALANCE)} coins."
+        message = f"{season.name}'s in the books, brother. {next_season.name} starts now, everyone's back to {_coins(config.STARTING_BALANCE)} coins, minus whatever's still riding on open bets."
         await channel.send(message, embed=await self._season_embed(channel, session, season))
 
     # --- command group ----------------------------------------------------

@@ -900,7 +900,7 @@ async def test_rollover_posts_the_final_standings_to_gainz(cog, alice, bob, cloc
     clock.advance(days=91)
     await cog.tick()
     expected = Embed(title="Season 1 — 2024-01-01 to 2024-04-01", description="🥇 user1 — 12,000 coins\n🥈 user2 — 10,000 coins", color=Color.gold())
-    gainz.send.assert_called_once_with("Season 1's in the books, brother. Season 2 starts now, everyone's back to 10,000 coins.", embed=expected)
+    gainz.send.assert_called_once_with("Season 1's in the books, brother. Season 2 starts now, everyone's back to 10,000 coins, minus whatever's still riding on open bets.", embed=expected)
 
 
 async def test_rollover_happens_without_a_gainz_channel(cog, alice, clock, in_memory_db):
