@@ -35,9 +35,11 @@ class FriendFacts(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.friend_facts_loop.start()
+        self.year_end_loop.start()
 
     def cog_unload(self):
         self.friend_facts_loop.cancel()
+        self.year_end_loop.cancel()
 
     def get_general_channel(self):
         return get(self.bot.get_all_channels(), guild__name="Friends Chat", name="general", type=ChannelType.text)
@@ -46,29 +48,39 @@ class FriendFacts(commands.Cog):
     async def friend_facts_loop(self):
         await self.on_month_start()
 
+    @tasks.loop(time=time(hour=12, minute=0, tzinfo=duckbot.util.datetime.timezone()))
+    async def year_end_loop(self):
+        await self.on_year_end()
+
     @friend_facts_loop.before_loop
+    @year_end_loop.before_loop
     async def before_loop(self):
         await self.bot.wait_until_ready()
 
     async def on_month_start(self):
         if duckbot.util.datetime.now().day == 1:
-            await self.send_report(self.get_general_channel())
+            await self.send_month_report(self.get_general_channel())
+
+    async def on_year_end(self):
+        now = duckbot.util.datetime.now()
+        if now.month == 12 and now.day == 31:
+            start = now.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+            await self.send_report(self.get_general_channel(), start, start.replace(year=start.year + 1), f"{start:%Y}")
 
     @commands.command(name="friend-facts")
     @commands.guild_only()
     async def friend_facts(self, context):
         async with context.typing():
-            await self.send_report(context.channel)
+            await self.send_month_report(context.channel)
 
-    def prior_month_range(self):
+    async def send_month_report(self, channel):
         end = duckbot.util.datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         start = (end - timedelta(days=1)).replace(day=1)
-        return start, end
+        await self.send_report(channel, start, end, f"{start:%B %Y}")
 
-    async def send_report(self, channel):
-        start, end = self.prior_month_range()
+    async def send_report(self, channel, start, end, label):
         stats, hours, days, channels, threads = await self.gather_stats(channel.guild, start, end)
-        await channel.send(await self.format_report(channel.guild, stats, hours, days, channels, threads, start))
+        await channel.send(await self.format_report(channel.guild, stats, hours, days, channels, threads, label))
 
     async def gather_stats(self, guild, start, end):
         """Streams message history into counters; messages are never kept in memory."""
@@ -135,10 +147,10 @@ class FriendFacts(commands.Cog):
         mentioned.discard(message.author.id)
         return len(mentioned)
 
-    async def format_report(self, guild, stats, hours, days, channels, threads, start):
-        header = f"**Friend Facts: {start:%B %Y}** :bar_chart:"
+    async def format_report(self, guild, stats, hours, days, channels, threads, label):
+        header = f"**Friend Facts: {label}** :bar_chart:"
         if not stats:
-            return f"{header}\nNobody said anything last month. :duck:"
+            return f"{header}\nNobody said anything in {label}. :duck:"
         lines = [header, "```", f"{'User':<24} {'Messages':>8}", "-" * 34]
         top = sorted(stats.items(), key=lambda x: x[1].messages, reverse=True)
         for user_id, user in top[:LEADERBOARD_SIZE]:
