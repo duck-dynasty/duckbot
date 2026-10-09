@@ -88,10 +88,11 @@ async def test_on_month_start_not_first_of_month_does_nothing(now, clazz, bot):
     bot.get_all_channels.assert_not_called()
 
 
-@mock.patch("duckbot.util.datetime.now", return_value=datetime.datetime(2026, 12, 31, hour=12))
+@mock.patch("duckbot.util.datetime.now", return_value=datetime.datetime(2026, 12, 31, hour=12, minute=30))
 async def test_on_year_end_sends_year_report(now, clazz, guild, general_channel):
-    guild.text_channels = []
+    guild.text_channels = [readable(general_channel, [])]
     await clazz.on_year_end()
+    general_channel.history.assert_called_once_with(limit=None, after=datetime.datetime(2026, 1, 1), before=datetime.datetime(2027, 1, 1), oldest_first=True)
     general_channel.send.assert_called_once_with("**Friend Facts: 2026** :bar_chart:\nNobody said anything in 2026. :duck:")
 
 
@@ -132,11 +133,6 @@ def test_prior_month_range(now, clazz, today, expected_start, expected_end):
     start, end = clazz.prior_month_range()
     assert start == expected_start
     assert end == expected_end
-
-
-@mock.patch("duckbot.util.datetime.now", return_value=datetime.datetime(2026, 12, 31, hour=12, minute=30))
-def test_year_range(now, clazz):
-    assert clazz.year_range() == (datetime.datetime(2026, 1, 1), datetime.datetime(2027, 1, 1))
 
 
 async def test_gather_stats_streams_counters(clazz, guild, text_channel):

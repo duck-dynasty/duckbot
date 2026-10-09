@@ -65,8 +65,8 @@ class FriendFacts(commands.Cog):
     async def on_year_end(self):
         now = duckbot.util.datetime.now()
         if now.month == 12 and now.day == 31:
-            start, end = self.year_range()
-            await self.send_report(self.get_general_channel(), start, end, f"{start:%Y}")
+            start = now.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
+            await self.send_report(self.get_general_channel(), start, start.replace(year=start.year + 1), f"{start:%Y}")
 
     @commands.command(name="friend-facts")
     @commands.guild_only()
@@ -78,10 +78,6 @@ class FriendFacts(commands.Cog):
         end = duckbot.util.datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         start = (end - timedelta(days=1)).replace(day=1)
         return start, end
-
-    def year_range(self):
-        start = duckbot.util.datetime.now().replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
-        return start, start.replace(year=start.year + 1)
 
     async def send_month_report(self, channel):
         start, end = self.prior_month_range()
