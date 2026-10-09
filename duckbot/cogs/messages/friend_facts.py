@@ -48,7 +48,6 @@ class FriendFacts(commands.Cog):
     async def friend_facts_loop(self):
         await self.on_month_start()
 
-    # the full year scan takes hours, so start early enough to post before midnight
     @tasks.loop(time=time(hour=12, minute=0, tzinfo=duckbot.util.datetime.timezone()))
     async def year_end_loop(self):
         await self.on_year_end()
