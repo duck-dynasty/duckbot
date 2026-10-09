@@ -46,7 +46,14 @@ def clock():
 
 
 @pytest.fixture
-def cog(bot, in_memory_db, clock):
+def gainz(general_channel):
+    general_channel.name = "gainz"
+    general_channel.guild.get_member = lambda uid: mock.Mock(id=uid, display_name=f"user{uid}")
+    return general_channel
+
+
+@pytest.fixture
+def cog(bot, in_memory_db, clock, gainz):
     market = bind_commands(PlayMarket(bot, in_memory_db))
     market.tick_loop.cancel()  # don't run the loop mid-test
     return market
@@ -264,14 +271,14 @@ async def test_create_sets_liquidity_and_subsidy_by_tier(cog, alice, in_memory_d
     assert market.subsidy == math.floor(b * math.log(2))
 
 
-async def test_create_after_season_end_rolls_over_first(cog, alice, clock, in_memory_db):
+async def test_create_after_season_end_leaves_the_rollover_to_the_tick(cog, alice, clock, in_memory_db):
     await open_market(cog, alice)  # creates Season 1
     clock.advance(days=91)  # past the season end (2024-01-01 -> next quarter start 2024-04-01)
     market_id = await open_market(cog, alice)
     with in_memory_db.session(Season) as session:
         statuses = {s.name: s.status for s in session.query(Season).all()}
-    assert statuses == {"Season 1": "archived", "Season 2": "active"}
-    assert market_row(in_memory_db, market_id).season_id == 2
+    assert statuses == {"Season 1": "active"}
+    assert market_row(in_memory_db, market_id).season_id == 1
 
 
 # --- bet -----------------------------------------------------------------
@@ -733,10 +740,11 @@ async def test_leaderboard_counts_down_to_the_season_end(cog, alice, clock):
     assert alice.send.call_args.kwargs["embed"].footer.text == "Ends on April 1, 2024 · 30 days left"
 
 
-async def test_leaderboard_rolls_the_season_over_when_it_has_ended(cog, alice, bob, clock, in_memory_db):
+async def test_leaderboard_shows_the_next_season_once_the_tick_rolls_over(cog, alice, bob, clock, in_memory_db):
     market_id = await open_market(cog, alice)
     await cog.bet(alice, market_id, "yes", BET)
     clock.advance(days=91)
+    await cog.tick()
     await cog.leaderboard(bob)
     expected = Embed(title="Season 2 Leaderboard", description="🥇 user1 — 10,023 coins (9,500 available)", color=Color.gold())  # stake carried, shares marked
     expected.set_footer(text="Ends on July 1, 2024 · 90 days left")
@@ -885,11 +893,31 @@ async def test_rollover_records_standings_at_net_worth(cog, alice, bob, clock, i
     assert results[2].rank == 2
 
 
-async def test_tick_does_nothing_before_the_season_ends(cog, alice, in_memory_db):
+async def test_rollover_posts_the_final_standings_to_gainz(cog, alice, bob, clock, gainz, in_memory_db):
+    await cog.balance(alice)
+    await cog.balance(bob)
+    set_balance(in_memory_db, 1, 12_000)
+    clock.advance(days=91)
+    await cog.tick()
+    expected = Embed(title="Season 1 — 2024-01-01 to 2024-04-01", description="🥇 user1 — 12,000 coins\n🥈 user2 — 10,000 coins", color=Color.gold())
+    gainz.send.assert_called_once_with("Season 1's in the books, brother. Season 2 starts now, everyone's back to 10,000 coins.", embed=expected)
+
+
+async def test_rollover_happens_without_a_gainz_channel(cog, alice, clock, in_memory_db):
+    cog.bot.get_all_channels.return_value = []
+    await cog.balance(alice)
+    clock.advance(days=91)
+    await cog.tick()
+    with in_memory_db.session(Season) as session:
+        assert session.query(Season).filter_by(name="Season 2").one().status == "active"
+
+
+async def test_tick_does_nothing_before_the_season_ends(cog, alice, gainz, in_memory_db):
     await cog.balance(alice)  # creates Season 1, still active
     await cog.tick()
     with in_memory_db.session(Season) as session:
         assert session.query(Season).count() == 1  # no rollover yet
+    gainz.send.assert_not_called()
 
 
 # --- season history --------------------------------------------------------

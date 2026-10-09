@@ -35,7 +35,7 @@ Everyone starts each **season** with **10,000 coins**. A season runs for a calen
 - Coins are always **whole numbers**. (Share counts can be fractional under the hood — that's the market's internal accounting — but you bet and get paid in whole coins.)
 - Coins are spent placing bets and earned when your bets pay out.
 - If you go broke (under 1,000 coins) **and** hold no open positions, `/market claim` tops you back up to 2,000 coins, once per week. It's the only faucet, so balances still track skill within a season.
-- At season end your balance resets to 10,000 and the final standings are recorded in a hall of fame — browse it with `/market season history`. Standings are ranked by net worth, so coins parked in an open bet still count towards where you finish.
+- At season end your balance resets to 10,000 and the final standings are posted to #gainz and recorded in a hall of fame — browse it with `/market season history`. Standings are ranked by net worth, so coins parked in an open bet still count towards where you finish.
 - **Open markets ride into the next season, and so do your positions.** What you spent on them stays committed rather than being handed back: your new 10,000 comes with the cost of your carried bets already deducted. Bet 1,000 on a market that survives the reset and you open the next season with 9,000 coins and the position, whatever the odds have done since — you're never charged for a gain you haven't cashed in. Sell to free the coins back up.
 
 Use `/market balance` to see your net worth, available coins and positions, and `/market leaderboard` for the standings (ranked by net worth = coins + the live value of your open positions). The leaderboard also shows the remaining time in the season.

@@ -4,9 +4,10 @@ from collections import Counter
 from decimal import ROUND_DOWN, Decimal
 from typing import List, Literal, Optional
 
-from discord import Color, Embed, Interaction
+from discord import ChannelType, Color, Embed, Interaction
 from discord.app_commands import Choice
 from discord.ext import commands, tasks
+from discord.utils import get
 from sqlalchemy import String, cast, or_
 from sqlalchemy.exc import OperationalError
 
@@ -89,8 +90,19 @@ class PlayMarket(commands.Cog):
     async def tick(self):
         """Roll the season over when its time comes; markets are resolved by their creators."""
         with self.db.session(Season) as session:
-            self.active_season(session)
+            season = self.active_season(session)
             session.commit()
+            if now() >= season.ends_at:
+                next_season = self._rollover(session, season)
+                session.commit()
+                await self._announce(session, season, next_season)
+
+    async def _announce(self, session, season, next_season):
+        channel = get(self.bot.get_all_channels(), guild__name="Friends Chat", name="gainz", type=ChannelType.text)
+        if channel is None:
+            return
+        message = f"{season.name}'s in the books, brother. {next_season.name} starts now, everyone's back to {_coins(config.STARTING_BALANCE)} coins."
+        await channel.send(message, embed=await self._season_embed(channel, session, season))
 
     # --- command group ----------------------------------------------------
 
@@ -352,13 +364,9 @@ class PlayMarket(commands.Cog):
     # --- season lifecycle -------------------------------------------------
 
     def active_season(self, session) -> Season:
-        """The active season; creates Season 1 on first use, rolling over an expired one immediately."""
+        """The active season; creates Season 1 on first use."""
         season = session.query(Season).filter_by(status="active").order_by(Season.id.desc()).first()
-        if season is None:
-            return self._new_season(session)
-        if now() >= season.ends_at:
-            return self._rollover(session, season)
-        return season
+        return season or self._new_season(session)
 
     def _rollover(self, session, season) -> Season:
         """Record final standings, archive the season, and start the next; open markets ride forward with their positions."""
