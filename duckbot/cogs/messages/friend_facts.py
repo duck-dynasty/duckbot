@@ -73,13 +73,9 @@ class FriendFacts(commands.Cog):
         async with context.typing():
             await self.send_month_report(context.channel)
 
-    def prior_month_range(self):
+    async def send_month_report(self, channel):
         end = duckbot.util.datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
         start = (end - timedelta(days=1)).replace(day=1)
-        return start, end
-
-    async def send_month_report(self, channel):
-        start, end = self.prior_month_range()
         await self.send_report(channel, start, end, f"{start:%B %Y}")
 
     async def send_report(self, channel, start, end, label):

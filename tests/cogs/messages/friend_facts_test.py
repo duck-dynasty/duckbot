@@ -128,11 +128,11 @@ async def test_friend_facts_command_is_rejected_outside_a_guild(clazz, context):
     ],
 )
 @mock.patch("duckbot.util.datetime.now")
-def test_prior_month_range(now, clazz, today, expected_start, expected_end):
+async def test_send_month_report_scans_prior_month(now, clazz, guild, general_channel, today, expected_start, expected_end):
     now.return_value = today
-    start, end = clazz.prior_month_range()
-    assert start == expected_start
-    assert end == expected_end
+    guild.text_channels = [readable(general_channel, [])]
+    await clazz.send_month_report(general_channel)
+    general_channel.history.assert_called_once_with(limit=None, after=expected_start, before=expected_end, oldest_first=True)
 
 
 async def test_gather_stats_streams_counters(clazz, guild, text_channel):
