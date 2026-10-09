@@ -72,6 +72,7 @@ async def test_before_loop_waits_for_bot(clazz, bot):
 def test_cog_unload_cancels_task(clazz):
     clazz.cog_unload()
     clazz.friend_facts_loop.cancel.assert_called()
+    clazz.year_end_loop.cancel.assert_called()
 
 
 @mock.patch("duckbot.util.datetime.now", return_value=datetime.datetime(2026, 7, 1, hour=9))
@@ -84,6 +85,22 @@ async def test_on_month_start_first_of_month_sends_report(now, clazz, guild, gen
 @mock.patch("duckbot.util.datetime.now", return_value=datetime.datetime(2026, 7, 2, hour=9))
 async def test_on_month_start_not_first_of_month_does_nothing(now, clazz, bot):
     await clazz.on_month_start()
+    bot.get_all_channels.assert_not_called()
+
+
+@mock.patch("duckbot.util.datetime.now", return_value=datetime.datetime(2026, 12, 31, hour=12, minute=30))
+async def test_on_year_end_sends_year_report(now, clazz, guild, general_channel):
+    guild.text_channels = [readable(general_channel, [])]
+    await clazz.on_year_end()
+    general_channel.history.assert_called_once_with(limit=None, after=datetime.datetime(2026, 1, 1), before=datetime.datetime(2027, 1, 1), oldest_first=True)
+    general_channel.send.assert_called_once_with("**Friend Facts: 2026** :bar_chart:\nNobody said anything in 2026. :duck:")
+
+
+@pytest.mark.parametrize("today", [datetime.datetime(2026, 12, 30, hour=12), datetime.datetime(2026, 1, 31, hour=12)])
+@mock.patch("duckbot.util.datetime.now")
+async def test_on_year_end_not_new_years_eve_does_nothing(now, clazz, bot, today):
+    now.return_value = today
+    await clazz.on_year_end()
     bot.get_all_channels.assert_not_called()
 
 
@@ -111,11 +128,11 @@ async def test_friend_facts_command_is_rejected_outside_a_guild(clazz, context):
     ],
 )
 @mock.patch("duckbot.util.datetime.now")
-def test_prior_month_range(now, clazz, today, expected_start, expected_end):
+async def test_send_month_report_scans_prior_month(now, clazz, guild, general_channel, today, expected_start, expected_end):
     now.return_value = today
-    start, end = clazz.prior_month_range()
-    assert start == expected_start
-    assert end == expected_end
+    guild.text_channels = [readable(general_channel, [])]
+    await clazz.send_month_report(general_channel)
+    general_channel.history.assert_called_once_with(limit=None, after=expected_start, before=expected_end, oldest_first=True)
 
 
 async def test_gather_stats_streams_counters(clazz, guild, text_channel):
@@ -293,8 +310,8 @@ def test_tally_buckets_hours_and_days_in_eastern_time(clazz):
 
 @mock.patch("duckbot.cogs.messages.friend_facts.get_user")
 async def test_format_report_empty_month(get_user, clazz, guild):
-    report = await clazz.format_report(guild, {}, [0] * 24, [0] * 7, 0, 0, datetime.datetime(2026, 6, 1))
-    assert report == "**Friend Facts: June 2026** :bar_chart:\nNobody said anything last month. :duck:"
+    report = await clazz.format_report(guild, {}, [0] * 24, [0] * 7, 0, 0, "June 2026")
+    assert report == "**Friend Facts: June 2026** :bar_chart:\nNobody said anything in June 2026. :duck:"
 
 
 @mock.patch("duckbot.cogs.messages.friend_facts.get_user")
@@ -308,7 +325,7 @@ async def test_format_report_leaderboard_and_awards(get_user, clazz, guild):
     hours[23] = 42
     days = [0] * 7
     days[5] = 42
-    report = await clazz.format_report(guild, stats, hours, days, 4, 2, datetime.datetime(2026, 6, 1))
+    report = await clazz.format_report(guild, stats, hours, days, 4, 2, "June 2026")
     assert "**Friend Facts: June 2026**" in report
     assert report.index("user1 ") < report.index("user2 ")
     assert ":pencil: 80 messages across 4 channels and 2 threads" in report
@@ -330,7 +347,7 @@ async def test_format_report_leaderboard_and_awards(get_user, clazz, guild):
 async def test_format_report_truncates_leaderboard_to_top_ten(get_user, clazz, guild):
     get_user.side_effect = lambda bot, user_id, guild: mock.Mock(display_name=f"user{user_id}")
     stats = {i: UserStats(messages=100 - i) for i in range(1, 12)}
-    report = await clazz.format_report(guild, stats, [0] * 24, [0] * 7, 1, 0, datetime.datetime(2026, 6, 1))
+    report = await clazz.format_report(guild, stats, [0] * 24, [0] * 7, 1, 0, "June 2026")
     assert "user10 " in report
     assert "user11 " not in report
 
@@ -338,7 +355,7 @@ async def test_format_report_truncates_leaderboard_to_top_ten(get_user, clazz, g
 @mock.patch("duckbot.cogs.messages.friend_facts.get_user")
 async def test_format_report_truncates_long_names_in_leaderboard(get_user, clazz, guild):
     get_user.side_effect = lambda bot, user_id, guild: mock.Mock(display_name="a" * 32)
-    report = await clazz.format_report(guild, {1: UserStats(messages=5)}, [0] * 24, [0] * 7, 1, 0, datetime.datetime(2026, 6, 1))
+    report = await clazz.format_report(guild, {1: UserStats(messages=5)}, [0] * 24, [0] * 7, 1, 0, "June 2026")
     assert "a" * 24 + " " in report
     assert "a" * 25 not in report
 
@@ -347,7 +364,7 @@ async def test_format_report_truncates_long_names_in_leaderboard(get_user, clazz
 async def test_format_report_awards_require_minimum_messages(get_user, clazz, guild):
     get_user.side_effect = lambda bot, user_id, guild: mock.Mock(display_name=f"user{user_id}")
     stats = {1: UserStats(messages=1, words=50, capital_starts=1, questions=1), 2: UserStats(messages=25, words=25, capital_starts=5, questions=5)}
-    report = await clazz.format_report(guild, stats, [0] * 24, [0] * 7, 1, 0, datetime.datetime(2026, 6, 1))
+    report = await clazz.format_report(guild, stats, [0] * 24, [0] * 7, 1, 0, "June 2026")
     assert "Grammar Police: <@2>" in report
     assert "Wordiest: <@2>" in report
     assert "Most Inquisitive: <@2>" in report
@@ -357,7 +374,7 @@ async def test_format_report_awards_require_minimum_messages(get_user, clazz, gu
 async def test_format_report_no_awards_for_zero_counts(get_user, clazz, guild):
     get_user.side_effect = lambda bot, user_id, guild: mock.Mock(display_name=f"user{user_id}")
     stats = {1: UserStats(messages=5, words=10)}
-    report = await clazz.format_report(guild, stats, [0] * 24, [0] * 7, 1, 0, datetime.datetime(2026, 6, 1))
+    report = await clazz.format_report(guild, stats, [0] * 24, [0] * 7, 1, 0, "June 2026")
     assert "Loudest" not in report
     assert "Chief Link Dumper" not in report
     assert "Golf Fanatic" not in report
@@ -374,10 +391,10 @@ async def test_display_name_unknown_user(get_user, clazz, guild):
 
 
 @mock.patch("duckbot.util.datetime.now", return_value=datetime.datetime(2026, 7, 10, hour=13))
-async def test_send_report_posts_to_channel(now, clazz, guild, general_channel):
+async def test_send_month_report_posts_prior_month_to_channel(now, clazz, guild, general_channel):
     guild.text_channels = [readable(general_channel, [make_message("Hello")])]
     with mock.patch("duckbot.cogs.messages.friend_facts.get_user", side_effect=lambda bot, user_id, g: mock.Mock(display_name=f"user{user_id}")):
-        await clazz.send_report(general_channel)
+        await clazz.send_month_report(general_channel)
     general_channel.send.assert_called_once()
     report = general_channel.send.call_args.args[0]
     assert "**Friend Facts: June 2026**" in report
