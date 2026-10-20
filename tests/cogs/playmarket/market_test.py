@@ -952,6 +952,29 @@ async def test_season_history_lists_newest_season_first(cog, alice, clock):
     alice.send.assert_called_with(embeds=[season_two, season_one])
 
 
+# --- season me -------------------------------------------------------------
+
+
+async def test_season_me_with_no_finished_seasons(cog, alice):
+    await cog.balance(alice)  # creates Season 1, still active
+    await cog.season_me(alice)
+    alice.send.assert_called_with("You haven't finished a season yet, brother.")
+
+
+async def test_season_me_shows_your_finish_each_season_newest_first(cog, alice, bob, carol, clock, in_memory_db):
+    for ctx in (alice, bob, carol, make_context(4)):
+        await cog.balance(ctx)
+    set_balance(in_memory_db, 1, 12_000)
+    clock.advance(days=91)
+    await cog.tick()
+    set_balance(in_memory_db, 1, 1_000)
+    clock.advance(days=91)
+    await cog.tick()
+    await cog.season_me(alice)
+    expected = Embed(title="user1's Seasons", description="#4 Season 2 — 1,000 coins\n🥇 Season 1 — 12,000 coins", color=Color.gold())
+    alice.send.assert_called_with(embed=expected)
+
+
 # --- season stats ----------------------------------------------------------
 
 

@@ -176,6 +176,17 @@ class PlayMarket(commands.Cog):
             for batch in group_by_max_length(embeds):
                 await context.send(embeds=batch)
 
+    @season.command(name="me", description="Your rank and final balance from each past season.")
+    async def season_me(self, context: commands.Context):
+        async with context.typing():
+            with self.db.session(Season) as session:
+                rows = session.query(Season, SeasonResult).join(SeasonResult, SeasonResult.season_id == Season.id)
+                rows = rows.filter(SeasonResult.user_id == context.author.id).order_by(Season.id.desc()).all()
+                if not rows:
+                    return await context.send("You haven't finished a season yet, brother.")
+                lines = [f"{MEDALS.get(result.rank, f'#{result.rank}')} {season.name} — {_coins(result.final_balance)} coins" for season, result in rows]
+            await context.send(embed=Embed(title=f"{context.author.display_name}'s Seasons", description="\n".join(lines), color=Color.gold()))
+
     @season.command(name="stats", description="Fun numbers from the season so far.")
     async def season_stats(self, context: commands.Context):
         async with context.typing():
@@ -350,6 +361,7 @@ class PlayMarket(commands.Cog):
     @leaderboard.error
     @season.error
     @season_history.error
+    @season_me.error
     @season_stats.error
     @list_command.error
     @create.error
