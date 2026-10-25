@@ -25,6 +25,9 @@ def test_embed_length(length):
         ([2500, 2500, 2500], [[0, 1], [2]]),  # single embed leftover in new message
         ([4000, 2500, 2500], [[0], [1, 2]]),  # multiple leftover in new message
         ([4000, 2500, 4000, 2500], [[0], [1], [2], [3]]),  # can never add subsequent embed into message
+        ([1] * 10, [list(range(10))]),  # ten embeds fit in a single message
+        ([1] * 11, [list(range(10)), [10]]),  # eleventh embed spills into a new message
+        ([1] * 21, [list(range(10)), list(range(10, 20)), [20]]),  # count cap applies to each message
     ],
 )
 def test_group_by_max_length_all_cases(lengths, expected_indexes):
