@@ -165,14 +165,14 @@ class PlayMarket(commands.Cog):
     async def season(self, context: commands.Context):
         pass
 
-    @season.command(name="history", description="Final standings from past seasons.")
+    @season.command(name="history", description="All-time trophy case and final standings from past seasons.")
     async def season_history(self, context: commands.Context):
         async with context.typing():
             with self.db.session(Season) as session:
                 seasons = session.query(Season).filter_by(status="archived").order_by(Season.id.desc()).all()
                 if not seasons:
                     return await context.send("No seasons in the books yet, brother.")
-                embeds = [await self._season_embed(context, session, season) for season in seasons]
+                embeds = [await self._trophy_embed(context, session)] + [await self._season_embed(context, session, season) for season in seasons]
             for batch in group_by_max_length(embeds):
                 await context.send(embeds=batch)
 
@@ -529,6 +529,14 @@ class PlayMarket(commands.Cog):
         results = session.query(SeasonResult).filter_by(season_id=season.id).order_by(SeasonResult.rank).all()
         lines = [f"{MEDALS.get(r.rank, f'{r.rank}.')} {await self._name(context, r.user_id)} — {_coins(r.final_balance)} coins" for r in results]
         return Embed(title=f"{season.name} — {season.starts_at:%Y-%m-%d} to {season.ends_at:%Y-%m-%d}", description="\n".join(lines), color=Color.gold())
+
+    async def _trophy_embed(self, context, session) -> Embed:
+        podiums = {}
+        for result in session.query(SeasonResult).filter(SeasonResult.rank.in_(MEDALS)).order_by(SeasonResult.season_id, SeasonResult.rank).all():
+            podiums.setdefault(result.user_id, Counter())[result.rank] += 1
+        ranked = sorted(podiums.items(), key=lambda item: [item[1][rank] for rank in MEDALS], reverse=True)
+        lines = [f"{await self._name(context, uid)} — {''.join(MEDALS[rank] * counts[rank] for rank in MEDALS)}" for uid, counts in ranked]
+        return Embed(title="Trophy Case", description="\n".join(lines), color=Color.gold())
 
     async def _season_stats_embed(self, context, season, markets, entries) -> Embed:
         bets = [e for e in entries if e.reason == "bet"]
