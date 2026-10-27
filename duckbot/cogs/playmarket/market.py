@@ -147,6 +147,11 @@ class PlayMarket(commands.Cog):
                 session.commit()
                 await context.send(f"Pity money granted. You're sitting on {_coins(account.balance)} coins now, you charity case.")
 
+    @market_group.command(name="subsidize", description="Get a coin top-up when you're low and have no active bets.")
+    @commands.guild_only()
+    async def subsidize(self, context: commands.Context):
+        await self.claim(context)
+
     @market_group.command(name="leaderboard", description="See who's winning this season.")
     async def leaderboard(self, context: commands.Context):
         async with context.typing():
@@ -358,6 +363,7 @@ class PlayMarket(commands.Cog):
     @market_group.error
     @balance.error
     @claim.error
+    @subsidize.error
     @leaderboard.error
     @season.error
     @season_history.error
