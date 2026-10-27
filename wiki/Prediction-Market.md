@@ -17,6 +17,7 @@ When the outcome is known, the market's creator resolves it and everyone's winni
 | :--------------------------------------: | --------------------------------------------------- |
 |            `/market balance`             | show your coins and open positions                  |
 |             `/market claim`              | claim the need-based top-up if you're broke         |
+|           `/market subsidize`            | same as `/market claim`                             |
 |          `/market leaderboard`           | current-season standings and the season clock       |
 |         `/market season history`         | all-time trophy case and past season standings      |
 |           `/market season me`            | your own rank and balance in each past season       |
