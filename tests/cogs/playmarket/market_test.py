@@ -685,10 +685,17 @@ async def test_claim_is_allowed_again_after_the_cooldown(cog, alice, clock, in_m
     assert account(in_memory_db, 1).balance == config.TOPUP_TARGET
 
 
+async def test_subsidize_tops_a_broke_player_up_to_the_target(cog, alice, in_memory_db):
+    await cog.balance(alice)
+    set_balance(in_memory_db, 1, 10)
+    await cog.subsidize(alice)
+    assert account(in_memory_db, 1).balance == config.TOPUP_TARGET
+
+
 # --- guild-only writes -----------------------------------------------------
 
 
-@pytest.mark.parametrize("command", ["create", "bet", "sell", "claim", "resolve"])
+@pytest.mark.parametrize("command", ["create", "bet", "sell", "claim", "subsidize", "resolve"])
 def test_write_commands_are_rejected_outside_a_guild(cog, command):
     context = make_context(1)
     context.guild = None
