@@ -685,10 +685,17 @@ async def test_claim_is_allowed_again_after_the_cooldown(cog, alice, clock, in_m
     assert account(in_memory_db, 1).balance == config.TOPUP_TARGET
 
 
+async def test_subsidize_tops_a_broke_player_up_to_the_target(cog, alice, in_memory_db):
+    await cog.balance(alice)
+    set_balance(in_memory_db, 1, 10)
+    await cog.subsidize(alice)
+    assert account(in_memory_db, 1).balance == config.TOPUP_TARGET
+
+
 # --- guild-only writes -----------------------------------------------------
 
 
-@pytest.mark.parametrize("command", ["create", "bet", "sell", "claim", "resolve"])
+@pytest.mark.parametrize("command", ["create", "bet", "sell", "claim", "subsidize", "resolve"])
 def test_write_commands_are_rejected_outside_a_guild(cog, command):
     context = make_context(1)
     context.guild = None
@@ -936,8 +943,9 @@ async def test_season_history_shows_final_standings(cog, alice, bob, clock, in_m
     clock.advance(days=91)
     await cog.tick()
     await cog.season_history(alice)
+    trophies = Embed(title="Trophy Case", description="user1 — 🥇\nuser2 — 🥈", color=Color.gold())
     expected = Embed(title="Season 1 — 2024-01-01 to 2024-04-01", description="🥇 user1 — 12,000 coins\n🥈 user2 — 10,000 coins", color=Color.gold())
-    alice.send.assert_called_with(embeds=[expected])
+    alice.send.assert_called_with(embeds=[trophies, expected])
 
 
 async def test_season_history_lists_newest_season_first(cog, alice, clock):
@@ -947,9 +955,23 @@ async def test_season_history_lists_newest_season_first(cog, alice, clock):
     clock.advance(days=91)
     await cog.tick()
     await cog.season_history(alice)
+    trophies = Embed(title="Trophy Case", description="user1 — 🥇🥇", color=Color.gold())
     season_two = Embed(title="Season 2 — 2024-04-01 to 2024-07-01", description="🥇 user1 — 10,000 coins", color=Color.gold())
     season_one = Embed(title="Season 1 — 2024-01-01 to 2024-04-01", description="🥇 user1 — 10,000 coins", color=Color.gold())
-    alice.send.assert_called_with(embeds=[season_two, season_one])
+    alice.send.assert_called_with(embeds=[trophies, season_two, season_one])
+
+
+async def test_season_history_trophy_case_ranks_golds_then_silvers_then_bronzes(cog, alice, bob, carol, clock, in_memory_db):
+    for ctx in (alice, bob, carol, make_context(4)):
+        await cog.balance(ctx)
+    for balances in ({1: 13_000, 3: 12_000, 2: 11_000}, {3: 13_000, 2: 12_000, 1: 11_000}):
+        for user_id, balance in balances.items():
+            set_balance(in_memory_db, user_id, balance)
+        clock.advance(days=91)
+        await cog.tick()
+    await cog.season_history(alice)
+    expected = Embed(title="Trophy Case", description="user3 — 🥇🥈\nuser1 — 🥇🥉\nuser2 — 🥈🥉", color=Color.gold())
+    alice.send.assert_called_with(embeds=[expected, mock.ANY, mock.ANY])
 
 
 # --- season me -------------------------------------------------------------
