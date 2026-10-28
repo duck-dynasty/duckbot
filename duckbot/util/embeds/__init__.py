@@ -11,6 +11,7 @@ MAX_FIELD_NAME_LENGTH = 256
 MAX_FIELD_VALUE_LENGTH = 1024
 MAX_FOOTER_LENGTH = 2048
 MAX_AUTHOR_NAME_LENGTH = 256
+MAX_EMBEDS = 10
 
 
 def group_by_max_length(embeds: List[Embed]) -> List[List[Embed]]:
@@ -19,7 +20,7 @@ def group_by_max_length(embeds: List[Embed]) -> List[List[Embed]]:
     total, group, groups = 0, [], []
     for embed in embeds:
         length = len(embed)
-        if total + length < MAX_EMBED_LENGTH:
+        if total + length < MAX_EMBED_LENGTH and len(group) < MAX_EMBEDS:
             total += length
             group.append(embed)
         else:
