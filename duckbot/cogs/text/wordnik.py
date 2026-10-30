@@ -47,19 +47,20 @@ class Wordnik(commands.Cog):
         pronunciation = self.get_pronunciation(word)
         embed = discord.Embed(title=word)
         for category in sorted({d.get("partOfSpeech") or "word" for d in definitions}):
-            lines = self.category_lines(word, [d for d in definitions if (d.get("partOfSpeech") or "word") == category])
+            lines = self.category_lines([d for d in definitions if (d.get("partOfSpeech") or "word") == category])
             value = "\n".join(lines)
             if len(value) > MAX_FIELD_VALUE_LENGTH:
                 value = f"{value[: MAX_FIELD_VALUE_LENGTH - 3]}..."
             embed.add_field(name=f"{category}: **{word}**  /{pronunciation}/", value=value, inline=False)
         return embed.set_footer(text=definitions[0].get("attributionText"))
 
-    def category_lines(self, word: str, definitions: List[dict]) -> List[str]:
-        fallback = f"this is where I'd use {word} in a sentence... IF I HAD ONE"
+    def category_lines(self, definitions: List[dict]) -> List[str]:
         lines = []
         for n, definition in enumerate(definitions, start=1):
-            example = next((eu.get("text") for eu in (definition.get("exampleUses") or []) if eu.get("text")), fallback)
-            lines.append(f"{n}. {self.plain_text(definition['text'])}\n_{self.plain_text(example)}_")
+            lines.append(f"{n}. {self.plain_text(definition['text'])}")
+            example = next((eu.get("text") for eu in (definition.get("exampleUses") or []) if eu.get("text")), None)
+            if example:
+                lines.append(f"_{self.plain_text(example)}_")
             lines.append("")
         return lines
 

@@ -25,9 +25,9 @@ async def test_define_inflected_word(clazz, context, responses):
     await clazz.define(context, word="Cows")
     embed = discord.Embed(title="cow")
     noun_lines = [
-        "1. The mature female of cattle of the genus Bos.\n_this is where I'd use cow in a sentence... IF I HAD ONE_",
+        "1. The mature female of cattle of the genus Bos.",
         "",
-        "2. The mature female of certain other large animals, such as elephants, moose, or whales.\n_this is where I'd use cow in a sentence... IF I HAD ONE_",
+        "2. The mature female of certain other large animals, such as elephants, moose, or whales.",
         "",
     ]
     verb_lines = [
@@ -85,7 +85,7 @@ async def test_define_handles_null_example_uses(clazz, context, responses):
     responses.add(responses.GET, f"{URL}/cow/pronunciations", json=cow_pronunciations())
     await clazz.define(context, word="cow")
     embed = discord.Embed(title="cow")
-    embed.add_field(name="noun: **cow**  /kou/", value="1. A big animal.\n_this is where I'd use cow in a sentence... IF I HAD ONE_\n", inline=False)
+    embed.add_field(name="noun: **cow**  /kou/", value="1. A big animal.\n", inline=False)
     embed.set_footer(text=ATTRIBUTION)
     context.send.assert_called_once_with(embed=embed)
 
