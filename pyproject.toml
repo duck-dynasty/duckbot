@@ -24,7 +24,7 @@ dependencies = [
     "psycopg2==2.9.13",
     "SQLAlchemy==2.1.1",
     "d20==1.1.2",
-    "nltk==3.10.3",
+    "nltk==3.10.4",
     "textblob==0.20.1",
     "pyfiglet==1.0.4",
     "matplotlib==3.11.2",
