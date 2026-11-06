@@ -63,6 +63,7 @@ days = {
             "Stir Fry day",
             "Friyay",
             "Friday",
+            "J's Pizza and a Movie Night",
         ],
         "templates": [],
         "gifs": [
