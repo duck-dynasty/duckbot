@@ -47,7 +47,7 @@ dev = [
     "black==26.10.1",
     "flake8-black==0.4.0",
     "isort==9.0.2",
-    "flake8-isort==7.0.0",
+    "flake8-isort==7.1.0",
     "pep8-naming==0.15.1",
     "mdformat==1.0.0",
     "mdformat-gfm==1.0.0",
