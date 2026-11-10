@@ -32,7 +32,7 @@ dependencies = [
     "PyGithub==2.10.0",
     "wolframalpha==5.1.4",
     "yfinance==1.7.0",
-    "mip==2.0.0",
+    "mip==2.0.1",
     "groq==1.7.0",
     "alembic==1.20.1",
 ]
