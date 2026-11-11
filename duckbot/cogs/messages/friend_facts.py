@@ -7,6 +7,7 @@ from discord.ext import commands, tasks
 from discord.utils import get
 
 import duckbot.util.datetime
+from duckbot.cogs.messages.haiku import Haiku
 from duckbot.cogs.weather import CHART_FILE
 from duckbot.util.messages import accessible_channels
 from duckbot.util.users import get_user
@@ -27,6 +28,7 @@ class UserStats:
     weather: int = 0
     mentions: int = 0
     attachments: int = 0
+    haikus: int = 0
     reactions_given: int = 0
     reactions_received: int = 0
 
@@ -89,6 +91,7 @@ class FriendFacts(commands.Cog):
         days = [0] * 7
         channels = 0
         threads = 0
+        haiku = self.bot.get_cog(Haiku.__cog_name__)
         async for channel in accessible_channels(guild):
             try:
                 active = False
@@ -97,7 +100,7 @@ class FriendFacts(commands.Cog):
                     if message.author.bot:
                         self.tally_slash_weather(stats, message)
                     else:
-                        self.tally(stats, hours, days, message)
+                        self.tally(stats, hours, days, haiku, message)
                     await self.tally_reactions(stats, message)
                 if active:
                     if isinstance(channel, Thread):
@@ -108,7 +111,7 @@ class FriendFacts(commands.Cog):
                 pass
         return stats, hours, days, channels, threads
 
-    def tally(self, stats, hours, days, message: Message):
+    def tally(self, stats, hours, days, haiku, message: Message):
         user = stats.setdefault(message.author.id, UserStats())
         content = message.content
         user.messages += 1
@@ -121,6 +124,7 @@ class FriendFacts(commands.Cog):
         user.weather += content.lower().startswith("!weather")
         user.mentions += self.mention_count(message)
         user.attachments += len(message.attachments)
+        user.haikus += haiku.get_haiku(message) is not None
         created = message.created_at.astimezone(duckbot.util.datetime.timezone())
         hours[created.hour] += 1
         days[created.weekday()] += 1
@@ -177,6 +181,7 @@ class FriendFacts(commands.Cog):
         lines += self.count_award(stats, "weather", ":white_sun_small_cloud: Weather Obsessed: {name} — {count} weather checks")
         lines += self.count_award(stats, "mentions", ":wave: Name Dropper: {name} — {count} people mentioned")
         lines += self.count_award(stats, "attachments", ":camera: Paparazzi: {name} — {count} attachments sent")
+        lines += self.count_award(stats, "haikus", ":cherry_blossom: Poet Laureate: {name} — {count} haikus written")
         lines += self.count_award(stats, "reactions_given", ":clap: Serial Reactor: {name} — {count} reactions added")
         lines += self.count_award(stats, "reactions_received", ":star: Crowd Pleaser: {name} — {count} reactions received")
         return lines

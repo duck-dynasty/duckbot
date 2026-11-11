@@ -6,14 +6,22 @@ import pytest
 from discord import Forbidden
 from discord.ext import commands
 
-from duckbot.cogs.messages import FriendFacts
+from duckbot.cogs.messages import FriendFacts, Haiku
 from duckbot.cogs.messages.friend_facts import UserStats
 from tests.async_mock_ext import list_as_async_generator
 from tests.discord_test_ext import bind_commands
 
 
 @pytest.fixture
-def clazz(bot) -> FriendFacts:
+def haiku() -> Haiku:
+    haiku = Haiku()
+    haiku.syllables = {"five": 5, "seven": 7}
+    return haiku
+
+
+@pytest.fixture
+def clazz(bot, haiku) -> FriendFacts:
+    bot.get_cog.return_value = haiku
     return bind_commands(FriendFacts(bot))
 
 
@@ -22,6 +30,7 @@ def make_message(content="hi", author_id=1, is_bot=False, created_at=datetime.da
     message.author.id = author_id
     message.author.bot = is_bot
     message.content = content
+    message.clean_content = content
     message.created_at = created_at
     message.mentions = mentions
     message.reference = reference
@@ -161,6 +170,12 @@ async def test_gather_stats_credits_slash_weather_to_invoker(clazz, guild, text_
     assert stats == {5: UserStats(weather=1)}
 
 
+async def test_gather_stats_counts_haikus(clazz, guild, text_channel):
+    guild.text_channels = [readable(text_channel, [make_message("five seven five")])]
+    stats, _, _, _, _ = await clazz.gather_stats(guild, None, None)
+    assert stats[1].haikus == 1
+
+
 async def test_gather_stats_skips_unreadable_channels(clazz, guild, text_channel):
     text_channel.permissions_for.return_value.read_message_history = False
     guild.text_channels = [text_channel]
@@ -225,51 +240,58 @@ async def test_gather_stats_counts_announcement_channels_as_channels(clazz, guil
     assert channels == 1 and threads == 0
 
 
-def test_tally_counts_each_stat(clazz):
+def test_tally_counts_each_stat(clazz, haiku):
     stats, hours, days = {}, [0] * 24, [0] * 7
-    clazz.tally(stats, hours, days, make_message("Hello world"))
-    clazz.tally(stats, hours, days, make_message("what? "))
-    clazz.tally(stats, hours, days, make_message("AAAH!"))
-    clazz.tally(stats, hours, days, make_message("see https://example.com"))
+    clazz.tally(stats, hours, days, haiku, make_message("Hello world"))
+    clazz.tally(stats, hours, days, haiku, make_message("what? "))
+    clazz.tally(stats, hours, days, haiku, make_message("AAAH!"))
+    clazz.tally(stats, hours, days, haiku, make_message("see https://example.com"))
     assert stats[1] == UserStats(messages=4, words=6, capital_starts=2, questions=1, shouts=1, links=1)
 
 
-def test_tally_counts_golf_mentions_case_insensitive(clazz):
+def test_tally_counts_golf_mentions_case_insensitive(clazz, haiku):
     stats, hours, days = {}, [0] * 24, [0] * 7
-    clazz.tally(stats, hours, days, make_message("GOLF golf golfing, hole in one"))
-    clazz.tally(stats, hours, days, make_message("GULF gulf engulfed"))
+    clazz.tally(stats, hours, days, haiku, make_message("GOLF golf golfing, hole in one"))
+    clazz.tally(stats, hours, days, haiku, make_message("GULF gulf engulfed"))
     assert stats[1].golf == 6
 
 
-def test_tally_counts_weather_prefix_command(clazz):
+def test_tally_counts_weather_prefix_command(clazz, haiku):
     stats, hours, days = {}, [0] * 24, [0] * 7
-    clazz.tally(stats, hours, days, make_message("!weather set london ca 2"))
-    clazz.tally(stats, hours, days, make_message("nice weather today"))
+    clazz.tally(stats, hours, days, haiku, make_message("!weather set london ca 2"))
+    clazz.tally(stats, hours, days, haiku, make_message("nice weather today"))
     assert stats[1].weather == 1
 
 
-def test_tally_counts_attachments(clazz):
+def test_tally_counts_attachments(clazz, haiku):
     stats, hours, days = {}, [0] * 24, [0] * 7
-    clazz.tally(stats, hours, days, make_message("look at these", attachments=[mock.Mock(), mock.Mock()]))
-    clazz.tally(stats, hours, days, make_message("no photos here"))
+    clazz.tally(stats, hours, days, haiku, make_message("look at these", attachments=[mock.Mock(), mock.Mock()]))
+    clazz.tally(stats, hours, days, haiku, make_message("no photos here"))
     assert stats[1].attachments == 2
 
 
-def test_tally_counts_mentions_and_replies_distinctly(clazz):
+def test_tally_counts_haikus(clazz, haiku):
     stats, hours, days = {}, [0] * 24, [0] * 7
-    clazz.tally(stats, hours, days, make_message("hi", mentions=[make_user(2), make_user(3)]))
-    clazz.tally(stats, hours, days, make_message("hi", reference=make_reply_to(2)))
-    clazz.tally(stats, hours, days, make_message("hi", mentions=[make_user(2)], reference=make_reply_to(2)))  # reply ping counts once
+    clazz.tally(stats, hours, days, haiku, make_message("five seven five"))
+    clazz.tally(stats, hours, days, haiku, make_message("five seven"))
+    assert stats[1].haikus == 1
+
+
+def test_tally_counts_mentions_and_replies_distinctly(clazz, haiku):
+    stats, hours, days = {}, [0] * 24, [0] * 7
+    clazz.tally(stats, hours, days, haiku, make_message("hi", mentions=[make_user(2), make_user(3)]))
+    clazz.tally(stats, hours, days, haiku, make_message("hi", reference=make_reply_to(2)))
+    clazz.tally(stats, hours, days, haiku, make_message("hi", mentions=[make_user(2)], reference=make_reply_to(2)))  # reply ping counts once
     assert stats[1].mentions == 4
 
 
-def test_tally_mentions_excludes_self_and_deleted_replies(clazz):
+def test_tally_mentions_excludes_self_and_deleted_replies(clazz, haiku):
     stats, hours, days = {}, [0] * 24, [0] * 7
     deleted = mock.Mock()
     deleted.resolved = mock.Mock(spec=discord.DeletedReferencedMessage)
-    clazz.tally(stats, hours, days, make_message("hi", mentions=[make_user(1)]))
-    clazz.tally(stats, hours, days, make_message("hi", reference=make_reply_to(1)))
-    clazz.tally(stats, hours, days, make_message("hi", reference=deleted))
+    clazz.tally(stats, hours, days, haiku, make_message("hi", mentions=[make_user(1)]))
+    clazz.tally(stats, hours, days, haiku, make_message("hi", reference=make_reply_to(1)))
+    clazz.tally(stats, hours, days, haiku, make_message("hi", reference=deleted))
     assert stats[1].mentions == 0
 
 
@@ -301,9 +323,9 @@ async def test_gather_stats_counts_reactions(clazz, guild, text_channel):
     assert stats[2] == UserStats(reactions_given=1)
 
 
-def test_tally_buckets_hours_and_days_in_eastern_time(clazz):
+def test_tally_buckets_hours_and_days_in_eastern_time(clazz, haiku):
     stats, hours, days = {}, [0] * 24, [0] * 7
-    clazz.tally(stats, hours, days, make_message(created_at=datetime.datetime(2026, 6, 15, 18, 30, tzinfo=datetime.timezone.utc)))  # 2:30pm EDT, a Monday
+    clazz.tally(stats, hours, days, haiku, make_message(created_at=datetime.datetime(2026, 6, 15, 18, 30, tzinfo=datetime.timezone.utc)))  # 2:30pm EDT, a Monday
     assert hours[14] == 1
     assert days[0] == 1
 
@@ -319,7 +341,7 @@ async def test_format_report_leaderboard_and_awards(get_user, clazz, guild):
     get_user.side_effect = lambda bot, user_id, guild: mock.Mock(display_name=f"user{user_id}")
     stats = {
         1: UserStats(messages=50, words=100, capital_starts=40, questions=5, shouts=3, links=7, golf=12, attachments=33, reactions_received=64),
-        2: UserStats(messages=30, words=300, capital_starts=6, questions=15, weather=9, mentions=21, reactions_given=17),
+        2: UserStats(messages=30, words=300, capital_starts=6, questions=15, weather=9, mentions=21, haikus=4, reactions_given=17),
     }
     hours = [0] * 24
     hours[23] = 42
@@ -338,6 +360,7 @@ async def test_format_report_leaderboard_and_awards(get_user, clazz, guild):
     assert "Weather Obsessed: <@2> — 9 weather checks" in report
     assert "Name Dropper: <@2> — 21 people mentioned" in report
     assert "Paparazzi: <@1> — 33 attachments sent" in report
+    assert "Poet Laureate: <@2> — 4 haikus written" in report
     assert "Serial Reactor: <@2> — 17 reactions added" in report
     assert "Crowd Pleaser: <@1> — 64 reactions received" in report
     assert "Busiest hour: 11pm · Busiest day: Saturday" in report
@@ -381,6 +404,7 @@ async def test_format_report_no_awards_for_zero_counts(get_user, clazz, guild):
     assert "Weather Obsessed" not in report
     assert "Name Dropper" not in report
     assert "Paparazzi" not in report
+    assert "Poet Laureate" not in report
     assert "Serial Reactor" not in report
     assert "Crowd Pleaser" not in report
 

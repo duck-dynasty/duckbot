@@ -23,21 +23,24 @@ class Haiku(commands.Cog):
     async def detect_haiku(self, message):
         if message.author.bot:
             return
+        lines = self.get_haiku(message)
+        if lines is not None:
+            # Convert `_..._` italics to `*..*` so user underscores don't collide with the wrapping italic.
+            haiku = UNDERSCORE_ITALIC_RE.sub(r"*\1*", "\n".join(lines))
+            embed = Embed(colour=Colour.dark_red()).add_field(name=":cherry_blossom: **Haiku Detected** :cherry_blossom:", value=f"_{haiku}_")
+            await message.channel.send(embed=embed)
+
+    def get_haiku(self, message):
         words = self.get_words(message)
         i = 0
         lines = []
         for target_syllables in [5, 7, 5]:
             line = self.get_haiku_line(words[i:], target_syllables)
-            if line is not None:
-                i += len(line)
-                lines.append(" ".join(line))
-            else:
-                return  # it's not a haiku
-        if i == len(words):
-            # Convert `_..._` italics to `*..*` so user underscores don't collide with the wrapping italic.
-            haiku = UNDERSCORE_ITALIC_RE.sub(r"*\1*", "\n".join(lines))
-            embed = Embed(colour=Colour.dark_red()).add_field(name=":cherry_blossom: **Haiku Detected** :cherry_blossom:", value=f"_{haiku}_")
-            await message.channel.send(embed=embed)
+            if line is None:
+                return None
+            i += len(line)
+            lines.append(" ".join(line))
+        return lines if i == len(words) else None
 
     def get_words(self, message):
         return message.clean_content.replace(",", "").replace(".", "").replace("!", "").replace("?", "").split()

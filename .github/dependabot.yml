@@ -6,9 +6,12 @@ updates:
   schedule:
     interval: monthly
   open-pull-requests-limit: 100
+  commit-message:
+    prefix: ":arrow_up: "
   ignore:
   - dependency-name: davey  # 0.2.0 is silent on discord.py 2.7.1: Rapptz/discord.py#10548
     versions: ["0.2.0"]
+
 - package-ecosystem: github-actions
   directories:
   - /
@@ -18,13 +21,21 @@ updates:
   schedule:
     interval: monthly
   open-pull-requests-limit: 100
+  commit-message:
+    prefix: ":arrow_up: "
+
 - package-ecosystem: docker
   directory: /
   schedule:
     interval: monthly
   open-pull-requests-limit: 100
+  commit-message:
+    prefix: ":arrow_up: "
+
 - package-ecosystem: docker-compose
   directory: /
   schedule:
     interval: monthly
   open-pull-requests-limit: 100
+  commit-message:
+    prefix: ":arrow_up: "

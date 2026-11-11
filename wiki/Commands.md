@@ -44,7 +44,7 @@ DuckBot can define words, sourcing data from [Wordnik](https://www.wordnik.com/)
 
 ## Friend Facts
 
-Run `!friend-facts` to get a stats report on the server's messages from the prior month: a message-count leaderboard plus awards like Grammar Police (% of messages starting with a capital), Wordiest, Most Inquisitive, Loudest, Chief Link Dumper, Golf Fanatic, Weather Obsessed, Name Dropper, Paparazzi, Serial Reactor (most reactions added), and Crowd Pleaser (most reactions received), along with the busiest hour and day. Percentage awards require at least 25 messages. DuckBot also posts this report [on a schedule](Events#friend-facts), monthly and for the whole year.
+Run `!friend-facts` to get a stats report on the server's messages from the prior month: a message-count leaderboard plus awards like Grammar Police (% of messages starting with a capital), Wordiest, Most Inquisitive, Loudest, Chief Link Dumper, Golf Fanatic, Weather Obsessed, Name Dropper, Paparazzi, Poet Laureate (most haikus), Serial Reactor (most reactions added), and Crowd Pleaser (most reactions received), along with the busiest hour and day. Percentage awards require at least 25 messages. DuckBot also posts this report [on a schedule](Events#friend-facts), monthly and for the whole year.
 
 ## Emoji Usage
 
