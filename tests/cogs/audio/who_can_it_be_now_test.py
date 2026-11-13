@@ -2,6 +2,7 @@ import asyncio
 from unittest import mock
 
 import pytest
+from discord import ClientException
 from discord.ext.commands import CommandError
 
 from duckbot.cogs.audio import WhoCanItBeNow
@@ -116,6 +117,17 @@ async def test_connect_to_voice_already_connected(clazz, context, voice_client):
     context.voice_client = voice_client
     await clazz.connect_to_voice(context)
     voice_client.stop.assert_called()
+    assert clazz.voice_client == voice_client
+
+
+@mock.patch("duckbot.cogs.audio.who_can_it_be_now.PCMVolumeTransformer", autospec=True)
+@mock.patch("duckbot.cogs.audio.who_can_it_be_now.FFmpegPCMAudio", autospec=True)
+async def test_stream_audio_play_fails_stops_streaming(ffmpeg, vol, clazz, voice_client):
+    voice_client.play.side_effect = ClientException("Not connected to voice.")
+    clazz.voice_client = voice_client
+    clazz.streaming = True
+    await clazz.stream_audio()
+    assert clazz.streaming is False
 
 
 async def test_start_already_started(clazz, bot, context):
