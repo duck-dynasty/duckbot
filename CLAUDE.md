@@ -2,12 +2,12 @@
 
 ## Project Overview
 
-DuckBot is a Discord bot built with discord.py, written in Python 3.13. It uses a Cog-based architecture where each feature is a separate module under `duckbot/cogs/`.
+DuckBot is a Discord bot built with discord.py, written in Python 3.14. It uses a Cog-based architecture where each feature is a separate module under `duckbot/cogs/`.
 
 ## Development Setup
 
 ```sh
-python3.13 -m venv --clear --prompt duckbot venv
+python3.14 -m venv --clear --prompt duckbot venv
 . venv/bin/activate
 pip install --editable .[dev]
 setup_nltk
@@ -40,7 +40,7 @@ setup_nltk
 
 ## Code Style
 
-- **Formatter**: black (line length 200, target py313)
+- **Formatter**: black (line length 200, target py314)
 - **Import sorting**: isort (black-compatible profile)
 - **Linter**: flake8 (max line length 200, max complexity 10)
 - Unused imports in `__init__.py` files are allowed (F401 ignored)

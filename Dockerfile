@@ -1,5 +1,5 @@
 # collect pip dependencies into a virtualenv, which we'll copy into the prod stage
-FROM python:3.13 AS pip-dependencies
+FROM python:3.14 AS pip-dependencies
 ENV VIRTUAL_ENV "/opt/venv"
 RUN python -m venv $VIRTUAL_ENV
 ENV PATH "$VIRTUAL_ENV/bin:$PATH"
@@ -13,7 +13,7 @@ COPY pyproject.toml .
 RUN pip install .
 RUN setup_nltk
 
-FROM python:3.13-slim AS prod
+FROM python:3.14-slim AS prod
 # ffmpeg: for discord audio
 # libpq-dev: postgres client libraries
 # postgresql-client: pg_dump/psql for !pg dump and !pg restore; keep the server pinned to the same major
