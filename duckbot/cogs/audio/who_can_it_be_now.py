@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from contextlib import suppress
 from importlib.resources import path
 from typing import Optional
@@ -7,6 +8,8 @@ from discord import FFmpegPCMAudio, PCMVolumeTransformer, VoiceClient
 from discord.ext import commands
 
 from duckbot.util.messages import try_delete
+
+log = logging.getLogger(__name__)
 
 
 class WhoCanItBeNow(commands.Cog):
@@ -35,27 +38,33 @@ class WhoCanItBeNow(commands.Cog):
             if not hasattr(context.author, "voice"):
                 await context.send("Music can only be played in a discord server, not a private channel.", delete_after=30)
             elif context.author.voice:
-                self.voice_client = await context.author.voice.channel.connect()
+                async with context.typing():
+                    self.voice_client = await context.author.voice.channel.connect()
             else:
                 await context.send("Connect to a voice channel so I know where to `!start`.", delete_after=30)
                 raise commands.CommandError("`start` invoked when author not in voice channel")
         else:
-            context.voice_client.stop()
+            self.voice_client = context.voice_client
+            self.voice_client.stop()
 
     async def stream_audio(self):
         """The music loop. Connect to channel and stream. We await on `self.stream` to block on the song being played."""
-        play_count = 0
-        while self.streaming and play_count < 75:
-            self.stream.clear()
-            # need to load the song every time, it seems to keep internal state
-            with path("resources", "who-can-it-be-now.mp3") as source:
-                song = PCMVolumeTransformer(FFmpegPCMAudio(source, options='-filter:a "volume=0.125"'))
-            self.voice_client.play(song, after=self.trigger_next_song)
-            play_count += 1
-            await asyncio.sleep(0)  # give up timeslice for `trigger_next_song`
-            await self.stream.wait()
-        if self.streaming and play_count >= 75:
-            await self.stop()
+        try:
+            play_count = 0
+            while self.streaming and play_count < 75:
+                self.stream.clear()
+                # need to load the song every time, it seems to keep internal state
+                with path("resources", "who-can-it-be-now.mp3") as source:
+                    song = PCMVolumeTransformer(FFmpegPCMAudio(source, options='-filter:a "volume=0.125"'))
+                self.voice_client.play(song, after=self.trigger_next_song)
+                play_count += 1
+                await asyncio.sleep(0)  # give up timeslice for `trigger_next_song`
+                await self.stream.wait()
+            if self.streaming and play_count >= 75:
+                await self.stop()
+        except Exception:
+            log.exception("audio stream failed")
+            self.streaming = False
 
     def trigger_next_song(self, error=None):
         self.stream.set()

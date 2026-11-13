@@ -15,7 +15,7 @@ async def test_cog_load_create_logger(make_dirs, log_config, filehandler, stream
     clazz = Logging(bot)
     await clazz.cog_load()
     make_dirs.assert_called_once_with(LOG_DIR, exist_ok=True)
-    log_config.assert_called_once_with(level=logging.INFO, format="%(asctime)s:%(levelname)s:%(name)s: %(message)s", handlers=[filehandler.return_value, streamhandler.return_value])
+    log_config.assert_called_once_with(level=logging.INFO, format="%(asctime)s:%(levelname)s:%(name)s: %(message)s", handlers=[filehandler.return_value, streamhandler.return_value], force=True)
 
 
 @mock.patch("discord.File")
