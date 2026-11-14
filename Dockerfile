@@ -1,8 +1,8 @@
 # collect pip dependencies into a virtualenv, which we'll copy into the prod stage
 FROM python:3.14 AS pip-dependencies
-ENV VIRTUAL_ENV "/opt/venv"
+ENV VIRTUAL_ENV="/opt/venv"
 RUN python -m venv $VIRTUAL_ENV
-ENV PATH "$VIRTUAL_ENV/bin:$PATH"
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 WORKDIR /pip-dependencies
 # install openblas for numpy (matplotlib dependency)
 RUN apt-get update && apt-get -y install --no-install-recommends \
@@ -28,14 +28,14 @@ RUN apt-get update && apt-get -y install --no-install-recommends \
     fortune-mod fortunes cowsay \
     graphviz \
   && apt-get clean && rm -rf /var/lib/apt/lists/*
-ENV PATH "$PATH:/usr/games"
-ENV VIRTUAL_ENV "/opt/venv"
-ENV PATH "$VIRTUAL_ENV/bin:$PATH"
+ENV PATH="$PATH:/usr/games"
+ENV VIRTUAL_ENV="/opt/venv"
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 WORKDIR /duckbot
 COPY --from=pip-dependencies "$VIRTUAL_ENV" "$VIRTUAL_ENV"
 COPY alembic.ini .
 COPY resources/ ./resources
 COPY duckbot/ ./duckbot
-ENV RUN_MIGRATIONS "true"
+ENV RUN_MIGRATIONS="true"
 ENTRYPOINT [ "python" ]
 CMD [ "-u", "-m", "duckbot" ]
