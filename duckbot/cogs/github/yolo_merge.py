@@ -1,14 +1,17 @@
+from __future__ import annotations
+
 import datetime
 import os
-from typing import Dict, List, Optional
+from typing import TYPE_CHECKING, Dict, List, Optional
 
 import discord
-import github
-import github.Auth
 from discord.ext import commands
 from discord.utils import utcnow
-from github.PullRequest import PullRequest
-from github.Repository import Repository
+
+if TYPE_CHECKING:
+    import github
+    from github.PullRequest import PullRequest
+    from github.Repository import Repository
 
 from duckbot.util.permissions import is_repository_admin
 
@@ -26,6 +29,9 @@ class YoloMerge(commands.Cog):
     @property
     def github(self) -> github.Github:
         if self._github is None:
+            import github
+            import github.Auth
+
             self._github = github.Github(auth=github.Auth.Token(os.getenv("BOT_GITHUB_TOKEN")))
         return self._github
 

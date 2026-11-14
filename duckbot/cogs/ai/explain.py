@@ -2,7 +2,6 @@ import os
 import re
 
 import discord
-import groq
 from discord.ext import commands
 
 from duckbot.cogs.ai.groq_api import complete
@@ -27,6 +26,8 @@ class Explain(commands.Cog):
     @property
     def ai_client(self):
         if self._ai_client is None:
+            import groq
+
             self._ai_client = groq.Groq(api_key=os.getenv("GROQ_API_KEY"))
         return self._ai_client
 

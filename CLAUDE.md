@@ -65,7 +65,7 @@ setup_nltk
 - `duckbot.db.Database` is a singleton. DB cogs receive it from their `setup`, which passes `Database()` into the constructor (see `duckbot/cogs/playmarket/__init__.py`, `duckbot/cogs/weather/__init__.py`) and store it as `self.db`.
 - Usage: `with self.db.session(SomeModel) as session:` then `session.commit()`. `session(model)` lazily runs `model.metadata.create_all` before returning, so tables are created on first use. Canonical example: `PlayMarket.tick` in `duckbot/cogs/playmarket/market.py`.
 - **Testing the DB** (reinforces "Don't shadow shared fixtures" below): the global `db` fixture is a *mocked* session; use `in_memory_db` (real in-memory SQLite, `tests/fixtures/database.py`) when logic is worth testing against real rows.
-- **Migrations** use Alembic (`alembic.ini` at repo root). Versioned files live in `duckbot/db/migrations/versions/` named `00N_description.py` (e.g. `003_playmarket.py`). They run at startup only when `RUN_MIGRATIONS` is set (`duckbot/__main__.py` → `Database().migrate()`). Since `metadata.create_all` handles fresh tables in dev/tests, migrations are for schema changes to already-deployed tables.
+- **Migrations** use Alembic (`alembic.ini` at repo root). Versioned files live in `duckbot/db/migrations/versions/` named `00N_description.py` (e.g. `003_playmarket.py`). They run at startup only when `RUN_MIGRATIONS` is set, in a child process (`duckbot/__main__.py` → `python -m duckbot.db`) so alembic never loads into the bot. Since `metadata.create_all` handles fresh tables in dev/tests, migrations are for schema changes to already-deployed tables.
 
 ## Testing Conventions
 

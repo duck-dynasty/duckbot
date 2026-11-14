@@ -1,7 +1,4 @@
 import sqlalchemy as sa
-from alembic import command
-from alembic.config import Config
-from alembic.runtime.migration import MigrationContext
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.orm.session import Session
@@ -19,6 +16,10 @@ class Database:
         self._db = None
 
     def migrate(self) -> None:
+        from alembic import command
+        from alembic.config import Config
+        from alembic.runtime.migration import MigrationContext
+
         cfg = Config("alembic.ini")
         # autostamp existing state that predates alembic; weather_locations exists but no version set
         with self.db.connect() as conn:
