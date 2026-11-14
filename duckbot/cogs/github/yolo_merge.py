@@ -9,7 +9,7 @@ from discord.ext import commands
 from discord.utils import utcnow
 
 if TYPE_CHECKING:
-    import github
+    from github import Github
     from github.PullRequest import PullRequest
     from github.Repository import Repository
 
@@ -27,7 +27,7 @@ class YoloMerge(commands.Cog):
         self.merge_confirmations: Dict[int, MergeConfirmation] = {}
 
     @property
-    def github(self) -> github.Github:
+    def github(self) -> Github:
         if self._github is None:
             import github
             import github.Auth
