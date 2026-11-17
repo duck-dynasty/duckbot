@@ -1,6 +1,8 @@
 import asyncio
 import os
 import pkgutil
+import subprocess
+import sys
 
 from discord.ext import commands
 
@@ -10,7 +12,6 @@ import duckbot.logs
 import duckbot.slash
 import duckbot.util.connection_test
 from duckbot import DuckBot
-from duckbot.db import Database
 
 
 async def run_duckbot(bot: commands.Bot):
@@ -31,5 +32,5 @@ async def run_duckbot(bot: commands.Bot):
 
 if __name__ == "__main__":
     if os.getenv("RUN_MIGRATIONS"):
-        Database().migrate()
+        subprocess.run([sys.executable, "-m", "duckbot.db"], check=True)
     asyncio.run(run_duckbot(DuckBot()))

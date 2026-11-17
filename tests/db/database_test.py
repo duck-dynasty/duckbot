@@ -36,10 +36,10 @@ def test_session_creates_tables(create, base):
     assert session is not None
 
 
-@mock.patch("duckbot.db.database.command")
-@mock.patch("duckbot.db.database.MigrationContext")
+@mock.patch("alembic.command")
+@mock.patch("alembic.runtime.migration.MigrationContext")
 @mock.patch("duckbot.db.database.sa")
-@mock.patch("duckbot.db.database.Config")
+@mock.patch("alembic.config.Config")
 @mock.patch("duckbot.db.database.create_engine")
 def test_migrate_stamps_and_upgrades_existing_db_without_alembic_version(create, config, sa, migration_context, command):
     migration_context.configure.return_value.get_current_revision.return_value = None
@@ -49,10 +49,10 @@ def test_migrate_stamps_and_upgrades_existing_db_without_alembic_version(create,
     command.upgrade.assert_called_once_with(config.return_value, "head")
 
 
-@mock.patch("duckbot.db.database.command")
-@mock.patch("duckbot.db.database.MigrationContext")
+@mock.patch("alembic.command")
+@mock.patch("alembic.runtime.migration.MigrationContext")
 @mock.patch("duckbot.db.database.sa")
-@mock.patch("duckbot.db.database.Config")
+@mock.patch("alembic.config.Config")
 @mock.patch("duckbot.db.database.create_engine")
 def test_migrate_skips_stamp_for_fresh_db(create, config, sa, migration_context, command):
     migration_context.configure.return_value.get_current_revision.return_value = None
@@ -62,10 +62,10 @@ def test_migrate_skips_stamp_for_fresh_db(create, config, sa, migration_context,
     command.upgrade.assert_called_once_with(config.return_value, "head")
 
 
-@mock.patch("duckbot.db.database.command")
-@mock.patch("duckbot.db.database.MigrationContext")
+@mock.patch("alembic.command")
+@mock.patch("alembic.runtime.migration.MigrationContext")
 @mock.patch("duckbot.db.database.sa")
-@mock.patch("duckbot.db.database.Config")
+@mock.patch("alembic.config.Config")
 @mock.patch("duckbot.db.database.create_engine")
 def test_migrate_skips_stamp_when_already_versioned(create, config, sa, migration_context, command):
     migration_context.configure.return_value.get_current_revision.return_value = "001_weather_locations"

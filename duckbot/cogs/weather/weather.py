@@ -5,8 +5,6 @@ from typing import Optional
 from zoneinfo import ZoneInfo
 
 import discord
-import matplotlib.dates as mdates
-import matplotlib.pyplot as plt
 import pyowm
 import timezonefinder
 from discord.ext import commands
@@ -150,6 +148,9 @@ class Weather(commands.Cog):
         return (weather.status and "snow" in weather.status.lower()) or (weather.detailed_status and "snow" in weather.detailed_status.lower())
 
     def weather_graph(self, city: Location, weather: OneCall):
+        import matplotlib.dates as mdates
+        import matplotlib.pyplot as plt
+
         hourly = [weather.forecast_hourly[i] for i in range(24)]
         tz = ZoneInfo(timezonefinder.TimezoneFinder().timezone_at(lat=city.lat, lng=city.lon))
         hours = [w.reference_time("date").astimezone(tz=tz) for w in hourly]

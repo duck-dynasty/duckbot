@@ -1,8 +1,12 @@
-from typing import List, Optional
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, List, Optional
 
 import discord
-import yfinance
 from discord.ext import commands
+
+if TYPE_CHECKING:
+    import yfinance
 
 
 class Stocks(commands.Cog):
@@ -20,6 +24,8 @@ class Stocks(commands.Cog):
         return list(dict.fromkeys(word[1:].upper() for word in content.split() if word.startswith("$")))
 
     def get_ticker(self, symbol: str) -> Optional[yfinance.Ticker]:
+        import yfinance
+
         ticker = yfinance.Ticker(symbol)
         return ticker if ticker.info.get("symbol", None) else None
 

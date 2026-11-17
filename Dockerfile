@@ -31,6 +31,8 @@ RUN apt-get update && apt-get -y install --no-install-recommends \
 ENV PATH="$PATH:/usr/games"
 ENV VIRTUAL_ENV="/opt/venv"
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+# https://man7.org/linux/man-pages/man3/mallopt.3.html (M_ARENA_MAX)
+ENV MALLOC_ARENA_MAX="2"
 WORKDIR /duckbot
 COPY --from=pip-dependencies "$VIRTUAL_ENV" "$VIRTUAL_ENV"
 COPY alembic.ini .

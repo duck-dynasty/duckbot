@@ -14,11 +14,16 @@ from .item import Item
 from .pretty import factory_embed, solution_embed
 from .recipe import all, as_slooped
 from .recipe_banks import recipe_banks
-from .solver import optimize
 
 item_names = [i.name for i in Item]
 boost_item_names = [Item.PowerShard.name, Item.Somersloop.name]
 recipes_by_name = {r.name: r for r in all()}
+
+
+def optimize(factory: Factory) -> Optional[dict]:
+    from .solver import optimize as solve
+
+    return solve(factory)
 
 
 class Satisfy(Cog):
