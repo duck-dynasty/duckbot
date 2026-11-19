@@ -14,4 +14,5 @@ responses = [
     ":eggplant: :sweat_drops:",
     ":cricket:",
     "So true.",
+    "Same.",
 ]
