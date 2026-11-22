@@ -2,7 +2,9 @@ from unittest import mock
 
 from discord import Embed
 
-from duckbot.cogs.games.satisfy.pretty import solution_embed
+from duckbot.cogs.games.satisfy.factory import Factory
+from duckbot.cogs.games.satisfy.item import Item
+from duckbot.cogs.games.satisfy.pretty import factory_embed, solution_embed
 from duckbot.cogs.games.satisfy.recipe import ModifiedRecipe, all
 
 
@@ -35,3 +37,18 @@ def test_solution_embed_splits_into_multiple_embeds_when_exceeding_max_fields():
     second.add_field(name="IronPlate", value="1.0 Constructor\n30.0 IronIngot -> 20.0 IronPlate", inline=False)
     second.set_footer(text="30.0 IronOre -> 20.0 IronPlate")
     assert result == [first, second]
+
+
+def maximize_field(factory: Factory) -> str:
+    factory.recipe_bank = "Default"
+    factory.include_recipes = set()
+    factory.exclude_recipes = set()
+    return next(f.value for f in factory_embed(factory).fields if f.name == "Maximize")
+
+
+def test_factory_embed_no_maximize():
+    assert maximize_field(Factory()) == "N/A"
+
+
+def test_factory_embed_lists_maximize():
+    assert maximize_field(Factory(maximize={Item.IronPlate})) == "IronPlate"

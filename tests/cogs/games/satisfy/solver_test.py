@@ -291,3 +291,20 @@ def test_optimize_fluid_output_exceeds_pipe_limit():
         sloops=8,
     )
     assert optimize(f) == {recipe_by_name("SuperpositionOscillator", 3, 4): approx(2.0)}
+
+
+def test_optimize_power_shards_are_limited():
+    recipe = Recipe("test", Building.Assembler, inputs=Item.IronOre * 500, outputs=Item.IronIngot * 100)
+    f = factory(input=Item.IronOre * 2400, target=Item.IronIngot * 960, recipes=[recipe], power_shards=3, sloops=4)
+    assert optimize(f) is None
+
+
+def test_optimize_maximize_unproducible_item_returns_empty():
+    f = factory(input=Item.IronOre * 30, maximize={Item.Computer}, recipes=[recipe_by_name("IronIngot").original_recipe])
+    assert optimize(f) == {}
+
+
+def test_optimize_maximize_unbounded_returns_empty():
+    free = Recipe("free", Building.Constructor, inputs=Rates(), outputs=Item.IronPlate * 10)
+    f = factory(input=Item.IronOre * 30, maximize={Item.IronPlate, Item.IronIngot}, recipes=[free, recipe_by_name("IronIngot").original_recipe])
+    assert optimize(f) == {}
