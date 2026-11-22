@@ -310,20 +310,26 @@ def test_optimize_maximize_unbounded_returns_empty():
     assert optimize(f) == {}
 
 
-def test_optimize_maximize_first_item_takes_priority():
-    f = factory(input=Item.IronOre * 600, maximize=[Item.IronPlate, Item.ReinforcedIronPlate], recipes=default_no_raw)
-    assert optimize(f) == {recipe_by_name("IronIngot"): approx(20), recipe_by_name("IronPlate"): approx(20)}
-
-
-def test_optimize_maximize_reordered_takes_priority():
-    f = factory(input=Item.IronOre * 600, maximize=[Item.ReinforcedIronPlate, Item.IronPlate], recipes=default_no_raw)
-    assert optimize(f) == {
-        recipe_by_name("IronIngot"): approx(20),
-        recipe_by_name("IronPlate"): approx(15),
-        recipe_by_name("IronRod"): approx(10),
-        recipe_by_name("Screw"): approx(15),
-        recipe_by_name("ReinforcedIronPlate"): approx(10),
-    }
+@pytest.mark.parametrize(
+    "maximize, expected",
+    [
+        pytest.param([Item.IronPlate, Item.ReinforcedIronPlate], {recipe_by_name("IronIngot"): approx(20), recipe_by_name("IronPlate"): approx(20)}, id="plate_first"),
+        pytest.param(
+            [Item.ReinforcedIronPlate, Item.IronPlate],
+            {
+                recipe_by_name("IronIngot"): approx(20),
+                recipe_by_name("IronPlate"): approx(15),
+                recipe_by_name("IronRod"): approx(10),
+                recipe_by_name("Screw"): approx(15),
+                recipe_by_name("ReinforcedIronPlate"): approx(10),
+            },
+            id="rip_first",
+        ),
+    ],
+)
+def test_optimize_maximize_first_item_takes_priority(maximize, expected):
+    f = factory(input=Item.IronOre * 600, maximize=maximize, recipes=default_no_raw)
+    assert optimize(f) == expected
 
 
 def test_optimize_maximize_leftovers_go_to_next_item():
