@@ -308,3 +308,14 @@ def test_optimize_maximize_unbounded_returns_empty():
     free = Recipe("free", Building.Constructor, inputs=Rates(), outputs=Item.IronPlate * 10)
     f = factory(input=Item.IronOre * 30, maximize={Item.IronPlate, Item.IronIngot}, recipes=[free, recipe_by_name("IronIngot").original_recipe])
     assert optimize(f) == {}
+
+
+def test_optimize_processes_cheap_fluid_byproduct():
+    purify = recipe_by_name("QuartzPurification")
+    distill = recipe_by_name("DistilledSilica")
+    f = factory(
+        input=Item.RawQuartz * 600 + Item.NitricAcid * 600 + Item.Water * 1000 + Item.Limestone * 600,
+        target=Item.QuartzCrystal * 100,
+        recipes=[purify.original_recipe, distill.original_recipe],
+    )
+    assert optimize(f) == {purify: approx(4 / 3), distill: approx(2 / 3)}

@@ -16,7 +16,7 @@ The solutions produced are scored by an arbitrary set of metrics which hopefully
 1. prioritize `maximize` items above all else
 1. penalize for using `input` items, or using raw inputs (like ores)
 1. penalize for using somersloops and power shards
-1. penalize leaving unsinkable items as factory outputs
+1. penalize leaving unsinkable items (like fluids) as factory outputs, no matter how cheap they are; unused `input` items are not penalized
 1. penalize number of machines
 
 In short, the solver aims to maximize the output while minimizing the input to the factory. Penalties per item are weighted (_item weights_), and are a function of raw resource rarity and item complexity. All else equal, it will also prefer simpler factories (eg, diluted fuel vs packaged diluted fuel).
