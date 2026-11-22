@@ -110,7 +110,16 @@ def boosters_used(model: Model, factory: Factory, recipes: List[ModifiedRecipe],
     """Power shards and sloopers are a limited, indivisible item that can be put into machines. This sums up the
     number of shards or sloops used based on recipe usage. The number of items used is `ceil(num_recipe)`,
     and the total of those must be constrained by the amount available to the factory."""
-    item_cost = [(r, v, model.add_var(name=f"{v.name}#ceil", var_type=INTEGER)) for r, v in zip(recipes, use_recipe) if r.sloops > 0]
+    item_cost = [
+        (
+            r,
+            v,
+            model.add_var(name=f"{v.name}#ceil", var_type=INTEGER),
+        )
+        for r, v in zip(recipes, use_recipe)
+        if r.sloops > 0
+    ]
+
     for _, v, p in item_cost:
         model.add_constr(p >= v)
 
