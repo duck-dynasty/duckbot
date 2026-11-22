@@ -73,7 +73,7 @@ def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
         if result not in (OptimizationStatus.OPTIMAL, OptimizationStatus.FEASIBLE):
             break
         best = amount_by_item[item].x
-        model.add_constr(amount_by_item[item] >= best - 1e-4 - 1e-6 * abs(best))
+        model.add_constr(amount_by_item[item] >= best)
     if result is None:
         model.objective = maximize(base)
         result = model.optimize()
