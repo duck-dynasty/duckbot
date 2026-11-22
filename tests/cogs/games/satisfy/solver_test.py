@@ -333,12 +333,7 @@ def test_optimize_maximize_first_item_takes_priority(maximize, expected):
 
 
 def test_optimize_maximize_leftovers_go_to_next_item():
-    rip = recipe_by_name("ReinforcedIronPlate")
-    f = factory(input=Item.IronOre * 600, maximize=[Item.ReinforcedIronPlate, Item.IronPlate], recipes=default_no_raw, limits={rip: 5})
-    assert optimize(f) == {
-        recipe_by_name("IronIngot"): approx(20),
-        recipe_by_name("IronPlate"): approx(17.5),
-        recipe_by_name("IronRod"): approx(5),
-        recipe_by_name("Screw"): approx(7.5),
-        rip: approx(5),
-    }
+    copper_alloy = recipe_by_name("CopperAlloyIngot")
+    iron_alloy = recipe_by_name("IronAlloyIngot")
+    f = factory(input=Item.CopperOre * 300 + Item.IronOre * 600, maximize=[Item.CopperIngot, Item.IronIngot], recipes=default_no_raw + [copper_alloy.original_recipe, iron_alloy.original_recipe])
+    assert optimize(f) == {copper_alloy: approx(6), recipe_by_name("IronIngot"): approx(10)}
