@@ -107,14 +107,13 @@ def items_must_be_non_negative(model: Model, amount_by_item: dict[Item, LinExpr]
 
 
 def boosters_used(model: Model, factory: Factory, recipes: List[ModifiedRecipe], use_recipe: List[Var]) -> tuple[LinExpr, LinExpr]:
-    """Shards and sloops are indivisible, so each boosted recipe needs `ceil(num_recipe)` buildings worth of them."""
-    # only p >= v is needed; the objective penalizes boosters, pushing p down to ceil(v)
-    buildings = [(r, v, model.add_var(name=f"{v.name}#ceil", var_type=INTEGER)) for r, v in zip(recipes, use_recipe) if r.sloops > 0]
-    for _, v, p in buildings:
+    """Shards and sloops are indivisible, so each boosted recipe uses them `ceil(num_recipe)` times."""
+    item_cost = [(r, v, model.add_var(name=f"{v.name}#ceil", var_type=INTEGER)) for r, v in zip(recipes, use_recipe) if r.sloops > 0]
+    for _, v, p in item_cost:
         model.add_constr(p >= v)
 
-    power_shards = xsum([r.power_shards * p for r, _, p in buildings])
-    sloops = xsum([r.sloops * p for r, _, p in buildings])
+    power_shards = xsum([r.power_shards * p for r, _, p in item_cost])
+    sloops = xsum([r.sloops * p for r, _, p in item_cost])
     model.add_constr(power_shards <= factory.power_shards)
     model.add_constr(sloops <= factory.sloops)
     return power_shards, sloops
