@@ -61,7 +61,7 @@ def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
         + 10 * input_remaining  # maximize the amount of remaining factory inputs
         - 10 * raw_usage  # minimize raw material usage, weighted by map availability
         - 5 * excess_target  # minimize creation of extra products
-        - 3 * unsinkable_excess  # fluids can't be sunk, so penalize leftovers no matter how cheap
+        - 3 * unsinkable_excess  # get rid of fluid products if possible
         - 0.5 * used_power_shards  # minimize power shard usage; they are only eventually cheap
         - 10 * used_sloops  # minimize sloop usage; they ain't cheap
         - min_weight * 0.1 * recipes_used  # minimize recipe usage; ie prefer simpler layouts when otherwise equal
