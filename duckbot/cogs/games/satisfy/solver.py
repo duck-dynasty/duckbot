@@ -1,6 +1,6 @@
 from functools import reduce
 from math import isclose
-from typing import Callable, List, Optional
+from typing import List, Optional
 
 from mip import INF, INTEGER, LinExpr, Model, OptimizationStatus, Var, maximize, xsum
 
@@ -53,8 +53,9 @@ def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
     raw_usage = xsum([amount * item_weights[i] for i, amount in generate_raw.items()])
     excess_target = xsum([(amount - factory.targets.get(i, 0)) * item_weights[i] for i, amount in amount_by_item.items()])
     unsinkable_excess = xsum([amount * item_weights[i] for i, amount in amount_by_item.items() if not sinkable(i)])
-    used_power_shards = item_weights[Item.Somersloop] / 100 * power_shards_used(model, factory, recipes, use_recipe)
-    used_sloops = item_weights[Item.Somersloop] * sloops_used(model, factory, recipes, use_recipe)
+    power_shards, sloops = boosters_used(model, factory, recipes, use_recipe)
+    used_power_shards = item_weights[Item.Somersloop] / 100 * power_shards
+    used_sloops = item_weights[Item.Somersloop] * sloops
     recipes_used = xsum(use_recipe)
     model.objective = maximize(
         100 * maximize_items  # prioritize maximizing requested items above all
@@ -105,32 +106,15 @@ def items_must_be_non_negative(model: Model, amount_by_item: dict[Item, LinExpr]
         model.add_constr(amount >= 0)
 
 
-def power_shards_used(model: Model, factory: Factory, recipes: List[ModifiedRecipe], use_recipe: List[Var]) -> LinExpr:
-    return limited_item_used(model, "power", factory.power_shards, recipes, use_recipe, lambda r: r.power_shards)
-
-
-def sloops_used(model: Model, factory: Factory, recipes: List[ModifiedRecipe], use_recipe: List[Var]) -> LinExpr:
-    return limited_item_used(model, "sloop", factory.sloops, recipes, use_recipe, lambda r: r.sloops)
-
-
-def limited_item_used(model: Model, item: str, limit: int, recipes: List[ModifiedRecipe], use_recipe: List[Var], amount_recipe_uses: Callable[[ModifiedRecipe], int]) -> LinExpr:
-    """Power shards and sloopers are a limited, indivisible item that can be put into machines. This sums up the
-    number of shards or sloops used based on recipe usage. The number of items used is `ceil(num_recipe)`,
-    and the total of those must be constrained by the amount available to the factory."""
-    item_cost = [
-        (
-            r,
-            v,
-            model.add_var(name=f"{v.name}#{item}", var_type=INTEGER),
-        )
-        for r, v in zip(recipes, use_recipe)
-        if r.sloops > 0
-    ]
-
-    for _, v, p in item_cost:
+def boosters_used(model: Model, factory: Factory, recipes: List[ModifiedRecipe], use_recipe: List[Var]) -> tuple[LinExpr, LinExpr]:
+    """Shards and sloops are indivisible, so each boosted recipe needs `ceil(num_recipe)` buildings worth of them."""
+    # only p >= v is needed; the objective penalizes boosters, pushing p down to ceil(v)
+    buildings = [(r, v, model.add_var(name=f"{v.name}#ceil", var_type=INTEGER)) for r, v in zip(recipes, use_recipe) if r.sloops > 0]
+    for _, v, p in buildings:
         model.add_constr(p >= v)
-        model.add_constr(p <= v + 1 - 0.00001)  # v <= p < v+1, ie, p = ceil(v)
 
-    total_used_item = xsum([amount_recipe_uses(r) * p for r, _, p in item_cost])
-    model.add_constr(total_used_item <= limit)
-    return total_used_item
+    power_shards = xsum([r.power_shards * p for r, _, p in buildings])
+    sloops = xsum([r.sloops * p for r, _, p in buildings])
+    model.add_constr(power_shards <= factory.power_shards)
+    model.add_constr(sloops <= factory.sloops)
+    return power_shards, sloops
