@@ -1,5 +1,10 @@
-import groq
-from groq.types import Model
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    import groq
+    from groq.types import Model
 
 
 def is_chat_model(model: Model) -> bool:
@@ -13,6 +18,8 @@ def chat_models(client: groq.Groq) -> list[Model]:
 
 def complete(client: groq.Groq, prompt: str) -> str:
     """Returns the newest chat model's response to the prompt, falling back to older models when rate limited."""
+    import groq
+
     for model in chat_models(client):
         try:
             completion = client.chat.completions.create(model=model.id, max_tokens=2000, temperature=0, messages=[{"role": "user", "content": prompt}])
