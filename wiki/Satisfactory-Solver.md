@@ -13,7 +13,7 @@ The intent is to use "raw supply" recipes to determine what inputs are needed fo
 
 The solutions produced are scored by an arbitrary set of metrics which hopefully lead to something reasonable. Fully optimal solutions are always wonky though, like including several recipes for the same item, so the iterative process above is still recommended. The solver objective is loosely:
 
-1. prioritize `maximize` items above all else, in the order they were added
+1. prioritize `maximize` items above all else
 1. penalize for using `input` items, or using raw inputs (like ores)
 1. penalize for using somersloops and power shards
 1. penalize leaving unsinkable items as factory outputs
@@ -70,7 +70,7 @@ Running the command twice for the same item clobbers the prior rate value.
 
 Tells the solver to maximize output of the given item. Should only be used when there are no raw supply recipes available (or at least it is impossible to create the target item with the raw supply), or it will lead to the infinite factory as a solution.
 
-When multiple items are maximized, they are prioritized in the order they were added. The first item is maximized as much as possible, then the second is maximized without reducing the first, and so on. For example, maximizing `ReinforcedIronPlate` then `IronPlate` makes as many reinforced plates as possible, and any leftover iron goes into plates. The factory state lists maximized items in priority order.
+When multiple items are maximized, they are prioritized in the order they were added. The first item is maximized as much as possible, then the second is maximized without reducing the first, and so on. For example, maximizing `ReinforcedIronPlate` then `IronPlate` makes as many reinforced plates as possible, and any leftover iron goes into plates.
 
 Running `/satisfy maximize` again for an item that is already being maximized will remove it from the maximize list. Re-adding it puts it at the end.
 
