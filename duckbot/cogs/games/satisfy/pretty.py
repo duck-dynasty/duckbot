@@ -36,7 +36,7 @@ def factory_embed(factory: Factory) -> Embed:
     target = "\n".join([rate_str(rate) for rate in factory.targets.items()]) if factory.targets else "N/A"
     embed.add_field(name="Target", value=target)
 
-    maxify = "\n".join([str(item) for item in factory.maximize]) if factory.maximize else "N/A"
+    maxify = "\n".join([f"{n}. {item}" for n, item in enumerate(factory.maximize, 1)]) if factory.maximize else "N/A"
     embed.add_field(name="Maximize", value=maxify)
 
     def group_recipes(names, limits={}):

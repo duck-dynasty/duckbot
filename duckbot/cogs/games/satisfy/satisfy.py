@@ -76,9 +76,9 @@ class Satisfy(Cog):
     async def toggle_maximize(self, context: Context, item: str):
         factory = self.factory(context)
         if Item[item] in factory.maximize:
-            factory.maximize.discard(Item[item])
+            factory.maximize.remove(Item[item])
         else:
-            factory.maximize.add(Item[item])
+            factory.maximize.append(Item[item])
         self.save(context, factory)
         await context.send(embed=factory_embed(factory), delete_after=60)
 

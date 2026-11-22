@@ -58,18 +58,18 @@ async def test_add_target_stores_output_rate(clazz, context, default_factory):
 
 async def test_toggle_maximize_stores_maximizer(clazz, context, default_factory):
     await clazz.toggle_maximize(context, str(Item.IronOre))
-    default_factory.maximize = {Item.IronOre}
+    default_factory.maximize = [Item.IronOre]
     assert clazz.factory(context) == default_factory
 
     await clazz.toggle_maximize(context, str(Item.IronIngot))
-    default_factory.maximize = {Item.IronOre, Item.IronIngot}
+    default_factory.maximize = [Item.IronOre, Item.IronIngot]
     assert clazz.factory(context) == default_factory
 
 
 async def test_toggle_maximize_removes_already_maximized_item(clazz, context, default_factory):
     await clazz.toggle_maximize(context, str(Item.IronOre))
     await clazz.toggle_maximize(context, str(Item.IronOre))
-    default_factory.maximize = set()
+    default_factory.maximize = []
     assert clazz.factory(context) == default_factory
 
 
@@ -78,7 +78,7 @@ async def test_toggle_maximize_removes_toggled_only(clazz, context, default_fact
     await clazz.toggle_maximize(context, str(Item.IronIngot))
     await clazz.toggle_maximize(context, str(Item.CopperOre))
     await clazz.toggle_maximize(context, str(Item.IronIngot))
-    default_factory.maximize = {Item.IronOre, Item.CopperOre}
+    default_factory.maximize = [Item.IronOre, Item.CopperOre]
     assert clazz.factory(context) == default_factory
 
 
@@ -226,7 +226,7 @@ async def test_solve_no_in_or_out(clazz, context, default_factory):
 @mock.patch("duckbot.cogs.games.satisfy.satisfy.optimize", return_value={})
 async def test_solve_all_defaults(opt, clazz, context, default_factory):
     default_factory.inputs = Item.IronOre * 30
-    default_factory.maximize = {Item.IronOre}
+    default_factory.maximize = [Item.IronOre]
     expected = copy(default_factory)
     expected.recipes = sloop(default())
 
@@ -238,7 +238,7 @@ async def test_solve_all_defaults(opt, clazz, context, default_factory):
 @mock.patch("duckbot.cogs.games.satisfy.satisfy.optimize", return_value={})
 async def test_solve_different_recipe_bank(opt, clazz, context, default_factory):
     default_factory.inputs = Item.IronOre * 30
-    default_factory.maximize = {Item.IronOre}
+    default_factory.maximize = [Item.IronOre]
     default_factory.recipe_bank = "All"
     expected = copy(default_factory)
     expected.recipes = sloop(all())
@@ -251,7 +251,7 @@ async def test_solve_different_recipe_bank(opt, clazz, context, default_factory)
 @mock.patch("duckbot.cogs.games.satisfy.satisfy.optimize", return_value={})
 async def test_solve_recipe_includes(opt, clazz, context, default_factory):
     default_factory.inputs = Item.IronOre * 30
-    default_factory.maximize = {Item.IronOre}
+    default_factory.maximize = [Item.IronOre]
     default_factory.recipe_bank = "Default"
     default_factory.include_recipes = {x.name for r in all() for x in as_slooped(r) if r.name == "DilutedPackagedFuel"}
     expected = copy(default_factory)
@@ -265,7 +265,7 @@ async def test_solve_recipe_includes(opt, clazz, context, default_factory):
 @mock.patch("duckbot.cogs.games.satisfy.satisfy.optimize", return_value={})
 async def test_solve_recipe_excludes(opt, clazz, context, default_factory):
     default_factory.inputs = Item.IronOre * 30
-    default_factory.maximize = {Item.IronOre}
+    default_factory.maximize = [Item.IronOre]
     default_factory.exclude_recipes = {x.name for r in default() for x in as_slooped(r)} - {x.name for r in default() for x in as_slooped(r) if r.name == "IronIngot"}
     expected = copy(default_factory)
     expected.recipes = sloop([r for r in default() if r.name == "IronIngot"])
@@ -279,7 +279,7 @@ async def test_solve_recipe_excludes(opt, clazz, context, default_factory):
 @mock.patch("duckbot.cogs.games.satisfy.satisfy.optimize", return_value={ModifiedRecipe(next(r for r in all() if r.name == "IronIngot"), 0, 0): 1.0})
 async def test_solve_sends_graph_file(mock_opt, mock_graph, clazz, context, default_factory):
     default_factory.inputs = Item.IronOre * 30
-    default_factory.maximize = {Item.IronIngot}
+    default_factory.maximize = [Item.IronIngot]
     clazz.save(context, default_factory)
     await clazz.solve(context)
     last_call_kwargs = context.send.call_args_list[-1].kwargs

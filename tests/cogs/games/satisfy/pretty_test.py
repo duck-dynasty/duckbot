@@ -50,5 +50,5 @@ def test_factory_embed_no_maximize():
     assert maximize_field(Factory()) == "N/A"
 
 
-def test_factory_embed_lists_maximize():
-    assert maximize_field(Factory(maximize={Item.IronPlate})) == "IronPlate"
+def test_factory_embed_lists_maximize_in_priority_order():
+    assert maximize_field(Factory(maximize=[Item.IronPlate, Item.Computer])) == "1. IronPlate\n2. Computer"
