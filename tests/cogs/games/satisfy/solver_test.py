@@ -310,6 +310,16 @@ def test_optimize_maximize_unbounded_returns_empty():
     assert optimize(f) == {}
 
 
+def test_optimize_input_beyond_map_limit_is_usable():
+    f = factory(input=Item.IronOre * 100_000, target=Item.IronIngot * 30, recipes=[recipe_by_name("IronIngot").original_recipe, recipe_by_name("IronOre").original_recipe])
+    assert optimize(f) == {recipe_by_name("IronIngot"): approx(1)}
+
+
+def test_optimize_input_beyond_map_limit_disables_raw_supply():
+    f = factory(input=Item.IronOre * 100_000, target=Item.IronIngot * 100_020, recipes=[recipe_by_name("IronIngot").original_recipe, recipe_by_name("IronOre").original_recipe])
+    assert optimize(f) is None
+
+
 @pytest.mark.parametrize(
     "maximize, expected",
     [
