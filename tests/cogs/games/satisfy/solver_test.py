@@ -310,27 +310,6 @@ def test_optimize_maximize_unbounded_returns_empty():
     assert optimize(f) == {}
 
 
-def test_optimize_input_beyond_map_limit_is_usable():
-    f = factory(input=Item.IronOre * 100_000, target=Item.IronIngot * 30, recipes=[recipe_by_name("IronIngot").original_recipe, recipe_by_name("IronOre").original_recipe])
-    assert optimize(f) == {recipe_by_name("IronIngot"): approx(1)}
-
-
-def test_optimize_input_beyond_map_limit_disables_raw_supply():
-    f = factory(input=Item.IronOre * 100_000, target=Item.IronIngot * 100_020, recipes=[recipe_by_name("IronIngot").original_recipe, recipe_by_name("IronOre").original_recipe])
-    assert optimize(f) is None
-
-
-def test_optimize_processes_cheap_fluid_byproduct():
-    purify = recipe_by_name("QuartzPurification")
-    distill = recipe_by_name("DistilledSilica")
-    f = factory(
-        input=Item.RawQuartz * 600 + Item.NitricAcid * 600 + Item.Water * 1000 + Item.Limestone * 600,
-        target=Item.QuartzCrystal * 100,
-        recipes=[purify.original_recipe, distill.original_recipe],
-    )
-    assert optimize(f) == {purify: approx(4 / 3), distill: approx(2 / 3)}
-
-
 @pytest.mark.parametrize(
     "maximize, expected",
     [
@@ -358,3 +337,24 @@ def test_optimize_maximize_leftovers_go_to_next_item():
     iron_alloy = recipe_by_name("IronAlloyIngot")
     f = factory(input=Item.CopperOre * 300 + Item.IronOre * 600, maximize=[Item.CopperIngot, Item.IronIngot], recipes=default_no_raw + [copper_alloy.original_recipe, iron_alloy.original_recipe])
     assert optimize(f) == {copper_alloy: approx(6), recipe_by_name("IronIngot"): approx(10)}
+
+
+def test_optimize_input_beyond_map_limit_is_usable():
+    f = factory(input=Item.IronOre * 100_000, target=Item.IronIngot * 30, recipes=[recipe_by_name("IronIngot").original_recipe, recipe_by_name("IronOre").original_recipe])
+    assert optimize(f) == {recipe_by_name("IronIngot"): approx(1)}
+
+
+def test_optimize_input_beyond_map_limit_disables_raw_supply():
+    f = factory(input=Item.IronOre * 100_000, target=Item.IronIngot * 100_020, recipes=[recipe_by_name("IronIngot").original_recipe, recipe_by_name("IronOre").original_recipe])
+    assert optimize(f) is None
+
+
+def test_optimize_processes_cheap_fluid_byproduct():
+    purify = recipe_by_name("QuartzPurification")
+    distill = recipe_by_name("DistilledSilica")
+    f = factory(
+        input=Item.RawQuartz * 600 + Item.NitricAcid * 600 + Item.Water * 1000 + Item.Limestone * 600,
+        target=Item.QuartzCrystal * 100,
+        recipes=[purify.original_recipe, distill.original_recipe],
+    )
+    assert optimize(f) == {purify: approx(4 / 3), distill: approx(2 / 3)}
