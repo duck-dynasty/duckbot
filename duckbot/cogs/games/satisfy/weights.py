@@ -1,7 +1,5 @@
 import sys
-from itertools import groupby
 from math import isclose
-from typing import List
 
 from .item import Item
 from .rates import Rates
@@ -65,35 +63,6 @@ def default_weights() -> dict[Item, float]:
                     adjusted = True
 
     return weights
-
-
-def alternate_weights() -> dict[Item, float]:
-    """Determines item weights (costs) based on the cheapest possible cost given all alternates."""
-    recipes_by_input = _recipes_by_input_item()
-    weights = {item: 1.0 / limit for item, limit in map_limits.items()}
-    # manually add recycling chain, since it is an iterative process which won't resolve with this approach
-    weights[Item.Plastic] = (1 / 3 * weights[Item.CrudeOil]) + (10 / 9 * weights[Item.Water])
-    weights[Item.Rubber] = (1 / 3 * weights[Item.CrudeOil]) + (10 / 9 * weights[Item.Water])
-
-    def propagate(item: Item):
-        """For each recipe where item is an input, calculate the new weight of that recipe's output."""
-        for recipe in recipes_by_input.get(item, []):
-            if all(i in weights for i in recipe.inputs.keys()):
-                for out in recipe.outputs.keys():
-                    rates = unit_inputs(out, recipe)
-                    new_weight = sum(weights[i] * rate for i, rate in rates.items())
-                    if out not in weights or new_weight < weights[out]:
-                        weights[out] = new_weight
-                        propagate(out)
-
-    for item in Item:
-        propagate(item)
-    return weights
-
-
-def _recipes_by_input_item() -> dict[Item, List[Recipe]]:
-    recipe_inputs = sorted(((recipe, item) for recipe in all_recipes() for item, _ in recipe.inputs.items()), key=lambda r: r[1])
-    return {item: [r[0] for r in recipes] for item, recipes in groupby(recipe_inputs, lambda r: r[1])}
 
 
 def minmax_weights():
