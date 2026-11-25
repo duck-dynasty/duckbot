@@ -308,3 +308,13 @@ def test_optimize_maximize_unbounded_returns_empty():
     free = Recipe("free", Building.Constructor, inputs=Rates(), outputs=Item.IronPlate * 10)
     f = factory(input=Item.IronOre * 30, maximize={Item.IronPlate, Item.IronIngot}, recipes=[free, recipe_by_name("IronIngot").original_recipe])
     assert optimize(f) == {}
+
+
+def test_optimize_input_beyond_map_limit_is_usable():
+    f = factory(input=Item.IronOre * 100_000, target=Item.IronIngot * 30, recipes=[recipe_by_name("IronIngot").original_recipe, recipe_by_name("IronOre").original_recipe])
+    assert optimize(f) == {recipe_by_name("IronIngot"): approx(1)}
+
+
+def test_optimize_input_beyond_map_limit_disables_raw_supply():
+    f = factory(input=Item.IronOre * 100_000, target=Item.IronIngot * 100_020, recipes=[recipe_by_name("IronIngot").original_recipe, recipe_by_name("IronOre").original_recipe])
+    assert optimize(f) is None
