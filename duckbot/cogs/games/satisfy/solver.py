@@ -35,7 +35,7 @@ def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
                 return factory.sloops / recipe.sloops
             item, rate = next(iter(recipe.outputs.items()))
             if recipe.inputs == Rates() and item in map_limits:
-                return (map_limits[item] - factory.inputs.get(item, 0)) / rate
+                return max(0, map_limits[item] - factory.inputs.get(item, 0)) / rate
             else:
                 return INF
 
@@ -51,7 +51,7 @@ def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
     maximize_items = xsum([amount * max_weight for i, amount in amount_by_item.items() if i in factory.maximize])
     input_remaining = xsum([amount * item_weights[i] for i, amount in amount_by_item.items() if i in factory.inputs and i not in can_generate])
     raw_usage = xsum([amount * item_weights[i] for i, amount in generate_raw.items()])
-    excess_target = xsum([(amount - factory.targets.get(i, 0)) * item_weights[i] for i, amount in amount_by_item.items()])
+    excess_target = xsum([amount * item_weights[i] for i, amount in amount_by_item.items()])
     unsinkable_excess = xsum([amount * item_weights[i] for i, amount in amount_by_item.items() if not sinkable(i)])
     used_power_shards = item_weights[Item.Somersloop] / 100 * power_shards_used(model, factory, recipes, use_recipe)
     used_sloops = item_weights[Item.Somersloop] * sloops_used(model, factory, recipes, use_recipe)
@@ -72,8 +72,7 @@ def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
 
 
 def limit_recipes(recipes: List[ModifiedRecipe], max_shards: int, max_sloops: int) -> List[ModifiedRecipe]:
-    """Creates recipes which are scaled by power shards and sloops. The recipes are always scaled to max clock
-    speed which the power shards allow, then the solver will be allowed to underclock them as needed."""
+    """Drops boosted recipes needing more shards or sloops than the factory has."""
     return [r for r in recipes if r.power_shards <= max_shards if r.sloops <= max_sloops]
 
 
