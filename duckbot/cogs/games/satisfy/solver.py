@@ -48,7 +48,6 @@ def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
     amount_by_item = amount_by_item_expressions(factory, recipes, use_recipe)
     items_must_be_non_negative(model, amount_by_item)
 
-    maximize_items = xsum([amount * max_weight for i, amount in amount_by_item.items() if i in factory.maximize])
     input_remaining = xsum([amount * item_weights[i] for i, amount in amount_by_item.items() if i in factory.inputs and i not in can_generate])
     raw_usage = xsum([amount * item_weights[i] for i, amount in generate_raw.items()])
     excess_target = xsum([amount * item_weights[i] for i, amount in amount_by_item.items()])
@@ -57,9 +56,8 @@ def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
     used_power_shards = item_weights[Item.Somersloop] / 100 * power_shards
     used_sloops = item_weights[Item.Somersloop] * sloops
     recipes_used = xsum(use_recipe)
-    model.objective = maximize(
-        100 * maximize_items  # prioritize maximizing requested items above all
-        + 10 * input_remaining  # maximize the amount of remaining factory inputs
+    base = (
+        10 * input_remaining  # maximize the amount of remaining factory inputs
         - 10 * raw_usage  # minimize raw material usage, weighted by map availability
         - 5 * excess_target  # minimize creation of extra products
         - 3 * unsinkable_excess  # get rid of fluid products if possible
@@ -67,7 +65,19 @@ def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
         - 10 * used_sloops  # minimize sloop usage; they ain't cheap
         - min_weight * 0.1 * recipes_used  # minimize recipe usage; ie prefer simpler layouts when otherwise equal
     )
-    result = model.optimize()
+
+    # maximize items in priority order, locking in each before moving to the next
+    result = None
+    for item in [i for i in factory.maximize if i in amount_by_item]:
+        model.objective = maximize(100 * max_weight * amount_by_item[item] + base)
+        result = model.optimize()
+        if result not in (OptimizationStatus.OPTIMAL, OptimizationStatus.FEASIBLE):
+            break
+        best = amount_by_item[item].x
+        model.add_constr(amount_by_item[item] >= best)
+    if result is None:
+        model.objective = maximize(base)
+        result = model.optimize()
 
     return {r: float(v.x) for r, v in zip(recipes, use_recipe) if v.x is not None and v.x > 0 and not isclose(float(v), 0, abs_tol=1e-4)} if result in good_enough else None
 

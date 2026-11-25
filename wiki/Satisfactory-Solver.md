@@ -70,9 +70,9 @@ Running the command twice for the same item clobbers the prior rate value.
 
 Tells the solver to maximize output of the given item. Should only be used when there are no raw supply recipes available (or at least it is impossible to create the target item with the raw supply), or it will lead to the infinite factory as a solution.
 
-Maximization occurs by item weights, so it will _not_ behave as you expect when multiple items are maximized. The solver will pick the item with the better rate to weight ratio. It is recommended to maximize a single item only.
+When multiple items are maximized, they are prioritized in the order they were added. The first item is maximized as much as possible, then the second is maximized without reducing the first, and so on. For example, maximizing `ReinforcedIronPlate` then `IronPlate` makes as many reinforced plates as possible, and any leftover iron goes into plates.
 
-Running `/satisfy maximize` again for an item that is already being maximized will remove it from the maximize set.
+Running `/satisfy maximize` again for an item that is already being maximized will remove it from the maximize list. Re-adding it puts it at the end.
 
 ```
 /satisfy booster   item amount
