@@ -320,6 +320,17 @@ def test_optimize_input_beyond_map_limit_disables_raw_supply():
     assert optimize(f) is None
 
 
+def test_optimize_processes_cheap_fluid_byproduct():
+    purify = recipe_by_name("QuartzPurification")
+    distill = recipe_by_name("DistilledSilica")
+    f = factory(
+        input=Item.RawQuartz * 600 + Item.NitricAcid * 600 + Item.Water * 1000 + Item.Limestone * 600,
+        target=Item.QuartzCrystal * 100,
+        recipes=[purify.original_recipe, distill.original_recipe],
+    )
+    assert optimize(f) == {purify: approx(4 / 3), distill: approx(2 / 3)}
+
+
 @pytest.mark.parametrize(
     "maximize, expected",
     [

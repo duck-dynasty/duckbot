@@ -51,7 +51,7 @@ def optimize(factory: Factory) -> Optional[dict[ModifiedRecipe, float]]:
     input_remaining = xsum([amount * item_weights[i] for i, amount in amount_by_item.items() if i in factory.inputs and i not in can_generate])
     raw_usage = xsum([amount * item_weights[i] for i, amount in generate_raw.items()])
     excess_target = xsum([amount * item_weights[i] for i, amount in amount_by_item.items()])
-    unsinkable_excess = xsum([amount * item_weights[i] for i, amount in amount_by_item.items() if not sinkable(i)])
+    unsinkable_excess = xsum([amount * max_weight for i, amount in amount_by_item.items() if not sinkable(i) and i not in factory.inputs])
     power_shards, sloops = boosters_used(model, factory, recipes, use_recipe)
     used_power_shards = item_weights[Item.Somersloop] / 100 * power_shards
     used_sloops = item_weights[Item.Somersloop] * sloops
